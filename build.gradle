@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.3'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id "org.flywaydb.flyway" version "10.17.2"
+}
+
+group = 'kz.jarkyn'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(22)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Database
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    //    implementation 'org.flywaydb:flyway-core'
+    //    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.hibernate:hibernate-jpamodelgen:6.2.5.Final'
+
+    // Model and Databind
+    implementation 'org.immutables:value:2.8.2'
+    annotationProcessor 'org.immutables:value:2.8.2'
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+}
+
+compileJava {
+    options.compilerArgs += [
+            '-Amapstruct.defaultComponentModel=spring',
+            '-Amapstruct.unmappedTargetPolicy=IGNORE'
+    ]
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
