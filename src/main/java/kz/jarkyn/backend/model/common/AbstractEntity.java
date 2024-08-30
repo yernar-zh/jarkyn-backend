@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.model.common.entity;
+package kz.jarkyn.backend.model.common;
 
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;

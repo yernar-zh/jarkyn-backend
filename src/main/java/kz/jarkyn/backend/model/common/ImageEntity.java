@@ -1,10 +1,10 @@
-package kz.jarkyn.backend.model.common.entity;
+package kz.jarkyn.backend.model.common;
 
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "product")
+@Table(name = "image")
 public class ImageEntity extends AbstractEntity {
 }
