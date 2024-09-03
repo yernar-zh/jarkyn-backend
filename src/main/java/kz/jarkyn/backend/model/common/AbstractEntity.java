@@ -16,7 +16,7 @@ import java.util.UUID;
 public abstract class AbstractEntity implements Persistable<UUID> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @CreatedDate

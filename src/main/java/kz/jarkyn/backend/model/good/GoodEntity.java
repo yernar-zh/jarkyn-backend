@@ -1,12 +1,9 @@
 package kz.jarkyn.backend.model.good;
 
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 import kz.jarkyn.backend.model.common.ImageEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "good")
@@ -18,7 +15,9 @@ public class GoodEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "image_id")
     private ImageEntity image;
+    @Column(name = "purchase_price")
     private Integer purchasePrice;
+    @Column(name = "minimum_price")
     private Integer minimumPrice;
 
     public String getName() {

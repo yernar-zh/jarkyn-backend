@@ -1,10 +1,7 @@
 package kz.jarkyn.backend.model.counterparty;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 
 @Entity
@@ -13,7 +10,9 @@ public class CustomerEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "counterparty_id")
     private CounterpartyEntity counterparty;
+    @Column(name = "phone_number")
     private String phoneNumber;
+    @Column(name = "shipping_address")
     private String shippingAddress;
     private Integer discount;
 

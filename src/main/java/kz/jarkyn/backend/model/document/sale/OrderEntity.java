@@ -8,15 +8,20 @@ import kz.jarkyn.backend.model.document.DocumentEntity;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 public class OrderEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "document_id")
     private DocumentEntity document;
+    @Column(name = "shipment_moment")
     private LocalDateTime shipmentMoment;
+    @Column(name = "places_quantity")
     private Integer placesQuantity;
+    @Column(name = "products_total_amount")
     private Integer productsTotalAmount;
+    @Column(name = "discount_amount")
     private Integer discountAmount;
+    @Column(name = "total_amount")
     private Integer totalAmount;
     @Enumerated(EnumType.STRING)
     private OrderState state;
