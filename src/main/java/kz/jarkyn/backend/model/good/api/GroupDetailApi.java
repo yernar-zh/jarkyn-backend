@@ -1,6 +1,7 @@
 
 package kz.jarkyn.backend.model.good.api;
 
+import jakarta.annotation.Nullable;
 import org.immutables.value.Value;
 
 import java.util.UUID;
@@ -9,5 +10,5 @@ import java.util.UUID;
 public interface GroupDetailApi {
     UUID getId();
     String getName();
-    GroupDetailApi getParent();
+    @Nullable GroupDetailApi getParent();
 }

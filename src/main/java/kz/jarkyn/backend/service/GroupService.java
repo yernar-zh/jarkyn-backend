@@ -3,6 +3,7 @@ package kz.jarkyn.backend.service;
 
 import kz.jarkyn.backend.model.good.GroupEntity;
 import kz.jarkyn.backend.model.good.api.GroupDetailApi;
+import kz.jarkyn.backend.model.good.api.GroupEditApi;
 import kz.jarkyn.backend.model.good.api.GroupListApi;
 import kz.jarkyn.backend.model.good.api.GroupCreateApi;
 import kz.jarkyn.backend.repository.GroupRepository;
@@ -38,9 +39,13 @@ public class GroupService {
     @Transactional
     public GroupDetailApi createApi(GroupCreateApi createApi) {
         GroupEntity entity = groupMapper.toEntity(createApi);
-        if (createApi.getParent() != null) {
-            entity.setParent(groupRepository.findById(createApi.getParent().getId()).orElseThrow());
-        }
+        return groupMapper.toDetailApi(groupRepository.save(entity));
+    }
+
+    @Transactional
+    public GroupDetailApi editApi(UUID id, GroupEditApi editApi) {
+        GroupEntity entity = groupRepository.findById(id).orElseThrow();
+        groupMapper.editEntity(entity, editApi);
         return groupMapper.toDetailApi(groupRepository.save(entity));
     }
 }
