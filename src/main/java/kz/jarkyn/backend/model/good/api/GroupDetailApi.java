@@ -11,4 +11,5 @@ public interface GroupDetailApi {
     UUID getId();
     String getName();
     @Nullable GroupDetailApi getParent();
+    Integer getPosition();
 }

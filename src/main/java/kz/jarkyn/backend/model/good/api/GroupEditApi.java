@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface GroupEditApi {
     String getName();
     IdApi getParent();
+    Integer getPosition();
 }

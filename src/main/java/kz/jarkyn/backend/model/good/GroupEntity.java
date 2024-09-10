@@ -15,6 +15,7 @@ public class GroupEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private GroupEntity parent;
+    private Integer position;
 
     public String getName() {
         return name;
@@ -30,5 +31,13 @@ public class GroupEntity extends AbstractEntity {
 
     public void setParent(GroupEntity parent) {
         this.parent = parent;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }

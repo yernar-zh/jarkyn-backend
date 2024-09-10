@@ -28,8 +28,16 @@ public class GroupService {
     public List<GroupListApi> findApiBy() {
         List<GroupEntity> entities = groupRepository.findAll();
         // Create a map of parent groups to their children using groupingBy
-        Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream().filter(group -> group.getParent() != null) // Filter out groups without parents
-                .collect(Collectors.groupingBy(GroupEntity::getParent));
+        Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream()
+                .filter(group -> group.getParent() != null) // Filter out groups without parents
+                .collect(Collectors.groupingBy(GroupEntity::getParent,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(), list -> {
+                                    list.sort(Comparator.comparing(GroupEntity::getPosition)); // Sort by position
+                                    return list;
+                                }
+                        )
+                ));
         // Find all head groups (groups without a parent) using a separate stream operation
         List<GroupEntity> heads = entities.stream().filter(group -> group.getParent() == null).toList();
         // Convert head groups into API model objects, using the childrenMap for hierarchy
