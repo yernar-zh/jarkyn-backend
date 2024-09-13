@@ -9,12 +9,13 @@ import jakarta.persistence.Table;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 
 @Entity
-@Table(name = "groups")
+@Table(name = "transport")
 public class TransportEntity extends AbstractEntity {
     private String name;
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private TransportEntity parent;
+    private Integer position;
 
     public String getName() {
         return name;
@@ -30,5 +31,13 @@ public class TransportEntity extends AbstractEntity {
 
     public void setParent(TransportEntity parent) {
         this.parent = parent;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }

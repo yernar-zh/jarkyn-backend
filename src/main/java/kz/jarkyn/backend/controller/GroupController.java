@@ -1,5 +1,6 @@
 package kz.jarkyn.backend.controller;
 
+import kz.jarkyn.backend.config.Api;
 import kz.jarkyn.backend.model.good.api.GroupCreateApi;
 import kz.jarkyn.backend.model.good.api.GroupDetailApi;
 import kz.jarkyn.backend.model.good.api.GroupEditApi;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/groups")
+@RequestMapping(Api.Group.PATH)
 public class GroupController {
     private final GroupService groupService;
 
