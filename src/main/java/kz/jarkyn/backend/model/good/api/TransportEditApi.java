@@ -5,7 +5,7 @@ import kz.jarkyn.backend.model.common.api.IdApi;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonDeserialize(builder = ImmutableGroupEditApi.Builder.class)
+@JsonDeserialize(builder = ImmutableTransportEditApi.Builder.class)
 public interface TransportEditApi {
     String getName();
     IdApi getParent();
