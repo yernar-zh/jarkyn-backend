@@ -26,6 +26,7 @@ public abstract class GroupMapper {
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "name", source = "entity.name")
     protected abstract GroupListApi toListApi(GroupEntity entity, List<GroupListApi> children);
+    @Mapping(target = "parent.parent", ignore = true)
     public abstract GroupDetailApi toDetailApi(GroupEntity entity);
     public abstract GroupEntity toEntity(GroupCreateApi api);
     public abstract void editEntity(@MappingTarget GroupEntity entity, GroupEditApi api);

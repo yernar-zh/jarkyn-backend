@@ -1,10 +1,7 @@
 package kz.jarkyn.backend.service.mapper;
 
-import kz.jarkyn.backend.model.good.GroupEntity;
-import kz.jarkyn.backend.model.good.api.GroupCreateApi;
-import kz.jarkyn.backend.model.good.api.GroupDetailApi;
-import kz.jarkyn.backend.model.good.api.GroupEditApi;
-import kz.jarkyn.backend.model.good.api.GroupListApi;
+import kz.jarkyn.backend.model.good.TransportEntity;
+import kz.jarkyn.backend.model.good.api.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -15,9 +12,9 @@ import java.util.Map;
 
 @Mapper(uses = EntityMapper.class)
 public abstract class TransportMapper {
-    public GroupListApi toListApi(GroupEntity entity, Map<GroupEntity, List<GroupEntity>> childrenMap) {
-        List<GroupListApi> children = new ArrayList<>();
-        for (GroupEntity child : childrenMap.getOrDefault(entity, List.of())) {
+    public TransportListApi toListApi(TransportEntity entity, Map<TransportEntity, List<TransportEntity>> childrenMap) {
+        List<TransportListApi> children = new ArrayList<>();
+        for (TransportEntity child : childrenMap.getOrDefault(entity, List.of())) {
             children.add(toListApi(child, childrenMap));
         }
         return toListApi(entity, children);
@@ -25,6 +22,9 @@ public abstract class TransportMapper {
 
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "name", source = "entity.name")
-    protected abstract GroupListApi toListApi(GroupEntity entity, List<GroupListApi> children);
-    public abstract GroupDetailApi toDetailApi(GroupEntity entity);
+    protected abstract TransportListApi toListApi(TransportEntity entity, List<TransportListApi> children);
+    @Mapping(target = "parent.parent", ignore = true)
+    public abstract TransportDetailApi toDetailApi(TransportEntity entity);
+    public abstract TransportEntity toEntity(TransportCreateApi api);
+    public abstract void editEntity(@MappingTarget TransportEntity entity, TransportEditApi api);
 }
