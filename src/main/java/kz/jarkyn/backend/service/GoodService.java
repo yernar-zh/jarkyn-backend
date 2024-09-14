@@ -5,35 +5,39 @@ package kz.jarkyn.backend.service;
 import kz.jarkyn.backend.model.common.api.IdApi;
 import kz.jarkyn.backend.model.good.GoodEntity;
 import kz.jarkyn.backend.model.good.GoodTransportEntity;
-import kz.jarkyn.backend.model.good.GroupEntity;
 import kz.jarkyn.backend.model.good.api.*;
 import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GoodTransportRepository;
-import kz.jarkyn.backend.repository.GroupRepository;
+import kz.jarkyn.backend.repository.TransportRepository;
 import kz.jarkyn.backend.service.mapper.GoodMapper;
-import kz.jarkyn.backend.service.mapper.GroupMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class GoodService {
     private final GoodRepository goodRepository;
-    private final GoodTransportRepository goodTransportEntity;
+    private final TransportRepository transportRepository;
+    private final GoodTransportRepository goodTransportRepository;
     private final GoodMapper goodMapper;
 
     public GoodService(
             GoodRepository goodRepository,
-            GoodTransportRepository goodTransportEntity,
+            TransportRepository transportRepository,
+            GoodTransportRepository goodTransportRepository,
             GoodMapper goodMapper) {
         this.goodRepository = goodRepository;
-        this.goodTransportEntity = goodTransportEntity;
+        this.transportRepository = transportRepository;
+        this.goodTransportRepository = goodTransportRepository;
         this.goodMapper = goodMapper;
+    }
+
+    @Transactional(readOnly = true)
+    public GoodDetailApi findApiById(UUID id) {
+        GoodEntity good = goodRepository.findById(id).orElseThrow();
+        List<GoodTransportEntity> goodTransports = goodTransportRepository.findByGood(good);
+        return goodMapper.toDetailApi(good, goodTransports);
     }
 
     @Transactional(readOnly = true)
@@ -42,21 +46,35 @@ public class GoodService {
     }
 
     @Transactional
-    public GroupDetailApi createApi(GoodCreateApi createApi) {
-        GoodEntity entity = goodMapper.toEntity(createApi);
-        entity = goodRepository.save(entity);
-        for (IdApi transportApi : createApi.getTransports()) {
-
-            GoodTransportEntity goodTransport = goodTransportEntity.findById(transportApi.getId()).orElseThrow();
+    public GoodDetailApi createApi(GoodCreateApi createApi) {
+        GoodEntity good = goodRepository.save(goodMapper.toEntity(createApi));
+        for (IdApi api : createApi.getTransports()) {
+            GoodTransportEntity newEntity = new GoodTransportEntity();
+            newEntity.setGood(good);
+            newEntity.setTransport(transportRepository.findById(api.getId()).orElseThrow());
+            goodTransportRepository.save(newEntity);
         }
-
-        return goodMapper.toDetailApi(goodRepository.save(entity));
+        List<GoodTransportEntity> goodTransports = goodTransportRepository.findByGood(good);
+        return goodMapper.toDetailApi(good, goodTransports);
     }
 
+
     @Transactional
-    public GroupDetailApi editApi(UUID id, GroupEditApi editApi) {
-        GroupEntity entity = groupRepository.findById(id).orElseThrow();
-        groupMapper.editEntity(entity, editApi);
-        return groupMapper.toDetailApi(groupRepository.save(entity));
+    public GoodDetailApi editApi(UUID id, GoodEditApi editApi) {
+        GoodEntity good = goodRepository.findById(id).orElseThrow();
+        goodMapper.editEntity(good, editApi);
+        EntityDivider<GoodTransportEntity, IdApi, UUID> divider = new EntityDivider<>(
+                goodTransportRepository.findByGood(good), x -> x.getTransport().getId(),
+                editApi.getTransports(), IdApi::getId
+        );
+        for (IdApi api : divider.newReceived()) {
+            GoodTransportEntity newEntity = new GoodTransportEntity();
+            newEntity.setGood(good);
+            newEntity.setTransport(transportRepository.findById(api.getId()).orElseThrow());
+            goodTransportRepository.save(newEntity);
+        }
+        goodTransportRepository.deleteAll(divider.skippedCurrent());
+        List<GoodTransportEntity> goodTransports = goodTransportRepository.findByGood(good);
+        return goodMapper.toDetailApi(good, goodTransports);
     }
 }

@@ -20,9 +20,14 @@ public class GroupController {
         this.groupService = groupService;
     }
 
+    @GetMapping("{id}")
+    public GroupDetailApi detail(@PathVariable UUID id) {
+        return groupService.findApiById(id);
+    }
+
     @GetMapping
     public List<GroupListApi> list() {
-        return groupService.findApiBy();
+        return groupService.findApiById();
     }
 
     @PostMapping

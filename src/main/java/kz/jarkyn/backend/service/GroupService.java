@@ -25,7 +25,13 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupListApi> findApiBy() {
+    public GroupDetailApi findApiById(UUID id) {
+        GroupEntity group = groupRepository.findById(id).orElseThrow();
+        return groupMapper.toDetailApi(group);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GroupListApi> findApiById() {
         List<GroupEntity> entities = groupRepository.findAll();
         // Create a map of parent groups to their children using groupingBy
         Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream()
