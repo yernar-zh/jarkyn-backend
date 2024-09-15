@@ -27,7 +27,7 @@ public class GroupController {
 
     @GetMapping
     public List<GroupListApi> list() {
-        return groupService.findApiById();
+        return groupService.findApiAll();
     }
 
     @PostMapping

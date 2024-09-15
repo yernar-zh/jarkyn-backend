@@ -41,7 +41,7 @@ public class GoodService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupListApi> findApiBy() {
+    public List<GoodListApi> findApiByFilter() {
         return null;
     }
 
@@ -77,4 +77,5 @@ public class GoodService {
         List<GoodTransportEntity> goodTransports = goodTransportRepository.findByGood(good);
         return goodMapper.toDetailApi(good, goodTransports);
     }
+
 }
