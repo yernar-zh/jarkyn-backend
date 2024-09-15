@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(Api.Group.PATH)
+@RequestMapping(Api.Good.PATH)
 public class GoodController {
     private final GoodService goodService;
 

@@ -10,4 +10,8 @@ public interface Api {
     interface Transport {
         String PATH = Api.PATH + "/transports";
     }
+
+    interface Good {
+        String PATH = Api.PATH + "/goods";
+    }
 }
