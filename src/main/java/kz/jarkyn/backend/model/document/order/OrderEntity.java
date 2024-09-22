@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.model.document.sale;
+package kz.jarkyn.backend.model.document.order;
 
 
 import jakarta.persistence.*;

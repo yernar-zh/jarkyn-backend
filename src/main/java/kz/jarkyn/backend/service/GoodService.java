@@ -10,6 +10,7 @@ import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GoodTransportRepository;
 import kz.jarkyn.backend.repository.TransportRepository;
 import kz.jarkyn.backend.service.mapper.GoodMapper;
+import kz.jarkyn.backend.service.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

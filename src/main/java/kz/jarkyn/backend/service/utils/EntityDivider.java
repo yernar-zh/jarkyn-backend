@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.service;
+package kz.jarkyn.backend.service.utils;
 
 import org.springframework.data.util.Pair;
 
