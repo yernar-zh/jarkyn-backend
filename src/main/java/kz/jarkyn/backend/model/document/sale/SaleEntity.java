@@ -18,7 +18,7 @@ public class SaleEntity extends AbstractEntity {
     @Column(name = "places_quantity")
     private Integer placesQuantity;
     @Column(name = "products_total_amount")
-    private Integer productsTotalAmount;
+    private Integer itemsTotalAmount;
     @Column(name = "discount_amount")
     private Integer discountAmount;
     @Column(name = "total_amount")

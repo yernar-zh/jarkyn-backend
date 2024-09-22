@@ -21,7 +21,6 @@ public class DocumentEntity extends AbstractEntity {
     private LocalDateTime moment;
     private String comment;
     private DocumentType type;
-
     private Boolean deleted;
 
     public WarehouseEntity getWarehouse() {
@@ -62,6 +61,14 @@ public class DocumentEntity extends AbstractEntity {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public DocumentType getType() {
+        return type;
+    }
+
+    public void setType(DocumentType type) {
+        this.type = type;
     }
 
     public Boolean getDeleted() {
