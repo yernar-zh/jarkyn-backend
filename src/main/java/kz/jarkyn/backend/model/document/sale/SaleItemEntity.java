@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.model.document.order;
+package kz.jarkyn.backend.model.document.sale;
 
 
 import jakarta.persistence.Entity;
@@ -9,11 +9,11 @@ import kz.jarkyn.backend.model.common.AbstractEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 
 @Entity
-@Table(name = "order_product")
-public class OrderItemEntity extends AbstractEntity {
+@Table(name = "sale_product")
+public class SaleItemEntity extends AbstractEntity {
     @ManyToOne
-    @JoinColumn(name = "order_id")
-    private OrderEntity order;
+    @JoinColumn(name = "sale_id")
+    private SaleEntity sale;
     private Integer position;
     @ManyToOne
     @JoinColumn(name = "good_id")
@@ -21,12 +21,12 @@ public class OrderItemEntity extends AbstractEntity {
     private Integer price;
     private Integer quantity;
 
-    public OrderEntity getOrder() {
-        return order;
+    public SaleEntity getSale() {
+        return sale;
     }
 
-    public void setOrder(OrderEntity order) {
-        this.order = order;
+    public void setSale(SaleEntity sale) {
+        this.sale = sale;
     }
 
     public Integer getPosition() {

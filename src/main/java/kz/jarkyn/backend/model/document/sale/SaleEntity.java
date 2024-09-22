@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.model.document.order;
+package kz.jarkyn.backend.model.document.sale;
 
 
 import jakarta.persistence.*;
@@ -8,8 +8,8 @@ import kz.jarkyn.backend.model.document.DocumentEntity;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "orders")
-public class OrderEntity extends AbstractEntity {
+@Table(name = "sale")
+public class SaleEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "document_id")
     private DocumentEntity document;
@@ -24,7 +24,7 @@ public class OrderEntity extends AbstractEntity {
     @Column(name = "total_amount")
     private Integer totalAmount;
     @Enumerated(EnumType.STRING)
-    private OrderState state;
+    private SaleState state;
 
     public DocumentEntity getDocument() {
         return document;
@@ -74,11 +74,11 @@ public class OrderEntity extends AbstractEntity {
         this.totalAmount = totalAmount;
     }
 
-    public OrderState getState() {
+    public SaleState getState() {
         return state;
     }
 
-    public void setState(OrderState state) {
+    public void setState(SaleState state) {
         this.state = state;
     }
 }
