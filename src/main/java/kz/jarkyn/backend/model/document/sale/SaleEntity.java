@@ -17,7 +17,7 @@ public class SaleEntity extends AbstractEntity {
     private LocalDateTime shipmentMoment;
     @Column(name = "places_quantity")
     private Integer placesQuantity;
-    @Column(name = "products_total_amount")
+    @Column(name = "items_total_amount")
     private Integer itemsTotalAmount;
     @Column(name = "discount_amount")
     private Integer discountAmount;
@@ -50,12 +50,12 @@ public class SaleEntity extends AbstractEntity {
         this.placesQuantity = placesQuantity;
     }
 
-    public Integer getProductsTotalAmount() {
-        return productsTotalAmount;
+    public Integer getItemsTotalAmount() {
+        return itemsTotalAmount;
     }
 
-    public void setProductsTotalAmount(Integer productsTotalAmount) {
-        this.productsTotalAmount = productsTotalAmount;
+    public void setItemsTotalAmount(Integer itemsTotalAmount) {
+        this.itemsTotalAmount = itemsTotalAmount;
     }
 
     public Integer getDiscountAmount() {

@@ -3,26 +3,17 @@ package kz.jarkyn.backend.model.counterparty;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.model.common.AbstractEntity;
+import kz.jarkyn.backend.model.common.AbstractEntity_;
 
 @Entity
-@Table(name = "сustomer")
-public class CustomerEntity extends AbstractEntity {
-    @ManyToOne
-    @JoinColumn(name = "counterparty_id")
-    private CounterpartyEntity counterparty;
+@Table(name = "customer")
+@PrimaryKeyJoinColumn(name = AbstractEntity_.ID)
+public class CustomerEntity extends CounterpartyEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
     @Column(name = "shipping_address")
     private String shippingAddress;
     private Integer discount;
-
-    public CounterpartyEntity getCounterparty() {
-        return counterparty;
-    }
-
-    public void setCounterparty(CounterpartyEntity counterparty) {
-        this.counterparty = counterparty;
-    }
 
     public String getPhoneNumber() {
         return phoneNumber;
