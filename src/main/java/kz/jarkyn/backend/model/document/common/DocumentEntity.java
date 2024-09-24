@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.model.document;
+package kz.jarkyn.backend.model.document.common;
 
 
 import kz.jarkyn.backend.model.common.AbstractEntity;
@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "document")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class DocumentEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "warehouse_id")
@@ -19,8 +20,8 @@ public class DocumentEntity extends AbstractEntity {
     private CounterpartyEntity customer;
     private String name;
     private LocalDateTime moment;
+    private Integer amount;
     private String comment;
-    private DocumentType type;
     private Boolean deleted;
 
     public WarehouseEntity getWarehouse() {
@@ -55,20 +56,20 @@ public class DocumentEntity extends AbstractEntity {
         this.moment = moment;
     }
 
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
     public String getComment() {
         return comment;
     }
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public DocumentType getType() {
-        return type;
-    }
-
-    public void setType(DocumentType type) {
-        this.type = type;
     }
 
     public Boolean getDeleted() {

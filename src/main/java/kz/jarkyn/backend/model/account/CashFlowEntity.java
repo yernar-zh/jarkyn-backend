@@ -6,8 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.model.common.AbstractEntity;
-import kz.jarkyn.backend.model.counterparty.CounterpartyEntity;
-import kz.jarkyn.backend.model.document.DocumentEntity;
+import kz.jarkyn.backend.model.document.common.DocumentEntity;
 
 @Entity
 @Table(name = "cash_flow")

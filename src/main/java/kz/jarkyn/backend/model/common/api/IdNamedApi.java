@@ -7,7 +7,6 @@ import java.util.UUID;
 
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableIdNamedApi.Builder.class)
-public interface IdNamedApi {
-    UUID getId();
+public interface IdNamedApi extends IdApi {
     String getName();
 }

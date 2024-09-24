@@ -6,7 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.model.common.AbstractEntity;
-import kz.jarkyn.backend.model.document.DocumentEntity;
+import kz.jarkyn.backend.model.document.common.DocumentEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 
 import java.time.LocalDateTime;
