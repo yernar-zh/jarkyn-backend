@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 @ControllerAdvice
 public class ApiResponseEntityExceptionHandler {
 
@@ -69,8 +72,13 @@ public class ApiResponseEntityExceptionHandler {
 
     private ResponseEntity<ExceptionApi> exceptionResponse(
             HttpStatus status, String code, String message, Exception ex) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        String stacktrace = sw.toString();
+        logger.error(message, ex);
         ExceptionApi exceptionResponse = ImmutableExceptionApi.builder()
-                .code(code).message(message).stacktrace(ex.toString()).build();
+                .code(code).message(message).stacktrace(stacktrace).build();
         return new ResponseEntity<>(exceptionResponse, status);
     }
 }

@@ -1,12 +1,3 @@
 spring:
   application:
     name: jarkyn-backend
-  datasource:
-    url: jdbc:h2:file:./local/h2;AUTO_SERVER=TRUE
-    driver-class-name: org.h2.Driver
-    username: admin
-    password: 123qwe123
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update

@@ -1,7 +1,7 @@
 package kz.jarkyn.backend.config;
 
 public interface Api {
-    String PATH = "api";
+    String PATH = "/api";
 
     interface Group {
         String PATH = Api.PATH + "/groups";
