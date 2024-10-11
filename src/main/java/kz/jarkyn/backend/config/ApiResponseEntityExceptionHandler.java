@@ -44,8 +44,7 @@ public class ApiResponseEntityExceptionHandler {
     }
 
     public ResponseEntity<ExceptionApi> handBindException(HttpMessageNotReadableException ex) {
-        String message = ex.getCause().getCause().getMessage();
-        return apiValidationExceptionResponse(message, ex);
+        return apiValidationExceptionResponse("json error", ex);
     }
 
 

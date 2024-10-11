@@ -1,6 +1,8 @@
 package kz.jarkyn.backend.service;
 
 
+import kz.jarkyn.backend.exception.DataValidationException;
+import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.good.GroupEntity;
 import kz.jarkyn.backend.model.good.api.GroupDetailApi;
 import kz.jarkyn.backend.model.good.api.GroupEditApi;
@@ -60,6 +62,11 @@ public class GroupService {
     public GroupDetailApi editApi(UUID id, GroupEditApi editApi) {
         GroupEntity entity = groupRepository.findById(id).orElseThrow();
         groupMapper.editEntity(entity, editApi);
+        for (GroupEntity parent = entity.getParent(); parent != null; parent = parent.getParent()) {
+            if (parent.equals(entity)) {
+                throw new DataValidationException("EXIST_PARENT_LOOP", "You are trying to move a group into itself");
+            }
+        }
         return groupMapper.toDetailApi(groupRepository.save(entity));
     }
 }

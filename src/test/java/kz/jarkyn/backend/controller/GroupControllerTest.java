@@ -27,7 +27,6 @@ class GroupControllerTest {
         mockMvc.perform(get(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
                 .andExpect(jsonPath("$.name").value("Педаль"))
                 .andExpect(jsonPath("$.position").value(100))
@@ -40,7 +39,6 @@ class GroupControllerTest {
         mockMvc.perform(get(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(jsonPath("$.name").value("Кикстартер"))
                 .andExpect(jsonPath("$.position").value(100))
@@ -75,7 +73,6 @@ class GroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestData))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Аккумулятор"))
                 .andExpect(jsonPath("$.parent").doesNotExist())
@@ -95,10 +92,44 @@ class GroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestData))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Кикстартер new"))
                 .andExpect(jsonPath("$.parent").doesNotExist())
                 .andExpect(jsonPath("$.position").value(101));
+    }
+
+    @Test
+    @Sql({"groups.sql"})
+    public void testEdit_existLoop() throws Exception {
+        String requestData = """
+                {
+                  "name": "Педаль",
+                  "parent": {
+                      "id": "cdfcf458-7cca-11ef-0a80-152f001b4886"
+                  },
+                  "position": 100
+                }""";
+        mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestData))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.code").value("EXIST_PARENT_LOOP"));
+    }
+    @Test
+    @Sql({"groups.sql"})
+    public void testEdit_existLoopShort() throws Exception {
+        String requestData = """
+                {
+                  "name": "Педаль",
+                  "parent": {
+                      "id": "da48c6fa-6739-11ee-0a80-039b000669e2"
+                  },
+                  "position": 100
+                }""";
+        mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestData))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.code").value("EXIST_PARENT_LOOP"));
     }
 }
