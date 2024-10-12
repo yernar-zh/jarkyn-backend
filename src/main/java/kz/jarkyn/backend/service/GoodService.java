@@ -8,7 +8,7 @@ import kz.jarkyn.backend.model.good.GoodTransportEntity;
 import kz.jarkyn.backend.model.good.api.*;
 import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GoodTransportRepository;
-import kz.jarkyn.backend.repository.TransportRepository;
+import kz.jarkyn.backend.repository.AttributeGroupRepository;
 import kz.jarkyn.backend.service.mapper.GoodMapper;
 import kz.jarkyn.backend.service.utils.EntityDivider;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,13 @@ import java.util.*;
 @Service
 public class GoodService {
     private final GoodRepository goodRepository;
-    private final TransportRepository transportRepository;
+    private final AttributeGroupRepository transportRepository;
     private final GoodTransportRepository goodTransportRepository;
     private final GoodMapper goodMapper;
 
     public GoodService(
             GoodRepository goodRepository,
-            TransportRepository transportRepository,
+            AttributeGroupRepository transportRepository,
             GoodTransportRepository goodTransportRepository,
             GoodMapper goodMapper) {
         this.goodRepository = goodRepository;

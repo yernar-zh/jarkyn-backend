@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import kz.jarkyn.backend.model.attribute.AttributeEntity;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 
 @Entity
@@ -14,7 +15,7 @@ public class GoodTransportEntity extends AbstractEntity {
     private GoodEntity good;
     @ManyToOne
     @JoinColumn(name = "transport_id")
-    private TransportEntity transport;
+    private AttributeEntity transport;
 
     public GoodEntity getGood() {
         return good;
@@ -24,11 +25,11 @@ public class GoodTransportEntity extends AbstractEntity {
         this.good = good;
     }
 
-    public TransportEntity getTransport() {
+    public AttributeEntity getTransport() {
         return transport;
     }
 
-    public void setTransport(TransportEntity transport) {
+    public void setTransport(AttributeEntity transport) {
         this.transport = transport;
     }
 }

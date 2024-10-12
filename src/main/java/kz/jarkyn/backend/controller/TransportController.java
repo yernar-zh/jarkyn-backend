@@ -1,8 +1,7 @@
 package kz.jarkyn.backend.controller;
 
 import kz.jarkyn.backend.config.Api;
-import kz.jarkyn.backend.model.good.api.*;
-import kz.jarkyn.backend.service.TransportService;
+import kz.jarkyn.backend.service.AttributeGroupService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +10,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping(Api.Transport.PATH)
 public class TransportController {
-    private final TransportService transportService;
+    private final AttributeGroupService transportService;
 
-    public TransportController(TransportService transportService) {
+    public TransportController(AttributeGroupService transportService) {
         this.transportService = transportService;
     }
 
