@@ -171,6 +171,14 @@ class AttributeGroupControllerTest {
 
     @Test
     @Sql({"attribute.sql"})
+    public void testDelete_hasRelation() throws Exception {
+        mockMvc.perform(delete(Api.AttributeGroup.PATH + "/c5a95fbd-121e-4f57-a84b-600a9919228a"))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.code").value("RELATION_EXCEPTION"));
+    }
+
+    @Test
+    @Sql({"attribute.sql"})
     public void testDelete_notFound() throws Exception {
         mockMvc.perform(delete(Api.AttributeGroup.PATH + "/db689b56-4c87-40da-8969-e2bfbf89a84a"))
                 .andExpect(status().isNotFound())
