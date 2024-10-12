@@ -37,6 +37,7 @@ public class AttributeController {
 
     @DeleteMapping("{id}")
     public MessageApi delete(@PathVariable UUID id) {
+        attributeService.delete(id);
         return MessageApi.DELETED;
     }
 }

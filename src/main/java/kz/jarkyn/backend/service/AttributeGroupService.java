@@ -2,6 +2,7 @@ package kz.jarkyn.backend.service;
 
 
 import kz.jarkyn.backend.exception.ApiValidationException;
+import kz.jarkyn.backend.exception.DataValidationException;
 import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.attribute.AttributeEntity;
 import kz.jarkyn.backend.model.attribute.AttributeGroupEntity;
@@ -75,7 +76,8 @@ public class AttributeGroupService {
 
     @Transactional
     public AttributeGroupDetailApi editApi(UUID id, AttributeGroupEditApi editApi) {
-        AttributeGroupEntity entity = attributeGroupRepository.findById(id).orElseThrow();
+        AttributeGroupEntity entity = attributeGroupRepository.findById(id)
+                .orElseThrow(ExceptionUtils.entityNotFound());
         attributeMapper.editEntity(entity, editApi);
         attributeGroupRepository.save(entity);
         EntityDivider<AttributeEntity, IdApi> divider = new EntityDivider<>(
@@ -89,5 +91,15 @@ public class AttributeGroupService {
             attributeRepository.save(attributeEntity);
         }
         return findApiById(entity.getId());
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        AttributeGroupEntity entity = attributeGroupRepository.findById(id)
+                .orElseThrow(ExceptionUtils.entityNotFound());
+        if (!attributeRepository.findByGroup(entity).isEmpty()) {
+            ExceptionUtils.throwRelationException();
+        }
+        attributeGroupRepository.delete(entity);
     }
 }

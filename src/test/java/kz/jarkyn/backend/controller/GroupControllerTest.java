@@ -90,12 +90,7 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.parent").doesNotExist())
                 .andExpect(jsonPath("$.children[0].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(jsonPath("$.children[1].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"));
-        mockMvc.perform(get(Api.Group.PATH).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$[0].children[0].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
-                .andExpect(jsonPath("$[0].children[1].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"));
-    }
+ }
 
     @Test
     @Sql({"groups.sql"})

@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,9 +48,14 @@ class AttributeControllerTest {
                   "group": {"id":  "c5a95fbd-121e-4f57-a84b-600a9919228a"},
                   "name": "Скутер"
                 }""";
-        mockMvc.perform(post(Api.Attribute.PATH).contentType(MediaType.APPLICATION_JSON).content(requestData))
+        MvcResult result = mockMvc.perform(post(Api.Attribute.PATH).contentType(MediaType.APPLICATION_JSON).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("Скутер"))
+                .andReturn();
+        mockMvc.perform(get(Api.Attribute.PATH + "/" + TestUtils.extractId(result)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(TestUtils.extractId(result)))
                 .andExpect(jsonPath("$.name").value("Скутер"));
     }
 
@@ -78,5 +84,20 @@ class AttributeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("e95420b5-3344-44ce-8d39-699f516ed715"))
                 .andExpect(jsonPath("$.name").value("Мотоцикл GN new"));
+        mockMvc.perform(get(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("e95420b5-3344-44ce-8d39-699f516ed715"))
+                .andExpect(jsonPath("$.name").value("Мотоцикл GN new"));
+    }
+
+    @Test
+    @Sql({"attribute.sql"})
+    public void testDelete() throws Exception {
+        mockMvc.perform(delete(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("DELETED"));
+        mockMvc.perform(get(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
 }

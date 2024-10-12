@@ -6,6 +6,7 @@ import kz.jarkyn.backend.model.attribute.api.AttributeGroupDetailApi;
 import kz.jarkyn.backend.model.attribute.api.AttributeGroupEditApi;
 import kz.jarkyn.backend.model.attribute.api.AttributeGroupListApi;
 import kz.jarkyn.backend.model.common.api.IdApi;
+import kz.jarkyn.backend.model.common.api.MessageApi;
 import kz.jarkyn.backend.service.AttributeGroupService;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,5 +45,11 @@ public class AttributeGroupController {
     @PutMapping("{id}")
     public AttributeGroupDetailApi edit(@PathVariable UUID id, @RequestBody AttributeGroupEditApi editApi) {
         return attributeGroupService.editApi(id, editApi);
+    }
+
+    @DeleteMapping("{id}")
+    public MessageApi delete(@PathVariable UUID id) {
+        attributeGroupService.delete(id);
+        return MessageApi.DELETED;
     }
 }
