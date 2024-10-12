@@ -1,5 +1,6 @@
 package kz.jarkyn.backend.service.utils;
 
+import kz.jarkyn.backend.exception.ApiValidationException;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 import kz.jarkyn.backend.model.common.api.IdApi;
 
@@ -19,7 +20,7 @@ public class EntityDivider<C extends AbstractEntity, R extends IdApi> {
 
         Map<UUID, C> currentMap = current.stream().collect(Collectors.toMap(AbstractEntity::getId, Function.identity()));
         if (currentMap.size() != received.size()) {
-            throw new IllegalArgumentException("Current list contains duplicates");
+            throw new ApiValidationException("Current list contains duplicates");
         }
         Set<UUID> editedReceivedSet = new HashSet<>();
         for (int i = 0; i < received.size(); i++) {

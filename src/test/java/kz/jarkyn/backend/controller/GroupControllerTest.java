@@ -145,4 +145,21 @@ class GroupControllerTest {
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.code").value("EXIST_PARENT_LOOP"));
     }
+
+    @Test
+    @Sql({"groups.sql"})
+    public void testEdit_childrenNotSame() throws Exception {
+        String requestData = """
+                {
+                  "name": "Педаль",
+                  "children": [
+                    {"id":  "cdfcf458-7cca-11ef-0a80-152f001b4886"}
+                  ]
+                }""";
+        mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestData))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.code").value("API Validation Error"));
+    }
 }
