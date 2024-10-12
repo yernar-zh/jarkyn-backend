@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -28,7 +29,8 @@ class GroupControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(jsonPath("$.name").value("Кикстартер"))
-                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"));
+                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
+                .andExpect(jsonPath("$.parent.name").value("Педаль"));
     }
 
     @Test
@@ -61,13 +63,22 @@ class GroupControllerTest {
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Аккумулятор"
+                  "name": "Тормоз",
+                  "parent": {"id": "da48c6fa-6739-11ee-0a80-039b000669e2"}
                 }""";
-        mockMvc.perform(post(Api.Group.PATH).contentType(MediaType.APPLICATION_JSON).content(requestData))
+        MvcResult result = mockMvc.perform(post(Api.Group.PATH).contentType(MediaType.APPLICATION_JSON).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Аккумулятор"))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.name").value("Тормоз"))
+                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
+                .andExpect(jsonPath("$.parent.name").value("Педаль"))
+                .andReturn();
+        mockMvc.perform(get(Api.Group.PATH + "/" + TestUtils.extractId(result)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("Тормоз"))
+                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
+                .andExpect(jsonPath("$.parent.name").value("Педаль"));
     }
 
     @Test
@@ -91,7 +102,15 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.children.length()").value(2))
                 .andExpect(jsonPath("$.children[0].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(jsonPath("$.children[1].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"));
- }
+        mockMvc.perform(get(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
+                .andExpect(jsonPath("$.name").value("Педаль new"))
+                .andExpect(jsonPath("$.parent").doesNotExist())
+                .andExpect(jsonPath("$.children.length()").value(2))
+                .andExpect(jsonPath("$.children[0].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
+                .andExpect(jsonPath("$.children[1].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"));
+    }
 
     @Test
     @Sql({"groups.sql"})
