@@ -5,11 +5,10 @@ import kz.jarkyn.backend.model.common.AbstractEntity;
 import java.util.function.Supplier;
 
 public class ExceptionUtils {
-    public static final String NOT_FOUND = "NOT_FOUND";
+    public static final String ENTITY_NOT_FOUND = "ENTITY_NOT_FOUND";
 
-    public static Supplier<DataValidationException> notFound(String entity, Long id) {
-        String message = "Resource `" + entity + "` with id: `" + id + "` not found";
-        return () -> new DataValidationException(NOT_FOUND, message);
+    public static Supplier<DataValidationException> entityNotFound() {
+        return () -> new DataValidationException(ENTITY_NOT_FOUND, "entity not found");
     }
 
     public static <T> void requireEqualsApi(T first, T second, String message) {

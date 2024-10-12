@@ -17,61 +17,47 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class GroupControllerTest {
+class AttributeControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    @Sql({"groups.sql"})
-    public void testDetail_parentNull() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
-                        .contentType(MediaType.APPLICATION_JSON))
+    @Sql({"attribute.sql"})
+    public void testDetail() throws Exception {
+        mockMvc.perform(get(Api.Attribute.PATH + "/c5a95fbd-121e-4f57-a84b-600a9919228a"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$.name").value("Педаль"))
-                .andExpect(jsonPath("$.parent").isEmpty());
+                .andExpect(jsonPath("$.id").value("c5a95fbd-121e-4f57-a84b-600a9919228a"))
+                .andExpect(jsonPath("$.name").value("Транспорт"));
     }
 
     @Test
-    @Sql({"groups.sql"})
-    public void testDetail_parentExist() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
-                .andExpect(jsonPath("$.name").value("Кикстартер"))
-                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"));
+    @Sql({"attribute.sql"})
+    public void testDetail_notFound() throws Exception {
+        mockMvc.perform(get(Api.Attribute.PATH + "/db689b56-4c87-40da-8969-e2bfbf89a84a"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @Sql({"attribute.sql"})
     public void testList() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(Api.Attribute.PATH))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$[0].name").value("Педаль"))
-                .andExpect(jsonPath("$[0].children[0].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"))
-                .andExpect(jsonPath("$[0].children[0].name").value("Педаль переключения передач"))
-                .andExpect(jsonPath("$[0].children[0].children").isEmpty())
-                .andExpect(jsonPath("$[0].children[1].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
-                .andExpect(jsonPath("$[0].children[1].name").value("Кикстартер"))
-                .andExpect(jsonPath("$[0].children[1].children").isEmpty());
+                .andExpect(jsonPath("$[0].id").value("c5a95fbd-121e-4f57-a84b-600a9919228a"))
+                .andExpect(jsonPath("$[0].name").value("Транспорт"));
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @Sql({"attribute.sql"})
     public void testCreate() throws Exception {
         String requestData = """
                 {
-                  "name": "Аккумулятор"
+                  "name": "Объем двигателя"
                 }""";
-        mockMvc.perform(post(Api.Group.PATH)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestData))
+        mockMvc.perform(post(Api.Attribute.PATH).contentType(MediaType.APPLICATION_JSON).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Аккумулятор"))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.name").value("Объем двигателя"));
     }
 
     @Test
@@ -97,6 +83,7 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.children[1].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"));
         mockMvc.perform(get(Api.Group.PATH).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
                 .andExpect(jsonPath("$[0].children[0].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(jsonPath("$[0].children[1].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"));

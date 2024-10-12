@@ -7,8 +7,8 @@ public interface Api {
         String PATH = Api.PATH + "/groups";
     }
 
-    interface Transport {
-        String PATH = Api.PATH + "/transports";
+    interface Attribute {
+        String PATH = Api.PATH + "/attribute";
     }
 
     interface Good {

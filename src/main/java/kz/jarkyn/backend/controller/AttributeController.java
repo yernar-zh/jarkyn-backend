@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(Api.Transport.PATH)
+@RequestMapping(Api.Attribute.PATH)
 public class AttributeController {
     private final AttributeService attributeService;
 

@@ -59,7 +59,7 @@ public class ApiResponseEntityExceptionHandler {
 
     private ResponseEntity<ExceptionApi> dataValidationExceptionResponse(
             String code, String message, Exception ex) {
-        HttpStatus status = code.equals(ExceptionUtils.NOT_FOUND) ?
+        HttpStatus status = code.equals(ExceptionUtils.ENTITY_NOT_FOUND) ?
                 HttpStatus.NOT_FOUND : HttpStatus.UNPROCESSABLE_ENTITY;
         return exceptionResponse(status, code, message, ex);
     }

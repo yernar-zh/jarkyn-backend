@@ -2,6 +2,7 @@ package kz.jarkyn.backend.service;
 
 
 import kz.jarkyn.backend.exception.ApiValidationException;
+import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.attribute.AttributeEntity;
 import kz.jarkyn.backend.model.attribute.AttributeGroupEntity;
 import kz.jarkyn.backend.model.attribute.api.*;
@@ -32,9 +33,10 @@ public class AttributeService {
 
     @Transactional(readOnly = true)
     public AttributeGroupDetailApi findApiById(UUID id) {
-        AttributeGroupEntity entity = attributeGroupRepository.findById(id).orElseThrow();
+        AttributeGroupEntity entity = attributeGroupRepository.findById(id)
+                .orElseThrow(ExceptionUtils.entityNotFound());
         List<AttributeEntity> attributes = attributeRepository.findByGroup(entity);
-        return attributeMapper.toDetailApi(entity,attributes);
+        return attributeMapper.toDetailApi(entity, attributes);
     }
 
     @Transactional(readOnly = true)
