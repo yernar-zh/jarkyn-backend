@@ -6,7 +6,6 @@ import kz.jarkyn.backend.model.attribute.api.AttributeGroupDetailApi;
 import kz.jarkyn.backend.model.attribute.api.AttributeGroupEditApi;
 import kz.jarkyn.backend.model.attribute.api.AttributeGroupListApi;
 import kz.jarkyn.backend.model.common.api.IdApi;
-import kz.jarkyn.backend.model.good.api.GroupDetailApi;
 import kz.jarkyn.backend.service.AttributeService;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.model.good.api;
+package kz.jarkyn.backend.model.group.api;
 
 import org.immutables.value.Value;
 

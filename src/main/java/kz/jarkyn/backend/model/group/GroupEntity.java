@@ -1,5 +1,5 @@
 
-package kz.jarkyn.backend.model.good;
+package kz.jarkyn.backend.model.group;
 
 
 import jakarta.persistence.JoinColumn;

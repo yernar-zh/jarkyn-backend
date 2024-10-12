@@ -1,10 +1,10 @@
 package kz.jarkyn.backend.controller;
 
 import kz.jarkyn.backend.config.Api;
-import kz.jarkyn.backend.model.good.api.GroupCreateApi;
-import kz.jarkyn.backend.model.good.api.GroupDetailApi;
-import kz.jarkyn.backend.model.good.api.GroupEditApi;
-import kz.jarkyn.backend.model.good.api.GroupListApi;
+import kz.jarkyn.backend.model.group.api.GroupCreateApi;
+import kz.jarkyn.backend.model.group.api.GroupDetailApi;
+import kz.jarkyn.backend.model.group.api.GroupEditApi;
+import kz.jarkyn.backend.model.group.api.GroupListApi;
 import kz.jarkyn.backend.service.GroupService;
 import org.springframework.web.bind.annotation.*;
 

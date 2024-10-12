@@ -4,6 +4,7 @@ package kz.jarkyn.backend.model.good;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 import kz.jarkyn.backend.model.common.ImageEntity;
+import kz.jarkyn.backend.model.group.GroupEntity;
 
 @Entity
 @Table(name = "good")

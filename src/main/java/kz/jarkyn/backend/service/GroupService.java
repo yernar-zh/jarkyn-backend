@@ -2,12 +2,11 @@ package kz.jarkyn.backend.service;
 
 
 import kz.jarkyn.backend.exception.DataValidationException;
-import kz.jarkyn.backend.exception.ExceptionUtils;
-import kz.jarkyn.backend.model.good.GroupEntity;
-import kz.jarkyn.backend.model.good.api.GroupDetailApi;
-import kz.jarkyn.backend.model.good.api.GroupEditApi;
-import kz.jarkyn.backend.model.good.api.GroupListApi;
-import kz.jarkyn.backend.model.good.api.GroupCreateApi;
+import kz.jarkyn.backend.model.group.GroupEntity;
+import kz.jarkyn.backend.model.group.api.GroupDetailApi;
+import kz.jarkyn.backend.model.group.api.GroupEditApi;
+import kz.jarkyn.backend.model.group.api.GroupListApi;
+import kz.jarkyn.backend.model.group.api.GroupCreateApi;
 import kz.jarkyn.backend.repository.GroupRepository;
 import kz.jarkyn.backend.service.mapper.GroupMapper;
 import org.springframework.stereotype.Service;
