@@ -3,6 +3,7 @@ package kz.jarkyn.backend.service;
 
 import kz.jarkyn.backend.exception.ApiValidationException;
 import kz.jarkyn.backend.exception.DataValidationException;
+import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.common.api.IdApi;
 import kz.jarkyn.backend.model.group.GroupEntity;
 import kz.jarkyn.backend.model.group.api.GroupDetailApi;
@@ -30,10 +31,10 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public GroupDetailApi findApiById(UUID id) {
-        GroupEntity group = groupRepository.findById(id).orElseThrow();
-        List<GroupEntity> children = groupRepository.findByParent(group);
+        GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        List<GroupEntity> children = groupRepository.findByParent(entity);
         children.sort(Comparator.comparing(GroupEntity::getPosition).thenComparing(GroupEntity::getCreatedAt));
-        return groupMapper.toDetailApi(group, children);
+        return groupMapper.toDetailApi(entity, children);
     }
 
     @Transactional(readOnly = true)
@@ -67,7 +68,7 @@ public class GroupService {
 
     @Transactional
     public GroupDetailApi editApi(UUID id, GroupEditApi editApi) {
-        GroupEntity entity = groupRepository.findById(id).orElseThrow();
+        GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         groupMapper.editEntity(entity, editApi);
         for (GroupEntity parent = entity.getParent(); parent != null; parent = parent.getParent()) {
             if (parent.equals(entity)) {
@@ -82,7 +83,7 @@ public class GroupService {
         }
         for (EntityDivider<GroupEntity, IdApi>.Entry entry : divider.edited()) {
             GroupEntity childrenEntity = entry.getCurrent();
-            childrenEntity.setPosition(entity.getPosition());
+            childrenEntity.setPosition(entry.getReceivedPosition());
             groupRepository.save(childrenEntity);
         }
         return findApiById(entity.getId());

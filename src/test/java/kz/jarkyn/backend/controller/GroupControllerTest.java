@@ -23,17 +23,7 @@ class GroupControllerTest {
 
     @Test
     @Sql({"groups.sql"})
-    public void testDetail_parentNull() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$.name").value("Педаль"))
-                .andExpect(jsonPath("$.parent").isEmpty());
-    }
-
-    @Test
-    @Sql({"groups.sql"})
-    public void testDetail_parentExist() throws Exception {
+    public void testDetail_success() throws Exception {
         mockMvc.perform(get(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
@@ -43,11 +33,21 @@ class GroupControllerTest {
 
     @Test
     @Sql({"groups.sql"})
-    public void testList() throws Exception {
+    public void testDetail_notFound() throws Exception {
+        mockMvc.perform(get(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
+    }
+
+    @Test
+    @Sql({"groups.sql"})
+    public void testList_success() throws Exception {
         mockMvc.perform(get(Api.Group.PATH))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
                 .andExpect(jsonPath("$[0].name").value("Педаль"))
+                .andExpect(jsonPath("$[0].children.length()").value(2))
                 .andExpect(jsonPath("$[0].children[0].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"))
                 .andExpect(jsonPath("$[0].children[0].name").value("Педаль переключения передач"))
                 .andExpect(jsonPath("$[0].children[0].children").isEmpty())
@@ -58,7 +58,7 @@ class GroupControllerTest {
 
     @Test
     @Sql({"groups.sql"})
-    public void testCreate() throws Exception {
+    public void testCreate_success() throws Exception {
         String requestData = """
                 {
                   "name": "Аккумулятор"
@@ -72,7 +72,7 @@ class GroupControllerTest {
 
     @Test
     @Sql({"groups.sql"})
-    public void testEdit() throws Exception {
+    public void testEdit_success() throws Exception {
         String requestData = """
                 {
                   "name": "Педаль new",
@@ -88,6 +88,7 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
                 .andExpect(jsonPath("$.name").value("Педаль new"))
                 .andExpect(jsonPath("$.parent").doesNotExist())
+                .andExpect(jsonPath("$.children.length()").value(2))
                 .andExpect(jsonPath("$.children[0].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(jsonPath("$.children[1].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"));
  }
@@ -146,5 +147,19 @@ class GroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).content(requestData))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.code").value("API Validation Error"));
+    }
+
+    @Test
+    @Sql({"groups.sql"})
+    public void testEdit_notFound() throws Exception {
+        String requestData = """
+                {
+                  "name": "Педаль",
+                  "children": []
+                }""";
+        mockMvc.perform(put(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7")
+                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
 }

@@ -57,6 +57,31 @@ class AttributeGroupControllerTest {
 
     @Test
     @Sql({"attribute.sql"})
+    public void testMove_success() throws Exception {
+        String requestData = """
+                [
+                  {"id": "5d82a954-5b87-11ee-0a80-000c0039afd5"},
+                  {"id": "c5a95fbd-121e-4f57-a84b-600a9919228a"}
+                ]""";
+        mockMvc.perform(put(Api.AttributeGroup.PATH)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value("5d82a954-5b87-11ee-0a80-000c0039afd5"))
+                .andExpect(jsonPath("$[0].name").value("Цвет"))
+                .andExpect(jsonPath("$[1].id").value("c5a95fbd-121e-4f57-a84b-600a9919228a"))
+                .andExpect(jsonPath("$[1].name").value("Транспорт"));
+        mockMvc.perform(get(Api.AttributeGroup.PATH))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value("5d82a954-5b87-11ee-0a80-000c0039afd5"))
+                .andExpect(jsonPath("$[0].name").value("Цвет"))
+                .andExpect(jsonPath("$[1].id").value("c5a95fbd-121e-4f57-a84b-600a9919228a"))
+                .andExpect(jsonPath("$[1].name").value("Транспорт"));
+    }
+
+    @Test
+    @Sql({"attribute.sql"})
     public void testCreate_success() throws Exception {
         String requestData = """
                 {

@@ -55,12 +55,12 @@ public class AttributeGroupService {
         EntityDivider<AttributeGroupEntity, IdApi> divider = new EntityDivider<>(
                 attributeGroupRepository.findAll(), apiList
         );
-        if (!divider.newReceived().isEmpty() || divider.skippedCurrent().isEmpty()) {
+        if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
             throw new ApiValidationException("list should contain only and all current groups");
         }
         for (EntityDivider<AttributeGroupEntity, IdApi>.Entry entry : divider.edited()) {
             AttributeGroupEntity entity = entry.getCurrent();
-            entity.setPosition(entity.getPosition());
+            entity.setPosition(entry.getReceivedPosition());
             attributeGroupRepository.save(entity);
         }
         return findApiAll();
@@ -87,7 +87,7 @@ public class AttributeGroupService {
         }
         for (EntityDivider<AttributeEntity, IdApi>.Entry entry : divider.edited()) {
             AttributeEntity attributeEntity = entry.getCurrent();
-            attributeEntity.setPosition(entity.getPosition());
+            attributeEntity.setPosition(entry.getReceivedPosition());
             attributeRepository.save(attributeEntity);
         }
         return findApiById(entity.getId());
