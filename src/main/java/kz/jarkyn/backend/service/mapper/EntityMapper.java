@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.attribute.AttributeEntity;
+import kz.jarkyn.backend.model.attribute.AttributeGroupEntity;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 import kz.jarkyn.backend.model.common.api.IdApi;
 import kz.jarkyn.backend.model.good.GoodEntity;
@@ -26,6 +27,10 @@ public class EntityMapper {
 
     public AttributeEntity toAttributeEntity(IdApi api) {
         return toEntity(api, AttributeEntity.class);
+    }
+
+    public AttributeGroupEntity toAttributeGroupEntity(IdApi api) {
+        return toEntity(api, AttributeGroupEntity.class);
     }
 
     private <T extends AbstractEntity> T toEntity(IdApi api, Class<T> clazz) {

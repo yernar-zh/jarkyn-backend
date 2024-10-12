@@ -11,15 +11,15 @@ import java.util.List;
 
 @Mapper(uses = EntityMapper.class)
 public abstract class AttributeMapper {
-    public abstract List<AttributeGroupListApi> toListApi(List<AttributeGroupEntity> entity);
-    public abstract AttributeGroupEntity toEntity(AttributeGroupCreateApi api);
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "name", source = "entity.name")
     @Mapping(target = "attributes", source = "attributes")
     public abstract AttributeGroupDetailApi toDetailApi(AttributeGroupEntity entity, List<AttributeEntity> attributes);
+    public abstract List<AttributeGroupListApi> toListApi(List<AttributeGroupEntity> entity);
+    public abstract AttributeGroupEntity toEntity(AttributeGroupCreateApi api);
     public abstract void editEntity(@MappingTarget AttributeGroupEntity entity, AttributeGroupEditApi api);
 
-    public abstract AttributeEntity toEntity(AttributeApi api);
-    @Mapping(target = "id", ignore = true)
-    public abstract void editEntity(@MappingTarget AttributeEntity attributeEntity, AttributeApi received);
+    public abstract AttributeDetailApi toDetailApi(AttributeEntity entity);
+    public abstract AttributeEntity toEntity(AttributeCreateApi api);
+    public abstract void editEntity(@MappingTarget AttributeEntity entity, AttributeEditApi api);
 }

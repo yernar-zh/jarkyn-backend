@@ -4,7 +4,11 @@ public interface Api {
     String PATH = "/api";
 
     interface Group {
-        String PATH = Api.PATH + "/groups";
+        String PATH = Api.PATH + "/group";
+    }
+
+    interface AttributeGroup {
+        String PATH = Api.PATH + "/attribute_group";
     }
 
     interface Attribute {
@@ -12,6 +16,6 @@ public interface Api {
     }
 
     interface Good {
-        String PATH = Api.PATH + "/goods";
+        String PATH = Api.PATH + "/good";
     }
 }

@@ -3,8 +3,6 @@ package kz.jarkyn.backend.service;
 
 import kz.jarkyn.backend.exception.ApiValidationException;
 import kz.jarkyn.backend.exception.DataValidationException;
-import kz.jarkyn.backend.model.attribute.AttributeEntity;
-import kz.jarkyn.backend.model.attribute.api.AttributeApi;
 import kz.jarkyn.backend.model.common.api.IdApi;
 import kz.jarkyn.backend.model.group.GroupEntity;
 import kz.jarkyn.backend.model.group.api.GroupDetailApi;
