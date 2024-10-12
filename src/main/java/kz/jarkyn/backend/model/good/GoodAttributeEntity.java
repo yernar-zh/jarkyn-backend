@@ -8,14 +8,14 @@ import kz.jarkyn.backend.model.attribute.AttributeEntity;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 
 @Entity
-@Table(name = "good_transport")
-public class GoodTransportEntity extends AbstractEntity {
+@Table(name = "good_attribute")
+public class GoodAttributeEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "good_id")
     private GoodEntity good;
     @ManyToOne
-    @JoinColumn(name = "transport_id")
-    private AttributeEntity transport;
+    @JoinColumn(name = "attribute_id")
+    private AttributeEntity attribute;
 
     public GoodEntity getGood() {
         return good;
@@ -25,11 +25,11 @@ public class GoodTransportEntity extends AbstractEntity {
         this.good = good;
     }
 
-    public AttributeEntity getTransport() {
-        return transport;
+    public AttributeEntity getAttribute() {
+        return attribute;
     }
 
-    public void setTransport(AttributeEntity transport) {
-        this.transport = transport;
+    public void setAttribute(AttributeEntity attribute) {
+        this.attribute = attribute;
     }
 }

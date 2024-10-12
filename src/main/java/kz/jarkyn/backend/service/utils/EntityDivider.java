@@ -1,42 +1,76 @@
 package kz.jarkyn.backend.service.utils;
 
-import org.springframework.data.util.Pair;
+import kz.jarkyn.backend.model.common.AbstractEntity;
+import kz.jarkyn.backend.model.common.api.IdApi;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class EntityDivider<C, R, K> {
-    private final Map<K, C> current;
-    private final Map<K, Pair<R, Integer>> received;
+public class EntityDivider<C extends AbstractEntity, R extends IdApi> {
+    private final List<Entry> edited;
+    private final List<Entry> newReceived;
+    private final List<C> skippedCurrent;
 
-    public EntityDivider(
-            List<C> current, Function<C, K> currentMapper,
-            List<R> received, Function<R, K> receivedMapper) {
-        this.current = current.stream().collect(Collectors.toMap(currentMapper, Function.identity()));
-        this.received = new HashMap<>();
+    public EntityDivider(List<C> current, List<R> received) {
+        edited = new ArrayList<>();
+        newReceived = new ArrayList<>();
+        skippedCurrent = new ArrayList<>();
+
+        Map<UUID, C> currentMap = current.stream().collect(Collectors.toMap(AbstractEntity::getId, Function.identity()));
+        if (currentMap.size() != received.size()) {
+            throw new IllegalArgumentException("Current list contains duplicates");
+        }
+        Set<UUID> editedReceivedSet = new HashSet<>();
         for (int i = 0; i < received.size(); i++) {
-            this.received.put(receivedMapper.apply(received.get(i)), Pair.of(received.get(i), i));
+            R receivedI = received.get(i);
+            if (receivedI.getId() == null) {
+                newReceived.add(new Entry(null, receivedI, i));
+            } else {
+                edited.add(new Entry(Objects.requireNonNull(currentMap.get(receivedI.getId())), receivedI, i));
+                editedReceivedSet.add(receivedI.getId());
+            }
+        }
+        for (Map.Entry<UUID, C> entry : currentMap.entrySet()) {
+            if (!editedReceivedSet.contains(entry.getKey())) {
+                skippedCurrent.add(entry.getValue());
+            }
         }
     }
 
-    public List<Pair<C, Pair<R, Integer>>> edited() {
-        return current.entrySet().stream()
-                .filter(kuEntry -> received.containsKey(kuEntry.getKey()))
-                .map(kuEntry -> Pair.of(kuEntry.getValue(), received.get(kuEntry.getKey()))).toList();
+    public List<Entry> edited() {
+        return edited;
     }
 
     public List<C> skippedCurrent() {
-        return current.entrySet().stream()
-                .filter(kuEntry -> !received.containsKey(kuEntry.getKey()))
-                .map(Map.Entry::getValue).toList();
+        return skippedCurrent;
     }
 
-    public List<Pair<R, Integer>> newReceived() {
-        return received.entrySet().stream()
-                .filter(kuEntry -> !current.containsKey(kuEntry.getKey()))
-                .map(Map.Entry::getValue).toList();
+    public List<Entry> newReceived() {
+        return newReceived;
+    }
+
+    public class Entry {
+        private final C current;
+        private final R received;
+        private final Integer receivedPosition;
+
+        private Entry(C current, R received, Integer receivedPosition) {
+            this.current = current;
+            this.received = received;
+            this.receivedPosition = receivedPosition;
+        }
+
+        public C getCurrent() {
+            return Objects.requireNonNull(current);
+        }
+
+        public R getReceived() {
+            return received;
+        }
+
+        public Integer getReceivedPosition() {
+            return receivedPosition;
+        }
     }
 }

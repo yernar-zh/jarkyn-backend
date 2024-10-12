@@ -2,7 +2,6 @@ package kz.jarkyn.backend.model.good.api;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.annotation.Nullable;
-import kz.jarkyn.backend.model.common.ImageEntity;
 import kz.jarkyn.backend.model.common.api.IdApi;
 import org.immutables.value.Value;
 
@@ -15,5 +14,5 @@ public interface GoodCreateApi {
     @Nullable IdApi getGroup();
     @Nullable IdApi getImage();
     Integer getMinimumPrice();
-    List<IdApi> getTransports();
+    List<IdApi> getAttributes();
 }
