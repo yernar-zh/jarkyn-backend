@@ -72,6 +72,8 @@ public class AttributeService {
     @Transactional
     public AttributeGroupDetailApi editApi(UUID id, AttributeGroupEditApi editApi) {
         AttributeGroupEntity entity = attributeGroupRepository.findById(id).orElseThrow();
+        attributeMapper.editEntity(entity, editApi);
+        attributeGroupRepository.save(entity);
         EntityDivider<AttributeEntity, AttributeApi> divider = new EntityDivider<>(
                 attributeRepository.findByGroup(entity), editApi.getAttributes());
         for (EntityDivider<AttributeEntity, AttributeApi>.Entry entry : divider.newReceived()) {

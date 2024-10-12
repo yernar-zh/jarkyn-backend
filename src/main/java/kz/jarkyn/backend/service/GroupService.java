@@ -1,7 +1,11 @@
 package kz.jarkyn.backend.service;
 
 
+import kz.jarkyn.backend.exception.ApiValidationException;
 import kz.jarkyn.backend.exception.DataValidationException;
+import kz.jarkyn.backend.model.attribute.AttributeEntity;
+import kz.jarkyn.backend.model.attribute.api.AttributeApi;
+import kz.jarkyn.backend.model.common.api.IdApi;
 import kz.jarkyn.backend.model.group.GroupEntity;
 import kz.jarkyn.backend.model.group.api.GroupDetailApi;
 import kz.jarkyn.backend.model.group.api.GroupEditApi;
@@ -9,6 +13,7 @@ import kz.jarkyn.backend.model.group.api.GroupListApi;
 import kz.jarkyn.backend.model.group.api.GroupCreateApi;
 import kz.jarkyn.backend.repository.GroupRepository;
 import kz.jarkyn.backend.service.mapper.GroupMapper;
+import kz.jarkyn.backend.service.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +33,9 @@ public class GroupService {
     @Transactional(readOnly = true)
     public GroupDetailApi findApiById(UUID id) {
         GroupEntity group = groupRepository.findById(id).orElseThrow();
-        return groupMapper.toDetailApi(group);
+        List<GroupEntity> children = groupRepository.findByParent(group);
+        children.sort(Comparator.comparing(GroupEntity::getPosition).thenComparing(GroupEntity::getCreatedAt));
+        return groupMapper.toDetailApi(group, children);
     }
 
     @Transactional(readOnly = true)
@@ -40,7 +47,8 @@ public class GroupService {
                 .collect(Collectors.groupingBy(GroupEntity::getParent,
                         Collectors.collectingAndThen(
                                 Collectors.toList(), list -> {
-                                    list.sort(Comparator.comparing(GroupEntity::getPosition)); // Sort by position
+                                    list.sort(Comparator.comparing(GroupEntity::getPosition)
+                                            .thenComparing(GroupEntity::getCreatedAt));
                                     return list;
                                 }
                         )
@@ -54,7 +62,9 @@ public class GroupService {
     @Transactional
     public GroupDetailApi createApi(GroupCreateApi createApi) {
         GroupEntity entity = groupMapper.toEntity(createApi);
-        return groupMapper.toDetailApi(groupRepository.save(entity));
+        entity.setPosition(1000);
+        groupRepository.save(entity);
+        return findApiById(entity.getId());
     }
 
     @Transactional
@@ -66,6 +76,17 @@ public class GroupService {
                 throw new DataValidationException("EXIST_PARENT_LOOP", "You are trying to move a group into itself");
             }
         }
-        return groupMapper.toDetailApi(groupRepository.save(entity));
+        groupRepository.save(entity);
+        EntityDivider<GroupEntity, IdApi> divider = new EntityDivider<>(
+                groupRepository.findByParent(entity), editApi.getChildren());
+        if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
+            throw new ApiValidationException("children list have to be same");
+        }
+        for (EntityDivider<GroupEntity, IdApi>.Entry entry : divider.edited()) {
+            GroupEntity childrenEntity = entry.getCurrent();
+            childrenEntity.setPosition(entity.getPosition());
+            groupRepository.save(childrenEntity);
+        }
+        return findApiById(entity.getId());
     }
 }

@@ -18,17 +18,14 @@ import java.util.*;
 @Service
 public class GoodService {
     private final GoodRepository goodRepository;
-    private final AttributeGroupRepository transportRepository;
     private final GoodAttributeRepository goodTransportRepository;
     private final GoodMapper goodMapper;
 
     public GoodService(
             GoodRepository goodRepository,
-            AttributeGroupRepository transportRepository,
             GoodAttributeRepository goodTransportRepository,
             GoodMapper goodMapper) {
         this.goodRepository = goodRepository;
-        this.transportRepository = transportRepository;
         this.goodTransportRepository = goodTransportRepository;
         this.goodMapper = goodMapper;
     }
