@@ -88,4 +88,13 @@ public class GroupService {
         }
         return findApiById(entity.getId());
     }
+
+    @Transactional
+    public void delete(UUID id) {
+        GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (!groupRepository.findByParent(entity).isEmpty()) {
+            ExceptionUtils.throwRelationException();
+        }
+        groupRepository.delete(entity); // TODO test
+    }
 }
