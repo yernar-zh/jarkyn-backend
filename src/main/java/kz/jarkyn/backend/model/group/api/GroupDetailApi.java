@@ -6,12 +6,9 @@ import kz.jarkyn.backend.model.common.api.IdNamedApi;
 import org.immutables.value.Value;
 
 import java.util.List;
-import java.util.UUID;
 
 @Value.Immutable
-public interface GroupDetailApi {
-    UUID getId();
-    String getName();
+public interface GroupDetailApi extends IdNamedApi {
     @Nullable IdNamedApi getParent();
     List<IdNamedApi> getChildren();
 }

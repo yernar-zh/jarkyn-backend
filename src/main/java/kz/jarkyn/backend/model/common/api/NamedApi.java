@@ -5,6 +5,6 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableNamedApi.Builder.class)
-public interface NamedApi extends IdApi {
+public interface NamedApi {
     String getName();
 }
