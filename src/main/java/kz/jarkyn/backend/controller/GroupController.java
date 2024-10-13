@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.controller;
 
 import kz.jarkyn.backend.config.Api;
+import kz.jarkyn.backend.model.common.api.MessageApi;
 import kz.jarkyn.backend.model.group.api.GroupCreateApi;
 import kz.jarkyn.backend.model.group.api.GroupDetailApi;
 import kz.jarkyn.backend.model.group.api.GroupEditApi;
@@ -38,5 +39,11 @@ public class GroupController {
     @PutMapping("{id}")
     public GroupDetailApi edit(@PathVariable UUID id, @RequestBody GroupEditApi editApi) {
         return groupService.editApi(id, editApi);
+    }
+
+    @DeleteMapping("{id}")
+    public MessageApi delete(@PathVariable UUID id) {
+        groupService.delete(id);
+        return MessageApi.DELETED;
     }
 }

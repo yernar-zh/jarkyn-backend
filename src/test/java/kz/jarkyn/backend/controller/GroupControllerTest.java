@@ -66,7 +66,8 @@ class GroupControllerTest {
                   "name": "Тормоз",
                   "parent": {"id": "da48c6fa-6739-11ee-0a80-039b000669e2"}
                 }""";
-        MvcResult result = mockMvc.perform(post(Api.Group.PATH).contentType(MediaType.APPLICATION_JSON).content(requestData))
+        MvcResult result = mockMvc.perform(post(Api.Group.PATH)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Тормоз"))
@@ -178,6 +179,33 @@ class GroupControllerTest {
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7")
                         .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
+    }
+
+    @Test
+    @Sql({"attribute.sql"})
+    public void testDelete_success() throws Exception {
+        mockMvc.perform(delete(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("DELETED"));
+        mockMvc.perform(get(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
+    }
+
+    @Test
+    @Sql({"attribute.sql"})
+    public void testDelete_hasRelation() throws Exception {
+        mockMvc.perform(delete(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2"))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.code").value("RELATION_EXCEPTION"));
+    }
+
+    @Test
+    @Sql({"attribute.sql"})
+    public void testDelete_notFound() throws Exception {
+        mockMvc.perform(delete(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
