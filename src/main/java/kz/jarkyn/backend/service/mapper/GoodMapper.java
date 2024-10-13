@@ -25,8 +25,8 @@ public abstract class GoodMapper {
     @Mapping(target = "group", source = "entity.group")
     @Mapping(target = "image", source = "entity.image")
     @Mapping(target = "minimumPrice", source = "entity.minimumPrice")
-    @Mapping(target = "transports", source = "goodTransports")
-    public abstract GoodDetailApi toDetailApi(GoodEntity entity, List<GoodAttributeEntity> goodTransports);
+    @Mapping(target = "attributes", source = "goodAttributes")
+    public abstract GoodDetailApi toDetailApi(GoodEntity entity, List<GoodAttributeEntity> goodAttributes);
 
     protected abstract IdNamedApi toApi(AttributeEntity entity);
 

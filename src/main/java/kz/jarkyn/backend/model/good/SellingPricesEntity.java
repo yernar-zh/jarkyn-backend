@@ -7,8 +7,8 @@ import jakarta.persistence.Table;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 
 @Entity
-@Table(name = "package")
-public class PackageEntity extends AbstractEntity {
+@Table(name = "selling_price")
+public class SellingPricesEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private GoodEntity product;

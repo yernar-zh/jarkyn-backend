@@ -7,14 +7,11 @@ import kz.jarkyn.backend.model.common.api.IdNamedApi;
 import org.immutables.value.Value;
 
 import java.util.List;
-import java.util.UUID;
 
 @Value.Immutable
-public interface GoodListApi {
-    UUID getId();
-    String getName();
-    @Nullable IdNamedApi getGroup();
+public interface GoodListApi extends IdNamedApi {
+    IdNamedApi getGroup();
     @Nullable IdApi getImage();
     Integer getMinimumPrice();
-    List<IdNamedApi> getTransports();
+    List<IdNamedApi> getAttributes();
 }

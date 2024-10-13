@@ -8,7 +8,6 @@ import kz.jarkyn.backend.model.good.GoodEntity;
 import kz.jarkyn.backend.model.good.api.*;
 import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GoodAttributeRepository;
-import kz.jarkyn.backend.repository.AttributeGroupRepository;
 import kz.jarkyn.backend.service.mapper.GoodMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,22 +17,22 @@ import java.util.*;
 @Service
 public class GoodService {
     private final GoodRepository goodRepository;
-    private final GoodAttributeRepository goodTransportRepository;
+    private final GoodAttributeRepository goodAttributeRepository;
     private final GoodMapper goodMapper;
 
     public GoodService(
             GoodRepository goodRepository,
-            GoodAttributeRepository goodTransportRepository,
+            GoodAttributeRepository goodAttributeRepository,
             GoodMapper goodMapper) {
         this.goodRepository = goodRepository;
-        this.goodTransportRepository = goodTransportRepository;
+        this.goodAttributeRepository = goodAttributeRepository;
         this.goodMapper = goodMapper;
     }
 
     @Transactional(readOnly = true)
     public GoodDetailApi findApiById(UUID id) {
         GoodEntity good = goodRepository.findById(id).orElseThrow();
-        List<GoodAttributeEntity> goodTransports = goodTransportRepository.findByGood(good);
+        List<GoodAttributeEntity> goodTransports = goodAttributeRepository.findByGood(good);
         return goodMapper.toDetailApi(good, goodTransports);
     }
 
@@ -48,7 +47,7 @@ public class GoodService {
         for (IdApi api : createApi.getAttributes()) {
             // TODO
         }
-        List<GoodAttributeEntity> goodTransports = goodTransportRepository.findByGood(good);
+        List<GoodAttributeEntity> goodTransports = goodAttributeRepository.findByGood(good);
         return goodMapper.toDetailApi(good, goodTransports);
     }
 
@@ -68,7 +67,7 @@ public class GoodService {
 //            goodTransportRepository.save(newEntity);
 //        }
 //        goodTransportRepository.deleteAll(divider.skippedCurrent());
-        List<GoodAttributeEntity> goodTransports = goodTransportRepository.findByGood(good);
+        List<GoodAttributeEntity> goodTransports = goodAttributeRepository.findByGood(good);
         return goodMapper.toDetailApi(good, goodTransports);
     }
 
