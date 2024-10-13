@@ -2,6 +2,7 @@
 package kz.jarkyn.backend.service;
 
 
+import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.common.api.IdApi;
 import kz.jarkyn.backend.model.good.GoodAttributeEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
@@ -31,7 +32,7 @@ public class GoodService {
 
     @Transactional(readOnly = true)
     public GoodDetailApi findApiById(UUID id) {
-        GoodEntity good = goodRepository.findById(id).orElseThrow();
+        GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<GoodAttributeEntity> goodTransports = goodAttributeRepository.findByGood(good);
         return goodMapper.toDetailApi(good, goodTransports);
     }
@@ -45,7 +46,8 @@ public class GoodService {
     public GoodDetailApi createApi(GoodCreateApi createApi) {
         GoodEntity good = goodRepository.save(goodMapper.toEntity(createApi));
         for (IdApi api : createApi.getAttributes()) {
-            // TODO
+            GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, api);
+            goodAttributeRepository.save(goodAttributeEntity);
         }
         List<GoodAttributeEntity> goodTransports = goodAttributeRepository.findByGood(good);
         return goodMapper.toDetailApi(good, goodTransports);

@@ -39,54 +39,48 @@ class GoodControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @Sql({"good.sql"})
     public void testDetail_notFound() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7"))
+        mockMvc.perform(get(Api.Good.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
 
     @Test
-    @Sql({"groups.sql"})
-    public void testList_success() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$[0].name").value("Педаль"))
-                .andExpect(jsonPath("$[0].children.length()").value(2))
-                .andExpect(jsonPath("$[0].children[0].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"))
-                .andExpect(jsonPath("$[0].children[0].name").value("Педаль переключения передач"))
-                .andExpect(jsonPath("$[0].children[0].children").isEmpty())
-                .andExpect(jsonPath("$[0].children[1].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
-                .andExpect(jsonPath("$[0].children[1].name").value("Кикстартер"))
-                .andExpect(jsonPath("$[0].children[1].children").isEmpty());
-    }
-
-    @Test
-    @Sql({"groups.sql"})
+    @Sql({"good.sql"})
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Тормоз",
-                  "parent": {"id": "da48c6fa-6739-11ee-0a80-039b000669e2"}
+                  "name": "Кикстартер S качественный",
+                  "group": {"id": "cdfcf458-7cca-11ef-0a80-152f001b4886"},
+                  "minimumPrice": 1000,
+                  "attributes": [{"id": "355785a2-0dd8-49f8-987f-06e3c48bf9a8"}]
                 }""";
-        MvcResult result = mockMvc.perform(post(Api.Group.PATH)
+        MvcResult result = mockMvc.perform(post(Api.Good.PATH)
                         .contentType(MediaType.APPLICATION_JSON).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Тормоз"))
-                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$.parent.name").value("Педаль"))
+                .andExpect(jsonPath("$.name").value("Кикстартер S качественный"))
+                .andExpect(jsonPath("$.group.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
+                .andExpect(jsonPath("$.group.name").value("Кикстартер"))
+                .andExpect(jsonPath("$.image").doesNotExist())
+                .andExpect(jsonPath("$.minimumPrice").value(1000))
+                .andExpect(jsonPath("$.attributes[0].id").value("355785a2-0dd8-49f8-987f-06e3c48bf9a8"))
+                .andExpect(jsonPath("$.attributes[0].name").value("Мотоцикл WY"))
                 .andReturn();
-        mockMvc.perform(get(Api.Group.PATH + "/" + TestUtils.extractId(result)))
+        mockMvc.perform(get(Api.Good.PATH + "/" + TestUtils.extractId(result)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Тормоз"))
-                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$.parent.name").value("Педаль"));
+                .andExpect(jsonPath("$.name").value("Кикстартер S качественный"))
+                .andExpect(jsonPath("$.group.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
+                .andExpect(jsonPath("$.group.name").value("Кикстартер"))
+                .andExpect(jsonPath("$.image").doesNotExist())
+                .andExpect(jsonPath("$.minimumPrice").value(1000))
+                .andExpect(jsonPath("$.attributes[0].id").value("355785a2-0dd8-49f8-987f-06e3c48bf9a8"))
+                .andExpect(jsonPath("$.attributes[0].name").value("Мотоцикл WY"));
     }
 
+    // TODO
     @Test
     @Sql({"groups.sql"})
     public void testEdit_success() throws Exception {
