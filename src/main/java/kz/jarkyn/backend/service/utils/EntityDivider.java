@@ -19,13 +19,13 @@ public class EntityDivider<C extends AbstractEntity, R extends IdApi> {
         skippedCurrent = new ArrayList<>();
 
         Map<UUID, C> currentMap = current.stream().collect(Collectors.toMap(AbstractEntity::getId, Function.identity()));
-        if (currentMap.size() != received.size()) {
+        if (currentMap.size() != current.size()) {
             throw new ApiValidationException("Current list contains duplicates");
         }
         Set<UUID> editedReceivedSet = new HashSet<>();
         for (int i = 0; i < received.size(); i++) {
             R receivedI = received.get(i);
-            if (receivedI.getId() == null) {
+            if (receivedI.getId() == null || !currentMap.containsKey(receivedI.getId())) {
                 newReceived.add(new Entry(null, receivedI, i));
             } else {
                 edited.add(new Entry(Objects.requireNonNull(currentMap.get(receivedI.getId())), receivedI, i));

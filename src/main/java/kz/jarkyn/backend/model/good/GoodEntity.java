@@ -18,6 +18,7 @@ public class GoodEntity extends AbstractEntity {
     private ImageEntity image;
     @Column(name = "minimum_price")
     private Integer minimumPrice;
+    private Boolean archived;
 
     public String getName() {
         return name;
@@ -49,5 +50,13 @@ public class GoodEntity extends AbstractEntity {
 
     public void setMinimumPrice(Integer minimumPrice) {
         this.minimumPrice = minimumPrice;
+    }
+
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
     }
 }

@@ -3,14 +3,14 @@ package kz.jarkyn.backend.model.good.api;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.model.common.api.IdApi;
-import kz.jarkyn.backend.model.common.api.IdNamedApi;
+import kz.jarkyn.backend.model.common.api.NamedApi;
 import org.immutables.value.Value;
 
 import java.util.List;
 
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableGoodEditApi.Builder.class)
-public interface GoodEditApi extends IdNamedApi {
+public interface GoodEditApi extends NamedApi {
     IdApi getGroup();
     @Nullable IdApi getImage();
     Integer getMinimumPrice();

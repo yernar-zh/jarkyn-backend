@@ -3,6 +3,10 @@ FROM selling_price
 WHERE TRUE;
 
 DELETE
+FROM good_attribute
+WHERE TRUE;
+
+DELETE
 FROM good
 WHERE TRUE;
 
@@ -21,7 +25,10 @@ WHERE TRUE;
 INSERT INTO groups (id, name, position, parent_id, created_at, last_modified_at)
 VALUES ('cdfcf458-7cca-11ef-0a80-152f001b4886',
         'Кикстартер', 100, null,
-        now(), now());
+        now(), now()),
+       ('faeb45ef-cf5a-45e1-af2e-6e875a2d6331',
+        'Кикстартер 2', 101, null,
+        now(), now());;
 
 INSERT INTO attribute_group (id, name, position, created_at, last_modified_at)
 VALUES ('c5a95fbd-121e-4f57-a84b-600a9919228a',
@@ -36,14 +43,14 @@ VALUES ('e95420b5-3344-44ce-8d39-699f516ed715',
         'Мотоцикл WY', 99, 'c5a95fbd-121e-4f57-a84b-600a9919228a',
         now(), now());
 
-INSERT INTO good (id, name, group_id, minimum_price, image_id, created_at, last_modified_at)
+INSERT INTO good (id, name, group_id, minimum_price, image_id, archived, created_at, last_modified_at)
 VALUES ('7f316872-1da3-44c8-9293-0fddda859435',
         'Кикстартер L', 'cdfcf458-7cca-11ef-0a80-152f001b4886',
-        '800', NULL,
+        '800', NULL, FALSE,
         now(), now()),
        ('5db9d602-5b87-11ee-0a80-000c0039afe5',
         'Кикстартер S', 'cdfcf458-7cca-11ef-0a80-152f001b4886',
-        '810', NULL,
+        '810', NULL, FALSE,
         now(), now());
 
 INSERT INTO good_attribute (id, good_id, attribute_id, created_at, last_modified_at)

@@ -13,5 +13,6 @@ public interface GoodDetailApi extends IdNamedApi {
     IdNamedApi getGroup();
     @Nullable IdApi getImage();
     Integer getMinimumPrice();
+    Boolean getArchived();
     List<IdNamedApi> getAttributes();
 }

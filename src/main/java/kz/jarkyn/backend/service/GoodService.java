@@ -7,9 +7,11 @@ import kz.jarkyn.backend.model.common.api.IdApi;
 import kz.jarkyn.backend.model.good.GoodAttributeEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 import kz.jarkyn.backend.model.good.api.*;
+import kz.jarkyn.backend.repository.AttributeRepository;
 import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GoodAttributeRepository;
 import kz.jarkyn.backend.service.mapper.GoodMapper;
+import kz.jarkyn.backend.service.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,14 +21,17 @@ import java.util.*;
 public class GoodService {
     private final GoodRepository goodRepository;
     private final GoodAttributeRepository goodAttributeRepository;
+    private final AttributeRepository attributeRepository;
     private final GoodMapper goodMapper;
 
     public GoodService(
             GoodRepository goodRepository,
             GoodAttributeRepository goodAttributeRepository,
+            AttributeRepository attributeRepository,
             GoodMapper goodMapper) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
+        this.attributeRepository = attributeRepository;
         this.goodMapper = goodMapper;
     }
 
@@ -45,6 +50,7 @@ public class GoodService {
     @Transactional
     public GoodDetailApi createApi(GoodCreateApi createApi) {
         GoodEntity good = goodRepository.save(goodMapper.toEntity(createApi));
+        good.setArchived(false);
         for (IdApi api : createApi.getAttributes()) {
             GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, api);
             goodAttributeRepository.save(goodAttributeEntity);
@@ -56,21 +62,27 @@ public class GoodService {
 
     @Transactional
     public GoodDetailApi editApi(UUID id, GoodEditApi editApi) {
-        GoodEntity good = goodRepository.findById(id).orElseThrow();
+        GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         goodMapper.editEntity(good, editApi);
-//        EntityDivider<GoodAttributeEntity, IdApi, UUID> divider = new EntityDivider<>(
-//                goodTransportRepository.findByGood(good), x -> x.getTransport().getId(),
-//                editApi.getTransports(), IdApi::getId
-//        );
-//        for (IdApi api : divider.newReceived()) {
-//            GoodAttributeEntity newEntity = new GoodAttributeEntity();
-//            newEntity.setGood(good);
-//            newEntity.setAttribute(transportRepository.findById(api.getId()).orElseThrow());
-//            goodTransportRepository.save(newEntity);
-//        }
-//        goodTransportRepository.deleteAll(divider.skippedCurrent());
-        List<GoodAttributeEntity> goodTransports = goodAttributeRepository.findByGood(good);
-        return goodMapper.toDetailApi(good, goodTransports);
+        EntityDivider<GoodAttributeEntity, IdApi> divider = new EntityDivider<>(
+                goodAttributeRepository.findByGood(good), editApi.getAttributes()
+        );
+        for (EntityDivider<GoodAttributeEntity, IdApi>.Entry entry : divider.newReceived()) {
+            GoodAttributeEntity newEntity = new GoodAttributeEntity();
+            newEntity.setGood(good);
+            newEntity.setAttribute(attributeRepository.findById(entry.getReceived().getId()).orElseThrow());
+            goodAttributeRepository.save(newEntity);
+        }
+        goodAttributeRepository.deleteAll(divider.skippedCurrent());
+        goodRepository.save(good);
+        return findApiById(id);
     }
 
+    @Transactional
+    public GoodDetailApi archive(UUID id, Boolean value) {
+        GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        good.setArchived(value);
+        goodRepository.save(good);
+        return findApiById(id);
+    }
 }

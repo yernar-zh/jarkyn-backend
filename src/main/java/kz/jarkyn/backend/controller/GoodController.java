@@ -1,9 +1,9 @@
 package kz.jarkyn.backend.controller;
 
 import kz.jarkyn.backend.config.Api;
+import kz.jarkyn.backend.model.common.api.ValueApi;
 import kz.jarkyn.backend.model.good.api.*;
 import kz.jarkyn.backend.service.GoodService;
-import kz.jarkyn.backend.service.GroupService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,5 +36,10 @@ public class GoodController {
     @PutMapping("{id}")
     public GoodDetailApi edit(@PathVariable UUID id, @RequestBody GoodEditApi editApi) {
         return goodService.editApi(id, editApi);
+    }
+
+    @PutMapping("{id}/archive")
+    public GoodDetailApi archive(@PathVariable UUID id, @RequestBody ValueApi<Boolean> valueApi) {
+        return goodService.archive(id, valueApi.getValue());
     }
 }
