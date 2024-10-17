@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,12 +19,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Sql({"good.sql"})
 class GoodControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    @Sql({"good.sql"})
+    @DirtiesContext
     public void testDetail_success() throws Exception {
         mockMvc.perform(get(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435"))
                 .andExpect(status().isOk())
@@ -39,7 +41,7 @@ class GoodControllerTest {
     }
 
     @Test
-    @Sql({"good.sql"})
+    @DirtiesContext
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
@@ -63,7 +65,7 @@ class GoodControllerTest {
     }
 
     @Test
-    @Sql({"good.sql"})
+    @DirtiesContext
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
@@ -90,7 +92,7 @@ class GoodControllerTest {
     }
 
     @Test
-    @Sql({"good.sql"})
+    @DirtiesContext
     public void testArchive_success() throws Exception {
         String requestData = """
                 {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,12 +20,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Sql({"attribute.sql"})
 class AttributeControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
     public void testDetail_success() throws Exception {
         mockMvc.perform(get(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715"))
                 .andExpect(status().isOk())
@@ -33,7 +35,7 @@ class AttributeControllerTest {
     }
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
     public void testDetail_notFound() throws Exception {
         mockMvc.perform(get(Api.AttributeGroup.PATH + "/db689b56-4c87-40da-8969-e2bfbf89a84a"))
                 .andExpect(status().isNotFound())
@@ -41,7 +43,7 @@ class AttributeControllerTest {
     }
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
     public void testCreate() throws Exception {
         String requestData = """
                 {
@@ -60,7 +62,7 @@ class AttributeControllerTest {
     }
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
     public void testCreate_incorrectGroup() throws Exception {
         String requestData = """
                 {
@@ -73,7 +75,7 @@ class AttributeControllerTest {
     }
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
@@ -91,7 +93,7 @@ class AttributeControllerTest {
     }
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
     public void testEdit_notFound() throws Exception {
         String requestData = """
                 {
@@ -104,7 +106,7 @@ class AttributeControllerTest {
     }
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
     public void testDelete_success() throws Exception {
         mockMvc.perform(delete(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715"))
                 .andExpect(status().isOk())
@@ -113,8 +115,17 @@ class AttributeControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
+
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
+    public void testDelete_hasGood() throws Exception {
+        mockMvc.perform(delete(Api.Attribute.PATH + "/355785a2-0dd8-49f8-987f-06e3c48bf9a8"))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.code").value("RELATION_EXCEPTION"));
+    }
+
+    @Test
+    @DirtiesContext
     public void testDelete_notFound() throws Exception {
         mockMvc.perform(delete(Api.AttributeGroup.PATH + "/db689b56-4c87-40da-8969-e2bfbf89a84a"))
                 .andExpect(status().isNotFound())

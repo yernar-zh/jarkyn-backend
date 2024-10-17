@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,12 +19,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Sql({"groups.sql"})
 class GroupControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testDetail_success() throws Exception {
         mockMvc.perform(get(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(status().isOk())
@@ -34,7 +36,7 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testDetail_notFound() throws Exception {
         mockMvc.perform(get(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7"))
                 .andExpect(status().isNotFound())
@@ -42,7 +44,7 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testList_success() throws Exception {
         mockMvc.perform(get(Api.Group.PATH))
                 .andExpect(status().isOk())
@@ -59,7 +61,7 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
@@ -83,7 +85,7 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
@@ -114,7 +116,7 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testEdit_existLoop() throws Exception {
         String requestData = """
                 {
@@ -134,7 +136,7 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testEdit_existLoopShort() throws Exception {
         String requestData = """
                 {
@@ -154,7 +156,7 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testEdit_childrenNotSame() throws Exception {
         String requestData = """
                 {
@@ -170,7 +172,7 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"groups.sql"})
+    @DirtiesContext
     public void testEdit_notFound() throws Exception {
         String requestData = """
                 {
@@ -184,26 +186,34 @@ class GroupControllerTest {
     }
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
     public void testDelete_success() throws Exception {
-        mockMvc.perform(delete(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
+        mockMvc.perform(delete(Api.Group.PATH + "/6120deea-5b87-11ee-0a80-000c0039b0fd"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("DELETED"));
-        mockMvc.perform(get(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
+        mockMvc.perform(get(Api.Group.PATH + "/6120deea-5b87-11ee-0a80-000c0039b0fd"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
 
     @Test
-    @Sql({"attribute.sql"})
-    public void testDelete_hasRelation() throws Exception {
+    @DirtiesContext
+    public void testDelete_hasChildren() throws Exception {
         mockMvc.perform(delete(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2"))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.code").value("RELATION_EXCEPTION"));
     }
 
     @Test
-    @Sql({"attribute.sql"})
+    @DirtiesContext
+    public void testDelete_hasGood() throws Exception {
+        mockMvc.perform(delete(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.code").value("RELATION_EXCEPTION"));
+    }
+
+    @Test
+    @DirtiesContext
     public void testDelete_notFound() throws Exception {
         mockMvc.perform(delete(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7"))
                 .andExpect(status().isNotFound())

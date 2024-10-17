@@ -5,6 +5,7 @@ import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.attribute.AttributeEntity;
 import kz.jarkyn.backend.model.attribute.api.*;
 import kz.jarkyn.backend.repository.AttributeRepository;
+import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.service.mapper.AttributeMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +15,16 @@ import java.util.UUID;
 @Service
 public class AttributeService {
     private final AttributeRepository attributeRepository;
+    private final GoodRepository goodRepository;
     private final AttributeMapper attributeMapper;
 
     public AttributeService(
             AttributeRepository attributeRepository,
+            GoodRepository goodRepository,
             AttributeMapper attributeMapper
     ) {
         this.attributeRepository = attributeRepository;
+        this.goodRepository = goodRepository;
         this.attributeMapper = attributeMapper;
     }
 
@@ -49,7 +53,10 @@ public class AttributeService {
 
     @Transactional
     public void delete(UUID id) {
-        AttributeEntity entity = attributeRepository.findById(id).orElseThrow();
-        attributeRepository.delete(entity);
+        AttributeEntity attribute = attributeRepository.findById(id).orElseThrow();
+        if (!goodRepository.findByAttribute(attribute).isEmpty()) {
+            ExceptionUtils.throwRelationException();
+        }
+        attributeRepository.delete(attribute);
     }
 }

@@ -10,6 +10,7 @@ import kz.jarkyn.backend.model.group.api.GroupDetailApi;
 import kz.jarkyn.backend.model.group.api.GroupEditApi;
 import kz.jarkyn.backend.model.group.api.GroupListApi;
 import kz.jarkyn.backend.model.group.api.GroupCreateApi;
+import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GroupRepository;
 import kz.jarkyn.backend.service.mapper.GroupMapper;
 import kz.jarkyn.backend.service.utils.EntityDivider;
@@ -22,10 +23,16 @@ import java.util.stream.Collectors;
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
+    private final GoodRepository goodRepository;
     private final GroupMapper groupMapper;
 
-    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper) {
+    public GroupService(
+            GroupRepository groupRepository,
+            GoodRepository goodRepository,
+            GroupMapper groupMapper
+    ) {
         this.groupRepository = groupRepository;
+        this.goodRepository = goodRepository;
         this.groupMapper = groupMapper;
     }
 
@@ -91,10 +98,13 @@ public class GroupService {
 
     @Transactional
     public void delete(UUID id) {
-        GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (!groupRepository.findByParent(entity).isEmpty()) {
+        GroupEntity good = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (!groupRepository.findByParent(good).isEmpty()) {
             ExceptionUtils.throwRelationException();
         }
-        groupRepository.delete(entity); // TODO test
+        if (!goodRepository.findByGroup(good).isEmpty()) {
+            ExceptionUtils.throwRelationException();
+        }
+        groupRepository.delete(good);
     }
 }
