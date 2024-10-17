@@ -3,7 +3,7 @@ package kz.jarkyn.backend.service;
 
 
 import kz.jarkyn.backend.exception.ExceptionUtils;
-import kz.jarkyn.backend.model.common.api.IdApi;
+import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.good.GoodAttributeEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 import kz.jarkyn.backend.model.good.api.*;
@@ -51,7 +51,7 @@ public class GoodService {
     public GoodDetailApi createApi(GoodCreateApi createApi) {
         GoodEntity good = goodRepository.save(goodMapper.toEntity(createApi));
         good.setArchived(false);
-        for (IdApi api : createApi.getAttributes()) {
+        for (IdDto api : createApi.getAttributes()) {
             GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, api);
             goodAttributeRepository.save(goodAttributeEntity);
         }
@@ -64,10 +64,10 @@ public class GoodService {
     public GoodDetailApi editApi(UUID id, GoodEditApi editApi) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         goodMapper.editEntity(good, editApi);
-        EntityDivider<GoodAttributeEntity, IdApi> divider = new EntityDivider<>(
+        EntityDivider<GoodAttributeEntity, IdDto> divider = new EntityDivider<>(
                 goodAttributeRepository.findByGood(good), editApi.getAttributes()
         );
-        for (EntityDivider<GoodAttributeEntity, IdApi>.Entry entry : divider.newReceived()) {
+        for (EntityDivider<GoodAttributeEntity, IdDto>.Entry entry : divider.newReceived()) {
             GoodAttributeEntity newEntity = new GoodAttributeEntity();
             newEntity.setGood(good);
             newEntity.setAttribute(attributeRepository.findById(entry.getReceived().getId()).orElseThrow());

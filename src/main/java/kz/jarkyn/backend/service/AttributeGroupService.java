@@ -2,13 +2,11 @@ package kz.jarkyn.backend.service;
 
 
 import kz.jarkyn.backend.exception.ApiValidationException;
-import kz.jarkyn.backend.exception.DataValidationException;
 import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.attribute.AttributeEntity;
 import kz.jarkyn.backend.model.attribute.AttributeGroupEntity;
 import kz.jarkyn.backend.model.attribute.api.*;
-import kz.jarkyn.backend.model.common.api.IdApi;
-import kz.jarkyn.backend.model.common.api.IdNamedApi;
+import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.repository.AttributeGroupRepository;
 import kz.jarkyn.backend.repository.AttributeRepository;
 import kz.jarkyn.backend.service.mapper.AttributeMapper;
@@ -51,14 +49,14 @@ public class AttributeGroupService {
     }
 
     @Transactional
-    public List<AttributeGroupListApi> moveApi(List<IdApi> apiList) {
-        EntityDivider<AttributeGroupEntity, IdApi> divider = new EntityDivider<>(
+    public List<AttributeGroupListApi> moveApi(List<IdDto> apiList) {
+        EntityDivider<AttributeGroupEntity, IdDto> divider = new EntityDivider<>(
                 attributeGroupRepository.findAll(), apiList
         );
         if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
             throw new ApiValidationException("list should contain only and all current groups");
         }
-        for (EntityDivider<AttributeGroupEntity, IdApi>.Entry entry : divider.edited()) {
+        for (EntityDivider<AttributeGroupEntity, IdDto>.Entry entry : divider.edited()) {
             AttributeGroupEntity entity = entry.getCurrent();
             entity.setPosition(entry.getReceivedPosition());
             attributeGroupRepository.save(entity);
@@ -80,12 +78,12 @@ public class AttributeGroupService {
                 .orElseThrow(ExceptionUtils.entityNotFound());
         attributeMapper.editEntity(entity, editApi);
         attributeGroupRepository.save(entity);
-        EntityDivider<AttributeEntity, IdApi> divider = new EntityDivider<>(
+        EntityDivider<AttributeEntity, IdDto> divider = new EntityDivider<>(
                 attributeRepository.findByGroup(entity), editApi.getAttributes());
         if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
             throw new ApiValidationException("children list have to be same");
         }
-        for (EntityDivider<AttributeEntity, IdApi>.Entry entry : divider.edited()) {
+        for (EntityDivider<AttributeEntity, IdDto>.Entry entry : divider.edited()) {
             AttributeEntity attributeEntity = entry.getCurrent();
             attributeEntity.setPosition(entry.getReceivedPosition());
             attributeRepository.save(attributeEntity);

@@ -2,13 +2,13 @@ package kz.jarkyn.backend.service.utils;
 
 import kz.jarkyn.backend.exception.ApiValidationException;
 import kz.jarkyn.backend.model.common.AbstractEntity;
-import kz.jarkyn.backend.model.common.api.IdApi;
+import kz.jarkyn.backend.model.common.dto.IdDto;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class EntityDivider<C extends AbstractEntity, R extends IdApi> {
+public class EntityDivider<C extends AbstractEntity, R extends IdDto> {
     private final List<Entry> edited;
     private final List<Entry> newReceived;
     private final List<C> skippedCurrent;

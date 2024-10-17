@@ -2,13 +2,10 @@ package kz.jarkyn.backend.controller;
 
 import kz.jarkyn.backend.config.Api;
 import kz.jarkyn.backend.model.attribute.api.*;
-import kz.jarkyn.backend.model.common.api.IdApi;
 import kz.jarkyn.backend.model.common.api.MessageApi;
-import kz.jarkyn.backend.service.AttributeGroupService;
 import kz.jarkyn.backend.service.AttributeService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController

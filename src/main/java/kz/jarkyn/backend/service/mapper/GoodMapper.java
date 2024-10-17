@@ -1,8 +1,8 @@
 
 package kz.jarkyn.backend.service.mapper;
 
-import kz.jarkyn.backend.model.common.api.IdApi;
-import kz.jarkyn.backend.model.common.api.IdNamedApi;
+import kz.jarkyn.backend.model.common.dto.IdDto;
+import kz.jarkyn.backend.model.common.dto.IdNamedDto;
 import kz.jarkyn.backend.model.good.GoodAttributeEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 import kz.jarkyn.backend.model.attribute.AttributeEntity;
@@ -25,9 +25,9 @@ public abstract class GoodMapper {
     @Mapping(target = "attributes", source = "goodAttributes")
     public abstract GoodDetailApi toDetailApi(GoodEntity entity, List<GoodAttributeEntity> goodAttributes);
 
-    protected abstract IdNamedApi toApi(AttributeEntity entity);
+    protected abstract IdNamedDto toApi(AttributeEntity entity);
 
-    protected List<IdNamedApi> mapGoodTransports(List<GoodAttributeEntity> goodTransports) {
+    protected List<IdNamedDto> mapGoodTransports(List<GoodAttributeEntity> goodTransports) {
         return goodTransports.stream()
                 .map(GoodAttributeEntity::getAttribute)
                 .map(this::toApi)
@@ -37,5 +37,5 @@ public abstract class GoodMapper {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "good", source = "good")
     @Mapping(target = "attribute", source = "attribute")
-    public abstract GoodAttributeEntity toEntity(GoodEntity good, IdApi attribute);
+    public abstract GoodAttributeEntity toEntity(GoodEntity good, IdDto attribute);
 }

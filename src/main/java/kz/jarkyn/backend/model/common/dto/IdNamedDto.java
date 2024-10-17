@@ -1,12 +1,11 @@
-package kz.jarkyn.backend.model.common.api;
+package kz.jarkyn.backend.model.common.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import kz.jarkyn.backend.model.common.api.ImmutableIdNamedApi;
 import org.immutables.value.Value;
-
-import java.util.UUID;
 
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableIdNamedApi.Builder.class)
-public interface IdNamedApi extends IdApi {
+public interface IdNamedDto extends IdDto {
     String getName();
 }

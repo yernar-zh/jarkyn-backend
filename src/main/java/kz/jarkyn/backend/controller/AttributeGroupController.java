@@ -5,7 +5,7 @@ import kz.jarkyn.backend.model.attribute.api.AttributeGroupCreateApi;
 import kz.jarkyn.backend.model.attribute.api.AttributeGroupDetailApi;
 import kz.jarkyn.backend.model.attribute.api.AttributeGroupEditApi;
 import kz.jarkyn.backend.model.attribute.api.AttributeGroupListApi;
-import kz.jarkyn.backend.model.common.api.IdApi;
+import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.common.api.MessageApi;
 import kz.jarkyn.backend.service.AttributeGroupService;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class AttributeGroupController {
     }
 
     @PutMapping
-    public List<AttributeGroupListApi> move(@RequestBody List<IdApi> apiList) {
+    public List<AttributeGroupListApi> move(@RequestBody List<IdDto> apiList) {
         return attributeGroupService.moveApi(apiList);
     }
 

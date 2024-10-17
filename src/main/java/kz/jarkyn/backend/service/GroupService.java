@@ -4,7 +4,7 @@ package kz.jarkyn.backend.service;
 import kz.jarkyn.backend.exception.ApiValidationException;
 import kz.jarkyn.backend.exception.DataValidationException;
 import kz.jarkyn.backend.exception.ExceptionUtils;
-import kz.jarkyn.backend.model.common.api.IdApi;
+import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.group.GroupEntity;
 import kz.jarkyn.backend.model.group.api.GroupDetailApi;
 import kz.jarkyn.backend.model.group.api.GroupEditApi;
@@ -83,12 +83,12 @@ public class GroupService {
             }
         }
         groupRepository.save(entity);
-        EntityDivider<GroupEntity, IdApi> divider = new EntityDivider<>(
+        EntityDivider<GroupEntity, IdDto> divider = new EntityDivider<>(
                 groupRepository.findByParent(entity), editApi.getChildren());
         if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
             throw new ApiValidationException("children list have to be same");
         }
-        for (EntityDivider<GroupEntity, IdApi>.Entry entry : divider.edited()) {
+        for (EntityDivider<GroupEntity, IdDto>.Entry entry : divider.edited()) {
             GroupEntity childrenEntity = entry.getCurrent();
             childrenEntity.setPosition(entry.getReceivedPosition());
             groupRepository.save(childrenEntity);
