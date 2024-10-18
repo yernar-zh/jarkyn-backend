@@ -49,6 +49,19 @@ class GoodControllerTest {
 
     @Test
     @DirtiesContext
+    public void testList_success() throws Exception {
+        mockMvc.perform(get(Api.Good.PATH)
+                        .param("search", "кик")
+                        .param("groupId", "cdfcf458-7cca-11ef-0a80-152f001b4886")
+                        .param("attributeId", "e95420b5-3344-44ce-8d39-699f516ed715")
+                        .param("archived", Boolean.FALSE.toString())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    @DirtiesContext
     public void testCreate_success() throws Exception {
         String requestData = """
                 {

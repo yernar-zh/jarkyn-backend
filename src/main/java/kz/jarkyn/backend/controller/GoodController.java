@@ -25,7 +25,7 @@ public class GoodController {
     }
 
     @GetMapping
-    public List<GoodResponse> list(GoodApiFilter filter) {
+    public List<GoodResponse> list(@ModelAttribute GoodApiFilter filter) {
         return goodService.findApiByFilter(filter);
     }
 

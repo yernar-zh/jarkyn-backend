@@ -70,6 +70,9 @@ public class GoodService {
             stream = stream.filter(goodDto -> goodDto.getAttributes().stream()
                     .map(IdDto::getId).anyMatch(filter.getAttributeId()::equals));
         }
+        if (filter.getArchived() != null) {
+            stream = stream.filter(goodDto -> filter.getArchived().equals(goodDto.getArchived()));
+        }
         return stream.map(goodMapper::toListApi).toList();
     }
 

@@ -1,19 +1,19 @@
 package kz.jarkyn.backend.model.common.filter;
 
 public abstract class PagedApiFilter {
-    public final int page;
-    public final int pageSize;
+    public final Integer page;
+    public final Integer pageSize;
 
-    public PagedApiFilter(int page, int pageSize) {
+    protected PagedApiFilter(Integer page, Integer pageSize) {
         this.page = page;
         this.pageSize = pageSize;
     }
 
-    public int getPage() {
+    public Integer getPage() {
         return page;
     }
 
-    public int getPageSize() {
+    public Integer getPageSize() {
         return pageSize;
     }
 }
