@@ -31,13 +31,13 @@ public class GroupController {
     }
 
     @PostMapping
-    public GroupDetailResponse create(@RequestBody GroupRequest createApi) {
-        return groupService.createApi(createApi);
+    public GroupDetailResponse create(@RequestBody GroupRequest request) {
+        return groupService.createApi(request);
     }
 
     @PutMapping("{id}")
-    public GroupDetailResponse edit(@PathVariable UUID id, @RequestBody GroupRequest editApi) {
-        return groupService.editApi(id, editApi);
+    public GroupDetailResponse edit(@PathVariable UUID id, @RequestBody GroupRequest request) {
+        return groupService.editApi(id, request);
     }
 
     @DeleteMapping("{id}")

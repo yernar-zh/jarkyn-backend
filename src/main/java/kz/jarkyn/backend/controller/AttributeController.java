@@ -23,13 +23,13 @@ public class AttributeController {
     }
 
     @PostMapping
-    public AttributeResponse create(@RequestBody AttributeRequest createApi) {
-        return attributeService.createApi(createApi);
+    public AttributeResponse create(@RequestBody AttributeRequest request) {
+        return attributeService.createApi(request);
     }
 
     @PutMapping("{id}")
-    public AttributeResponse edit(@PathVariable UUID id, @RequestBody AttributeEditRequest editApi) {
-        return attributeService.editApi(id, editApi);
+    public AttributeResponse edit(@PathVariable UUID id, @RequestBody AttributeEditRequest request) {
+        return attributeService.editApi(id, request);
     }
 
     @DeleteMapping("{id}")

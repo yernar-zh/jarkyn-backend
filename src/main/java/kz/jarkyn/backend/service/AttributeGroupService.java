@@ -65,21 +65,21 @@ public class AttributeGroupService {
     }
 
     @Transactional
-    public AttributeGroupResponse createApi(AttributeGroupRequest createApi) {
-        AttributeGroupEntity entity = attributeMapper.toEntity(createApi);
+    public AttributeGroupResponse createApi(AttributeGroupRequest request) {
+        AttributeGroupEntity entity = attributeMapper.toEntity(request);
         entity.setPosition(1000);
         attributeGroupRepository.save(entity);
         return findApiById(entity.getId());
     }
 
     @Transactional
-    public AttributeGroupResponse editApi(UUID id, AttributeGroupRequest editApi) {
+    public AttributeGroupResponse editApi(UUID id, AttributeGroupRequest request) {
         AttributeGroupEntity entity = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
-        attributeMapper.editEntity(entity, editApi);
+        attributeMapper.editEntity(entity, request);
         attributeGroupRepository.save(entity);
         EntityDivider<AttributeEntity, IdDto> divider = new EntityDivider<>(
-                attributeRepository.findByGroup(entity), editApi.getAttributes());
+                attributeRepository.findByGroup(entity), request.getAttributes());
         if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
             throw new ApiValidationException("children list have to be same");
         }

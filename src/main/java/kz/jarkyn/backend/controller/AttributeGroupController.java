@@ -36,13 +36,13 @@ public class AttributeGroupController {
     }
 
     @PostMapping
-    public AttributeGroupResponse create(@RequestBody AttributeGroupRequest createApi) {
-        return attributeGroupService.createApi(createApi);
+    public AttributeGroupResponse create(@RequestBody AttributeGroupRequest request) {
+        return attributeGroupService.createApi(request);
     }
 
     @PutMapping("{id}")
-    public AttributeGroupResponse edit(@PathVariable UUID id, @RequestBody AttributeGroupRequest editApi) {
-        return attributeGroupService.editApi(id, editApi);
+    public AttributeGroupResponse edit(@PathVariable UUID id, @RequestBody AttributeGroupRequest request) {
+        return attributeGroupService.editApi(id, request);
     }
 
     @DeleteMapping("{id}")

@@ -74,14 +74,14 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodResponse createApi(GoodRequest createApi) {
-        GoodEntity good = goodRepository.save(goodMapper.toEntity(createApi));
+    public GoodResponse createApi(GoodRequest request) {
+        GoodEntity good = goodRepository.save(goodMapper.toEntity(request));
         good.setArchived(false);
-        for (IdDto api : createApi.getAttributes()) {
+        for (IdDto api : request.getAttributes()) {
             GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, api);
             goodAttributeRepository.save(goodAttributeEntity);
         }
-        for (SellingPriceRequest sellingPrice : createApi.getSellingPrices()) {
+        for (SellingPriceRequest sellingPrice : request.getSellingPrices()) {
             SellingPriceEntity sellingPriceEntity = goodMapper.toEntity(good, sellingPrice);
             sellingPriceRepository.save(sellingPriceEntity);
         }
@@ -89,12 +89,12 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodResponse editApi(UUID id, GoodRequest editApi) {
+    public GoodResponse editApi(UUID id, GoodRequest request) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        goodMapper.editEntity(good, editApi);
+        goodMapper.editEntity(good, request);
 
         EntityDivider<AttributeEntity, IdDto> attributeDivider = new EntityDivider<>(
-                attributeRepository.findByGood(good), editApi.getAttributes()
+                attributeRepository.findByGood(good), request.getAttributes()
         );
         for (EntityDivider<AttributeEntity, IdDto>.Entry entry : attributeDivider.newReceived()) {
             GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, entry.getReceived());
@@ -107,7 +107,7 @@ public class GoodService {
         }
 
         EntityDivider<SellingPriceEntity, SellingPriceRequest> sellingPriceDivider = new EntityDivider<>(
-                sellingPriceRepository.findByGood(good), editApi.getSellingPrices()
+                sellingPriceRepository.findByGood(good), request.getSellingPrices()
         );
         for (EntityDivider<SellingPriceEntity, SellingPriceRequest>.Entry entry : sellingPriceDivider.newReceived()) {
             SellingPriceEntity sellingPrice = goodMapper.toEntity(good, entry.getReceived());

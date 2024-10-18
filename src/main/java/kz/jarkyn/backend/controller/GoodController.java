@@ -30,13 +30,13 @@ public class GoodController {
     }
 
     @PostMapping
-    public GoodResponse create(@RequestBody GoodRequest createApi) {
-        return goodService.createApi(createApi);
+    public GoodResponse create(@RequestBody GoodRequest request) {
+        return goodService.createApi(request);
     }
 
     @PutMapping("{id}")
-    public GoodResponse edit(@PathVariable UUID id, @RequestBody GoodRequest editApi) {
-        return goodService.editApi(id, editApi);
+    public GoodResponse edit(@PathVariable UUID id, @RequestBody GoodRequest request) {
+        return goodService.editApi(id, request);
     }
 
     @PutMapping("{id}/archive")

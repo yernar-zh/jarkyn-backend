@@ -29,7 +29,7 @@ public abstract class GoodMapper {
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices);
     public abstract GoodResponse toListApi(GoodDto entity);
 
-    public abstract GoodEntity toEntity(GoodRequest api);
+    public abstract GoodEntity toEntity(GoodRequest request);
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "good", source = "good")
     @Mapping(target = "attribute", source = "attribute")
@@ -40,7 +40,7 @@ public abstract class GoodMapper {
     @Mapping(target = "value", source = "sellingPrice.value")
     public abstract SellingPriceEntity toEntity(GoodEntity good, SellingPriceRequest sellingPrice);
 
-    public abstract void editEntity(@MappingTarget GoodEntity entity, GoodRequest api);
+    public abstract void editEntity(@MappingTarget GoodEntity entity, GoodRequest request);
     public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceRequest dto);
 
     public abstract GoodDto toDto(

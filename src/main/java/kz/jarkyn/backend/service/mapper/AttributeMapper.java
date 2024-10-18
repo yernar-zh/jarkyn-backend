@@ -16,10 +16,10 @@ public abstract class AttributeMapper {
     @Mapping(target = "attributes", source = "attributes")
     public abstract AttributeGroupResponse toDetailApi(AttributeGroupEntity entity, List<AttributeEntity> attributes);
     public abstract List<AttributeGroupResponse> toListApi(List<AttributeGroupEntity> entity);
-    public abstract AttributeGroupEntity toEntity(AttributeGroupRequest api);
-    public abstract void editEntity(@MappingTarget AttributeGroupEntity entity, AttributeGroupRequest api);
+    public abstract AttributeGroupEntity toEntity(AttributeGroupRequest request);
+    public abstract void editEntity(@MappingTarget AttributeGroupEntity entity, AttributeGroupRequest request);
 
     public abstract AttributeResponse toDetailApi(AttributeEntity entity);
-    public abstract AttributeEntity toEntity(AttributeRequest api);
-    public abstract void editEntity(@MappingTarget AttributeEntity entity, AttributeEditRequest api);
+    public abstract AttributeEntity toEntity(AttributeRequest request);
+    public abstract void editEntity(@MappingTarget AttributeEntity entity, AttributeEditRequest request);
 }

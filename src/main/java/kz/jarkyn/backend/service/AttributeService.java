@@ -36,17 +36,17 @@ public class AttributeService {
     }
 
     @Transactional
-    public AttributeResponse createApi(AttributeRequest createApi) {
-        AttributeEntity entity = attributeMapper.toEntity(createApi);
+    public AttributeResponse createApi(AttributeRequest request) {
+        AttributeEntity entity = attributeMapper.toEntity(request);
         entity.setPosition(1000);
         attributeRepository.save(entity);
         return findApiById(entity.getId());
     }
 
     @Transactional
-    public AttributeResponse editApi(UUID id, AttributeEditRequest editApi) {
+    public AttributeResponse editApi(UUID id, AttributeEditRequest request) {
         AttributeEntity entity = attributeRepository.findById(id).orElseThrow();
-        attributeMapper.editEntity(entity, editApi);
+        attributeMapper.editEntity(entity, request);
         attributeRepository.save(entity);
         return findApiById(entity.getId());
     }

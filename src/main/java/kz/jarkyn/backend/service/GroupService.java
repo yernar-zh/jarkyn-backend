@@ -65,17 +65,17 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupDetailResponse createApi(GroupRequest createApi) {
-        GroupEntity entity = groupMapper.toEntity(createApi);
+    public GroupDetailResponse createApi(GroupRequest request) {
+        GroupEntity entity = groupMapper.toEntity(request);
         entity.setPosition(1000);
         groupRepository.save(entity);
         return findApiById(entity.getId());
     }
 
     @Transactional
-    public GroupDetailResponse editApi(UUID id, GroupRequest editApi) {
+    public GroupDetailResponse editApi(UUID id, GroupRequest request) {
         GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        groupMapper.editEntity(entity, editApi);
+        groupMapper.editEntity(entity, request);
         for (GroupEntity parent = entity.getParent(); parent != null; parent = parent.getParent()) {
             if (parent.equals(entity)) {
                 throw new DataValidationException("EXIST_PARENT_LOOP", "You are trying to move a group into itself");
@@ -83,7 +83,7 @@ public class GroupService {
         }
         groupRepository.save(entity);
         EntityDivider<GroupEntity, IdDto> divider = new EntityDivider<>(
-                groupRepository.findByParent(entity), editApi.getChildren());
+                groupRepository.findByParent(entity), request.getChildren());
         if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
             throw new ApiValidationException("children list have to be same");
         }
