@@ -18,17 +18,17 @@ public class AttributeController {
     }
 
     @GetMapping("{id}")
-    public AttributeDetailApi detail(@PathVariable UUID id) {
+    public AttributeResponse detail(@PathVariable UUID id) {
         return attributeService.findApiById(id);
     }
 
     @PostMapping
-    public AttributeDetailApi create(@RequestBody AttributeCreateApi createApi) {
+    public AttributeResponse create(@RequestBody AttributeRequest createApi) {
         return attributeService.createApi(createApi);
     }
 
     @PutMapping("{id}")
-    public AttributeDetailApi edit(@PathVariable UUID id, @RequestBody AttributeEditApi editApi) {
+    public AttributeResponse edit(@PathVariable UUID id, @RequestBody AttributeEditRequest editApi) {
         return attributeService.editApi(id, editApi);
     }
 

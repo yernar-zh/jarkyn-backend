@@ -2,10 +2,9 @@ package kz.jarkyn.backend.controller;
 
 import kz.jarkyn.backend.config.Api;
 import kz.jarkyn.backend.model.common.api.MessageApi;
-import kz.jarkyn.backend.model.group.api.GroupCreateApi;
-import kz.jarkyn.backend.model.group.api.GroupDetailApi;
-import kz.jarkyn.backend.model.group.api.GroupEditApi;
-import kz.jarkyn.backend.model.group.api.GroupListApi;
+import kz.jarkyn.backend.model.group.api.GroupDetailResponse;
+import kz.jarkyn.backend.model.group.api.GroupRequest;
+import kz.jarkyn.backend.model.group.api.GroupResponse;
 import kz.jarkyn.backend.service.GroupService;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,22 +21,22 @@ public class GroupController {
     }
 
     @GetMapping("{id}")
-    public GroupDetailApi detail(@PathVariable UUID id) {
+    public GroupDetailResponse detail(@PathVariable UUID id) {
         return groupService.findApiById(id);
     }
 
     @GetMapping
-    public List<GroupListApi> list() {
+    public List<GroupResponse> list() {
         return groupService.findApiAll();
     }
 
     @PostMapping
-    public GroupDetailApi create(@RequestBody GroupCreateApi createApi) {
+    public GroupDetailResponse create(@RequestBody GroupRequest createApi) {
         return groupService.createApi(createApi);
     }
 
     @PutMapping("{id}")
-    public GroupDetailApi edit(@PathVariable UUID id, @RequestBody GroupEditApi editApi) {
+    public GroupDetailResponse edit(@PathVariable UUID id, @RequestBody GroupRequest editApi) {
         return groupService.editApi(id, editApi);
     }
 

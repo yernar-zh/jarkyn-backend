@@ -15,5 +15,5 @@ public interface GoodRequest extends NamedDto {
     @Nullable IdDto getImage();
     Integer getMinimumPrice();
     List<IdDto> getAttributes();
-    List<SellingPriceApi> getSellingPrices();
+    List<SellingPriceRequest> getSellingPrices();
 }

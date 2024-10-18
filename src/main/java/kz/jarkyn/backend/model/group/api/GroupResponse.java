@@ -6,6 +6,6 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-public interface GroupListApi extends IdNamedDto {
-    List<GroupListApi> getChildren();
+public interface GroupResponse extends IdNamedDto {
+    List<GroupResponse> getChildren();
 }

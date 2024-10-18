@@ -38,10 +38,10 @@ public abstract class GoodMapper {
     @Mapping(target = "good", source = "good")
     @Mapping(target = "quantity", source = "sellingPrice.quantity")
     @Mapping(target = "value", source = "sellingPrice.value")
-    public abstract SellingPriceEntity toEntity(GoodEntity good, SellingPriceApi sellingPrice);
+    public abstract SellingPriceEntity toEntity(GoodEntity good, SellingPriceRequest sellingPrice);
 
     public abstract void editEntity(@MappingTarget GoodEntity entity, GoodRequest api);
-    public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceApi dto);
+    public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceRequest dto);
 
     public abstract GoodDto toDto(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,

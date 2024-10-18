@@ -6,10 +6,9 @@ import kz.jarkyn.backend.exception.DataValidationException;
 import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.group.GroupEntity;
-import kz.jarkyn.backend.model.group.api.GroupDetailApi;
-import kz.jarkyn.backend.model.group.api.GroupEditApi;
-import kz.jarkyn.backend.model.group.api.GroupListApi;
-import kz.jarkyn.backend.model.group.api.GroupCreateApi;
+import kz.jarkyn.backend.model.group.api.GroupDetailResponse;
+import kz.jarkyn.backend.model.group.api.GroupRequest;
+import kz.jarkyn.backend.model.group.api.GroupResponse;
 import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GroupRepository;
 import kz.jarkyn.backend.service.mapper.GroupMapper;
@@ -37,7 +36,7 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public GroupDetailApi findApiById(UUID id) {
+    public GroupDetailResponse findApiById(UUID id) {
         GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<GroupEntity> children = groupRepository.findByParent(entity);
         children.sort(Comparator.comparing(GroupEntity::getPosition).thenComparing(GroupEntity::getCreatedAt));
@@ -45,7 +44,7 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupListApi> findApiAll() {
+    public List<GroupResponse> findApiAll() {
         List<GroupEntity> entities = groupRepository.findAll();
         // Create a map of parent groups to their children using groupingBy
         Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream()
@@ -66,7 +65,7 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupDetailApi createApi(GroupCreateApi createApi) {
+    public GroupDetailResponse createApi(GroupRequest createApi) {
         GroupEntity entity = groupMapper.toEntity(createApi);
         entity.setPosition(1000);
         groupRepository.save(entity);
@@ -74,7 +73,7 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupDetailApi editApi(UUID id, GroupEditApi editApi) {
+    public GroupDetailResponse editApi(UUID id, GroupRequest editApi) {
         GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         groupMapper.editEntity(entity, editApi);
         for (GroupEntity parent = entity.getParent(); parent != null; parent = parent.getParent()) {

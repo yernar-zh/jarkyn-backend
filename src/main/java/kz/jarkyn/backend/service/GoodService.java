@@ -12,7 +12,7 @@ import kz.jarkyn.backend.model.good.SellingPriceEntity;
 import kz.jarkyn.backend.model.good.api.*;
 import kz.jarkyn.backend.model.good.apiFilter.GoodApiFilter;
 import kz.jarkyn.backend.model.good.dto.GoodDto;
-import kz.jarkyn.backend.model.good.api.SellingPriceApi;
+import kz.jarkyn.backend.model.good.api.SellingPriceRequest;
 import kz.jarkyn.backend.repository.AttributeRepository;
 import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GoodAttributeRepository;
@@ -81,7 +81,7 @@ public class GoodService {
             GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, api);
             goodAttributeRepository.save(goodAttributeEntity);
         }
-        for (SellingPriceApi sellingPrice : createApi.getSellingPrices()) {
+        for (SellingPriceRequest sellingPrice : createApi.getSellingPrices()) {
             SellingPriceEntity sellingPriceEntity = goodMapper.toEntity(good, sellingPrice);
             sellingPriceRepository.save(sellingPriceEntity);
         }
@@ -106,14 +106,14 @@ public class GoodService {
             goodAttributeRepository.delete(goodAttribute);
         }
 
-        EntityDivider<SellingPriceEntity, SellingPriceApi> sellingPriceDivider = new EntityDivider<>(
+        EntityDivider<SellingPriceEntity, SellingPriceRequest> sellingPriceDivider = new EntityDivider<>(
                 sellingPriceRepository.findByGood(good), editApi.getSellingPrices()
         );
-        for (EntityDivider<SellingPriceEntity, SellingPriceApi>.Entry entry : sellingPriceDivider.newReceived()) {
+        for (EntityDivider<SellingPriceEntity, SellingPriceRequest>.Entry entry : sellingPriceDivider.newReceived()) {
             SellingPriceEntity sellingPrice = goodMapper.toEntity(good, entry.getReceived());
             sellingPriceRepository.save(sellingPrice);
         }
-        for (EntityDivider<SellingPriceEntity, SellingPriceApi>.Entry entry : sellingPriceDivider.edited()) {
+        for (EntityDivider<SellingPriceEntity, SellingPriceRequest>.Entry entry : sellingPriceDivider.edited()) {
             goodMapper.editEntity(entry.getCurrent(), entry.getReceived());
         }
         sellingPriceRepository.deleteAll(sellingPriceDivider.skippedCurrent());

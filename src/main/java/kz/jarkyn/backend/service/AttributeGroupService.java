@@ -32,7 +32,7 @@ public class AttributeGroupService {
     }
 
     @Transactional(readOnly = true)
-    public AttributeGroupDetailApi findApiById(UUID id) {
+    public AttributeGroupResponse findApiById(UUID id) {
         AttributeGroupEntity entity = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
         List<AttributeEntity> attributes = attributeRepository.findByGroup(entity);
@@ -41,7 +41,7 @@ public class AttributeGroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<AttributeGroupListApi> findApiAll() {
+    public List<AttributeGroupResponse> findApiAll() {
         List<AttributeGroupEntity> entities = attributeGroupRepository.findAll();
         entities.sort(Comparator.comparing(AttributeGroupEntity::getPosition)
                 .thenComparing(AttributeGroupEntity::getCreatedAt));
@@ -49,7 +49,7 @@ public class AttributeGroupService {
     }
 
     @Transactional
-    public List<AttributeGroupListApi> moveApi(List<IdDto> apiList) {
+    public List<AttributeGroupResponse> moveApi(List<IdDto> apiList) {
         EntityDivider<AttributeGroupEntity, IdDto> divider = new EntityDivider<>(
                 attributeGroupRepository.findAll(), apiList
         );
@@ -65,7 +65,7 @@ public class AttributeGroupService {
     }
 
     @Transactional
-    public AttributeGroupDetailApi createApi(AttributeGroupCreateApi createApi) {
+    public AttributeGroupResponse createApi(AttributeGroupRequest createApi) {
         AttributeGroupEntity entity = attributeMapper.toEntity(createApi);
         entity.setPosition(1000);
         attributeGroupRepository.save(entity);
@@ -73,7 +73,7 @@ public class AttributeGroupService {
     }
 
     @Transactional
-    public AttributeGroupDetailApi editApi(UUID id, AttributeGroupEditApi editApi) {
+    public AttributeGroupResponse editApi(UUID id, AttributeGroupRequest editApi) {
         AttributeGroupEntity entity = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
         attributeMapper.editEntity(entity, editApi);

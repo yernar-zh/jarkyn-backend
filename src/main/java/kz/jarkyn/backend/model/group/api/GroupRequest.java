@@ -6,8 +6,11 @@ import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.common.dto.NamedDto;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 @Value.Immutable
-@JsonDeserialize(builder = ImmutableGroupCreateApi.Builder.class)
-public interface GroupCreateApi extends NamedDto {
+@JsonDeserialize(builder = ImmutableGroupRequest.Builder.class)
+public interface GroupRequest extends NamedDto {
     @Nullable IdDto getParent();
+    List<IdDto> getChildren();
 }

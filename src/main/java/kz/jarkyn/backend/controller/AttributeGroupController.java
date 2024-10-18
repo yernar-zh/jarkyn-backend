@@ -1,10 +1,8 @@
 package kz.jarkyn.backend.controller;
 
 import kz.jarkyn.backend.config.Api;
-import kz.jarkyn.backend.model.attribute.api.AttributeGroupCreateApi;
-import kz.jarkyn.backend.model.attribute.api.AttributeGroupDetailApi;
-import kz.jarkyn.backend.model.attribute.api.AttributeGroupEditApi;
-import kz.jarkyn.backend.model.attribute.api.AttributeGroupListApi;
+import kz.jarkyn.backend.model.attribute.api.AttributeGroupResponse;
+import kz.jarkyn.backend.model.attribute.api.AttributeGroupRequest;
 import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.common.api.MessageApi;
 import kz.jarkyn.backend.service.AttributeGroupService;
@@ -23,27 +21,27 @@ public class AttributeGroupController {
     }
 
     @GetMapping("{id}")
-    public AttributeGroupDetailApi detail(@PathVariable UUID id) {
+    public AttributeGroupResponse detail(@PathVariable UUID id) {
         return attributeGroupService.findApiById(id);
     }
 
     @GetMapping
-    public List<AttributeGroupListApi> list() {
+    public List<AttributeGroupResponse> list() {
         return attributeGroupService.findApiAll();
     }
 
     @PutMapping
-    public List<AttributeGroupListApi> move(@RequestBody List<IdDto> apiList) {
+    public List<AttributeGroupResponse> move(@RequestBody List<IdDto> apiList) {
         return attributeGroupService.moveApi(apiList);
     }
 
     @PostMapping
-    public AttributeGroupDetailApi create(@RequestBody AttributeGroupCreateApi createApi) {
+    public AttributeGroupResponse create(@RequestBody AttributeGroupRequest createApi) {
         return attributeGroupService.createApi(createApi);
     }
 
     @PutMapping("{id}")
-    public AttributeGroupDetailApi edit(@PathVariable UUID id, @RequestBody AttributeGroupEditApi editApi) {
+    public AttributeGroupResponse edit(@PathVariable UUID id, @RequestBody AttributeGroupRequest editApi) {
         return attributeGroupService.editApi(id, editApi);
     }
 

@@ -9,8 +9,8 @@ import org.immutables.value.Value;
 import java.util.UUID;
 
 @Value.Immutable
-@JsonDeserialize(builder = ImmutableSellingPriceApi.Builder.class)
-public interface SellingPriceApi extends IdDto {
+@JsonDeserialize(builder = ImmutableSellingPriceRequest.Builder.class)
+public interface SellingPriceRequest extends IdDto {
     @Nullable UUID getId();
     Integer getQuantity();
     Integer getValue();

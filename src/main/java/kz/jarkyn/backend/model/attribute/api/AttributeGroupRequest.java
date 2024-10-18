@@ -8,7 +8,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-@JsonDeserialize(builder = ImmutableAttributeGroupEditApi.Builder.class)
-public interface AttributeGroupEditApi extends NamedDto {
+@JsonDeserialize(builder = ImmutableAttributeGroupRequest.Builder.class)
+public interface AttributeGroupRequest extends NamedDto {
     List<IdDto> getAttributes();
 }

@@ -8,7 +8,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-public interface GroupDetailApi extends IdNamedDto {
+public interface GroupDetailResponse extends IdNamedDto {
     @Nullable IdNamedDto getParent();
     List<IdNamedDto> getChildren();
 }

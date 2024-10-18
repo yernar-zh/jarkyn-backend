@@ -1,10 +1,9 @@
 package kz.jarkyn.backend.service.mapper;
 
 import kz.jarkyn.backend.model.group.GroupEntity;
-import kz.jarkyn.backend.model.group.api.GroupCreateApi;
-import kz.jarkyn.backend.model.group.api.GroupDetailApi;
-import kz.jarkyn.backend.model.group.api.GroupEditApi;
-import kz.jarkyn.backend.model.group.api.GroupListApi;
+import kz.jarkyn.backend.model.group.api.GroupDetailResponse;
+import kz.jarkyn.backend.model.group.api.GroupRequest;
+import kz.jarkyn.backend.model.group.api.GroupResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -15,8 +14,8 @@ import java.util.Map;
 
 @Mapper(uses = EntityMapper.class)
 public abstract class GroupMapper {
-    public GroupListApi toListApi(GroupEntity entity, Map<GroupEntity, List<GroupEntity>> childrenMap) {
-        List<GroupListApi> children = new ArrayList<>();
+    public GroupResponse toListApi(GroupEntity entity, Map<GroupEntity, List<GroupEntity>> childrenMap) {
+        List<GroupResponse> children = new ArrayList<>();
         for (GroupEntity child : childrenMap.getOrDefault(entity, List.of())) {
             children.add(toListApi(child, childrenMap));
         }
@@ -25,11 +24,11 @@ public abstract class GroupMapper {
 
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "name", source = "entity.name")
-    protected abstract GroupListApi toListApi(GroupEntity entity, List<GroupListApi> children);
+    protected abstract GroupResponse toListApi(GroupEntity entity, List<GroupResponse> children);
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "name", source = "entity.name")
     @Mapping(target = "parent", source = "entity.parent")
-    public abstract GroupDetailApi toDetailApi(GroupEntity entity, List<GroupEntity> children);
-    public abstract GroupEntity toEntity(GroupCreateApi api);
-    public abstract void editEntity(@MappingTarget GroupEntity entity, GroupEditApi api);
+    public abstract GroupDetailResponse toDetailApi(GroupEntity entity, List<GroupEntity> children);
+    public abstract GroupEntity toEntity(GroupRequest api);
+    public abstract void editEntity(@MappingTarget GroupEntity entity, GroupRequest api);
 }

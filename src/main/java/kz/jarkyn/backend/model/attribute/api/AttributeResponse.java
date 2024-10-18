@@ -4,5 +4,5 @@ import kz.jarkyn.backend.model.common.dto.IdNamedDto;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface AttributeGroupListApi extends IdNamedDto {
+public interface AttributeResponse extends IdNamedDto {
 }

@@ -6,7 +6,7 @@ import kz.jarkyn.backend.model.common.dto.NamedDto;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonDeserialize(builder = ImmutableAttributeCreateApi.Builder.class)
-public interface AttributeCreateApi extends NamedDto {
+@JsonDeserialize(builder = ImmutableAttributeRequest.Builder.class)
+public interface AttributeRequest extends NamedDto {
     IdDto getGroup();
 }
