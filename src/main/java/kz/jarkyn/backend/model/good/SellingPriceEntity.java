@@ -8,19 +8,19 @@ import kz.jarkyn.backend.model.common.AbstractEntity;
 
 @Entity
 @Table(name = "selling_price")
-public class SellingPricesEntity extends AbstractEntity {
+public class SellingPriceEntity extends AbstractEntity {
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    private GoodEntity product;
+    @JoinColumn(name = "good_id")
+    private GoodEntity good;
     private Integer quantity;
-    private Integer price;
+    private Integer value;
 
-    public GoodEntity getProduct() {
-        return product;
+    public GoodEntity getGood() {
+        return good;
     }
 
-    public void setProduct(GoodEntity product) {
-        this.product = product;
+    public void setGood(GoodEntity product) {
+        this.good = product;
     }
 
     public Integer getQuantity() {
@@ -32,10 +32,10 @@ public class SellingPricesEntity extends AbstractEntity {
     }
 
     public Integer getPrice() {
-        return price;
+        return value;
     }
 
     public void setPrice(Integer price) {
-        this.price = price;
+        this.value = price;
     }
 }

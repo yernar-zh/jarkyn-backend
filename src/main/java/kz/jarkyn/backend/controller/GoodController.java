@@ -3,6 +3,7 @@ package kz.jarkyn.backend.controller;
 import kz.jarkyn.backend.config.Api;
 import kz.jarkyn.backend.model.common.api.ValueApi;
 import kz.jarkyn.backend.model.good.api.*;
+import kz.jarkyn.backend.model.good.apiFilter.GoodApiFilter;
 import kz.jarkyn.backend.service.GoodService;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +25,8 @@ public class GoodController {
     }
 
     @GetMapping
-    public List<GoodListApi> list() {
-        return goodService.findApiByFilter();
+    public List<GoodListApi> list(GoodApiFilter filter) {
+        return goodService.findApiByFilter(filter);
     }
 
     @PostMapping

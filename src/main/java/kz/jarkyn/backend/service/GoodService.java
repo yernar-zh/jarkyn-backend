@@ -3,16 +3,20 @@ package kz.jarkyn.backend.service;
 
 
 import kz.jarkyn.backend.exception.ExceptionUtils;
+import kz.jarkyn.backend.model.attribute.AttributeEntity;
 import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.common.dto.PrefixSearch;
 import kz.jarkyn.backend.model.good.GoodAttributeEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
+import kz.jarkyn.backend.model.good.SellingPriceEntity;
 import kz.jarkyn.backend.model.good.api.*;
 import kz.jarkyn.backend.model.good.apiFilter.GoodApiFilter;
 import kz.jarkyn.backend.model.good.dto.GoodDto;
+import kz.jarkyn.backend.model.good.dto.SellingPriceDto;
 import kz.jarkyn.backend.repository.AttributeRepository;
 import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GoodAttributeRepository;
+import kz.jarkyn.backend.repository.SellingPriceRepository;
 import kz.jarkyn.backend.service.mapper.GoodMapper;
 import kz.jarkyn.backend.service.utils.EntityDivider;
 import org.springframework.stereotype.Service;
@@ -26,24 +30,28 @@ public class GoodService {
     private final GoodRepository goodRepository;
     private final GoodAttributeRepository goodAttributeRepository;
     private final AttributeRepository attributeRepository;
+    private final SellingPriceRepository sellingPriceRepository;
     private final GoodMapper goodMapper;
 
     public GoodService(
             GoodRepository goodRepository,
             GoodAttributeRepository goodAttributeRepository,
             AttributeRepository attributeRepository,
+            SellingPriceRepository sellingPriceRepository,
             GoodMapper goodMapper) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
+        this.sellingPriceRepository = sellingPriceRepository;
         this.goodMapper = goodMapper;
     }
 
     @Transactional(readOnly = true)
     public GoodDetailApi findApiById(UUID id) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        List<GoodAttributeEntity> goodAttributes = goodAttributeRepository.findByGood(good);
-        return goodMapper.toDetailApi(good, goodAttributes);
+        List<AttributeEntity> attributes = attributeRepository.findByGood(good);
+        List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
+        return goodMapper.toDetailApi(good, attributes, sellingPrices);
     }
 
     @Transactional(readOnly = true)
@@ -60,7 +68,7 @@ public class GoodService {
             stream = stream.filter(goodDto -> goodDto.getAttributes().stream()
                     .map(IdDto::getId).anyMatch(filter.getAttributeId()::equals));
         }
-        return stream.map(goodDto -> goodMapper.toDetailApi(goodDto)).toList();
+        return stream.map(goodMapper::toListApi).toList();
     }
 
     @Transactional
@@ -71,26 +79,42 @@ public class GoodService {
             GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, api);
             goodAttributeRepository.save(goodAttributeEntity);
         }
-        List<GoodAttributeEntity> goodTransports = goodAttributeRepository.findByGood(good);
-        return goodMapper.toDetailApi(good, goodTransports);
+        for (SellingPriceDto sellingPrice : createApi.getSellingPrices()) {
+            SellingPriceEntity sellingPriceEntity = goodMapper.toEntity(good, sellingPrice);
+            sellingPriceRepository.save(sellingPriceEntity);
+        }
+        return findApiById(good.getId());
     }
-
 
     @Transactional
     public GoodDetailApi editApi(UUID id, GoodEditApi editApi) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         goodMapper.editEntity(good, editApi);
-        EntityDivider<GoodAttributeEntity, IdDto> divider = new EntityDivider<>(
-                goodAttributeRepository.findByGood(good), editApi.getAttributes()
+
+        EntityDivider<AttributeEntity, IdDto> attributeDivider = new EntityDivider<>(
+                attributeRepository.findByGood(good), editApi.getAttributes()
         );
-        for (EntityDivider<GoodAttributeEntity, IdDto>.Entry entry : divider.newReceived()) {
-            GoodAttributeEntity newEntity = new GoodAttributeEntity();
-            newEntity.setGood(good);
-            newEntity.setAttribute(attributeRepository.findById(entry.getReceived().getId()).orElseThrow());
-            goodAttributeRepository.save(newEntity);
+        for (EntityDivider<AttributeEntity, IdDto>.Entry entry : attributeDivider.newReceived()) {
+            GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, entry.getReceived());
+            goodAttributeRepository.save(goodAttributeEntity);
         }
-        goodAttributeRepository.deleteAll(divider.skippedCurrent());
-        goodRepository.save(good);
+        for (AttributeEntity attribute : attributeDivider.skippedCurrent()) {
+            GoodAttributeEntity goodAttribute = goodAttributeRepository
+                    .findByGoodAndAttribute(good, attribute).orElseThrow();
+            goodAttributeRepository.delete(goodAttribute);
+        }
+
+        EntityDivider<SellingPriceEntity, SellingPriceDto> sellingPriceDivider = new EntityDivider<>(
+                sellingPriceRepository.findByGood(good), editApi.getSellingPrices()
+        );
+        for (EntityDivider<SellingPriceEntity, SellingPriceDto>.Entry entry : sellingPriceDivider.newReceived()) {
+            SellingPriceEntity sellingPrice = goodMapper.toEntity(good, entry.getReceived());
+            sellingPriceRepository.save(sellingPrice);
+        }
+        for (EntityDivider<SellingPriceEntity, SellingPriceDto>.Entry entry : sellingPriceDivider.newReceived()) {
+            goodMapper.editEntity(entry.getCurrent(), entry.getReceived());
+        }
+        sellingPriceRepository.deleteAll(sellingPriceDivider.skippedCurrent());
         return findApiById(id);
     }
 
@@ -106,11 +130,12 @@ public class GoodService {
         List<GoodDto> result = new ArrayList<>();
         List<GoodEntity> goods = goodRepository.findAll();
         for (GoodEntity good : goods) {
-            List<GoodAttributeEntity> goodTransports = goodAttributeRepository.findByGood(good);
+            List<AttributeEntity> attributes = attributeRepository.findByGood(good);
+            List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
             PrefixSearch prefixSearch = new PrefixSearch();
             prefixSearch.add(good.getName());
             prefixSearch.add(good.getGroup().getName());
-            result.add(goodMapper.toDto(good, goodTransports, prefixSearch));
+            result.add(goodMapper.toDto(good, attributes, sellingPrices, prefixSearch));
         }
         return result;
     }

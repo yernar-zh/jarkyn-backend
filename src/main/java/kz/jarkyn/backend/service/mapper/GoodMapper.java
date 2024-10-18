@@ -8,10 +8,13 @@ import kz.jarkyn.backend.model.common.dto.PrefixSearch;
 import kz.jarkyn.backend.model.good.GoodAttributeEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 import kz.jarkyn.backend.model.attribute.AttributeEntity;
+import kz.jarkyn.backend.model.good.SellingPriceEntity;
 import kz.jarkyn.backend.model.good.api.GoodCreateApi;
 import kz.jarkyn.backend.model.good.api.GoodDetailApi;
 import kz.jarkyn.backend.model.good.api.GoodEditApi;
+import kz.jarkyn.backend.model.good.api.GoodListApi;
 import kz.jarkyn.backend.model.good.dto.GoodDto;
+import kz.jarkyn.backend.model.good.dto.SellingPriceDto;
 import kz.jarkyn.backend.model.group.GroupEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -26,15 +29,30 @@ import java.util.stream.Stream;
 
 @Mapper(uses = EntityMapper.class)
 public abstract class GoodMapper {
+    public abstract GoodDetailApi toDetailApi(
+            GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices);
+    public abstract GoodListApi toListApi(GoodDto entity);
+
     public abstract GoodEntity toEntity(GoodCreateApi api);
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "good", source = "good")
+    @Mapping(target = "attribute", source = "attribute")
+    public abstract GoodAttributeEntity toEntity(GoodEntity good, IdDto attribute);
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "good", source = "good")
+    @Mapping(target = "quantity", source = "sellingPrice.quantity")
+    @Mapping(target = "value", source = "attribute.value")
+    public abstract SellingPriceEntity toEntity(GoodEntity good, SellingPriceDto sellingPrice);
+
     public abstract void editEntity(@MappingTarget GoodEntity entity, GoodEditApi api);
-    @Mapping(target = "attributes", source = "goodAttributes")
-    public abstract GoodDetailApi toDetailApi(GoodEntity entity, List<GoodAttributeEntity> goodAttributes);
-    public abstract GoodDto toDto(GoodEntity entity, List<GoodAttributeEntity> attributes, PrefixSearch prefixSearch);
-    protected abstract IdNamedDto toApi(AttributeEntity entity);
+    public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceDto dto);
+
+    public abstract GoodDto toDto(
+            GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,
+            PrefixSearch prefixSearch);
     protected abstract IdNamedDto toApi(GroupEntity entity);
 
-    protected List<IdNamedDto> mapGoodAttributes(List<GoodAttributeEntity> goodTransports) {
+    protected List<IdNamedDto> mapGoodAttributes(List<GoodAttributeEntity> goodAttributes) {
         return goodTransports.stream()
                 .map(GoodAttributeEntity::getAttribute)
                 .map(this::toApi)
@@ -46,8 +64,5 @@ public abstract class GoodMapper {
                 .map(this::toApi).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "good", source = "good")
-    @Mapping(target = "attribute", source = "attribute")
-    public abstract GoodAttributeEntity toEntity(GoodEntity good, IdDto attribute);
+
 }

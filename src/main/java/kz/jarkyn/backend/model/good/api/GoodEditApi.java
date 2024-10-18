@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.common.dto.NamedDto;
+import kz.jarkyn.backend.model.good.dto.SellingPriceDto;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -15,4 +16,5 @@ public interface GoodEditApi extends NamedDto {
     @Nullable IdDto getImage();
     Integer getMinimumPrice();
     List<IdDto> getAttributes();
+    List<SellingPriceDto> getSellingPrices();
 }

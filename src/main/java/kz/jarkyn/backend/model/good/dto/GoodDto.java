@@ -15,5 +15,6 @@ public interface GoodDto extends IdNamedDto {
     @Nullable IdDto getImage();
     Integer getMinimumPrice();
     List<IdNamedDto> getAttributes();
+    List<SellingPriceDto> getSellingPrices();
     PrefixSearch getPrefixSearch();
 }
