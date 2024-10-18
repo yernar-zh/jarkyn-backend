@@ -1,9 +1,6 @@
 package kz.jarkyn.backend.model.good;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 
 @Entity
@@ -13,14 +10,15 @@ public class SellingPriceEntity extends AbstractEntity {
     @JoinColumn(name = "good_id")
     private GoodEntity good;
     private Integer quantity;
+    @Column(name = "val")
     private Integer value;
 
     public GoodEntity getGood() {
         return good;
     }
 
-    public void setGood(GoodEntity product) {
-        this.good = product;
+    public void setGood(GoodEntity good) {
+        this.good = good;
     }
 
     public Integer getQuantity() {
@@ -31,11 +29,11 @@ public class SellingPriceEntity extends AbstractEntity {
         this.quantity = quantity;
     }
 
-    public Integer getPrice() {
+    public Integer getValue() {
         return value;
     }
 
-    public void setPrice(Integer price) {
-        this.value = price;
+    public void setValue(Integer value) {
+        this.value = value;
     }
 }

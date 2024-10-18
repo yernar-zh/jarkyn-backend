@@ -5,20 +5,20 @@ package kz.jarkyn.backend.service;
 import kz.jarkyn.backend.exception.ExceptionUtils;
 import kz.jarkyn.backend.model.attribute.AttributeEntity;
 import kz.jarkyn.backend.model.common.dto.IdDto;
-import kz.jarkyn.backend.model.common.dto.PrefixSearch;
+import kz.jarkyn.backend.utils.PrefixSearch;
 import kz.jarkyn.backend.model.good.GoodAttributeEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 import kz.jarkyn.backend.model.good.SellingPriceEntity;
 import kz.jarkyn.backend.model.good.api.*;
 import kz.jarkyn.backend.model.good.apiFilter.GoodApiFilter;
 import kz.jarkyn.backend.model.good.dto.GoodDto;
-import kz.jarkyn.backend.model.good.dto.SellingPriceDto;
+import kz.jarkyn.backend.model.good.api.SellingPriceApi;
 import kz.jarkyn.backend.repository.AttributeRepository;
 import kz.jarkyn.backend.repository.GoodRepository;
 import kz.jarkyn.backend.repository.GoodAttributeRepository;
 import kz.jarkyn.backend.repository.SellingPriceRepository;
 import kz.jarkyn.backend.service.mapper.GoodMapper;
-import kz.jarkyn.backend.service.utils.EntityDivider;
+import kz.jarkyn.backend.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,15 +47,17 @@ public class GoodService {
     }
 
     @Transactional(readOnly = true)
-    public GoodDetailApi findApiById(UUID id) {
+    public GoodResponse findApiById(UUID id) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<AttributeEntity> attributes = attributeRepository.findByGood(good);
+        attributes.sort(Comparator.comparing(AttributeEntity::getName));
         List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
+        sellingPrices.sort(Comparator.comparing(SellingPriceEntity::getQuantity));
         return goodMapper.toDetailApi(good, attributes, sellingPrices);
     }
 
     @Transactional(readOnly = true)
-    public List<GoodListApi> findApiByFilter(GoodApiFilter filter) {
+    public List<GoodResponse> findApiByFilter(GoodApiFilter filter) {
         Stream<GoodDto> stream = findAllDto().stream();
         if (filter.getSearch() != null) {
             stream = stream.filter(goodDto -> goodDto.getPrefixSearch().contains(filter.getSearch()));
@@ -72,14 +74,14 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodDetailApi createApi(GoodCreateApi createApi) {
+    public GoodResponse createApi(GoodRequest createApi) {
         GoodEntity good = goodRepository.save(goodMapper.toEntity(createApi));
         good.setArchived(false);
         for (IdDto api : createApi.getAttributes()) {
             GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, api);
             goodAttributeRepository.save(goodAttributeEntity);
         }
-        for (SellingPriceDto sellingPrice : createApi.getSellingPrices()) {
+        for (SellingPriceApi sellingPrice : createApi.getSellingPrices()) {
             SellingPriceEntity sellingPriceEntity = goodMapper.toEntity(good, sellingPrice);
             sellingPriceRepository.save(sellingPriceEntity);
         }
@@ -87,7 +89,7 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodDetailApi editApi(UUID id, GoodEditApi editApi) {
+    public GoodResponse editApi(UUID id, GoodRequest editApi) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         goodMapper.editEntity(good, editApi);
 
@@ -104,14 +106,14 @@ public class GoodService {
             goodAttributeRepository.delete(goodAttribute);
         }
 
-        EntityDivider<SellingPriceEntity, SellingPriceDto> sellingPriceDivider = new EntityDivider<>(
+        EntityDivider<SellingPriceEntity, SellingPriceApi> sellingPriceDivider = new EntityDivider<>(
                 sellingPriceRepository.findByGood(good), editApi.getSellingPrices()
         );
-        for (EntityDivider<SellingPriceEntity, SellingPriceDto>.Entry entry : sellingPriceDivider.newReceived()) {
+        for (EntityDivider<SellingPriceEntity, SellingPriceApi>.Entry entry : sellingPriceDivider.newReceived()) {
             SellingPriceEntity sellingPrice = goodMapper.toEntity(good, entry.getReceived());
             sellingPriceRepository.save(sellingPrice);
         }
-        for (EntityDivider<SellingPriceEntity, SellingPriceDto>.Entry entry : sellingPriceDivider.newReceived()) {
+        for (EntityDivider<SellingPriceEntity, SellingPriceApi>.Entry entry : sellingPriceDivider.edited()) {
             goodMapper.editEntity(entry.getCurrent(), entry.getReceived());
         }
         sellingPriceRepository.deleteAll(sellingPriceDivider.skippedCurrent());
@@ -119,7 +121,7 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodDetailApi archive(UUID id, Boolean value) {
+    public GoodResponse archive(UUID id, Boolean value) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         good.setArchived(value);
         goodRepository.save(good);

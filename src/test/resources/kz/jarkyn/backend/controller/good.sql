@@ -1,27 +1,3 @@
-DELETE
-FROM selling_price
-WHERE TRUE;
-
-DELETE
-FROM good_attribute
-WHERE TRUE;
-
-DELETE
-FROM good
-WHERE TRUE;
-
-DELETE
-FROM attribute
-WHERE TRUE;
-
-DELETE
-FROM attribute_group
-WHERE TRUE;
-
-DELETE
-FROM groups
-WHERE TRUE;
-
 INSERT INTO groups (id, name, position, parent_id, created_at, last_modified_at)
 VALUES ('cdfcf458-7cca-11ef-0a80-152f001b4886',
         'Кикстартер', 100, null,
@@ -54,7 +30,7 @@ VALUES ('adc7414d-3985-4a16-8790-d5543f624d7a',
         '7f316872-1da3-44c8-9293-0fddda859435', 'e95420b5-3344-44ce-8d39-699f516ed715',
         now(), now());
 
-INSERT INTO selling_price (id, product_id, quantity, price, created_at, last_modified_at)
+INSERT INTO selling_price (id, good_id, quantity, val, created_at, last_modified_at)
 VALUES ('fbe70a5c-a0d1-414c-9507-7352739b1243',
         '7f316872-1da3-44c8-9293-0fddda859435', 1, 880,
         now(), now()),

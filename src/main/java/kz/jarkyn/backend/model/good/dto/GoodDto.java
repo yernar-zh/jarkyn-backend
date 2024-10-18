@@ -4,7 +4,7 @@ package kz.jarkyn.backend.model.good.dto;
 import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.model.common.dto.IdNamedDto;
-import kz.jarkyn.backend.model.common.dto.PrefixSearch;
+import kz.jarkyn.backend.utils.PrefixSearch;
 import org.immutables.value.Value;
 
 import java.util.List;

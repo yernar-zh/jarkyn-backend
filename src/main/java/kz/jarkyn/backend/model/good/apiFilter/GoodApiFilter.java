@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.model.good.apiFilter;
 
-import kz.jarkyn.backend.model.common.PagedApiFilter;
+import kz.jarkyn.backend.model.common.filter.PagedApiFilter;
 
 import java.util.UUID;
 

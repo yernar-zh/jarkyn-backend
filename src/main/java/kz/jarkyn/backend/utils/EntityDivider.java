@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.service.utils;
+package kz.jarkyn.backend.utils;
 
 import kz.jarkyn.backend.exception.ApiValidationException;
 import kz.jarkyn.backend.model.common.AbstractEntity;

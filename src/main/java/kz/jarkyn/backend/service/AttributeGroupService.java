@@ -10,7 +10,7 @@ import kz.jarkyn.backend.model.common.dto.IdDto;
 import kz.jarkyn.backend.repository.AttributeGroupRepository;
 import kz.jarkyn.backend.repository.AttributeRepository;
 import kz.jarkyn.backend.service.mapper.AttributeMapper;
-import kz.jarkyn.backend.service.utils.EntityDivider;
+import kz.jarkyn.backend.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

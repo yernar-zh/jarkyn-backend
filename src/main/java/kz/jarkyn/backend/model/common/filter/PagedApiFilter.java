@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.model.common;
+package kz.jarkyn.backend.model.common.filter;
 
 public abstract class PagedApiFilter {
     public final int page;

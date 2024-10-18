@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.model.common.dto;
+package kz.jarkyn.backend.utils;
 
 import java.util.*;
 
