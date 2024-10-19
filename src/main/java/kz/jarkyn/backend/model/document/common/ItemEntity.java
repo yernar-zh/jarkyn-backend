@@ -14,12 +14,12 @@ public class ItemEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "document_id")
     private DocumentEntity document;
-    private Integer position;
     @ManyToOne
     @JoinColumn(name = "good_id")
     private GoodEntity good;
     private Integer price;
     private Integer quantity;
+    private Integer position;
 
     public DocumentEntity getDocument() {
         return document;

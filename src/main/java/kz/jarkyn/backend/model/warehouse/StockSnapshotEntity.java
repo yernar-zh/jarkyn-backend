@@ -20,7 +20,7 @@ public class StockSnapshotEntity extends AbstractEntity {
     @JoinColumn(name = "good_id")
     private GoodEntity good;
     private LocalDateTime moment;
-    private Integer remains;
+    private Integer remain;
 
     public WarehouseEntity getWarehouse() {
         return warehouse;
@@ -46,11 +46,11 @@ public class StockSnapshotEntity extends AbstractEntity {
         this.moment = moment;
     }
 
-    public Integer getRemains() {
-        return remains;
+    public Integer getRemain() {
+        return remain;
     }
 
-    public void setRemains(Integer remains) {
-        this.remains = remains;
+    public void setRemain(Integer remain) {
+        this.remain = remain;
     }
 }

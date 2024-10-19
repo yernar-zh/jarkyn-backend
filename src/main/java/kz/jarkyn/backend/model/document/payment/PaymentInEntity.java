@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import kz.jarkyn.backend.model.account.AccountEntity;
 import kz.jarkyn.backend.model.common.AbstractEntity_;
 import kz.jarkyn.backend.model.document.common.DocumentEntity;
-import kz.jarkyn.backend.model.document.sale.SaleState;
 
 @Entity
 @Table(name = "payment_in")
@@ -14,9 +13,8 @@ public class PaymentInEntity extends DocumentEntity {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private AccountEntity account;
-    private Integer amount;
     @Enumerated(EnumType.STRING)
-    private SaleState state;
+    private PaymentInState state;
 
     public AccountEntity getAccount() {
         return account;
@@ -26,19 +24,11 @@ public class PaymentInEntity extends DocumentEntity {
         this.account = account;
     }
 
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Integer amount) {
-        this.amount = amount;
-    }
-
-    public SaleState getState() {
+    public PaymentInState getState() {
         return state;
     }
 
-    public void setState(SaleState state) {
+    public void setState(PaymentInState state) {
         this.state = state;
     }
 }
