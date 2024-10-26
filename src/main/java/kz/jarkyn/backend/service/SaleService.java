@@ -8,7 +8,6 @@ import kz.jarkyn.backend.model.document.payment.PaymentInForSaleEntity;
 import kz.jarkyn.backend.model.document.sale.SaleEntity;
 import kz.jarkyn.backend.model.document.sale.api.SaleDetailResponse;
 import kz.jarkyn.backend.model.document.sale.api.SaleRequest;
-import kz.jarkyn.backend.model.good.api.GoodResponse;
 import kz.jarkyn.backend.repository.*;
 import kz.jarkyn.backend.service.mapper.SaleMapper;
 import org.springframework.stereotype.Service;
@@ -44,29 +43,10 @@ public class SaleService {
         return saleMapper.toDetailResponse(sale, items, saleRepositoryBySale);
     }
 
-    @Transactional(readOnly = true)
-    public List<GoodResponse> findApiByFilter() {
-        return null;
-    }
-
     @Transactional
     public UUID createApi(SaleRequest request) {
         SaleEntity sale = saleRepository.save(saleMapper.toEntity(request));
         itemService.editApi(sale, request.getItems());
         return sale.getId();
     }
-
-    @Transactional
-    public void editApi(UUID id, SaleRequest request) {
-        SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        saleMapper.editEntity(sale, request);
-        itemService.editApi(sale, request.getItems());
-    }
-
-    @Transactional
-    public void delete(UUID id) {
-        SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        sale.setDeleted(true);
-    }
-
 }
