@@ -9,8 +9,8 @@ import kz.jarkyn.backend.model.common.AbstractEntity;
 import kz.jarkyn.backend.model.document.common.DocumentEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 @Entity
 @Table(name = "turnover")
 public class TurnoverEntity extends AbstractEntity {

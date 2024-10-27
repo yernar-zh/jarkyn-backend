@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 import kz.jarkyn.backend.model.counterparty.CounterpartyEntity;
 import kz.jarkyn.backend.model.warehouse.WarehouseEntity;
 
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 @Entity
 @Table(name = "document")
 @Inheritance(strategy = InheritanceType.JOINED)

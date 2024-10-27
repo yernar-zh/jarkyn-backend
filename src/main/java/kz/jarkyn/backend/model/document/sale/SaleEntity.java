@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import kz.jarkyn.backend.model.common.AbstractEntity_;
 import kz.jarkyn.backend.model.document.common.DocumentEntity;
 
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 @Entity
 @Table(name = "sale")
 @PrimaryKeyJoinColumn(name = AbstractEntity_.ID)

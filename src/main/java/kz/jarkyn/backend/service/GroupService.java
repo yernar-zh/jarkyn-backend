@@ -39,7 +39,7 @@ public class GroupService {
     public GroupDetailResponse findApiById(UUID id) {
         GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<GroupEntity> children = groupRepository.findByParent(entity);
-        children.sort(Comparator.comparing(GroupEntity::getPosition).thenComparing(GroupEntity::getCreatedAt));
+        children.sort(Comparator.comparing(GroupEntity::getPosition));
         return groupMapper.toDetailApi(entity, children);
     }
 
@@ -52,8 +52,7 @@ public class GroupService {
                 .collect(Collectors.groupingBy(GroupEntity::getParent,
                         Collectors.collectingAndThen(
                                 Collectors.toList(), list -> {
-                                    list.sort(Comparator.comparing(GroupEntity::getPosition)
-                                            .thenComparing(GroupEntity::getCreatedAt));
+                                    list.sort(Comparator.comparing(GroupEntity::getPosition));
                                     return list;
                                 }
                         )

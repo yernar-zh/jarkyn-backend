@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(Api.Good.PATH)
+@RequestMapping(Api.Sale.PATH)
 public class SaleController {
     private final SaleService saleService;
 

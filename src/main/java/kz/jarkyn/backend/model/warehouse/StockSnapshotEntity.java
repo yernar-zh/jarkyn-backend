@@ -8,8 +8,8 @@ import jakarta.persistence.Table;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 import kz.jarkyn.backend.model.good.GoodEntity;
 
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 @Entity
 @Table(name = "stock_snapshot")
 public class StockSnapshotEntity extends AbstractEntity {

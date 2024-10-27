@@ -36,15 +36,14 @@ public class AttributeGroupService {
         AttributeGroupEntity entity = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
         List<AttributeEntity> attributes = attributeRepository.findByGroup(entity);
-        attributes.sort(Comparator.comparing(AttributeEntity::getPosition).thenComparing(AttributeEntity::getCreatedAt));
+        attributes.sort(Comparator.comparing(AttributeEntity::getPosition));
         return attributeMapper.toDetailApi(entity, attributes);
     }
 
     @Transactional(readOnly = true)
     public List<AttributeGroupResponse> findApiAll() {
         List<AttributeGroupEntity> entities = attributeGroupRepository.findAll();
-        entities.sort(Comparator.comparing(AttributeGroupEntity::getPosition)
-                .thenComparing(AttributeGroupEntity::getCreatedAt));
+        entities.sort(Comparator.comparing(AttributeGroupEntity::getPosition));
         return attributeMapper.toListApi(entities);
     }
 

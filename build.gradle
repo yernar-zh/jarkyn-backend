@@ -28,6 +28,7 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.hibernate:hibernate-jpamodelgen:6.2.5.Final'
 
+
     // Model and Databind
     implementation 'org.immutables:value:2.8.2'
     annotationProcessor 'org.immutables:value:2.8.2'
