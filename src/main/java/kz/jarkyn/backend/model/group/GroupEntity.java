@@ -7,9 +7,13 @@ import jakarta.persistence.ManyToOne;
 import kz.jarkyn.backend.model.common.AbstractEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 @Entity
 @Table(name = "groups")
+@AuditTable(value = "group_aud")
+@Audited
 public class GroupEntity extends AbstractEntity {
     private String name;
     @ManyToOne

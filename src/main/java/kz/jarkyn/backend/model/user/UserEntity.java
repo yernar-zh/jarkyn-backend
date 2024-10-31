@@ -10,6 +10,7 @@ import kz.jarkyn.backend.model.common.AbstractEntity;
 @Table(name = "users")
 public class UserEntity extends AbstractEntity {
     private String name;
+    private String authToken;
 
     public String getName() {
         return name;
@@ -17,5 +18,13 @@ public class UserEntity extends AbstractEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 }
