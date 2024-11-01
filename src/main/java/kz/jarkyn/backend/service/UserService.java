@@ -1,5 +1,5 @@
 
-package kz.jarkyn.backend.service.utils;
+package kz.jarkyn.backend.service;
 
 
 import kz.jarkyn.backend.model.user.UserEntity;

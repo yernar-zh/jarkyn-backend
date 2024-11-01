@@ -6,6 +6,7 @@ import kz.jarkyn.backend.model.group.api.GroupDetailResponse;
 import kz.jarkyn.backend.model.group.api.GroupRequest;
 import kz.jarkyn.backend.model.group.api.GroupResponse;
 import kz.jarkyn.backend.service.GroupService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class GroupController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('GROUP_CREATE')")
     public GroupDetailResponse create(@RequestBody GroupRequest request) {
         return groupService.createApi(request);
     }
