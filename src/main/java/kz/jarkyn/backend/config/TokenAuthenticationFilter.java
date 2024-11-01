@@ -4,20 +4,18 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kz.jarkyn.backend.model.user.Permission;
-import kz.jarkyn.backend.model.user.UserEntity;
-import kz.jarkyn.backend.service.RoleService;
-import kz.jarkyn.backend.service.UserService;
+import kz.jarkyn.backend.user.model.Permission;
+import kz.jarkyn.backend.user.model.UserEntity;
+import kz.jarkyn.backend.user.service.RoleService;
+import kz.jarkyn.backend.user.service.UserService;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component

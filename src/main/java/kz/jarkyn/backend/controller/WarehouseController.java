@@ -1,9 +1,9 @@
 package kz.jarkyn.backend.controller;
 
-import kz.jarkyn.backend.config.Api;
-import kz.jarkyn.backend.model.warehouse.api.WarehouseRequest;
-import kz.jarkyn.backend.model.warehouse.api.WarehouseResponse;
-import kz.jarkyn.backend.service.WarehouseService;
+import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.warehouse.mode.dto.WarehouseRequest;
+import kz.jarkyn.backend.warehouse.mode.dto.WarehouseResponse;
+import kz.jarkyn.backend.warehouse.service.WarehouseService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

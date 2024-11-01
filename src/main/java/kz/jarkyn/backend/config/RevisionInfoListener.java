@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.config;
 
-import kz.jarkyn.backend.model.audit.RevisionInfoEntity;
+import kz.jarkyn.backend.audit.model.enity.RevisionInfoEntity;
 import org.hibernate.envers.RevisionListener;
 import org.springframework.security.core.context.SecurityContextHolder;
 

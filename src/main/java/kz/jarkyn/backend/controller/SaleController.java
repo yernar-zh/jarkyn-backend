@@ -1,12 +1,12 @@
 package kz.jarkyn.backend.controller;
 
-import kz.jarkyn.backend.config.Api;
-import kz.jarkyn.backend.model.document.sale.api.SaleDetailResponse;
-import kz.jarkyn.backend.model.document.sale.api.SaleRequest;
-import kz.jarkyn.backend.model.good.api.GoodRequest;
-import kz.jarkyn.backend.model.good.api.GoodResponse;
-import kz.jarkyn.backend.model.good.apiFilter.GoodApiFilter;
-import kz.jarkyn.backend.service.SaleService;
+import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.sale.model.dto.SaleDetailResponse;
+import kz.jarkyn.backend.sale.model.dto.SaleRequest;
+import kz.jarkyn.backend.good.model.dto.GoodRequest;
+import kz.jarkyn.backend.good.model.dto.GoodResponse;
+import kz.jarkyn.backend.good.model.filter.GoodApiFilter;
+import kz.jarkyn.backend.sale.service.SaleService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

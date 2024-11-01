@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.controller;
 
-import kz.jarkyn.backend.config.Api;
+import kz.jarkyn.backend.core.controller.Api;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
