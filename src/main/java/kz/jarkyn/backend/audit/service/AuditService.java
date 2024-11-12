@@ -1,14 +1,18 @@
 package kz.jarkyn.backend.audit.service;
 
 
+import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import kz.jarkyn.backend.audit.config.ParentAudit;
 import kz.jarkyn.backend.audit.model.enity.AuditEntity;
 import kz.jarkyn.backend.audit.repository.AuditRepository;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -34,6 +38,9 @@ public class AuditService {
                 break;
             }
             for (Field field : fields) {
+                if (field.isAnnotationPresent(IgnoreAudit.class)) {
+                    continue;
+                }
                 field.setAccessible(true);
                 String fieldName = field.getName();
                 String fieldValue = fieldValueToString(field.get(entity));
@@ -63,7 +70,10 @@ public class AuditService {
                 return;
             }
         }
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         AuditEntity newAudit = new AuditEntity();
+        newAudit.setUserId(Objects.requireNonNull(userId));
+        newAudit.setMoment(LocalDateTime.now());
         newAudit.setEntityId(entityId);
         newAudit.setEntityParentId(entityParentId);
         newAudit.setFieldName(fieldName);

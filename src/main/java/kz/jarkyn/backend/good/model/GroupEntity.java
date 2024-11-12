@@ -4,6 +4,7 @@ package kz.jarkyn.backend.good.model;
 
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -15,6 +16,7 @@ public class GroupEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private GroupEntity parent;
+    @IgnoreAudit
     private Integer position;
 
     public String getName() {
