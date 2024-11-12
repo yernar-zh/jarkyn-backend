@@ -1,19 +1,3 @@
-DELETE
-FROM good_attribute
-WHERE TRUE;
-
-DELETE
-FROM good
-WHERE TRUE;
-
-DELETE
-FROM attribute
-WHERE TRUE;
-
-DELETE
-FROM attribute_group
-WHERE TRUE;
-
 INSERT INTO ATTRIBUTE_GROUP (ID, NAME, POSITION)
 VALUES ('c5a95fbd-121e-4f57-a84b-600a9919228a',
         'Транспорт', 100),

@@ -27,7 +27,7 @@ class GoodControllerTest {
     @Test
     @DirtiesContext
     public void testDetail_success() throws Exception {
-        mockMvc.perform(get(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435"))
+        mockMvc.perform(get(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435").with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
                 .andExpect(jsonPath("$.name").value("Кикстартер L"))
@@ -50,7 +50,7 @@ class GoodControllerTest {
     @Test
     @DirtiesContext
     public void testList_success() throws Exception {
-        mockMvc.perform(get(Api.Good.PATH)
+        mockMvc.perform(get(Api.Good.PATH).with(TestUtils.auth())
                         .param("search", "кик")
                         .param("groupId", "cdfcf458-7cca-11ef-0a80-152f001b4886")
                         .param("attributeId", "e95420b5-3344-44ce-8d39-699f516ed715")
@@ -74,8 +74,7 @@ class GoodControllerTest {
                     {"quantity": 30, "value": 899}
                   ]
                 }""";
-        mockMvc.perform(post(Api.Good.PATH)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+        mockMvc.perform(post(Api.Good.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Кикстартер S качественный"))
@@ -112,7 +111,7 @@ class GoodControllerTest {
                   ]
                 }""";
         mockMvc.perform(put(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435")
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                        .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
                 .andExpect(jsonPath("$.name").value("Кикстартер L new"))
@@ -139,7 +138,7 @@ class GoodControllerTest {
                 }
                 """;
         mockMvc.perform(put(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435/archive")
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                        .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.archived").value(true));
     }
