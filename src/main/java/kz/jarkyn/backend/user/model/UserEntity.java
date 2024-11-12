@@ -2,20 +2,27 @@
 package kz.jarkyn.backend.user.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 
 @Entity
 @Table(name = "users")
 public class UserEntity extends AbstractEntity {
+    @Column(name = "phone_number")
+    private String phoneNumber;
     private String name;
+    @Column(name = "auth_token")
     private String authToken;
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private RoleEntity role;
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     public String getName() {
         return name;
@@ -33,11 +40,11 @@ public class UserEntity extends AbstractEntity {
         this.authToken = authToken;
     }
 
-    public RoleEntity getRole() {
+    public RoleEnum getRole() {
         return role;
     }
 
-    public void setRole(RoleEntity role) {
+    public void setRole(RoleEnum role) {
         this.role = role;
     }
 }

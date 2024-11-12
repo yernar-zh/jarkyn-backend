@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.good.service;
 
 
+import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
@@ -24,15 +25,18 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GoodRepository goodRepository;
     private final GroupMapper groupMapper;
+    private final AuditService auditService;
 
     public GroupService(
             GroupRepository groupRepository,
             GoodRepository goodRepository,
-            GroupMapper groupMapper
+            GroupMapper groupMapper,
+            AuditService auditService
     ) {
         this.groupRepository = groupRepository;
         this.goodRepository = goodRepository;
         this.groupMapper = groupMapper;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -68,6 +72,7 @@ public class GroupService {
         GroupEntity entity = groupMapper.toEntity(request);
         entity.setPosition(1000);
         groupRepository.save(entity);
+        auditService.saveChanges(entity);
         return findApiById(entity.getId());
     }
 

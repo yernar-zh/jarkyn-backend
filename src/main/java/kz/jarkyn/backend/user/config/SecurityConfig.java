@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.config;
+package kz.jarkyn.backend.user.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

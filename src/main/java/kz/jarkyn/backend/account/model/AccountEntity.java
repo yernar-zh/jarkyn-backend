@@ -6,7 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.core.model.AbstractEntity;
-import kz.jarkyn.backend.counterparty.CounterpartyEntity;
+import kz.jarkyn.backend.counterparty.model.CounterpartyEntity;
 
 @Entity
 @Table(name = "account")

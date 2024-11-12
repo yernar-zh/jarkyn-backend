@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.counterparty;
+package kz.jarkyn.backend.counterparty.model;
 
 
 import jakarta.persistence.*;

@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Sql({"groups.sql"})
+@Sql({"auth.sql", "groups.sql"})
 class GroupControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -69,6 +69,7 @@ class GroupControllerTest {
                   "parent": {"id": "da48c6fa-6739-11ee-0a80-039b000669e2"}
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Group.PATH)
+                        .header("Authorization", "Bearer <AUTH_TOKEN>")
                         .contentType(MediaType.APPLICATION_JSON).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())

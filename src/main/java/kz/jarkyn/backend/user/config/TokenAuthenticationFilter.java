@@ -1,10 +1,10 @@
-package kz.jarkyn.backend.config;
+package kz.jarkyn.backend.user.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kz.jarkyn.backend.user.model.Permission;
+import kz.jarkyn.backend.user.model.PermissionEnum;
 import kz.jarkyn.backend.user.model.UserEntity;
 import kz.jarkyn.backend.user.service.RoleService;
 import kz.jarkyn.backend.user.service.UserService;
@@ -52,7 +52,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
         List<SimpleGrantedAuthority> authorities = roleService.findPermission(user.getRole())
                 .stream()
-                .map(Permission::getName)
+                .map(PermissionEnum::name)
                 .map(SimpleGrantedAuthority::new)
                 .toList();
         SecurityContextHolder.getContext().setAuthentication(

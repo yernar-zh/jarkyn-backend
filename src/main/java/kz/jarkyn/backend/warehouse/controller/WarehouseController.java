@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.controller;
+package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.warehouse.mode.dto.WarehouseRequest;

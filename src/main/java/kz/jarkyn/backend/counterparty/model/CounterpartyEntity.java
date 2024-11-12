@@ -1,14 +1,13 @@
+package kz.jarkyn.backend.counterparty.model;
 
-package kz.jarkyn.backend.user.model;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 
 @Entity
-@Table(name = "role")
-public class RoleEntity extends AbstractEntity {
+@Table(name = "counterparty")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class CounterpartyEntity extends AbstractEntity {
     private String name;
 
     public String getName() {

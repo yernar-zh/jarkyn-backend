@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.controller;
+package kz.jarkyn.backend.sale.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.sale.model.dto.SaleDetailResponse;
