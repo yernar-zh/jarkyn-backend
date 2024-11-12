@@ -18,16 +18,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            TokenAuthenticationFilter jwtAuthFilter
+            TokenAuthenticationFilter tokenAuthFilter
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(config ->
-                        config.anyRequest().permitAll()
+                        config.requestMatchers("/api/auth/login", "/api/auth/sendSms")
+                                .permitAll()
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(config ->
                         config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(tokenAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
