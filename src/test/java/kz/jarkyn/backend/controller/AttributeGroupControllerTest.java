@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Sql({"attribute.sql"})
+@Sql({"auth.sql", "attribute.sql"})
 class AttributeGroupControllerTest {
     @Autowired
     private MockMvc mockMvc;

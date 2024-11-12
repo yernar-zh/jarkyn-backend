@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Sql({"good.sql"})
+@Sql({"auth.sql", "good.sql"})
 class GoodControllerTest {
     @Autowired
     private MockMvc mockMvc;
