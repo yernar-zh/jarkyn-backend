@@ -1,5 +1,6 @@
-package kz.jarkyn.backend.controller;
+package kz.jarkyn.backend.good.controller;
 
+import kz.jarkyn.backend.TestUtils;
 import kz.jarkyn.backend.core.controller.Api;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

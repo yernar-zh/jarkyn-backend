@@ -9,12 +9,22 @@ import kz.jarkyn.backend.user.model.UserEntity;
 @Table(name = "customer")
 @PrimaryKeyJoinColumn(name = AbstractEntity_.ID)
 public class CustomerEntity extends CounterpartyEntity {
+    @Column(name = "phone_number")
+    private String phoneNumber;
     @Column(name = "shipping_address")
     private String shippingAddress;
     private Integer discount;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     public String getShippingAddress() {
         return shippingAddress;

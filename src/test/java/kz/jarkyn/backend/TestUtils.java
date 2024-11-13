@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.controller;
+package kz.jarkyn.backend;
 
 import com.jayway.jsonpath.JsonPath;
 import org.springframework.http.MediaType;
