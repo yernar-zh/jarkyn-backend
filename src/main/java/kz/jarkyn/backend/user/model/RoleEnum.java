@@ -7,7 +7,8 @@ import java.util.List;
 
 public enum RoleEnum {
     SYSTEM("Система", List.of()),
-    ADMIN("Админ", Arrays.stream(PermissionEnum.values()).toList());
+    ADMIN("Админ", Arrays.stream(PermissionEnum.values()).toList()),
+    CUSTOMER("Система", List.of());
 
     private final String name;
     private final List<PermissionEnum> permissions;

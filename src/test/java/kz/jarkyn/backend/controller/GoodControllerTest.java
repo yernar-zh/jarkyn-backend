@@ -99,7 +99,7 @@ class GoodControllerTest {
         String requestData = """
                 {
                   "name": "Кикстартер L new",
-                  "group": {"id": "faeb45ef-cf5a-45e1-af2e-6e875a2d6331"},
+                  "group": {"id": "6120deea-5b87-11ee-0a80-000c0039b0fd"},
                   "minimumPrice": 1200,
                   "attributes": [
                     {"id": "355785a2-0dd8-49f8-987f-06e3c48bf9a8"},
@@ -115,7 +115,7 @@ class GoodControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
                 .andExpect(jsonPath("$.name").value("Кикстартер L new"))
-                .andExpect(jsonPath("$.group.id").value("faeb45ef-cf5a-45e1-af2e-6e875a2d6331"))
+                .andExpect(jsonPath("$.group.id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"))
                 .andExpect(jsonPath("$.image").doesNotExist())
                 .andExpect(jsonPath("$.minimumPrice").value(1200))
                 .andExpect(jsonPath("$.archived").value(false))

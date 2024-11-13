@@ -53,7 +53,9 @@ public class AuditService {
     }
 
     private String fieldValueToString(Object fieldValue) {
-        if (fieldValue instanceof AbstractEntity abstractEntity) {
+        if (fieldValue == null) {
+            return "";
+        } else if (fieldValue instanceof AbstractEntity abstractEntity) {
             return abstractEntity.getId().toString();
         } else {
             return fieldValue.toString();

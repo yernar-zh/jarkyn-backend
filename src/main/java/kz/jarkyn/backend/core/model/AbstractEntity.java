@@ -11,8 +11,14 @@ import java.util.UUID;
 public abstract class AbstractEntity implements Persistable<UUID> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
+    @PrePersist
+    private void prePersist() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+    }
 
     @Override
     @Transient

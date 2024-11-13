@@ -1,12 +1,16 @@
-INSERT INTO groups (id, name, position, parent_id)
-VALUES ('cdfcf458-7cca-11ef-0a80-152f001b4886',
-        'Кикстартер', 100, null),
-       ('faeb45ef-cf5a-45e1-af2e-6e875a2d6331',
-        'Кикстартер 2', 101, null);
+INSERT INTO groups (ID, NAME, POSITION, PARENT_ID)
+VALUES ('da48c6fa-6739-11ee-0a80-039b000669e2',
+        'Педаль', 100, null),
+       ('cdfcf458-7cca-11ef-0a80-152f001b4886',
+        'Кикстартер', 100, 'da48c6fa-6739-11ee-0a80-039b000669e2'),
+       ('6120deea-5b87-11ee-0a80-000c0039b0fd',
+        'Педаль переключения передач', 99, 'da48c6fa-6739-11ee-0a80-039b000669e2');
 
 INSERT INTO attribute_group (id, name, position)
 VALUES ('c5a95fbd-121e-4f57-a84b-600a9919228a',
-        'Транспорт', 100);
+        'Транспорт', 100),
+       ('5d82a954-5b87-11ee-0a80-000c0039afd5',
+        'Цвет', 101);
 
 INSERT INTO attribute (id, name, position, group_id)
 VALUES ('e95420b5-3344-44ce-8d39-699f516ed715',

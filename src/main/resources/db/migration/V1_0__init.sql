@@ -264,16 +264,3 @@ ALTER TABLE turnover
 
 ALTER TABLE turnover
     ADD CONSTRAINT FK_TURNOVER_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
-
-// ----------------------- CORE INSERTS -----------------------
-
-
-insert into users (id, auth_token, name, phone_number, role)
-values ('376d6b4e-746b-4ee6-9e6c-8c8223643a7a',
-        null,
-        'Система', null,
-        'SYSTEM'),
-       ('f57382c9-35a1-4b64-b3f0-f172489dc90a',
-        null,
-        'Ернар', '+77752166661',
-        'ADMIN')

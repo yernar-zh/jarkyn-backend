@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Sql({"auth.sql", "attribute.sql"})
+@Sql({"auth.sql", "good.sql"})
 class AttributeControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -115,11 +115,11 @@ class AttributeControllerTest {
     @Test
     @DirtiesContext
     public void testDelete_success() throws Exception {
-        mockMvc.perform(delete(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715")
+        mockMvc.perform(delete(Api.Attribute.PATH + "/355785a2-0dd8-49f8-987f-06e3c48bf9a8")
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("DELETED"));
-        mockMvc.perform(get(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715")
+        mockMvc.perform(get(Api.Attribute.PATH + "/355785a2-0dd8-49f8-987f-06e3c48bf9a8")
                         .with(TestUtils.auth()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
@@ -128,7 +128,7 @@ class AttributeControllerTest {
     @Test
     @DirtiesContext
     public void testDelete_hasGood() throws Exception {
-        mockMvc.perform(delete(Api.Attribute.PATH + "/355785a2-0dd8-49f8-987f-06e3c48bf9a8")
+        mockMvc.perform(delete(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715")
                         .with(TestUtils.auth()))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.code").value("RELATION_EXCEPTION"));

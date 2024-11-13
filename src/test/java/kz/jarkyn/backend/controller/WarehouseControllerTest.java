@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Sql({"auth.sql", "warehouse.sql"})
+@Sql({"auth.sql"})
 class WarehouseControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -28,18 +28,17 @@ class WarehouseControllerTest {
     @Test
     @DirtiesContext
     public void testDetail_success() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
+        mockMvc.perform(get(Api.Warehouse.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3")
+                        .with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
-                .andExpect(jsonPath("$.name").value("Кикстартер"))
-                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$.parent.name").value("Педаль"));
+                .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.name").value("Кенжина"));
     }
 
     @Test
     @DirtiesContext
     public void testDetail_notFound() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7"))
+        mockMvc.perform(get(Api.Warehouse.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7").with(TestUtils.auth()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
@@ -47,7 +46,7 @@ class WarehouseControllerTest {
     @Test
     @DirtiesContext
     public void testList_success() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH))
+        mockMvc.perform(get(Api.Group.PATH).with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
@@ -69,15 +68,15 @@ class WarehouseControllerTest {
                   "name": "Тормоз",
                   "parent": {"id": "da48c6fa-6739-11ee-0a80-039b000669e2"}
                 }""";
-        MvcResult result = mockMvc.perform(post(Api.Group.PATH)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+        MvcResult result = mockMvc.perform(post(Api.Group.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Тормоз"))
                 .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
                 .andExpect(jsonPath("$.parent.name").value("Педаль"))
                 .andReturn();
-        mockMvc.perform(get(Api.Group.PATH + "/" + TestUtils.extractId(result)))
+        mockMvc.perform(get(Api.Group.PATH + "/" + TestUtils.extractId(result)).with(TestUtils.auth())
+                        .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Тормоз"))
@@ -98,7 +97,7 @@ class WarehouseControllerTest {
                   ]
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                        .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
                 .andExpect(jsonPath("$.name").value("Педаль new"))
@@ -106,7 +105,7 @@ class WarehouseControllerTest {
                 .andExpect(jsonPath("$.children.length()").value(2))
                 .andExpect(jsonPath("$.children[0].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(jsonPath("$.children[1].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"));
-        mockMvc.perform(get(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2"))
+        mockMvc.perform(get(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2").with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
                 .andExpect(jsonPath("$.name").value("Педаль new"))
@@ -131,7 +130,7 @@ class WarehouseControllerTest {
                   ]
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                        .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.code").value("EXIST_PARENT_LOOP"));
     }
@@ -151,7 +150,7 @@ class WarehouseControllerTest {
                   ]
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                        .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.code").value("EXIST_PARENT_LOOP"));
     }
@@ -167,7 +166,7 @@ class WarehouseControllerTest {
                   ]
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                        .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.code").value("API Validation Error"));
     }
@@ -181,7 +180,7 @@ class WarehouseControllerTest {
                   "children": []
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7")
-                        .contentType(MediaType.APPLICATION_JSON).content(requestData))
+                        .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
@@ -189,10 +188,12 @@ class WarehouseControllerTest {
     @Test
     @DirtiesContext
     public void testDelete_success() throws Exception {
-        mockMvc.perform(delete(Api.Group.PATH + "/6120deea-5b87-11ee-0a80-000c0039b0fd"))
+        mockMvc.perform(delete(Api.Group.PATH + "/6120deea-5b87-11ee-0a80-000c0039b0fd")
+                        .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("DELETED"));
-        mockMvc.perform(get(Api.Group.PATH + "/6120deea-5b87-11ee-0a80-000c0039b0fd"))
+        mockMvc.perform(get(Api.Group.PATH + "/6120deea-5b87-11ee-0a80-000c0039b0fd")
+                        .with(TestUtils.auth()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
@@ -200,7 +201,8 @@ class WarehouseControllerTest {
     @Test
     @DirtiesContext
     public void testDelete_hasChildren() throws Exception {
-        mockMvc.perform(delete(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2"))
+        mockMvc.perform(delete(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
+                        .with(TestUtils.auth()))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.code").value("RELATION_EXCEPTION"));
     }
@@ -208,7 +210,8 @@ class WarehouseControllerTest {
     @Test
     @DirtiesContext
     public void testDelete_hasGood() throws Exception {
-        mockMvc.perform(delete(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886"))
+        mockMvc.perform(delete(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886")
+                        .with(TestUtils.auth()))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.code").value("RELATION_EXCEPTION"));
     }
@@ -216,7 +219,8 @@ class WarehouseControllerTest {
     @Test
     @DirtiesContext
     public void testDelete_notFound() throws Exception {
-        mockMvc.perform(delete(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7"))
+        mockMvc.perform(delete(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7")
+                        .with(TestUtils.auth()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
