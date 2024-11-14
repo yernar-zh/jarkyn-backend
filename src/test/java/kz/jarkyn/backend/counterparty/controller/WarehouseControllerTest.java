@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.good.controller;
+package kz.jarkyn.backend.counterparty.controller;
 
 import kz.jarkyn.backend.TestUtils;
 import kz.jarkyn.backend.core.controller.Api;
@@ -13,32 +13,33 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Sql({"../../../../../../resources/kz/jarkyn/backend/auth.sql", "good.sql"})
-class GroupControllerTest {
+@Sql({"../../auth.sql", "counterparty.sql"})
+class WarehouseControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     @DirtiesContext
     public void testDetail_success() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH + "/cdfcf458-7cca-11ef-0a80-152f001b4886").with(TestUtils.auth()))
+        mockMvc.perform(get(Api.Warehouse.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3")
+                        .with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
-                .andExpect(jsonPath("$.name").value("Кикстартер"))
-                .andExpect(jsonPath("$.parent.id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$.parent.name").value("Педаль"));
+                .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.name").value("Кенжина"));
     }
 
     @Test
     @DirtiesContext
     public void testDetail_notFound() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7").with(TestUtils.auth()))
+        mockMvc.perform(get(Api.Warehouse.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7").with(TestUtils.auth()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
