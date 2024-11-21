@@ -17,5 +17,5 @@ public interface GoodDto extends IdNamedDto {
     Boolean getArchived();
     List<IdNamedDto> getAttributes();
     List<SellingPriceDto> getSellingPrices();
-    PrefixSearch getPrefixSearch();
+    PrefixSearch getSearch();
 }

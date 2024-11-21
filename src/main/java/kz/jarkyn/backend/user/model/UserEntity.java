@@ -4,10 +4,14 @@ package kz.jarkyn.backend.user.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.counterparty.model.CounterpartyEntity;
 
 @Entity
 @Table(name = "users")
 public class UserEntity extends AbstractEntity {
+    @ManyToOne
+    @JoinColumn(name = "counterparty_id")
+    private CounterpartyEntity counterparty;
     @Column(name = "phone_number")
     private String phoneNumber;
     private String name;
@@ -15,6 +19,14 @@ public class UserEntity extends AbstractEntity {
     private String authToken;
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
+
+    public CounterpartyEntity getCounterparty() {
+        return counterparty;
+    }
+
+    public void setCounterparty(CounterpartyEntity counterparty) {
+        this.counterparty = counterparty;
+    }
 
     public String getPhoneNumber() {
         return phoneNumber;

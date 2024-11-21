@@ -22,10 +22,10 @@ public class SecurityConfig {
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(config ->
-                        config.requestMatchers("/api/auth/login", "/api/auth/sendSms")
-                                .permitAll()
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests(config -> config
+                        .requestMatchers("/api/auth/login", "/api/auth/sendSms")
+                        .permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(config ->
                         config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

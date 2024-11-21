@@ -2,6 +2,7 @@
 package kz.jarkyn.backend.counterparty.service;
 
 
+import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 import kz.jarkyn.backend.counterparty.model.dto.WarehouseRequest;
@@ -18,13 +19,16 @@ import java.util.UUID;
 public class WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
+    private final AuditService auditService;
 
     public WarehouseService(
             WarehouseRepository warehouseRepository,
-            WarehouseMapper warehouseMapper
+            WarehouseMapper warehouseMapper,
+            AuditService auditService
     ) {
         this.warehouseRepository = warehouseRepository;
         this.warehouseMapper = warehouseMapper;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -41,6 +45,7 @@ public class WarehouseService {
     @Transactional
     public UUID createApi(WarehouseRequest request) {
         WarehouseEntity warehouse = warehouseRepository.save(warehouseMapper.toEntity(request));
+        auditService.saveChanges(warehouse);
         return warehouse.getId();
     }
 
@@ -48,5 +53,6 @@ public class WarehouseService {
     public void editApi(UUID id, WarehouseRequest request) {
         WarehouseEntity warehouse = warehouseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         warehouseMapper.editEntity(warehouse, request);
+        auditService.saveChanges(warehouse);
     }
 }

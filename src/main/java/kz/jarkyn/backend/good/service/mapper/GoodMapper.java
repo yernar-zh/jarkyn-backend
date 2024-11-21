@@ -47,7 +47,7 @@ public abstract class GoodMapper {
 
     public abstract GoodDto toDto(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,
-            PrefixSearch prefixSearch);
+            PrefixSearch search);
 
     protected IdNamedDto map(List<IdNamedDto> value) {
         if (value.isEmpty()) return null;

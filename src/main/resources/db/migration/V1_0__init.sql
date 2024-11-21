@@ -51,9 +51,9 @@ CREATE TABLE counterparty
 CREATE TABLE customer
 (
     id               UUID PRIMARY KEY,
+    phone_number     VARCHAR(255),
     shipping_address VARCHAR(255),
-    discount         INT,
-    user_id          UUID
+    discount         INT
 );
 
 CREATE TABLE document
@@ -169,11 +169,12 @@ CREATE TABLE turnover
 
 CREATE TABLE users
 (
-    id           UUID PRIMARY KEY,
-    phone_number VARCHAR(255),
-    name         VARCHAR(255),
-    auth_token   VARCHAR(255),
-    role         VARCHAR(255)
+    id              UUID PRIMARY KEY,
+    counterparty_id UUID,
+    phone_number    VARCHAR(255),
+    name            VARCHAR(255),
+    auth_token      VARCHAR(255),
+    role            VARCHAR(255)
 );
 
 CREATE TABLE warehouse
@@ -198,9 +199,6 @@ ALTER TABLE cash_flow
 
 ALTER TABLE customer
     ADD CONSTRAINT FK_CUSTOMER_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);
-
-ALTER TABLE customer
-    ADD CONSTRAINT FK_CUSTOMER_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES counterparty (id);
@@ -264,3 +262,6 @@ ALTER TABLE turnover
 
 ALTER TABLE turnover
     ADD CONSTRAINT FK_TURNOVER_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
+
+ALTER TABLE users
+    ADD CONSTRAINT FK_USERS_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);

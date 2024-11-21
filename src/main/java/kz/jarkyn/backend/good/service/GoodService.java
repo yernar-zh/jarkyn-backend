@@ -11,7 +11,7 @@ import kz.jarkyn.backend.core.utils.PrefixSearch;
 import kz.jarkyn.backend.good.model.GoodAttributeEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.good.model.SellingPriceEntity;
-import kz.jarkyn.backend.good.model.filter.GoodApiFilter;
+import kz.jarkyn.backend.good.model.filter.GoodRequestFilter;
 import kz.jarkyn.backend.good.model.dto.GoodDto;
 import kz.jarkyn.backend.good.model.dto.SellingPriceRequest;
 import kz.jarkyn.backend.good.repository.AttributeRepository;
@@ -58,10 +58,10 @@ public class GoodService {
     }
 
     @Transactional(readOnly = true)
-    public List<GoodResponse> findApiByFilter(GoodApiFilter filter) {
+    public List<GoodResponse> findApiByFilter(GoodRequestFilter filter) {
         Stream<GoodDto> stream = findAllDto().stream();
         if (filter.getSearch() != null) {
-            stream = stream.filter(goodDto -> goodDto.getPrefixSearch().contains(filter.getSearch()));
+            stream = stream.filter(goodDto -> goodDto.getSearch().contains(filter.getSearch()));
         }
         if (filter.getGroupId() != null) {
             stream = stream.filter(goodDto -> goodDto.getGroup().stream()
@@ -139,8 +139,8 @@ public class GoodService {
             List<AttributeEntity> attributes = attributeRepository.findByGood(good);
             List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
             PrefixSearch prefixSearch = new PrefixSearch();
-            prefixSearch.add(good.getName());
-            prefixSearch.add(good.getGroup().getName());
+            prefixSearch.addText(good.getName());
+            prefixSearch.addText(good.getGroup().getName());
             result.add(goodMapper.toDto(good, attributes, sellingPrices, prefixSearch));
         }
         return result;

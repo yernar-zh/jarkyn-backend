@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.3'
     id 'io.spring.dependency-management' version '1.1.6'
-    id "org.flywaydb.flyway" version "10.17.2"
+    id "org.flywaydb.flyway" version "10.21.0"
 }
 
 group = 'kz.jarkyn'
@@ -27,9 +27,9 @@ dependencies {
 
     // Database
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//    implementation 'org.flywaydb:flyway-core'
-    //    runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'com.h2database:h2'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    implementation 'org.postgresql:postgresql'
     annotationProcessor 'org.hibernate:hibernate-jpamodelgen:6.2.5.Final'
 
 
@@ -41,16 +41,16 @@ dependencies {
 
     //Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.opentable.components:otj-pg-embedded:1.1.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
 }
 
-flyway {
-    url = 'jdbc:h2:file:./local/h2;AUTO_SERVER=TRUE'
-    user = 'admin'
-    password = '123qwe123'
-    schemas = ['public']
-}
+//flyway {
+//    url = 'jdbc:h2:file:./local/h2;AUTO_SERVER=TRUE'
+//    user = 'admin'
+//    password = '123qwe123'
+//    schemas = ['public']
+//}
 
 compileJava {
     options.compilerArgs += [

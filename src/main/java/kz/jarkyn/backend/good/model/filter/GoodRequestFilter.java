@@ -1,20 +1,20 @@
 package kz.jarkyn.backend.good.model.filter;
 
-import kz.jarkyn.backend.core.model.filter.PagedApiFilter;
+import kz.jarkyn.backend.core.model.filter.PageableRequestQuery;
 
 import java.util.UUID;
 
-public class GoodApiFilter extends PagedApiFilter {
+public class GoodRequestFilter extends PageableRequestQuery {
     private final String search;
     private final UUID groupId;
     private final UUID attributeId;
     private final Boolean archived;
 
-    public GoodApiFilter(
-            String search, UUID groupId, UUID attributeId, Integer page,
-            Integer pageSize, Boolean archived
+    public GoodRequestFilter(
+            String search, UUID groupId, UUID attributeId, Boolean archived,
+            Integer pageFirst, Integer pageSize
     ) {
-        super(page, pageSize);
+        super(pageFirst, pageSize);
         this.search = search;
         this.groupId = groupId;
         this.attributeId = attributeId;

@@ -3,7 +3,6 @@ package kz.jarkyn.backend.counterparty.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity_;
-import kz.jarkyn.backend.user.model.UserEntity;
 
 @Entity
 @Table(name = "customer")
@@ -14,9 +13,6 @@ public class CustomerEntity extends CounterpartyEntity {
     @Column(name = "shipping_address")
     private String shippingAddress;
     private Integer discount;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -40,13 +36,5 @@ public class CustomerEntity extends CounterpartyEntity {
 
     public void setDiscount(Integer discount) {
         this.discount = discount;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
     }
 }
