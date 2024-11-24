@@ -23,11 +23,11 @@ public class QueryParams {
     private static final Set<String> STATIC_FIELDS = Set.of(
             SORT_FIELD, SORT_SPLITTER, SEARCH_FIELD, PAGE_FIRST_FIELD, PAGE_SIZE_FIELD);
 
-    public final String search;
-    public final Integer pageFirst;
-    public final Integer pageSize;
-    public final List<Filter> filters;
-    public final List<Sort> sorts;
+    private final String search;
+    private final Integer pageFirst;
+    private final Integer pageSize;
+    private final List<Filter> filters;
+    private final List<Sort> sorts;
 
 
     public static QueryParams of(Map<String, String> allParams) {

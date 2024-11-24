@@ -54,7 +54,9 @@ class CustomerControllerTest {
                         .queryParam("discount[max]", "5")
                         .queryParam("sort", "-lastSale,name")
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists());
+
     }
 
     @Test

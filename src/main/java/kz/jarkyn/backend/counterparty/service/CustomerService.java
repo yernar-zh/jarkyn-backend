@@ -8,12 +8,15 @@ import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.service.CriteriaSearch;
+import kz.jarkyn.backend.core.service.CriteriaSearchHolder;
+import kz.jarkyn.backend.core.service.CriteriaSearchFactory;
 import kz.jarkyn.backend.counterparty.model.AccountEntity;
 import kz.jarkyn.backend.counterparty.model.AccountEntity_;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity_;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerRequest;
-import kz.jarkyn.backend.counterparty.model.dto.CustomerResponse;
+import kz.jarkyn.backend.counterparty.model.dto.CustomerSearchResponse;
 import kz.jarkyn.backend.counterparty.repository.CustomerRepository;
 import kz.jarkyn.backend.counterparty.service.mapper.CustomerMapper;
 import kz.jarkyn.backend.document.sale.model.SaleEntity;
@@ -30,8 +33,8 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final AuditService auditService;
-    private final EntityManager entityManager;
     private final ConversionService conversionService;
+    private final CriteriaSearchFactory criteriaSearchFactory;
 
 
     public CustomerService(
@@ -39,136 +42,51 @@ public class CustomerService {
             CustomerMapper customerMapper,
             AuditService auditService,
             EntityManager entityManager,
-            ConversionService conversionService
+            ConversionService conversionService,
+            CriteriaSearchFactory criteriaSearchFactory
     ) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.auditService = auditService;
-        this.entityManager = entityManager;
+        this.criteriaSearchFactory = criteriaSearchFactory;
         this.conversionService = conversionService;
     }
 
     @Transactional(readOnly = true)
-    public CustomerResponse findApiById(UUID id) {
+    public CustomerSearchResponse findApiById(UUID id) {
         CustomerEntity customer = customerRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         return customerMapper.toApi(customer);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<CustomerResponse> findApiByFilter(QueryParams requestQuery) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CustomerResponse> query = cb.createQuery(CustomerResponse.class);
-
-        Root<CustomerEntity> customerRoot = query.from(CustomerEntity.class);
-        ListJoin<CustomerEntity, AccountEntity> accountJoin = customerRoot.join(CustomerEntity_.accounts, JoinType.LEFT);
-        ListJoin<CustomerEntity, SaleEntity> saleJoin = cb.treat(
-                customerRoot.join(CustomerEntity_.documents, JoinType.LEFT), SaleEntity.class);
-
-        Map<String, Expression<?>> attributes = new LinkedHashMap<>();
-        attributes.put("id", customerRoot.get(CustomerEntity_.id));
-        attributes.put("name", customerRoot.get(CustomerEntity_.name));
-        attributes.put("phoneNumber", customerRoot.get(CustomerEntity_.phoneNumber));
-        attributes.put("shippingAddress", customerRoot.get(CustomerEntity_.shippingAddress));
-        attributes.put("discount", customerRoot.get(CustomerEntity_.discount));
-        attributes.put("balance", accountJoin.get(AccountEntity_.balance));
-        attributes.put("firstSale", cb.least(saleJoin.get(SaleEntity_.moment)));
-        attributes.put("lastSale", cb.greatest(saleJoin.get(SaleEntity_.moment)));
-        attributes.put("totalSaleCount", cb.count(saleJoin).as(Integer.class));
-        attributes.put("totalSaleAmount", cb.sum(saleJoin.get(SaleEntity_.amount)));
-        Selection<?>[] selectionArray = attributes.values().toArray(Selection<?>[]::new);
-
-        List<Expression<?>> searchAttributes = new ArrayList<>();
-        searchAttributes.add(attributes.get("name"));
-        searchAttributes.add(attributes.get("phoneNumber"));
-        searchAttributes.add(attributes.get("shippingAddress"));
-
-        List<Expression<?>> groupByAttributes = new ArrayList<>();
-        groupByAttributes.add(attributes.get("id"));
-        groupByAttributes.add(attributes.get("name"));
-        groupByAttributes.add(attributes.get("phoneNumber"));
-        groupByAttributes.add(attributes.get("shippingAddress"));
-        groupByAttributes.add(attributes.get("discount"));
-        groupByAttributes.add(attributes.get("balance"));
-
-        Predicate staticPredicate = cb.equal(saleJoin.get(SaleEntity_.state), SaleState.SHIPPED);
-        Predicate searchPredicate = searchToPredicate(cb, requestQuery.getSearch(), searchAttributes);
-        Predicate wherePredicate = filterToWherePredicate(cb, requestQuery.getFilters(), attributes);
-        Predicate havingPredicate = filterToHavingPredicate(cb, requestQuery.getFilters(), attributes);
-
-        List<Order> orderList = sortToOrder(cb, requestQuery.getSorts(), attributes);
-
-        query.select(cb.construct(CustomerResponse.class, selectionArray));
-        query.where(cb.and(staticPredicate, searchPredicate, wherePredicate));
-        query.groupBy(groupByAttributes);
-        query.having(havingPredicate);
-        query.orderBy(orderList);
-        List<CustomerResponse> rows = entityManager.createQuery(query).getResultList();
-        return null;
-    }
-
-    private Predicate searchToPredicate(
-            CriteriaBuilder cb,
-            String search,
-            List<Expression<?>> attributes) {
-        Expression<?>[] expressions = new Expression<?>[attributes.size() + 1];
-        expressions[0] = cb.literal(search);
-        for (int i = 1; i <= attributes.size(); i++) {
-            expressions[i] = attributes.get(i - 1);
-        }
-        return cb.isTrue(cb.function("search", Boolean.class, expressions));
-    }
-
-    private Predicate filterToWherePredicate(
-            CriteriaBuilder cb,
-            List<QueryParams.Filter> filters,
-            Map<String, Expression<?>> attributes) {
-        return filters.stream()
-                .filter(filter -> attributes.containsKey(filter.getName()))
-                .filter(filter -> filter instanceof Path<?>)
-                .map(filter -> {
-                    Expression<Comparable> expression = (Expression<Comparable>) attributes.get(filter.getName());
-                    Comparable value = conversionService.convert(filter.getValue(), expression.getJavaType());
-                    return switch (filter.getType()) {
-                        case EQUAL_TO -> cb.equal(expression, value);
-                        case LESS_THEN -> cb.lessThanOrEqualTo(expression, value);
-                        case GREATER_THEN -> cb.greaterThanOrEqualTo(expression, value);
-                    };
-                })
-                .reduce(cb::and).orElse(cb.conjunction());
-    }
-
-    private Predicate filterToHavingPredicate(
-            CriteriaBuilder cb,
-            List<QueryParams.Filter> filters,
-            Map<String, Expression<?>> attributes) {
-        return filters.stream()
-                .filter(filter -> attributes.containsKey(filter.getName()))
-                .filter(filter -> !(filter instanceof Path<?>))
-                .map(filter -> {
-                    Expression<Comparable> expression = (Expression<Comparable>) attributes.get(filter.getName());
-                    Comparable value = conversionService.convert(filter.getValue(), expression.getJavaType());
-                    return switch (filter.getType()) {
-                        case EQUAL_TO -> cb.equal(expression, value);
-                        case LESS_THEN -> cb.lessThanOrEqualTo(expression, value);
-                        case GREATER_THEN -> cb.greaterThanOrEqualTo(expression, value);
-                    };
-                })
-                .reduce(cb::and).orElse(cb.conjunction());
-    }
-
-    private List<Order> sortToOrder(
-            CriteriaBuilder cb,
-            List<QueryParams.Sort> sorts,
-            Map<String, Expression<?>> attributes) {
-        return sorts.stream()
-                .filter(filter -> attributes.containsKey(filter.getName()))
-                .map(filter -> {
-                    Expression<?> expression = attributes.get(filter.getName());
-                    return switch (filter.getType()) {
-                        case ASC -> cb.asc(expression);
-                        case DESC -> cb.desc(expression);
-                    };
-                }).toList();
+    public PageResponse<CustomerSearchResponse> findApiByFilter(QueryParams queryParams) {
+        CriteriaSearch<CustomerSearchResponse> criteriaSearch = criteriaSearchFactory
+                .createAsdf(CustomerSearchResponse.class);
+        criteriaSearch.specification((cs, query, cb) -> {
+            Root<CustomerEntity> customerRoot = query.from(CustomerEntity.class);
+            ListJoin<CustomerEntity, AccountEntity> accountJoin = customerRoot
+                    .join(CustomerEntity_.accounts, JoinType.LEFT);
+            ListJoin<CustomerEntity, SaleEntity> saleJoin = cb.treat(
+                    customerRoot.join(CustomerEntity_.documents, JoinType.LEFT), SaleEntity.class);
+            cs.attributes()
+                    .add(CustomerEntity_.ID, customerRoot.get(CustomerEntity_.id))
+                    .add(CustomerEntity_.NAME, customerRoot.get(CustomerEntity_.name))
+                    .add(CustomerEntity_.PHONE_NUMBER, customerRoot.get(CustomerEntity_.phoneNumber))
+                    .add(CustomerEntity_.SHIPPING_ADDRESS, customerRoot.get(CustomerEntity_.shippingAddress))
+                    .add(CustomerEntity_.DISCOUNT, customerRoot.get(CustomerEntity_.discount))
+                    .add("balance", accountJoin.get(AccountEntity_.balance))
+                    .add("firstSale", cb.least(saleJoin.get(SaleEntity_.moment)))
+                    .add("lastSale", cb.greatest(saleJoin.get(SaleEntity_.moment)))
+                    .add("totalSaleCount", cb.count(saleJoin).as(Integer.class))
+                    .add("totalSaleAmount", cb.sum(saleJoin.get(SaleEntity_.amount)))
+                    .finish();
+            cs.idAttribute("id");
+            cs.searchAttributes("name", "phoneNumber", "shippingAddress");
+            cs.groupByAttributes("id", "name", "phoneNumber", "shippingAddress", "discount", "balance");
+            cs.where(cb.equal(saleJoin.get(SaleEntity_.state), SaleState.SHIPPED));
+        });
+        criteriaSearch.queryParams(queryParams);
+        return criteriaSearch.getResult();
     }
 
     @Transactional

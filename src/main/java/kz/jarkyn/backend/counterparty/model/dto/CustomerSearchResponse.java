@@ -5,7 +5,7 @@ import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class CustomerResponse implements IdNamedDto {
+public class CustomerSearchResponse implements IdNamedDto {
     private final UUID id;
     private final String name;
     private final String phoneNumber;
@@ -17,7 +17,7 @@ public class CustomerResponse implements IdNamedDto {
     private final Integer totalSaleCount;
     private final Integer totalSaleAmount;
 
-    public CustomerResponse(
+    public CustomerSearchResponse(
             UUID id, String name, String phoneNumber, String shippingAddress,
             Integer discount, Integer balance, LocalDateTime firstSale, LocalDateTime lastSale,
             Integer totalSaleCount, Integer totalSaleAmount) {
