@@ -11,13 +11,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION search(search TEXT, pattern TEXT)
+CREATE OR REPLACE FUNCTION search(pattern TEXT, VARIADIC texts TEXT[])
     RETURNS BOOLEAN AS
 $$
 DECLARE
-    ts_query TEXT;
+    query    TEXT;
+    document TEXT;
 BEGIN
-    ts_query := regexp_replace(remove_symbols(pattern), '\s+', ':* & ', 'ig') || ':*';
-    RETURN to_tsvector('russian', search) @@ to_tsquery(ts_query);
+    document := remove_symbols(array_to_string(texts, ' '));
+    query := regexp_replace(remove_symbols(pattern), '\s+', ':* & ', 'ig') || ':*';
+    RETURN to_tsvector('russian', document) @@ to_tsquery(query);
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
+

@@ -3,6 +3,7 @@ package kz.jarkyn.backend.good.service;
 
 
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.good.model.AttributeEntity;
@@ -11,7 +12,6 @@ import kz.jarkyn.backend.core.utils.PrefixSearch;
 import kz.jarkyn.backend.good.model.GoodAttributeEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.good.model.SellingPriceEntity;
-import kz.jarkyn.backend.good.model.filter.GoodRequestFilter;
 import kz.jarkyn.backend.good.model.dto.GoodDto;
 import kz.jarkyn.backend.good.model.dto.SellingPriceRequest;
 import kz.jarkyn.backend.good.repository.AttributeRepository;
@@ -58,23 +58,24 @@ public class GoodService {
     }
 
     @Transactional(readOnly = true)
-    public List<GoodResponse> findApiByFilter(GoodRequestFilter filter) {
-        Stream<GoodDto> stream = findAllDto().stream();
-        if (filter.getSearch() != null) {
-            stream = stream.filter(goodDto -> goodDto.getSearch().contains(filter.getSearch()));
-        }
-        if (filter.getGroupId() != null) {
-            stream = stream.filter(goodDto -> goodDto.getGroup().stream()
-                    .map(IdDto::getId).anyMatch(filter.getGroupId()::equals));
-        }
-        if (filter.getAttributeId() != null) {
-            stream = stream.filter(goodDto -> goodDto.getAttributes().stream()
-                    .map(IdDto::getId).anyMatch(filter.getAttributeId()::equals));
-        }
-        if (filter.getArchived() != null) {
-            stream = stream.filter(goodDto -> filter.getArchived().equals(goodDto.getArchived()));
-        }
-        return stream.map(goodMapper::toListApi).toList();
+    public List<GoodResponse> findApiByFilter(QueryParams queryParams) {
+//        Stream<GoodDto> stream = findAllDto().stream();
+//        if (filter.getSearch() != null) {
+//            stream = stream.filter(goodDto -> goodDto.getSearch().contains(filter.getSearch()));
+//        }
+//        if (filter.getGroupId() != null) {
+//            stream = stream.filter(goodDto -> goodDto.getGroup().stream()
+//                    .map(IdDto::getId).anyMatch(filter.getGroupId()::equals));
+//        }
+//        if (filter.getAttributeId() != null) {
+//            stream = stream.filter(goodDto -> goodDto.getAttributes().stream()
+//                    .map(IdDto::getId).anyMatch(filter.getAttributeId()::equals));
+//        }
+//        if (filter.getArchived() != null) {
+//            stream = stream.filter(goodDto -> filter.getArchived().equals(goodDto.getArchived()));
+//        }
+//        return stream.map(goodMapper::toListApi).toList();
+        return null;
     }
 
     @Transactional

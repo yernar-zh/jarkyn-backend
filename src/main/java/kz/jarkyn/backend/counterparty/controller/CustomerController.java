@@ -1,13 +1,15 @@
 package kz.jarkyn.backend.counterparty.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerRequest;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerResponse;
-import kz.jarkyn.backend.counterparty.model.filter.CustomerRequestQuery;
 import kz.jarkyn.backend.counterparty.service.CustomerService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -27,8 +29,8 @@ public class CustomerController {
     }
 
     @GetMapping
-    public List<CustomerResponse> list(@ModelAttribute CustomerRequestQuery filter) {
-        return customerService.findApiByFilter(filter);
+    public PageResponse<CustomerResponse> list(@RequestParam Map<String, String> allParams) {
+        return customerService.findApiByFilter(QueryParams.of(allParams));
     }
 
     @PostMapping

@@ -1,11 +1,11 @@
 package kz.jarkyn.backend.document.sale.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.document.sale.model.dto.SaleDetailResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
-import kz.jarkyn.backend.good.model.filter.GoodRequestFilter;
 import kz.jarkyn.backend.document.sale.service.SaleService;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,7 @@ public class SaleController {
     }
 
     @GetMapping
-    public List<GoodResponse> list(@ModelAttribute GoodRequestFilter filter) {
+    public List<GoodResponse> list(@ModelAttribute QueryParams queryParams) {
         return null;
     }
 
