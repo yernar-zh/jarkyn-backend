@@ -1,5 +1,6 @@
 package kz.jarkyn.backend.counterparty.repository;
 
+import kz.jarkyn.backend.core.repository.PageSpecificationExecutor;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<CustomerEntity, UUID> {
+public interface CustomerRepository extends JpaRepository<CustomerEntity, UUID>, PageSpecificationExecutor<CustomerEntity> {
     @Query("""
                 SELECT
                     ctr.id,

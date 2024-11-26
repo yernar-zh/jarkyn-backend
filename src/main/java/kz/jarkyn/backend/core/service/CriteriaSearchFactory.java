@@ -1,21 +1,22 @@
 package kz.jarkyn.backend.core.service;
 
-import jakarta.persistence.EntityManager;
+import kz.jarkyn.backend.core.PageSpecification;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CriteriaSearchFactory {
-    private final EntityManager entityManager;
     private final ConversionService conversionService;
 
-    public CriteriaSearchFactory(EntityManager entityManager, ConversionService conversionService) {
-        this.entityManager = entityManager;
+    public CriteriaSearchFactory(ConversionService conversionService) {
         this.conversionService = conversionService;
     }
 
-    public <T> CriteriaSearch<T> createAsdf(Class<T> javaClass) {
-        return new CriteriaSearch<>(entityManager, javaClass, conversionService);
+    public <T> PageSpecification<T> createSpecification(Class<T> javaClass, QueryParams queryParams) {
+        return new PageSpecification<>(conversionService, queryParams,
+                (root, query, criteriaBuilder) -> criteriaBuilder.conjunction(),
+                Sort.unsorted());
     }
-
 }

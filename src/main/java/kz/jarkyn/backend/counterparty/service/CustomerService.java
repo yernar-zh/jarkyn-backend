@@ -3,26 +3,22 @@ package kz.jarkyn.backend.counterparty.service;
 
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.*;
 import kz.jarkyn.backend.audit.service.AuditService;
+import kz.jarkyn.backend.core.CoreSpecifications;
+import kz.jarkyn.backend.core.PageSpecification;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.core.service.CriteriaSearch;
-import kz.jarkyn.backend.core.service.CriteriaSearchHolder;
 import kz.jarkyn.backend.core.service.CriteriaSearchFactory;
-import kz.jarkyn.backend.counterparty.model.AccountEntity;
-import kz.jarkyn.backend.counterparty.model.AccountEntity_;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity_;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerRequest;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerSearchResponse;
 import kz.jarkyn.backend.counterparty.repository.CustomerRepository;
 import kz.jarkyn.backend.counterparty.service.mapper.CustomerMapper;
-import kz.jarkyn.backend.document.sale.model.SaleEntity;
-import kz.jarkyn.backend.document.sale.model.SaleEntity_;
-import kz.jarkyn.backend.document.sale.model.SaleState;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +30,7 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
     private final AuditService auditService;
     private final ConversionService conversionService;
-    private final CriteriaSearchFactory criteriaSearchFactory;
+    private final CriteriaSearchFactory pageSpesificationFactory;
 
 
     public CustomerService(
@@ -48,7 +44,7 @@ public class CustomerService {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.auditService = auditService;
-        this.criteriaSearchFactory = criteriaSearchFactory;
+        this.pageSpesificationFactory = criteriaSearchFactory;
         this.conversionService = conversionService;
     }
 
@@ -60,36 +56,15 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public PageResponse<CustomerSearchResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaSearch<CustomerSearchResponse> criteriaSearch = criteriaSearchFactory
-                .createAsdf(CustomerSearchResponse.class);
-        criteriaSearch.specification((cs, query, cb) -> {
-            Root<CustomerEntity> customerRoot = query.from(CustomerEntity.class);
-            ListJoin<CustomerEntity, AccountEntity> accountJoin = customerRoot
-                    .join(CustomerEntity_.accounts, JoinType.LEFT);
-            ListJoin<CustomerEntity, SaleEntity> saleJoin = cb.treat(
-                    customerRoot.join(CustomerEntity_.documents, JoinType.LEFT), SaleEntity.class);
-            saleJoin.on(cb.equal(saleJoin.get(SaleEntity_.state), SaleState.SHIPPED));
-            cs.attributes()
-                    .add(CustomerEntity_.ID, customerRoot.get(CustomerEntity_.id))
-                    .add(CustomerEntity_.NAME, customerRoot.get(CustomerEntity_.name))
-                    .add(CustomerEntity_.PHONE_NUMBER, customerRoot.get(CustomerEntity_.phoneNumber))
-                    .add(CustomerEntity_.SHIPPING_ADDRESS, customerRoot.get(CustomerEntity_.shippingAddress))
-                    .add(CustomerEntity_.DISCOUNT, customerRoot.get(CustomerEntity_.discount))
-                    .add(AccountEntity_.BALANCE, accountJoin.get(AccountEntity_.balance))
-                    .add("firstSale", cb.least(saleJoin.get(SaleEntity_.moment)))
-                    .add("lastSale", cb.greatest(saleJoin.get(SaleEntity_.moment)))
-                    .add("totalSaleCount", cb.count(saleJoin).as(Integer.class))
-                    .add("totalSaleAmount", cb.sum(saleJoin.get(SaleEntity_.amount)))
-                    .finish();
-            cs.idAttribute(CustomerEntity_.ID);
-            cs.searchAttributes(CustomerEntity_.NAME, CustomerEntity_.PHONE_NUMBER,
-                    CustomerEntity_.SHIPPING_ADDRESS);
-            cs.groupByAttributes(CustomerEntity_.ID, CustomerEntity_.NAME, CustomerEntity_.PHONE_NUMBER,
-                    CustomerEntity_.SHIPPING_ADDRESS, CustomerEntity_.DISCOUNT, AccountEntity_.BALANCE);
-        });
-        criteriaSearch.queryParams(queryParams);
-        SaleEntity_.customer.
-        return criteriaSearch.getResult();
+        PageSpecification<CustomerEntity> pageSpecification = pageSpesificationFactory
+                .createSpecification(CustomerEntity.class, queryParams)
+                .filterAndSort("id", CustomerEntity_.id)
+                .filterAndSort("name", CustomerEntity_.name)
+                .filterAndSort("phoneNumber", CustomerEntity_.phoneNumber)
+                .filterAndSort("shippingAddress", CustomerEntity_.shippingAddress)
+                .filterAndSort("discount", CustomerEntity_.discount);
+        Page<CustomerEntity> result = customerRepository.findAll(pageSpecification);
+        return null;
     }
 
     @Transactional

@@ -4,6 +4,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.util.Pair;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class QueryParams {
     private static final List<Pair<String, Filter.Type>> FILTER_SUFFIX = new ArrayList<>() {{
@@ -18,16 +20,16 @@ public class QueryParams {
     private static final String SORT_FIELD = "sort";
     private static final String SORT_SPLITTER = ",";
     private static final String SEARCH_FIELD = "search";
-    private static final String PAGE_FIRST_FIELD = "page.first";
+    private static final String PAGE_NUMBER_FIELD = "page.number";
     private static final String PAGE_SIZE_FIELD = "page.size";
     private static final Set<String> STATIC_FIELDS = Set.of(
-            SORT_FIELD, SORT_SPLITTER, SEARCH_FIELD, PAGE_FIRST_FIELD, PAGE_SIZE_FIELD);
+            SORT_FIELD, SORT_SPLITTER, SEARCH_FIELD, PAGE_NUMBER_FIELD, PAGE_SIZE_FIELD);
 
     private final String search;
-    private final Integer pageFirst;
+    private final Integer pageNumber;
     private final Integer pageSize;
-    private final List<Filter> filters;
-    private final List<Sort> sorts;
+    private final Map<String, Filter> filters;
+    private final Map<String, Sort> sorts;
 
 
     public static QueryParams of(Map<String, String> allParams) {
@@ -36,7 +38,7 @@ public class QueryParams {
 
     public QueryParams(Map<String, String> allParams) {
         this.search = allParams.get(SEARCH_FIELD);
-        this.pageFirst = Integer.valueOf(allParams.getOrDefault(PAGE_FIRST_FIELD, "0"));
+        this.pageNumber = Integer.valueOf(allParams.getOrDefault(PAGE_NUMBER_FIELD, "0"));
         this.pageSize = Integer.valueOf(allParams.getOrDefault(PAGE_SIZE_FIELD, "20"));
         this.filters = allParams.entrySet().stream()
                 .filter(entry -> !STATIC_FIELDS.contains(entry.getKey()))
@@ -49,7 +51,7 @@ public class QueryParams {
                         }
                     }
                     throw new RuntimeException("Invalid filter suffix: " + entry.getKey());
-                }).toList();
+                }).collect(Collectors.toMap(Filter::getName, Function.identity()));
         this.sorts = Arrays.stream(allParams.getOrDefault(SORT_FIELD, "").split(SORT_SPLITTER))
                 .filter(Strings::isNotBlank)
                 .map(paramName -> {
@@ -60,26 +62,26 @@ public class QueryParams {
                         }
                     }
                     throw new RuntimeException("Invalid filter suffix: " + paramName);
-                }).toList();
+                }).collect(Collectors.toMap(Sort::getName, Function.identity()));
     }
 
     public String getSearch() {
         return search;
     }
 
-    public Integer getPageFirst() {
-        return pageFirst;
+    public Integer getPageNumber() {
+        return pageNumber;
     }
 
     public Integer getPageSize() {
         return pageSize;
     }
 
-    public List<Filter> getFilters() {
+    public Map<String, Filter> getFilters() {
         return filters;
     }
 
-    public List<Sort> getSorts() {
+    public Map<String, Sort> getSorts() {
         return sorts;
     }
 
