@@ -68,24 +68,27 @@ public class CustomerService {
                     .join(CustomerEntity_.accounts, JoinType.LEFT);
             ListJoin<CustomerEntity, SaleEntity> saleJoin = cb.treat(
                     customerRoot.join(CustomerEntity_.documents, JoinType.LEFT), SaleEntity.class);
+            saleJoin.on(cb.equal(saleJoin.get(SaleEntity_.state), SaleState.SHIPPED));
             cs.attributes()
                     .add(CustomerEntity_.ID, customerRoot.get(CustomerEntity_.id))
                     .add(CustomerEntity_.NAME, customerRoot.get(CustomerEntity_.name))
                     .add(CustomerEntity_.PHONE_NUMBER, customerRoot.get(CustomerEntity_.phoneNumber))
                     .add(CustomerEntity_.SHIPPING_ADDRESS, customerRoot.get(CustomerEntity_.shippingAddress))
                     .add(CustomerEntity_.DISCOUNT, customerRoot.get(CustomerEntity_.discount))
-                    .add("balance", accountJoin.get(AccountEntity_.balance))
+                    .add(AccountEntity_.BALANCE, accountJoin.get(AccountEntity_.balance))
                     .add("firstSale", cb.least(saleJoin.get(SaleEntity_.moment)))
                     .add("lastSale", cb.greatest(saleJoin.get(SaleEntity_.moment)))
                     .add("totalSaleCount", cb.count(saleJoin).as(Integer.class))
                     .add("totalSaleAmount", cb.sum(saleJoin.get(SaleEntity_.amount)))
                     .finish();
-            cs.idAttribute("id");
-            cs.searchAttributes("name", "phoneNumber", "shippingAddress");
-            cs.groupByAttributes("id", "name", "phoneNumber", "shippingAddress", "discount", "balance");
-            cs.where(cb.equal(saleJoin.get(SaleEntity_.state), SaleState.SHIPPED));
+            cs.idAttribute(CustomerEntity_.ID);
+            cs.searchAttributes(CustomerEntity_.NAME, CustomerEntity_.PHONE_NUMBER,
+                    CustomerEntity_.SHIPPING_ADDRESS);
+            cs.groupByAttributes(CustomerEntity_.ID, CustomerEntity_.NAME, CustomerEntity_.PHONE_NUMBER,
+                    CustomerEntity_.SHIPPING_ADDRESS, CustomerEntity_.DISCOUNT, AccountEntity_.BALANCE);
         });
         criteriaSearch.queryParams(queryParams);
+        SaleEntity_.customer.
         return criteriaSearch.getResult();
     }
 

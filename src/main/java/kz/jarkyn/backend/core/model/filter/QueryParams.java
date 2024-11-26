@@ -18,8 +18,8 @@ public class QueryParams {
     private static final String SORT_FIELD = "sort";
     private static final String SORT_SPLITTER = ",";
     private static final String SEARCH_FIELD = "search";
-    private static final String PAGE_FIRST_FIELD = "pageFirst";
-    private static final String PAGE_SIZE_FIELD = "pageSize";
+    private static final String PAGE_FIRST_FIELD = "page.first";
+    private static final String PAGE_SIZE_FIELD = "page.size";
     private static final Set<String> STATIC_FIELDS = Set.of(
             SORT_FIELD, SORT_SPLITTER, SEARCH_FIELD, PAGE_FIRST_FIELD, PAGE_SIZE_FIELD);
 

@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.*;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.core.convert.ConversionService;
 
 import java.util.*;
@@ -67,22 +68,29 @@ public class CriteriaSearch<T> {
     }
 
     private void buildQuery(CriteriaQuery<?> query, QueryParams queryParams) {
-        Expression<?>[] expressions = new Expression<?>[cs.searchAttributes.size() + 1];
-        expressions[0] = cb.literal(queryParams.getSearch());
-        for (int i = 1; i <= cs.searchAttributes.size(); i++) {
-            expressions[i] = cs.searchAttributes.get(i - 1);
+        List<Predicate> wherePredicates = new ArrayList<>();
+        if (Strings.isNotBlank(queryParams.getSearch())) {
+            Expression<?>[] expressions = new Expression<?>[cs.searchAttributes.size() + 1];
+            expressions[0] = cb.literal(queryParams.getSearch());
+            for (int i = 1; i <= cs.searchAttributes.size(); i++) {
+                expressions[i] = cs.searchAttributes.get(i - 1);
+            }
+            Predicate searchPredicate = cb.isTrue(cb.function("search", Boolean.class, expressions));
+            wherePredicates.add(searchPredicate);
         }
-        Predicate searchPredicate = cb.isTrue(cb.function("search", Boolean.class, expressions));
-        Predicate wherePredicate = getFilterPredicate(queryParams
+        List<Predicate> filterPredicates = getFilterPredicate(queryParams
                 .getFilters().stream().filter(filter -> cs.groupByFiledNames.contains(filter.getName())).toList());
-        Predicate havingPredicate = getFilterPredicate(queryParams
+        wherePredicates.addAll(filterPredicates);
+        query.where(cb.and(wherePredicates.toArray(new Predicate[0])));
+
+        List<Predicate> havingPredicates = getFilterPredicate(queryParams
                 .getFilters().stream().filter(filter -> !cs.groupByFiledNames.contains(filter.getName())).toList());
-        query.where(cb.and(cs.staticPredicate, searchPredicate, wherePredicate));
+        query.having(cb.and(havingPredicates.toArray(new Predicate[0])));
+
         query.groupBy(cs.groupByAttributes);
-        query.having(havingPredicate);
     }
 
-    private Predicate getFilterPredicate(List<QueryParams.Filter> filters) {
+    private List<Predicate> getFilterPredicate(List<QueryParams.Filter> filters) {
         return filters.stream()
                 .filter(filter -> cs.attributes.containsKey(filter.getName()))
                 .map(filter -> {
@@ -94,8 +102,7 @@ public class CriteriaSearch<T> {
                         case LESS_THEN -> cb.lessThanOrEqualTo(expression, value);
                         case GREATER_THEN -> cb.greaterThanOrEqualTo(expression, value);
                     };
-                })
-                .reduce(cb::and).orElse(cb.conjunction());
+                }).toList();
     }
 
     public interface Specification<T> {
