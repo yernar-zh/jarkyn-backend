@@ -139,9 +139,7 @@ public class GoodService {
         for (GoodEntity good : goods) {
             List<AttributeEntity> attributes = attributeRepository.findByGood(good);
             List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
-            PrefixSearch prefixSearch = new PrefixSearch();
-            prefixSearch.addText(good.getName());
-            prefixSearch.addText(good.getGroup().getName());
+            PrefixSearch prefixSearch = new PrefixSearch(good.getName(), good.getGroup().getName());
             result.add(goodMapper.toDto(good, attributes, sellingPrices, prefixSearch));
         }
         return result;

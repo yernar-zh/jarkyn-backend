@@ -32,8 +32,10 @@ public class PageSpecification<T> {
     public <V extends Comparable<? super V>> PageSpecification<T> filterAndSort(
             String filedName, SingularAttribute<? super T, V> attribute) {
         Specification<T> specification = this.specification;
-        QueryParams.Filter filter = queryParams.getFilters().get(filedName);
-        if (filter != null) {
+        for (QueryParams.Filter filter : queryParams.getFilters()) {
+            if (!filter.getName().equals(filedName)) {
+                continue;
+            }
             V value = conversionService.convert(filter.getValue(), attribute.getJavaType());
             Specification<T> newSpecification = switch (filter.getType()) {
                 case EQUAL_TO -> filterByEqual(attribute, value);
@@ -42,10 +44,11 @@ public class PageSpecification<T> {
             };
             specification = specification.and(newSpecification);
         }
-
         Sort orderSort = this.orderSort;
-        QueryParams.Sort sort = queryParams.getSorts().get(filedName);
-        if (sort != null) {
+        for (QueryParams.Sort sort : queryParams.getSorts()) {
+            if (!sort.getName().equals(filedName)) {
+                continue;
+            }
             String property = attribute.getName();
             Sort newSortOrder = switch (sort.getType()) {
                 case ASC -> Sort.by(Sort.Order.asc(property));
@@ -54,17 +57,6 @@ public class PageSpecification<T> {
             orderSort = orderSort.and(newSortOrder);
         }
         return new PageSpecification<>(conversionService, queryParams, specification, orderSort);
-    }
-
-    public <V extends Comparable<? super V>> Specification<T> filter(
-            String filedName, SingularAttribute<? super T, V> attribute) {
-        QueryParams.Filter filter = queryParams.getFilters().get(filedName);
-        V value = conversionService.convert(filter.getValue(), attribute.getJavaType());
-        return switch (filter.getType()) {
-            case EQUAL_TO -> filterByEqual(attribute, value);
-            case LESS_THEN -> filterByLessThan(attribute, value);
-            case GREATER_THEN -> filterByGreaterThan(attribute, value);
-        };
     }
 
     private <V extends Comparable<? super V>> Specification<T> filterByEqual(
@@ -112,6 +104,6 @@ public class PageSpecification<T> {
     }
 
     public Pageable getPageable() {
-        return PageRequest.of(queryParams.getPageNumber(), queryParams.getPageSize(), orderSort);
+        return PageRequest.of(queryParams.getPageFirst(), queryParams.getPageSize(), orderSort);
     }
 }

@@ -30,11 +30,14 @@ class CustomerControllerTest {
     @Test
     @DirtiesContext
     public void testDetail_success() throws Exception {
-        mockMvc.perform(get(Api.Customer.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3")
+        mockMvc.perform(get(Api.Customer.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff")
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.name").value("Кенжина"));
+                .andExpect(jsonPath("$.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(jsonPath("$.name").value("Заманбек Жетысай"))
+                .andExpect(jsonPath("$.phoneNumber").value("+7(707)145-14-75"))
+                .andExpect(jsonPath("$.shippingAddress").value(""))
+                .andExpect(jsonPath("$.discount").value(3));
     }
 
     @Test
@@ -49,13 +52,29 @@ class CustomerControllerTest {
     @DirtiesContext
     public void testList_success() throws Exception {
         mockMvc.perform(get(Api.Customer.PATH).with(TestUtils.auth())
-//                        .queryParam("search", "Зам")
-//                        .queryParam("firstSale[min]", "2024-11-24T14:54")
-//                        .queryParam("discount[max]", "5")
-//                        .queryParam("sort", "-lastSale,name")
+                                .queryParam("search", "Зам 145")
+//                              .queryParam("firstSale[min]", "2024-11-24T14:54")
+                                .queryParam("discount[min]", "2")
+                                .queryParam("discount[max]", "4")
+                                .queryParam("sort", "-discount")
+                                .queryParam("page.first", "0")
+                                .queryParam("page.size", "50")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists());
+                .andExpect(jsonPath("$.page.first").value(0))
+                .andExpect(jsonPath("$.page.size").value(50))
+                .andExpect(jsonPath("$.page.totalCount").value(1))
+                .andExpect(jsonPath("$.row.length()").value(1))
+                .andExpect(jsonPath("$.row[0].id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(jsonPath("$.row[0].name").value("Заманбек Жетысай"))
+                .andExpect(jsonPath("$.row[0].phoneNumber").value("+7(707)145-14-75"))
+                .andExpect(jsonPath("$.row[0].shippingAddress").value(""))
+                .andExpect(jsonPath("$.row[0].discount").value(3))
+                .andExpect(jsonPath("$.row[0].balance").value(0))
+                .andExpect(jsonPath("$.row[0].firstSaleMoment").isEmpty())
+                .andExpect(jsonPath("$.row[0].lastSaleMoment").isEmpty())
+                .andExpect(jsonPath("$.row[0].totalSaleCount").value(0))
+                .andExpect(jsonPath("$.row[0].totalSaleAmount").value(0));
 
     }
 

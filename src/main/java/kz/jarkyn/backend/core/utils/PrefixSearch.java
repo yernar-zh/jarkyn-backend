@@ -1,8 +1,6 @@
 package kz.jarkyn.backend.core.utils;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PrefixSearch {
     private static final String ENG_LETTERS = "abcdefghijklmnopqrstuvwxyz";
@@ -19,20 +17,11 @@ public class PrefixSearch {
 
     private final TreeSet<String> set;
 
-    public PrefixSearch() {
+    public PrefixSearch(String... texts) {
         this.set = new TreeSet<>();
-    }
-
-    public void addText(String text) {
-        set.addAll(split(text));
-    }
-
-    public void addPhoneNumber(String phoneNumber) {
-        Matcher matcher = Pattern.compile("\\+7(\\d{3})(\\d{3})(\\d{4})").matcher(phoneNumber);
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException("Invalid phone number format");
+        for (String text : texts) {
+            set.addAll(split(text));
         }
-        set.addAll(List.of(matcher.group(1), matcher.group(2), matcher.group(3)));
     }
 
     public Boolean contains(String search) {

@@ -6,7 +6,7 @@ import org.immutables.value.Value;
 import java.time.LocalDateTime;
 
 @Value.Immutable
-public interface CustomerDto extends IdNamedDto {
+public interface CustomerListResponse extends IdNamedDto {
     String getPhoneNumber();
     String getShippingAddress();
     Integer getDiscount();

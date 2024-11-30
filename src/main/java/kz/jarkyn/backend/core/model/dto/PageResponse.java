@@ -7,7 +7,12 @@ import java.util.List;
 @Value.Immutable
 public interface PageResponse<T> {
     List<T> getRow();
-    Integer getPageFirst();
-    Integer getPageSize();
-    Integer getTotalCount();
+    Page getPage();
+
+    @Value.Immutable
+    interface Page {
+        Integer getFirst();
+        Integer getSize();
+        Integer getTotalCount();
+    }
 }
