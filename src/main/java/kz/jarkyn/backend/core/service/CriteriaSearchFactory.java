@@ -26,7 +26,7 @@ public class CriteriaSearchFactory {
 
     @Cacheable(value = "response_cache", key = "#type.name")
     public <T> SearchList<T> createSpecification(Class<T> type, List<T> response, String... searchFields) {
-        return new SearchList<>(conversionService, response, type, searchFields);
+        return new SearchList<>(response, searchFields);
 
     }
 }

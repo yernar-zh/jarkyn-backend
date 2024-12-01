@@ -3,16 +3,18 @@ package kz.jarkyn.backend.good.service;
 
 
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.service.CriteriaSearchFactory;
+import kz.jarkyn.backend.counterparty.repository.SearchList;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.good.model.AttributeEntity;
 import kz.jarkyn.backend.core.model.dto.IdDto;
-import kz.jarkyn.backend.core.utils.PrefixSearch;
 import kz.jarkyn.backend.good.model.GoodAttributeEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.good.model.SellingPriceEntity;
-import kz.jarkyn.backend.good.model.dto.GoodDto;
+import kz.jarkyn.backend.good.model.dto.GoodListResponse;
 import kz.jarkyn.backend.good.model.dto.SellingPriceRequest;
 import kz.jarkyn.backend.good.repository.AttributeRepository;
 import kz.jarkyn.backend.good.repository.GoodRepository;
@@ -24,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 @Service
 public class GoodService {
@@ -33,18 +34,20 @@ public class GoodService {
     private final AttributeRepository attributeRepository;
     private final SellingPriceRepository sellingPriceRepository;
     private final GoodMapper goodMapper;
+    private final CriteriaSearchFactory criteriaSearchFactory;
 
     public GoodService(
             GoodRepository goodRepository,
             GoodAttributeRepository goodAttributeRepository,
             AttributeRepository attributeRepository,
             SellingPriceRepository sellingPriceRepository,
-            GoodMapper goodMapper) {
+            GoodMapper goodMapper, CriteriaSearchFactory criteriaSearchFactory) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
         this.sellingPriceRepository = sellingPriceRepository;
         this.goodMapper = goodMapper;
+        this.criteriaSearchFactory = criteriaSearchFactory;
     }
 
     @Transactional(readOnly = true)
@@ -58,24 +61,15 @@ public class GoodService {
     }
 
     @Transactional(readOnly = true)
-    public List<GoodResponse> findApiByFilter(QueryParams queryParams) {
-//        Stream<GoodDto> stream = findAllDto().stream();
-//        if (filter.getSearch() != null) {
-//            stream = stream.filter(goodDto -> goodDto.getSearch().contains(filter.getSearch()));
-//        }
-//        if (filter.getGroupId() != null) {
-//            stream = stream.filter(goodDto -> goodDto.getGroup().stream()
-//                    .map(IdDto::getId).anyMatch(filter.getGroupId()::equals));
-//        }
-//        if (filter.getAttributeId() != null) {
-//            stream = stream.filter(goodDto -> goodDto.getAttributes().stream()
-//                    .map(IdDto::getId).anyMatch(filter.getAttributeId()::equals));
-//        }
-//        if (filter.getArchived() != null) {
-//            stream = stream.filter(goodDto -> filter.getArchived().equals(goodDto.getArchived()));
-//        }
-//        return stream.map(goodMapper::toListApi).toList();
-        return null;
+    public PageResponse<GoodListResponse> findApiByFilter(QueryParams queryParams) {
+        List<GoodListResponse> responses = goodRepository.findAll().stream().map(good -> {
+            List<AttributeEntity> attributes = attributeRepository.findByGood(good);
+            List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
+            return goodMapper.toListResponse(good, attributes, sellingPrices);
+        }).toList();
+        SearchList<GoodListResponse> searchResponse = criteriaSearchFactory.createSpecification(
+                GoodListResponse.class, responses, "name");
+        return searchResponse.getResponse(queryParams);
     }
 
     @Transactional
@@ -132,17 +126,4 @@ public class GoodService {
         goodRepository.save(good);
         return findApiById(id);
     }
-
-    private List<GoodDto> findAllDto() {
-        List<GoodDto> result = new ArrayList<>();
-        List<GoodEntity> goods = goodRepository.findAll();
-        for (GoodEntity good : goods) {
-            List<AttributeEntity> attributes = attributeRepository.findByGood(good);
-            List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
-            PrefixSearch prefixSearch = new PrefixSearch(good.getName(), good.getGroup().getName());
-            result.add(goodMapper.toDto(good, attributes, sellingPrices, prefixSearch));
-        }
-        return result;
-    }
-
 }

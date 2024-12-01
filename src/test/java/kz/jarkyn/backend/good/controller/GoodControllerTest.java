@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -19,7 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Sql({"../../../../../../resources/kz/jarkyn/backend/auth.sql", "good.sql"})
+@ComponentScan(basePackages = "kz.jarkyn.backend")
+@Sql({"../../auth.sql", "good.sql"})
 class GoodControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -51,13 +53,19 @@ class GoodControllerTest {
     @DirtiesContext
     public void testList_success() throws Exception {
         mockMvc.perform(get(Api.Good.PATH).with(TestUtils.auth())
-                        .param("search", "кик")
-                        .param("groupId", "cdfcf458-7cca-11ef-0a80-152f001b4886")
-                        .param("attributeId", "e95420b5-3344-44ce-8d39-699f516ed715")
-                        .param("archived", Boolean.FALSE.toString())
+                        .queryParam("search", "кикL")
+                        .queryParam("groups.id", "cdfcf458-7cca-11ef-0a80-152f001b4886")
+                        .queryParam("attributes.id", "e95420b5-3344-44ce-8d39-699f516ed715")
+                        .queryParam("archived", Boolean.FALSE.toString())
+                        .queryParam("sort", "-name")
+                        .queryParam("page.first", "0")
+                        .queryParam("page.size", "50")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.page.first").value(0))
+                .andExpect(jsonPath("$.page.size").value(50))
+                .andExpect(jsonPath("$.page.totalCount").value(1))
+                .andExpect(jsonPath("$.row.length()").value(1));
     }
 
     @Test

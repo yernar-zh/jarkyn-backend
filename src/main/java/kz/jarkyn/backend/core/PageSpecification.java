@@ -36,7 +36,7 @@ public class PageSpecification<T> {
             if (!filter.getName().equals(filedName)) {
                 continue;
             }
-            V value = conversionService.convert(filter.getValue(), attribute.getJavaType());
+            V value = conversionService.convert(filter.getValues(), attribute.getJavaType());
             Specification<T> newSpecification = switch (filter.getType()) {
                 case EQUAL_TO -> filterByEqual(attribute, value);
                 case LESS_THEN -> filterByLessThan(attribute, value);

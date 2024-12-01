@@ -1,7 +1,9 @@
 package kz.jarkyn.backend.good.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.good.model.dto.GoodListResponse;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.core.model.dto.ValueDto;
@@ -9,6 +11,7 @@ import kz.jarkyn.backend.good.service.GoodService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -26,8 +29,8 @@ public class GoodController {
     }
 
     @GetMapping
-    public List<GoodResponse> list(@ModelAttribute QueryParams queryParams) {
-        return goodService.findApiByFilter(queryParams);
+    public PageResponse<GoodListResponse> list(@RequestParam Map<String, String> allParams) {
+        return goodService.findApiByFilter(QueryParams.of(allParams));
     }
 
     @PostMapping

@@ -6,33 +6,94 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.utils.PrefixSearch;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.core.convert.ConversionService;
+import org.springframework.data.util.Pair;
 
 import java.beans.Introspector;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class SearchList<R> {
-    private final ConversionService conversionService;
     private final List<Row> rows;
 
-    public SearchList(
-            ConversionService conversionService,
-            List<R> list, Class<R> javaClass, String... searchFields) {
-        this.conversionService = conversionService;
+    public SearchList(List<R> list, String... searchFields) {
         rows = list.stream().map(data -> {
-            Map<String, Field<?>> fields = new HashMap<>();
-            for (Method method : javaClass.getMethods()) {
-                Field<?> field = buildFiled(data, method);
-                fields.put(field.getName(), field);
-            }
+            Map<String, Set<Object>> fields = getFields(data).stream()
+                    .collect(Collectors.groupingBy(
+                            Pair::getFirst,
+                            Collectors.mapping(Pair::getSecond, Collectors.toSet())
+                    ));
             String[] texts = Arrays.stream(searchFields)
-                    .map(searchField -> fields.get(searchField).getValue())
-                    .map(Object::toString).toArray(String[]::new);
+                    .map(fields::get).filter(Objects::nonNull).map(Object::toString).toArray(String[]::new);
             return new Row(data, new PrefixSearch(texts), fields);
         }).toList();
+    }
+
+    private List<Pair<String, Object>> getFields(Object object) {
+        if (object == null) {
+            return Collections.emptyList();
+        }
+        Class<?> javaClass = object.getClass();
+        Function<String, Object> convertor = getConvertor(javaClass);
+        if (convertor != null) {
+            return List.of(Pair.of("", object));
+        }
+        if (object instanceof Collection) {
+            return ((Collection<?>) object).stream().map(this::getFields).flatMap(List::stream).toList();
+        }
+        List<Pair<String, Object>> result = new ArrayList<>();
+        for (Method method : javaClass.getMethods()) {
+            if (!method.getName().startsWith("get") || method.getName().equals("getClass")) {
+                continue;
+            }
+            String name = Introspector.decapitalize(method.getName().substring(3));
+            method.setAccessible(true);
+            Object value;
+            try {
+                value = method.invoke(object);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            for (Pair<String, Object> field : getFields(value)) {
+                String childName = name + (Strings.isNotBlank(field.getFirst()) ? "." + field.getFirst() : "");
+                result.add(Pair.of(childName, field.getSecond()));
+            }
+        }
+        return result;
+    }
+
+    private Function<String, Object> getConvertor(Class<?> javaClass) {
+        if (javaClass == Integer.class) {
+            return Integer::valueOf;
+        } else if (javaClass == Long.class) {
+            return Long::valueOf;
+        } else if (javaClass == Double.class) {
+            return Double::valueOf;
+        } else if (javaClass == Float.class) {
+            return Float::valueOf;
+        } else if (javaClass == Boolean.class) {
+            return Boolean::valueOf;
+        } else if (javaClass == String.class) {
+            return x -> x;
+        } else if (javaClass == LocalDate.class) {
+            return str -> LocalDate.parse(str, DateTimeFormatter.ISO_DATE);
+        } else if (javaClass == LocalDateTime.class) {
+            return str -> LocalDateTime.parse(str, DateTimeFormatter.ISO_DATE_TIME);
+        } else if (javaClass == BigInteger.class) {
+            return BigInteger::new;
+        } else if (javaClass == UUID.class) {
+            return UUID::fromString;
+        } else if (javaClass.isEnum()) {
+            return str -> Enum.valueOf((Class<? extends Enum>) javaClass, str);
+        } else {
+            return null;
+        }
     }
 
     public PageResponse<R> getResponse(QueryParams queryParams) {
@@ -53,68 +114,53 @@ public class SearchList<R> {
                 }
             }
             for (QueryParams.Filter filter : queryParams.getFilters()) {
-                Field<?> field = row.getFields().get(filter.getName());
-                if (field == null) {
+                Set<Object> rowValues = row.getValues().get(filter.getName());
+                if (rowValues == null) {
                     continue;
                 }
-                if (!filter(field, filter)) {
+                if (rowValues.isEmpty()) {
                     return false;
                 }
+                Object firstRowValue = rowValues.iterator().next();
+                Function<String, Object> convertor = getConvertor(firstRowValue.getClass());
+                Set<Object> filterValues = filter.getValues().stream()
+                        .map(filterValue -> convertor.apply(filterValue)).collect(Collectors.toSet());
+                Object firstFilterValues = filterValues.iterator().next();
+                return switch (filter.getType()) {
+                    case EQUAL_TO -> rowValues.containsAll(filterValues);
+                    case LESS_THEN -> ((Comparable) firstRowValue).compareTo(firstFilterValues) <= 0;
+                    case GREATER_THEN -> ((Comparable) firstRowValue).compareTo(firstFilterValues) >= 0;
+                };
             }
             return true;
         };
     }
 
-    private <V extends Comparable<V>> boolean filter(Field<V> field, QueryParams.Filter filter) {
-        V value = conversionService.convert(filter.getValue(), field.getJavaClass());
-        Objects.requireNonNull(value);
-        return switch (filter.getType()) {
-            case EQUAL_TO -> field.getValue().equals(value);
-            case LESS_THEN -> field.getValue().compareTo(value) <= 0;
-            case GREATER_THEN -> field.getValue().compareTo(value) >= 0;
-        };
-    }
-
     private Comparator<Row> sort(QueryParams queryParams) {
-        Comparator<Row> mainComparator = Comparator.comparing(_ -> true);
-        for (QueryParams.Sort sort : queryParams.getSorts()) {
+        return queryParams.getSorts().stream().map(sort -> {
             Comparator<Row> comparator = Comparator.comparing(row -> {
-                Field<?> field = row.getFields().get(sort.getName());
-                if (field == null) {
+                Set<Object> rowValues = row.getValues().get(sort.getName());
+                if (rowValues == null || rowValues.isEmpty()) {
                     return null;
                 }
-                return field.getValue();
+                return (Comparable) rowValues.iterator().next();
             });
-            switch (sort.getType()) {
-                case ASC -> mainComparator = mainComparator.thenComparing(comparator);
-                case DESC -> mainComparator = mainComparator.thenComparing(comparator.reversed());
-            }
-        }
-        return mainComparator;
-    }
-
-    private <V extends Comparable<V>> Field<V> buildFiled(R data, Method method) {
-        String name = Introspector.decapitalize(method.getName().substring(3));
-        Class<V> javaClass = (Class<V>) method.getReturnType();
-        V value;
-        method.setAccessible(true);
-        try {
-            value = (V) method.invoke(data);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-        return new Field<>(name, value, javaClass);
+            return switch (sort.getType()) {
+                case ASC -> comparator;
+                case DESC -> comparator.reversed();
+            };
+        }).reduce(Comparator::thenComparing).orElse(Comparator.comparing(_ -> true));
     }
 
     private class Row {
         private final R data;
         private final PrefixSearch search;
-        private final Map<String, Field<?>> fields;
+        private final Map<String, Set<Object>> values;
 
-        private Row(R data, PrefixSearch search, Map<String, Field<?>> fields) {
+        public Row(R data, PrefixSearch search, Map<String, Set<Object>> values) {
             this.data = data;
             this.search = search;
-            this.fields = fields;
+            this.values = values;
         }
 
         public R getData() {
@@ -125,33 +171,8 @@ public class SearchList<R> {
             return search;
         }
 
-        public Map<String, Field<?>> getFields() {
-            return fields;
-        }
-    }
-
-    private class Field<V extends Comparable<V>> {
-        private final String name;
-        private final V value;
-        private final Class<V> javaClass;
-
-
-        private Field(String name, V value, Class<V> javaClass) {
-            this.name = name;
-            this.value = value;
-            this.javaClass = javaClass;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public Class<V> getJavaClass() {
-            return javaClass;
+        public Map<String, Set<Object>> getValues() {
+            return values;
         }
     }
 }

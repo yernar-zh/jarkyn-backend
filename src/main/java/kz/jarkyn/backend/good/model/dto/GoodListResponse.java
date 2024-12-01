@@ -10,12 +10,11 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-public interface GoodDto extends IdNamedDto {
-    List<IdNamedDto> getGroup();
+public interface GoodListResponse extends IdNamedDto {
+    List<IdNamedDto> getGroups();
     @Nullable IdDto getImage();
     Integer getMinimumPrice();
     Boolean getArchived();
     List<IdNamedDto> getAttributes();
     List<SellingPriceDto> getSellingPrices();
-    PrefixSearch getSearch();
 }

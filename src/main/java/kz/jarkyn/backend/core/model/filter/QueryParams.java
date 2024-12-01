@@ -4,8 +4,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.util.Pair;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class QueryParams {
     private static final List<Pair<String, Filter.Type>> FILTER_SUFFIX = new ArrayList<>() {{
@@ -43,11 +41,12 @@ public class QueryParams {
         this.filters = allParams.entrySet().stream()
                 .filter(entry -> !STATIC_FIELDS.contains(entry.getKey()))
                 .map(entry -> {
+                    List<String> values = Arrays.stream(entry.getValue().split(SORT_SPLITTER)).toList();
                     for (Pair<String, Filter.Type> suffix : FILTER_SUFFIX) {
                         if (entry.getKey().endsWith(suffix.getFirst())) {
                             String name = entry.getKey()
                                     .substring(0, entry.getKey().length() - suffix.getFirst().length());
-                            return new Filter(name, entry.getValue(), suffix.getSecond());
+                            return new Filter(name, values, suffix.getSecond());
                         }
                     }
                     throw new RuntimeException("Invalid filter suffix: " + entry.getKey());
@@ -87,12 +86,12 @@ public class QueryParams {
 
     public static class Filter {
         private final String name;
-        private final String value;
+        private final List<String> values;
         private final Type type;
 
-        public Filter(String name, String value, Type type) {
+        public Filter(String name, List<String> values, Type type) {
             this.name = name;
-            this.value = value;
+            this.values = values;
             this.type = type;
         }
 
@@ -100,8 +99,8 @@ public class QueryParams {
             return name;
         }
 
-        public String getValue() {
-            return value;
+        public List<String> getValues() {
+            return values;
         }
 
         public Type getType() {

@@ -47,9 +47,9 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public PageResponse<CustomerListResponse> findApiByFilter(QueryParams queryParams) {
-        SearchList<CustomerListResponse> allResponse = criteriaSearchFactory.createSpecification(
+        SearchList<CustomerListResponse> searchResponse = criteriaSearchFactory.createSpecification(
                 CustomerListResponse.class, customerRepository.findAllResponse(), "name", "phoneNumber");
-        return allResponse.getResponse(queryParams);
+        return searchResponse.getResponse(queryParams);
     }
 
     @Transactional
