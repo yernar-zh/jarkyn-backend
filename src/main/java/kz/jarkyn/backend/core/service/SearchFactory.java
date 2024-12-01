@@ -2,19 +2,20 @@ package kz.jarkyn.backend.core.service;
 
 import kz.jarkyn.backend.core.PageSpecification;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.counterparty.repository.SearchList;
+import kz.jarkyn.backend.counterparty.repository.ListSearch;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Service
-public class CriteriaSearchFactory {
+public class SearchFactory {
     private final ConversionService conversionService;
 
-    public CriteriaSearchFactory(ConversionService conversionService) {
+    public SearchFactory(ConversionService conversionService) {
         this.conversionService = conversionService;
     }
 
@@ -25,8 +26,10 @@ public class CriteriaSearchFactory {
     }
 
     @Cacheable(value = "response_cache", key = "#type.name")
-    public <T> SearchList<T> createSpecification(Class<T> type, List<T> response, String... searchFields) {
-        return new SearchList<>(response, searchFields);
+    public <T> ListSearch<T> createListSearch(
+            Class<T> type, List<String> searchFields,
+            Supplier<List<T>> responseSupplier) {
+        return new ListSearch<>(responseSupplier.get(), searchFields);
 
     }
 }

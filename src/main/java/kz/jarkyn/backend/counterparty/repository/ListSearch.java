@@ -19,18 +19,19 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class SearchList<R> {
+public class ListSearch<R> {
     private final List<Row> rows;
 
-    public SearchList(List<R> list, String... searchFields) {
+    public ListSearch(List<R> list, List<String> searchFields) {
         rows = list.stream().map(data -> {
             Map<String, Set<Object>> fields = getFields(data).stream()
                     .collect(Collectors.groupingBy(
                             Pair::getFirst,
                             Collectors.mapping(Pair::getSecond, Collectors.toSet())
                     ));
-            String[] texts = Arrays.stream(searchFields)
-                    .map(fields::get).filter(Objects::nonNull).map(Object::toString).toArray(String[]::new);
+            String[] texts = searchFields.stream()
+                    .map(fields::get).filter(Objects::nonNull).flatMap(Set::stream)
+                    .map(Object::toString).toArray(String[]::new);
             return new Row(data, new PrefixSearch(texts), fields);
         }).toList();
     }
@@ -96,7 +97,7 @@ public class SearchList<R> {
         }
     }
 
-    public PageResponse<R> getResponse(QueryParams queryParams) {
+    public PageResponse<R> getResult(QueryParams queryParams) {
         List<R> result = rows.stream().filter(filter(queryParams)).sorted(sort(queryParams))
                 .map(Row::getData).toList();
         int totalCount = result.size();

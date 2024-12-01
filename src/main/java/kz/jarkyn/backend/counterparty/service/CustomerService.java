@@ -6,13 +6,13 @@ import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.core.service.CriteriaSearchFactory;
+import kz.jarkyn.backend.core.service.SearchFactory;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerListResponse;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerRequest;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerResponse;
 import kz.jarkyn.backend.counterparty.repository.CustomerRepository;
-import kz.jarkyn.backend.counterparty.repository.SearchList;
+import kz.jarkyn.backend.counterparty.repository.ListSearch;
 import kz.jarkyn.backend.counterparty.service.mapper.CustomerMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,18 +24,18 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final AuditService auditService;
-    private final CriteriaSearchFactory criteriaSearchFactory;
+    private final SearchFactory searchFactory;
 
     public CustomerService(
             CustomerRepository customerRepository,
             CustomerMapper customerMapper,
             AuditService auditService,
-            CriteriaSearchFactory criteriaSearchFactory
+            SearchFactory searchFactory
     ) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.auditService = auditService;
-        this.criteriaSearchFactory = criteriaSearchFactory;
+        this.searchFactory = searchFactory;
     }
 
 
@@ -47,9 +47,10 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public PageResponse<CustomerListResponse> findApiByFilter(QueryParams queryParams) {
-        SearchList<CustomerListResponse> searchResponse = criteriaSearchFactory.createSpecification(
-                CustomerListResponse.class, customerRepository.findAllResponse(), "name", "phoneNumber");
-        return searchResponse.getResponse(queryParams);
+        ListSearch<CustomerListResponse> search = searchFactory.createListSearch(
+                CustomerListResponse.class, List.of("name", "phoneNumber"),
+                customerRepository::findAllResponse);
+        return search.getResult(queryParams);
     }
 
     @Transactional
