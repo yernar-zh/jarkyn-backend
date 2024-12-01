@@ -25,11 +25,11 @@ public class SearchFactory {
                 Sort.unsorted());
     }
 
-    @Cacheable(value = "response_cache", key = "#type.name")
-    public <T> ListSearch<T> createListSearch(
-            Class<T> type, List<String> searchFields,
-            Supplier<List<T>> responseSupplier) {
-        return new ListSearch<>(responseSupplier.get(), searchFields);
+    @Cacheable(value = "response_cache", key = "#javaClass.name")
+    public <R> ListSearch<R> createListSearch(
+            Class<R> javaClass, List<String> searchFields,
+            Supplier<List<R>> responseSupplier) {
+        return new ListSearch<>(javaClass, responseSupplier.get(), searchFields);
 
     }
 }

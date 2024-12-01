@@ -10,6 +10,7 @@ import org.springframework.data.util.Pair;
 
 import java.beans.Introspector;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,9 +23,9 @@ import java.util.stream.Collectors;
 public class ListSearch<R> {
     private final List<Row> rows;
 
-    public ListSearch(List<R> list, List<String> searchFields) {
+    public ListSearch(Class<R> javaClass, List<R> list, List<String> searchFields) {
         rows = list.stream().map(data -> {
-            Map<String, Set<Object>> fields = getFields(data).stream()
+            Map<String, Set<Object>> fields = getRowValues(javaClass, data).stream()
                     .collect(Collectors.groupingBy(
                             Pair::getFirst,
                             Collectors.mapping(Pair::getSecond, Collectors.toSet())
@@ -36,34 +37,40 @@ public class ListSearch<R> {
         }).toList();
     }
 
-    private List<Pair<String, Object>> getFields(Object object) {
-        if (object == null) {
+    private List<Pair<String, Object>> getRowValues(Class<?> valueClass, Object value) {
+        if (value == null) {
             return Collections.emptyList();
         }
-        Class<?> javaClass = object.getClass();
-        Function<String, Object> convertor = getConvertor(javaClass);
+        Function<String, Object> convertor = getConvertor(valueClass);
         if (convertor != null) {
-            return List.of(Pair.of("", object));
-        }
-        if (object instanceof Collection) {
-            return ((Collection<?>) object).stream().map(this::getFields).flatMap(List::stream).toList();
+            return List.of(Pair.of("", value));
         }
         List<Pair<String, Object>> result = new ArrayList<>();
-        for (Method method : javaClass.getMethods()) {
-            if (!method.getName().startsWith("get") || method.getName().equals("getClass")) {
-                continue;
+        for (Method method : valueClass.getMethods()) {
+            if (!method.getName().startsWith("get")) {
+                throw new RuntimeException();
             }
             String name = Introspector.decapitalize(method.getName().substring(3));
             method.setAccessible(true);
-            Object value;
+            Object methodReturnValue;
             try {
-                value = method.invoke(object);
+                methodReturnValue = method.invoke(value);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            for (Pair<String, Object> field : getFields(value)) {
-                String childName = name + (Strings.isNotBlank(field.getFirst()) ? "." + field.getFirst() : "");
-                result.add(Pair.of(childName, field.getSecond()));
+            List<Pair<String, Object>> subValues;
+            if (Collection.class.isAssignableFrom(method.getReturnType())) {
+                ParameterizedType genericType = (ParameterizedType) method.getGenericReturnType();
+                Class<?> itemClass = (Class<?>) genericType.getActualTypeArguments()[0];
+                subValues = ((Collection<?>) methodReturnValue).stream()
+                        .map(itemValue -> getRowValues(itemClass, itemValue))
+                        .flatMap(List::stream).toList();
+            } else {
+                subValues = getRowValues(method.getReturnType(), methodReturnValue);
+            }
+            for (Pair<String, Object> subValue : subValues) {
+                String childName = name + (Strings.isNotBlank(subValue.getFirst()) ? "." + subValue.getFirst() : "");
+                result.add(Pair.of(childName, subValue.getSecond()));
             }
         }
         return result;
