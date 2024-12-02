@@ -6,7 +6,7 @@ import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.service.SearchFactory;
-import kz.jarkyn.backend.counterparty.repository.ListSearch;
+import kz.jarkyn.backend.core.service.ListSearch;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.good.model.AttributeEntity;

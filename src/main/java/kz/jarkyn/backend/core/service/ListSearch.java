@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.counterparty.repository;
+package kz.jarkyn.backend.core.service;
 
 import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class ListSearch<R> {
     private final List<Row> rows;
 
-    public ListSearch(Class<R> javaClass, List<R> list, List<String> searchFields) {
+    public ListSearch(Class<R> javaClass, List<String> searchFields, List<R> list) {
         rows = list.stream().map(data -> {
             Map<String, Set<Object>> fields = getRowValues(javaClass, data).stream()
                     .collect(Collectors.groupingBy(
