@@ -1,9 +1,9 @@
-package kz.jarkyn.backend.good.service.mapper;
+package kz.jarkyn.backend.good.mapper;
 
 import kz.jarkyn.backend.good.model.dto.*;
 import kz.jarkyn.backend.good.model.AttributeEntity;
 import kz.jarkyn.backend.good.model.AttributeGroupEntity;
-import kz.jarkyn.backend.core.service.mapper.EntityMapper;
+import kz.jarkyn.backend.core.mapper.EntityMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

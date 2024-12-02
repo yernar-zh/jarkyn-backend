@@ -8,7 +8,7 @@ import kz.jarkyn.backend.good.model.dto.AttributeResponse;
 import kz.jarkyn.backend.good.model.AttributeEntity;
 import kz.jarkyn.backend.good.repository.AttributeRepository;
 import kz.jarkyn.backend.good.repository.GoodRepository;
-import kz.jarkyn.backend.good.service.mapper.AttributeMapper;
+import kz.jarkyn.backend.good.mapper.AttributeMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

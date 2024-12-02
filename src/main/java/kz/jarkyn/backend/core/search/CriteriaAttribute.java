@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.core.service;
+package kz.jarkyn.backend.core.search;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

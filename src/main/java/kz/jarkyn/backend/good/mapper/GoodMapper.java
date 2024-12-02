@@ -1,12 +1,12 @@
 
-package kz.jarkyn.backend.good.service.mapper;
+package kz.jarkyn.backend.good.mapper;
 
 import kz.jarkyn.backend.good.model.dto.GoodListResponse;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.good.model.dto.SellingPriceRequest;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
-import kz.jarkyn.backend.core.service.mapper.EntityMapper;
+import kz.jarkyn.backend.core.mapper.EntityMapper;
 import kz.jarkyn.backend.good.model.GoodAttributeEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.good.model.AttributeEntity;

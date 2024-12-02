@@ -12,7 +12,7 @@ import kz.jarkyn.backend.good.model.dto.GroupRequest;
 import kz.jarkyn.backend.good.model.dto.GroupResponse;
 import kz.jarkyn.backend.good.repository.GoodRepository;
 import kz.jarkyn.backend.good.repository.GroupRepository;
-import kz.jarkyn.backend.good.service.mapper.GroupMapper;
+import kz.jarkyn.backend.good.mapper.GroupMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

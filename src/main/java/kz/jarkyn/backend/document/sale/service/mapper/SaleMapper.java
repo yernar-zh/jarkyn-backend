@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.document.sale.service.mapper;
 
-import kz.jarkyn.backend.core.service.mapper.EntityMapper;
+import kz.jarkyn.backend.core.mapper.EntityMapper;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.payment.model.PaymentInForSaleEntity;
 import kz.jarkyn.backend.document.sale.model.SaleEntity;

@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.core.service;
+package kz.jarkyn.backend.core.search;
 
 import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;

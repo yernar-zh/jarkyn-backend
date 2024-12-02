@@ -1,5 +1,5 @@
 
-package kz.jarkyn.backend.core.service.mapper;
+package kz.jarkyn.backend.core.mapper;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

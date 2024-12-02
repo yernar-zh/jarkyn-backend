@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.core.service;
+package kz.jarkyn.backend.core.search;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
@@ -7,8 +7,6 @@ import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.counterparty.model.dto.CustomerListResponse;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.cglib.proxy.InvocationHandler;
 import org.springframework.cglib.proxy.Proxy;
 

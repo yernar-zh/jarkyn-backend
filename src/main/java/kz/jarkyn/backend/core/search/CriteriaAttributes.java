@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.core.service;
+package kz.jarkyn.backend.core.search;
 
 import java.util.*;
 
@@ -15,14 +15,14 @@ public class CriteriaAttributes<E> {
     }
 
 
-    public static <E> Builder<E> builder(Class<E> javaClass) {
-        return new Builder<>(javaClass);
+    public static <E> Builder<E> builder() {
+        return new Builder<>();
     }
 
     public static class Builder<E> {
         private final Map<String, CriteriaAttribute<E>> attributes;
 
-        public Builder(Class<E> javaClass) {
+        public Builder() {
             this.attributes = new HashMap<>();
         }
 

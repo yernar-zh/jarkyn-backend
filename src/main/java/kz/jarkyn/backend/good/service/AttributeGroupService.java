@@ -10,7 +10,7 @@ import kz.jarkyn.backend.good.model.AttributeGroupEntity;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.good.repository.AttributeGroupRepository;
 import kz.jarkyn.backend.good.repository.AttributeRepository;
-import kz.jarkyn.backend.good.service.mapper.AttributeMapper;
+import kz.jarkyn.backend.good.mapper.AttributeMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
