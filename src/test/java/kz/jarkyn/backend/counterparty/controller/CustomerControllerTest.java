@@ -83,7 +83,11 @@ class CustomerControllerTest {
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Толе би"
+                  "id": "1d468c04-6360-43e5-9d51-7771e9d9dcff",
+                  "name": "Заманбек Жетысай",
+                  "phoneNumber": "+7(707)145-14-75",
+                  "shippingAddress": "Рынок Салем",
+                  "discount": 3
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Customer.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())

@@ -8,7 +8,7 @@ import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 import kz.jarkyn.backend.counterparty.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.counterparty.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.counterparty.repository.WarehouseRepository;
-import kz.jarkyn.backend.counterparty.service.mapper.WarehouseMapper;
+import kz.jarkyn.backend.counterparty.mapper.WarehouseMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

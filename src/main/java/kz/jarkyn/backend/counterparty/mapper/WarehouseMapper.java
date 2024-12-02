@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.counterparty.service.mapper;
+package kz.jarkyn.backend.counterparty.mapper;
 
 import kz.jarkyn.backend.core.service.mapper.EntityMapper;
 import kz.jarkyn.backend.counterparty.model.WarehouseEntity;

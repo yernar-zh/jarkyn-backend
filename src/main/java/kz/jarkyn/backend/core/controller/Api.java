@@ -23,6 +23,10 @@ public interface Api {
         String PATH = Api.PATH + "/warehouse";
     }
 
+    interface Account {
+        String PATH = Api.PATH + "/account";
+    }
+
     interface Customer {
         String PATH = Api.PATH + "/customer";
     }

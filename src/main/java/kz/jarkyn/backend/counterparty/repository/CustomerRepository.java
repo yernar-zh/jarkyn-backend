@@ -1,9 +1,7 @@
 package kz.jarkyn.backend.counterparty.repository;
 
-import kz.jarkyn.backend.core.repository.PageSpecificationExecutor;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerListResponse;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
