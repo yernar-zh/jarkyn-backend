@@ -66,9 +66,8 @@ public class AttributeGroupService {
 
     @Transactional
     public AttributeGroupResponse createApi(AttributeGroupRequest request) {
-        AttributeGroupEntity entity = attributeMapper.toEntity(request);
+        AttributeGroupEntity entity = attributeGroupRepository.save(attributeMapper.toEntity(request));
         entity.setPosition(1000);
-        attributeGroupRepository.save(entity);
         return findApiById(entity.getId());
     }
 

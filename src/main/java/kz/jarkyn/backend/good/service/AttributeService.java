@@ -39,9 +39,8 @@ public class AttributeService {
 
     @Transactional
     public AttributeResponse createApi(AttributeRequest request) {
-        AttributeEntity entity = attributeMapper.toEntity(request);
+        AttributeEntity entity = attributeRepository.save(attributeMapper.toEntity(request));
         entity.setPosition(1000);
-        attributeRepository.save(entity);
         return findApiById(entity.getId());
     }
 
@@ -49,7 +48,6 @@ public class AttributeService {
     public AttributeResponse editApi(UUID id, AttributeEditRequest request) {
         AttributeEntity entity = attributeRepository.findById(id).orElseThrow();
         attributeMapper.editEntity(entity, request);
-        attributeRepository.save(entity);
         return findApiById(entity.getId());
     }
 
