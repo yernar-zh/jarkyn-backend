@@ -58,6 +58,7 @@ public class CustomerService {
         CriteriaAttributes<CustomerEntity> attributes = CriteriaAttributes.builder(CustomerEntity.class)
                 .add("id", (root, query, cb) -> root.get(CustomerEntity_.id))
                 .add("name", (root, query, cb) -> root.get(CustomerEntity_.name))
+                .add("phoneNumber", (root, query, cb) -> root.get(CustomerEntity_.phoneNumber))
                 .add("shippingAddress", (root, query, cb) -> root.get(CustomerEntity_.shippingAddress))
                 .add("discount", (root, query, cb) -> root.get(CustomerEntity_.discount))
                 .add("balance", (root, query, cb) -> {
@@ -100,7 +101,7 @@ public class CustomerService {
                 .add("totalSaleAmount", (root, query, cb) -> {
                     Subquery<Integer> subQuery = query.subquery(Integer.class);
                     Root<SaleEntity> saleRoot = subQuery.from(SaleEntity.class);
-                    subQuery.select(cb.sum(saleRoot.get(SaleEntity_.amount)));
+                    subQuery.select(cb.coalesce(cb.sum(saleRoot.get(SaleEntity_.amount)), 0));
                     subQuery.where(cb.and(
                             cb.equal(saleRoot.get(SaleEntity_.customer), root),
                             cb.equal(saleRoot.get(SaleEntity_.state), SaleState.SHIPPED)
@@ -108,15 +109,15 @@ public class CustomerService {
                     return subQuery;
                 })
                 .build();
-        CriteriaSearch<CustomerListResponse, CustomerEntity> search1 = searchFactory.createCriteriaSearch(
+        CriteriaSearch<CustomerListResponse, CustomerEntity> search = searchFactory.createCriteriaSearch(
                 CustomerListResponse.class, List.of("name", "phoneNumber"),
                 CustomerEntity.class, attributes);
-        PageResponse<CustomerListResponse> result = search1.getResult(queryParams);
-
-        ListSearch<CustomerListResponse> search = searchFactory.createListSearch(
-                CustomerListResponse.class, List.of("name", "phoneNumber"),
-                customerRepository::findAllResponse);
         return search.getResult(queryParams);
+
+//        ListSearch<CustomerListResponse> search = searchFactory.createListSearch(
+//                CustomerListResponse.class, List.of("name", "phoneNumber"),
+//                customerRepository::findAllResponse);
+//        return search.getResult(queryParams);
     }
 
     @Transactional

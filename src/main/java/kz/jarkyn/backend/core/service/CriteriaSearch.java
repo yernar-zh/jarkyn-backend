@@ -3,9 +3,12 @@ package kz.jarkyn.backend.core.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
+import kz.jarkyn.backend.core.model.dto.ImmutablePage;
+import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerListResponse;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.cglib.proxy.InvocationHandler;
 import org.springframework.cglib.proxy.Proxy;
 
@@ -16,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CriteriaSearch<R, E> {
     private final EntityManager em;
@@ -37,17 +41,19 @@ public class CriteriaSearch<R, E> {
 
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
         Root<E> root = query.from(entityClass);
-        Map<String, Expression<?>> expressions = new HashMap<>();
-        for (Map.Entry<String, CriteriaAttribute<E>> entry : attributes.entrySet()) {
-            expressions.put(entry.getKey(), entry.getValue().get(root, query, cb));
-        }
+        Map<String, Expression<?>> expressions = attributes.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get(root, query, cb)));
         List<Selection<?>> selections = expressions.entrySet().stream()
                 .map(entry -> entry.getValue().alias(entry.getKey()))
                 .collect(Collectors.toList());
         query.multiselect(selections);
-        List<Predicate> wherePredicates = getWherePredicates(expressions, queryParams.getFilters(), cb);
+        List<Predicate> wherePredicates = getWherePredicates(expressions, queryParams, cb);
         if (!wherePredicates.isEmpty()) {
             query.where(wherePredicates.toArray(new Predicate[0]));
+        }
+        List<Order> orders = getOrders(expressions, queryParams, cb);
+        if (!orders.isEmpty()) {
+            query.orderBy(orders.toArray(new Order[0]));
         }
         List<Tuple> tupleList = em.createQuery(query)
                 .setFirstResult(queryParams.getPageFirst()).setMaxResults(queryParams.getPageSize())
@@ -57,8 +63,18 @@ public class CriteriaSearch<R, E> {
                 .map(tuple -> createProxy(tuple, expressions.keySet(), responseClass))
                 .toList();
 
-
-        return null;
+        CriteriaQuery<Integer> countQuery = cb.createQuery(Integer.class);
+        Root<E> countRoot = countQuery.from(entityClass);
+        Map<String, Expression<?>> countExpressions = attributes.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get(countRoot, countQuery, cb)));
+        countQuery.select(cb.count(cb.conjunction()).as(Integer.class));
+        List<Predicate> countWherePredicates = getWherePredicates(countExpressions, queryParams, cb);
+        if (!countWherePredicates.isEmpty()) {
+            countQuery.where(countWherePredicates.toArray(new Predicate[0]));
+        }
+        Integer count = em.createQuery(countQuery).getSingleResult();
+        return ImmutablePageResponse.of(results, ImmutablePage
+                .of(queryParams.getPageFirst(), queryParams.getPageSize(), count));
     }
 
     private R createProxy(Tuple tuple, Set<String> attributeKeys, Class<R> resultClass) {
@@ -80,8 +96,8 @@ public class CriteriaSearch<R, E> {
     }
 
     private List<Predicate> getWherePredicates(
-            Map<String, Expression<?>> expressions, List<QueryParams.Filter> filters, CriteriaBuilder cb) {
-        return filters.stream().map(filter -> {
+            Map<String, Expression<?>> expressions, QueryParams queryParams, CriteriaBuilder cb) {
+        List<Predicate> filterPredicates = queryParams.getFilters().stream().map(filter -> {
             Expression<?> expression = expressions.get(filter.getName());
             if (expression == null) {
                 return cb.conjunction();
@@ -100,6 +116,28 @@ public class CriteriaSearch<R, E> {
                         (Comparable) firstFilterValues);
                 case GREATER_THEN -> cb.greaterThanOrEqualTo((Expression<Comparable>) expression,
                         (Comparable) firstFilterValues);
+            };
+        }).toList();
+        List<Expression<?>> searchFields = searchByAttributeNames.stream().map(expressions::get)
+                .filter(Objects::nonNull).collect(Collectors.toList());
+        List<Predicate> searchPredicates = Stream.of(queryParams.getSearch())
+                .filter(Objects::nonNull).map(cb::literal).map(pattern -> {
+                    List<Expression<?>> searchArgument = Stream.concat(Stream.of(pattern),
+                            searchFields.stream()).toList();
+                    return cb.isTrue(cb.function("search", Boolean.class,
+                            searchArgument.toArray(new Expression[0])));
+                }).toList();
+
+        return Stream.concat(filterPredicates.stream(), searchPredicates.stream()).toList();
+    }
+
+    private List<Order> getOrders(
+            Map<String, Expression<?>> expressions, QueryParams queryParams, CriteriaBuilder cb) {
+        return queryParams.getSorts().stream().map(sort -> {
+            Expression<?> expression = expressions.get(sort.getName());
+            return switch (sort.getType()) {
+                case ASC -> cb.asc(expression);
+                case DESC -> cb.desc(expression);
             };
         }).toList();
     }
