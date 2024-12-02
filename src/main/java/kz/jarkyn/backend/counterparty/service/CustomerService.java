@@ -24,17 +24,20 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
     private final AuditService auditService;
     private final SearchFactory searchFactory;
+    private final AccountService accountService;
 
     public CustomerService(
             CustomerRepository customerRepository,
             CustomerMapper customerMapper,
             AuditService auditService,
-            SearchFactory searchFactory
+            SearchFactory searchFactory,
+            AccountService accountService
     ) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.auditService = auditService;
         this.searchFactory = searchFactory;
+        this.accountService = accountService;
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +58,7 @@ public class CustomerService {
     public UUID createApi(CustomerRequest request) {
         CustomerEntity customer = customerRepository.save(customerMapper.toEntity(request));
         auditService.saveChanges(customer);
-
+        accountService.createForCustomer(customer);
         return customer.getId();
     }
 

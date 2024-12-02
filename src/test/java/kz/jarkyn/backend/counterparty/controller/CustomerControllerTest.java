@@ -35,7 +35,7 @@ class CustomerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
                 .andExpect(jsonPath("$.name").value("Заманбек Жетысай"))
-                .andExpect(jsonPath("$.phoneNumber").value("+7(707)145-14-75"))
+                .andExpect(jsonPath("$.phoneNumber").value("+7(707)145-1475"))
                 .andExpect(jsonPath("$.shippingAddress").value(""))
                 .andExpect(jsonPath("$.discount").value(3));
     }
@@ -67,7 +67,7 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.row.length()").value(1))
                 .andExpect(jsonPath("$.row[0].id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
                 .andExpect(jsonPath("$.row[0].name").value("Заманбек Жетысай"))
-                .andExpect(jsonPath("$.row[0].phoneNumber").value("+7(707)145-14-75"))
+                .andExpect(jsonPath("$.row[0].phoneNumber").value("+7(707)145-1475"))
                 .andExpect(jsonPath("$.row[0].shippingAddress").value(""))
                 .andExpect(jsonPath("$.row[0].discount").value(3))
                 .andExpect(jsonPath("$.row[0].balance").value(0))
@@ -83,22 +83,30 @@ class CustomerControllerTest {
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
-                  "id": "1d468c04-6360-43e5-9d51-7771e9d9dcff",
-                  "name": "Заманбек Жетысай",
-                  "phoneNumber": "+7(707)145-14-75",
+                  "name": "Зейнел Зайсан",
+                  "phoneNumber": "+7(702)564-3638",
                   "shippingAddress": "Рынок Салем",
-                  "discount": 3
+                  "discount": 5
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Customer.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Толе би"))
                 .andReturn();
-        mockMvc.perform(get(Api.Customer.PATH + "/" + TestUtils.extractId(result)).with(TestUtils.auth())
-                        .with(TestUtils.auth()))
+        mockMvc.perform(get(Api.Customer.PATH).with(TestUtils.auth())
+                                .queryParam("id", TestUtils.extractId(result))
+                )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(TestUtils.extractId(result)))
-                .andExpect(jsonPath("$.name").value("Толе би"));
+                .andExpect(jsonPath("$.row.length()").value(1))
+                .andExpect(jsonPath("$.row[0].id").value(TestUtils.extractId(result)))
+                .andExpect(jsonPath("$.row[0].name").value("Зейнел Зайсан"))
+                .andExpect(jsonPath("$.row[0].phoneNumber").value("+7(702)564-3638"))
+                .andExpect(jsonPath("$.row[0].shippingAddress").value("Рынок Салем"))
+                .andExpect(jsonPath("$.row[0].discount").value(5))
+                .andExpect(jsonPath("$.row[0].balance").value(0))
+                .andExpect(jsonPath("$.row[0].firstSaleMoment").isEmpty())
+                .andExpect(jsonPath("$.row[0].lastSaleMoment").isEmpty())
+                .andExpect(jsonPath("$.row[0].totalSaleCount").value(0))
+                .andExpect(jsonPath("$.row[0].totalSaleAmount").value(0));
     }
 
     @Test
@@ -106,16 +114,21 @@ class CustomerControllerTest {
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Кенжина 5"
+                  "name": "Заманбек Жетысай 2",
+                  "phoneNumber": "+7(707)145-1476",
+                  "shippingAddress": "Рынок Салем",
+                  "discount": 5
                 }""";
-        mockMvc.perform(put(Api.Customer.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3")
+        mockMvc.perform(put(Api.Customer.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff")
                         .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.name").value("Кенжина 5"));
-        mockMvc.perform(get(Api.Customer.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3").with(TestUtils.auth()))
+                .andExpect(jsonPath("$.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"));
+        mockMvc.perform(get(Api.Customer.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff").with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.name").value("Кенжина 5"));
+                .andExpect(jsonPath("$.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(jsonPath("$.name").value("Заманбек Жетысай 2"))
+                .andExpect(jsonPath("$.phoneNumber").value("+7(707)145-1476"))
+                .andExpect(jsonPath("$.shippingAddress").value("Рынок Салем"))
+                .andExpect(jsonPath("$.discount").value(5));
     }
 }

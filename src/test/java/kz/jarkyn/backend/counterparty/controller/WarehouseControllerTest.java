@@ -67,7 +67,6 @@ class WarehouseControllerTest {
         MvcResult result = mockMvc.perform(post(Api.Warehouse.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Толе би"))
                 .andReturn();
         mockMvc.perform(get(Api.Warehouse.PATH + "/" + TestUtils.extractId(result)).with(TestUtils.auth())
                         .with(TestUtils.auth()))
@@ -86,8 +85,7 @@ class WarehouseControllerTest {
         mockMvc.perform(put(Api.Warehouse.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3")
                         .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.name").value("Кенжина 5"));
+                .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"));
         mockMvc.perform(get(Api.Warehouse.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3").with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))

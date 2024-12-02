@@ -6,6 +6,7 @@ import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.counterparty.model.AccountEntity;
+import kz.jarkyn.backend.counterparty.model.CustomerEntity;
 import kz.jarkyn.backend.counterparty.model.OrganizationEntity;
 import kz.jarkyn.backend.counterparty.model.dto.AccountRequest;
 import kz.jarkyn.backend.counterparty.model.dto.AccountResponse;
@@ -58,6 +59,15 @@ public class AccountService {
         account.setBalance(0);
         auditService.saveChanges(account);
         return account.getId();
+    }
+
+    @Transactional
+    public void createForCustomer(CustomerEntity customer) {
+        AccountEntity account = new AccountEntity();
+        account.setCounterparty(customer);
+        account.setBalance(0);
+        accountRepository.save(account);
+        auditService.saveChanges(account);
     }
 
     @Transactional

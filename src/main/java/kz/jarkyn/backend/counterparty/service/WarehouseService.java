@@ -34,12 +34,13 @@ public class WarehouseService {
     @Transactional(readOnly = true)
     public WarehouseResponse findApiById(UUID id) {
         WarehouseEntity warehouse = warehouseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        return warehouseMapper.toApi(warehouse);
+        return warehouseMapper.toResponse(warehouse);
     }
 
     @Transactional(readOnly = true)
     public List<WarehouseResponse> findApiAll() {
-        return warehouseRepository.findAll().stream().map(warehouseMapper::toApi).toList();
+        List<WarehouseEntity> warehouses = warehouseRepository.findAll();
+        return warehouseMapper.toResponse(warehouses);
     }
 
     @Transactional
