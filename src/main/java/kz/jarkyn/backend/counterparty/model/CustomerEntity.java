@@ -3,11 +3,6 @@ package kz.jarkyn.backend.counterparty.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity_;
-import kz.jarkyn.backend.document.core.model.DocumentEntity;
-import org.hibernate.annotations.Immutable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "customer")
@@ -18,9 +13,6 @@ public class CustomerEntity extends CounterpartyEntity {
     @Column(name = "shipping_address")
     private String shippingAddress;
     private Integer discount;
-    @Immutable
-    @OneToMany(mappedBy = "customer")
-    private List<DocumentEntity> documents = new ArrayList<>();
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -44,13 +36,5 @@ public class CustomerEntity extends CounterpartyEntity {
 
     public void setDiscount(Integer discount) {
         this.discount = discount;
-    }
-
-    public List<DocumentEntity> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<DocumentEntity> documents) {
-        this.documents = documents;
     }
 }
