@@ -11,7 +11,7 @@ import kz.jarkyn.backend.document.sale.model.SaleEntity;
 import kz.jarkyn.backend.document.sale.model.dto.SaleDetailResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import kz.jarkyn.backend.document.sale.repository.SaleRepository;
-import kz.jarkyn.backend.document.sale.service.mapper.SaleMapper;
+import kz.jarkyn.backend.document.sale.mapper.SaleMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

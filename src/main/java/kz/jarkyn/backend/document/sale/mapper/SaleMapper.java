@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.document.sale.service.mapper;
+package kz.jarkyn.backend.document.sale.mapper;
 
 import kz.jarkyn.backend.core.mapper.EntityMapper;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;

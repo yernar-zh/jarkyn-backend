@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.audit.model.enity;
+package kz.jarkyn.backend.audit.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;

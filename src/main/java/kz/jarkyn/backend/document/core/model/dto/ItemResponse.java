@@ -9,4 +9,6 @@ public interface ItemResponse extends IdDto {
     GoodItemResponse getGood();
     Integer getPrice();
     Integer getQuantity();
+    Integer getRemain();
+    Integer getCostPrice();
 }

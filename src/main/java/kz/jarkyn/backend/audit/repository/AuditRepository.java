@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.audit.repository;
 
-import kz.jarkyn.backend.audit.model.enity.AuditEntity;
+import kz.jarkyn.backend.audit.model.AuditEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

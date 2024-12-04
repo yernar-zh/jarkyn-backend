@@ -103,8 +103,8 @@ CREATE TABLE item
     id          UUID PRIMARY KEY,
     document_id UUID,
     good_id     UUID,
-    price       INT,
     quantity    INT,
+    price       INT,
     position    INT
 );
 
@@ -144,15 +144,6 @@ CREATE TABLE selling_price
     val      INT
 );
 
-CREATE TABLE stock_snapshot
-(
-    id           UUID PRIMARY KEY,
-    warehouse_id UUID,
-    good_id      UUID,
-    moment       TIMESTAMP,
-    remain       INT
-);
-
 CREATE TABLE supplier
 (
     id UUID PRIMARY KEY
@@ -164,7 +155,9 @@ CREATE TABLE turnover
     document_id UUID,
     good_id     UUID,
     moment      TIMESTAMP,
-    quantity    INT
+    quantity    INT,
+    cost_price  INT,
+    remain      INT
 );
 
 CREATE TABLE users
@@ -247,12 +240,6 @@ ALTER TABLE sale
 
 ALTER TABLE selling_price
     ADD CONSTRAINT FK_SELLING_PRICE_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
-
-ALTER TABLE stock_snapshot
-    ADD CONSTRAINT FK_STOCK_SNAPSHOT_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
-
-ALTER TABLE stock_snapshot
-    ADD CONSTRAINT FK_STOCK_SNAPSHOT_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
 
 ALTER TABLE supplier
     ADD CONSTRAINT FK_SUPPLIER_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);

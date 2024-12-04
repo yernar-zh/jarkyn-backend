@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.document.core.service.mapper;
+package kz.jarkyn.backend.document.core.mapper;
 
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.ItemEntity;
@@ -11,12 +11,14 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(uses = EntityMapper.class)
 public abstract class ItemMapper {
-    public abstract ItemResponse toResponse(ItemEntity entity);
+    public abstract ItemResponse toResponse(ItemEntity entity, Integer remain, Integer costPrice);
+
     @Mapping(target = "id", source = "request.id")
     @Mapping(target = "document", source = "document")
     @Mapping(target = "good", source = "request.good")
     @Mapping(target = "price", source = "request.price")
     @Mapping(target = "quantity", source = "request.quantity")
     public abstract ItemEntity toEntity(DocumentEntity document, ItemRequest request);
+
     public abstract void editEntity(@MappingTarget ItemEntity entity, ItemRequest request);
 }

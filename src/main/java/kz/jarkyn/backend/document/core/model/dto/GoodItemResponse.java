@@ -5,6 +5,5 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 public interface GoodItemResponse extends IdNamedDto {
-    Integer getRemain();
     Boolean getArchived();
 }

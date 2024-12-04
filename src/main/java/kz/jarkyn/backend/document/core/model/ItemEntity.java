@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import kz.jarkyn.backend.audit.config.ParentAudit;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 
@@ -13,6 +14,7 @@ import kz.jarkyn.backend.good.model.GoodEntity;
 public class ItemEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "document_id")
+    @ParentAudit
     private DocumentEntity document;
     @ManyToOne
     @JoinColumn(name = "good_id")

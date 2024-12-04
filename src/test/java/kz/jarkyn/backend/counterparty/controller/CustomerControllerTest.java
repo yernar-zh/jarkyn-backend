@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ComponentScan(basePackages = "kz.jarkyn.backend")
-@Sql({"../../auth.sql", "counterparty.sql"})
+@Sql({"../../inti.sql"})
 class CustomerControllerTest {
     @Autowired
     private MockMvc mockMvc;

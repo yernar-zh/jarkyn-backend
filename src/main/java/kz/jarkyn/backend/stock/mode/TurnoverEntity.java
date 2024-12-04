@@ -11,6 +11,7 @@ import kz.jarkyn.backend.good.model.GoodEntity;
 
 
 import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "turnover")
 public class TurnoverEntity extends AbstractEntity {
@@ -22,6 +23,8 @@ public class TurnoverEntity extends AbstractEntity {
     private GoodEntity good;
     private LocalDateTime moment;
     private Integer quantity;
+    private Integer remain;
+    private Integer costPrice;
 
     public DocumentEntity getDocument() {
         return document;
@@ -53,5 +56,21 @@ public class TurnoverEntity extends AbstractEntity {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Integer getRemain() {
+        return remain;
+    }
+
+    public void setRemain(Integer remain) {
+        this.remain = remain;
+    }
+
+    public Integer getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(Integer costPrice) {
+        this.costPrice = costPrice;
     }
 }

@@ -3,7 +3,7 @@ package kz.jarkyn.backend.audit.service;
 
 import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import kz.jarkyn.backend.audit.config.ParentAudit;
-import kz.jarkyn.backend.audit.model.enity.AuditEntity;
+import kz.jarkyn.backend.audit.model.AuditEntity;
 import kz.jarkyn.backend.audit.repository.AuditRepository;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
