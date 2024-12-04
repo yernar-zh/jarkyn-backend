@@ -56,11 +56,12 @@ public class ItemService {
     }
 
     @Transactional
-    public void editApi(DocumentEntity document, List<ItemRequest> itemRequests) {
+    public void saveApi(DocumentEntity document, List<ItemRequest> itemRequests) {
         EntityDivider<ItemEntity, ItemRequest> divider = new EntityDivider<>(
                 itemRepository.findByDocument(document), itemRequests);
         for (EntityDivider<ItemEntity, ItemRequest>.Entry entry : divider.newReceived()) {
-            ItemEntity item = itemMapper.toEntity(document, entry.getReceived());
+            ItemEntity item = itemMapper.toEntity(entry.getReceived());
+            item.setDocument(document);
             item.setPosition(entry.getReceivedPosition());
             itemRepository.save(item);
         }

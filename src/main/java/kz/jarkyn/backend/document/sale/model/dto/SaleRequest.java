@@ -14,6 +14,7 @@ import java.util.List;
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableSaleRequest.Builder.class)
 public interface SaleRequest extends NamedDto {
+    @Nullable String getName();
     IdDto getWarehouse();
     IdDto getCustomer();
     LocalDateTime getMoment();

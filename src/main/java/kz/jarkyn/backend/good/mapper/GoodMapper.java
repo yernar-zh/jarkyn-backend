@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 public abstract class GoodMapper {
     public abstract GoodResponse toDetailApi(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices);
-    public abstract GoodResponse toListApi(GoodListResponse entity);
 
     public abstract GoodEntity toEntity(GoodRequest request);
     @BeanMapping(ignoreByDefault = true)
@@ -42,7 +41,7 @@ public abstract class GoodMapper {
     public abstract SellingPriceEntity toEntity(GoodEntity good, SellingPriceRequest sellingPrice);
 
     public abstract void editEntity(@MappingTarget GoodEntity entity, GoodRequest request);
-    public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceRequest dto);
+    public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceRequest request);
 
     @Mapping(target = "groups", source = "entity.group")
     public abstract GoodListResponse toListResponse(

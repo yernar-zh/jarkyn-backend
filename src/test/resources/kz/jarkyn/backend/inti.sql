@@ -77,7 +77,7 @@ VALUES ('fbe70a5c-a0d1-414c-9507-7352739b1243', '7f316872-1da3-44c8-9293-0fddda8
 INSERT INTO document (id, warehouse_id, customer_id, name, moment, amount, comment, deleted)
 VALUES ('9d56c02e-81e5-47a6-ab0a-fbeca21293af', '523961a7-696d-4779-8bb0-fd327feaecf3',
         '1d468c04-6360-43e5-9d51-7771e9d9dcff', 'SL-00001', '2024-12-03 17:28',
-        0, '', false);
+        63800, '', false);
 
 INSERT INTO sale (id, shipment_moment, state)
 VALUES ('9d56c02e-81e5-47a6-ab0a-fbeca21293af', null, 'NEW');

@@ -36,7 +36,7 @@ class SaleControllerTest {
                 .andExpect(jsonPath("$.id").value("9d56c02e-81e5-47a6-ab0a-fbeca21293af"))
                 .andExpect(jsonPath("$.name").value("SL-00001"))
                 .andExpect(jsonPath("$.moment").value("2024-12-03T17:28:00"))
-                .andExpect(jsonPath("$.amount").value(0))
+                .andExpect(jsonPath("$.amount").value(63800))
                 .andExpect(jsonPath("$.warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
                 .andExpect(jsonPath("$.warehouse.name").value("Кенжина"))
                 .andExpect(jsonPath("$.customer.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
@@ -87,8 +87,34 @@ class SaleControllerTest {
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Толе би"
-                }""";
+                  "moment": "2024-12-05T00:10:00",
+                  "amount": 4800,
+                  "warehouse": {
+                    "id": "523961a7-696d-4779-8bb0-fd327feaecf3"
+                  },
+                  "customer": {
+                    "id": "1d468c04-6360-43e5-9d51-7771e9d9dcff"
+                  },
+                  "comment": "",
+                  "shipmentMoment": null,
+                  "items": [
+                    {
+                      "good": {
+                        "id": "7f316872-1da3-44c8-9293-0fddda859435"
+                      },
+                      "price": 900,
+                      "quantity": 2
+                    },
+                    {
+                      "good": {
+                        "id": "bf6f2ba4-f994-44c1-839f-36a75f07242e"
+                      },
+                      "price": 600,
+                      "quantity": 5
+                    }
+                  ]
+                }
+                """;
         MvcResult result = mockMvc.perform(post(Api.Sale.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
@@ -97,7 +123,30 @@ class SaleControllerTest {
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TestUtils.extractId(result)))
-                .andExpect(jsonPath("$.name").value("Толе би"));
+                .andExpect(jsonPath("$.name").value("SL-00002"))
+                .andExpect(jsonPath("$.moment").value("2024-12-05T00:10:00"))
+                .andExpect(jsonPath("$.amount").value(4800))
+                .andExpect(jsonPath("$.warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.warehouse.name").value("Кенжина"))
+                .andExpect(jsonPath("$.customer.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(jsonPath("$.customer.name").value("Заманбек Жетысай"))
+                .andExpect(jsonPath("$.comment").value(""))
+                .andExpect(jsonPath("$.shipmentMoment").isEmpty())
+                .andExpect(jsonPath("$.items[0].good.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
+                .andExpect(jsonPath("$.items[0].good.name").value("Кикстартер L"))
+                .andExpect(jsonPath("$.items[0].good.archived").value(false))
+                .andExpect(jsonPath("$.items[0].price").value(900))
+                .andExpect(jsonPath("$.items[0].quantity").value(2))
+                .andExpect(jsonPath("$.items[0].remain").value(0))
+                .andExpect(jsonPath("$.items[0].costPrice").value(0))
+                .andExpect(jsonPath("$.items[1].good.id").value("bf6f2ba4-f994-44c1-839f-36a75f07242e"))
+                .andExpect(jsonPath("$.items[1].good.name").value("Педаль переключения передач WY (короткий)"))
+                .andExpect(jsonPath("$.items[1].good.archived").value(false))
+                .andExpect(jsonPath("$.items[1].price").value(600))
+                .andExpect(jsonPath("$.items[1].quantity").value(5))
+                .andExpect(jsonPath("$.items[1].remain").value(0))
+                .andExpect(jsonPath("$.items[1].costPrice").value(0))
+                .andExpect(jsonPath("$.payments").isEmpty());
     }
 
     @Test
