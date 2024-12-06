@@ -1,15 +1,20 @@
 package kz.jarkyn.backend.document.sale.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.counterparty.model.dto.WarehouseRequest;
+import kz.jarkyn.backend.counterparty.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleDetailResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
+import kz.jarkyn.backend.good.model.dto.GoodListResponse;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.document.sale.service.SaleService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -28,8 +33,8 @@ public class SaleController {
     }
 
     @GetMapping
-    public List<GoodResponse> list(@ModelAttribute QueryParams queryParams) {
-        return null;
+    public List<GoodResponse> list(@RequestParam Map<String, String> allParams) {
+        return saleService.findApiByFilter(QueryParams.of(allParams));
     }
 
     @PostMapping
@@ -39,7 +44,8 @@ public class SaleController {
     }
 
     @PutMapping("{id}")
-    public GoodResponse edit(@PathVariable UUID id, @RequestBody GoodRequest request) {
-        return null;
+    public SaleDetailResponse edit(@PathVariable UUID id, @RequestBody SaleRequest request) {
+        saleService.editApi(id, request);
+        return saleService.findApiById(id);
     }
 }

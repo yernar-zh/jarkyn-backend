@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ComponentScan(basePackages = "kz.jarkyn.backend")
-@Sql({"../../../../../../resources/kz/jarkyn/backend/inti.sql", "good.sql"})
+@Sql({"../../inti.sql"})
 class GoodControllerTest {
     @Autowired
     private MockMvc mockMvc;

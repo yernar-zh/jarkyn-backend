@@ -34,10 +34,13 @@ class AttributeGroupControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("c5a95fbd-121e-4f57-a84b-600a9919228a"))
                 .andExpect(jsonPath("$.name").value("Транспорт"))
+                .andExpect(jsonPath("$.attributes.length()").value(3))
                 .andExpect(jsonPath("$.attributes[0].id").value("355785a2-0dd8-49f8-987f-06e3c48bf9a8"))
                 .andExpect(jsonPath("$.attributes[0].name").value("Мотоцикл WY"))
                 .andExpect(jsonPath("$.attributes[1].id").value("e95420b5-3344-44ce-8d39-699f516ed715"))
-                .andExpect(jsonPath("$.attributes[1].name").value("Мотоцикл GN"));
+                .andExpect(jsonPath("$.attributes[1].name").value("Мотоцикл GN"))
+                .andExpect(jsonPath("$.attributes[2].id").value("797e7bc8-fca0-4d2b-b1ce-6975f54b48eb"))
+                .andExpect(jsonPath("$.attributes[2].name").value("Alpha"));
     }
 
     @Test
@@ -113,17 +116,13 @@ class AttributeGroupControllerTest {
                   "name": "Транспорт new",
                   "attributes": [
                     {"id":  "e95420b5-3344-44ce-8d39-699f516ed715"},
-                    {"id":  "355785a2-0dd8-49f8-987f-06e3c48bf9a8"}
+                    {"id":  "355785a2-0dd8-49f8-987f-06e3c48bf9a8"},
+                    {"id":  "797e7bc8-fca0-4d2b-b1ce-6975f54b48eb"}
                   ]
                 }""";
         mockMvc.perform(put(Api.AttributeGroup.PATH + "/c5a95fbd-121e-4f57-a84b-600a9919228a")
                         .with(TestUtils.auth()).content(requestData))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("c5a95fbd-121e-4f57-a84b-600a9919228a"))
-                .andExpect(jsonPath("$.name").value("Транспорт new"))
-                .andExpect(jsonPath("$.parent").doesNotExist())
-                .andExpect(jsonPath("$.attributes[0].id").value("e95420b5-3344-44ce-8d39-699f516ed715"))
-                .andExpect(jsonPath("$.attributes[1].id").value("355785a2-0dd8-49f8-987f-06e3c48bf9a8"));
+                .andExpect(status().isOk());
         mockMvc.perform(get(Api.AttributeGroup.PATH + "/c5a95fbd-121e-4f57-a84b-600a9919228a")
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
@@ -131,7 +130,8 @@ class AttributeGroupControllerTest {
                 .andExpect(jsonPath("$.name").value("Транспорт new"))
                 .andExpect(jsonPath("$.parent").doesNotExist())
                 .andExpect(jsonPath("$.attributes[0].id").value("e95420b5-3344-44ce-8d39-699f516ed715"))
-                .andExpect(jsonPath("$.attributes[1].id").value("355785a2-0dd8-49f8-987f-06e3c48bf9a8"));
+                .andExpect(jsonPath("$.attributes[1].id").value("355785a2-0dd8-49f8-987f-06e3c48bf9a8"))
+                .andExpect(jsonPath("$.attributes[2].id").value("797e7bc8-fca0-4d2b-b1ce-6975f54b48eb"));
 
     }
 

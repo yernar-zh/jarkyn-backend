@@ -49,10 +49,10 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public List<GroupResponse> findApiAll() {
-        List<GroupEntity> entities = groupRepository.findAll();
-        // Create a map of parent groups to their children using groupingBy
+        List<GroupEntity> entities = groupRepository.findAll().stream()
+                .sorted(Comparator.comparing(GroupEntity::getPosition)).toList();
         Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream()
-                .filter(group -> group.getParent() != null) // Filter out groups without parents
+                .filter(group -> group.getParent() != null)
                 .collect(Collectors.groupingBy(GroupEntity::getParent,
                         Collectors.collectingAndThen(
                                 Collectors.toList(), list -> {
@@ -61,10 +61,10 @@ public class GroupService {
                                 }
                         )
                 ));
-        // Find all head groups (groups without a parent) using a separate stream operation
-        List<GroupEntity> heads = entities.stream().filter(group -> group.getParent() == null).toList();
-        // Convert head groups into API model objects, using the childrenMap for hierarchy
-        return heads.stream().map(head -> groupMapper.toListApi(head, childrenMap)).collect(Collectors.toList());
+        List<GroupEntity> roots = entities.stream()
+                .sorted(Comparator.comparing(GroupEntity::getPosition))
+                .filter(group -> group.getParent() == null).toList();
+        return roots.stream().map(head -> groupMapper.toListApi(head, childrenMap)).collect(Collectors.toList());
     }
 
     @Transactional

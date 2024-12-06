@@ -35,7 +35,9 @@ VALUES ('da48c6fa-6739-11ee-0a80-039b000669e2',
        ('cdfcf458-7cca-11ef-0a80-152f001b4886',
         'Кикстартер', 100, 'da48c6fa-6739-11ee-0a80-039b000669e2'),
        ('6120deea-5b87-11ee-0a80-000c0039b0fd',
-        'Педаль переключения передач', 99, 'da48c6fa-6739-11ee-0a80-039b000669e2');
+        'Педаль переключения передач', 99, 'da48c6fa-6739-11ee-0a80-039b000669e2'),
+       ('a590bc3a-9498-4f56-bce6-0e604b00590d',
+        'Свеча', 99, null);
 
 INSERT INTO attribute_group (id, name, position)
 VALUES ('c5a95fbd-121e-4f57-a84b-600a9919228a',
@@ -47,7 +49,9 @@ INSERT INTO attribute (id, name, position, group_id)
 VALUES ('e95420b5-3344-44ce-8d39-699f516ed715',
         'Мотоцикл GN', 100, 'c5a95fbd-121e-4f57-a84b-600a9919228a'),
        ('355785a2-0dd8-49f8-987f-06e3c48bf9a8',
-        'Мотоцикл WY', 99, 'c5a95fbd-121e-4f57-a84b-600a9919228a');
+        'Мотоцикл WY', 99, 'c5a95fbd-121e-4f57-a84b-600a9919228a'),
+       ('797e7bc8-fca0-4d2b-b1ce-6975f54b48eb',
+        'Alpha', 101, 'c5a95fbd-121e-4f57-a84b-600a9919228a');
 
 INSERT INTO good (id, name, group_id, minimum_price, image_id, archived)
 VALUES ('7f316872-1da3-44c8-9293-0fddda859435',

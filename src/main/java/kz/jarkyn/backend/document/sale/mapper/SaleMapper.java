@@ -15,5 +15,4 @@ import java.util.List;
 public abstract class SaleMapper extends RequestMapper<SaleEntity, SaleRequest> {
     public abstract SaleDetailResponse toDetailResponse(
             SaleEntity entity, List<ItemResponse> items, List<PaymentInForSaleEntity> payments);
-    public abstract SaleEntity toEntity(SaleRequest request);
 }

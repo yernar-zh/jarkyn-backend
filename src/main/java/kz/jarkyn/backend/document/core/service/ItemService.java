@@ -14,6 +14,7 @@ import kz.jarkyn.backend.stock.service.TurnoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -45,7 +46,7 @@ public class ItemService {
                 .filter(Predicate.not(turnovers::containsKey)).toList();
         Map<GoodEntity, Integer> absentGoodRemains = turnoverService.findRemain(absentGoods);
 
-        return items.stream().map(item -> {
+        return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
             TurnoverEntity turnover = turnovers.get(item.getGood());
             if (turnover != null) {
                 return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());

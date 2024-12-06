@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ComponentScan(basePackages = "kz.jarkyn.backend")
-@Sql({"../../../../../../resources/kz/jarkyn/backend/inti.sql", "good.sql"})
+@Sql({"../../inti.sql"})
 class AttributeControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -114,11 +114,11 @@ class AttributeControllerTest {
     @Test
     @DirtiesContext
     public void testDelete_success() throws Exception {
-        mockMvc.perform(delete(Api.Attribute.PATH + "/355785a2-0dd8-49f8-987f-06e3c48bf9a8")
+        mockMvc.perform(delete(Api.Attribute.PATH + "/797e7bc8-fca0-4d2b-b1ce-6975f54b48eb")
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("DELETED"));
-        mockMvc.perform(get(Api.Attribute.PATH + "/355785a2-0dd8-49f8-987f-06e3c48bf9a8")
+        mockMvc.perform(get(Api.Attribute.PATH + "/797e7bc8-fca0-4d2b-b1ce-6975f54b48eb")
                         .with(TestUtils.auth()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));

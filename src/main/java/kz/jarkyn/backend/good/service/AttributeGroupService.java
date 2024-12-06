@@ -80,7 +80,7 @@ public class AttributeGroupService {
         EntityDivider<AttributeEntity, IdDto> divider = new EntityDivider<>(
                 attributeRepository.findByGroup(entity), request.getAttributes());
         if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
-            throw new ApiValidationException("children list have to be same");
+            throw new ApiValidationException("children list have to be same, only change positions");
         }
         for (EntityDivider<AttributeEntity, IdDto>.Entry entry : divider.edited()) {
             AttributeEntity attributeEntity = entry.getCurrent();
