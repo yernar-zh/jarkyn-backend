@@ -34,4 +34,8 @@ public interface Api {
     interface Sale {
         String PATH = Api.PATH + "/sale";
     }
+
+    interface Supply {
+        String PATH = Api.PATH + "/supply";
+    }
 }

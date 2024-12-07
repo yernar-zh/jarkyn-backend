@@ -3,18 +3,18 @@ package kz.jarkyn.backend.document.payment.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
-import kz.jarkyn.backend.document.sale.model.SaleEntity;
+import kz.jarkyn.backend.document.core.model.DocumentEntity;
 
 @Entity
-@Table(name = "payment_purpose")
-public class PaymentInForSaleEntity extends AbstractEntity {
+@Table(name = "payment_in_purpose")
+public class PaymentInPurpose extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "payment_id")
     private PaymentInEntity paymentIn;
 
     @ManyToOne
-    @JoinColumn(name = "sale_id")
-    private SaleEntity sale;
+    @JoinColumn(name = "document_id")
+    private DocumentEntity document;
 
     private Integer amount;
 
@@ -26,12 +26,12 @@ public class PaymentInForSaleEntity extends AbstractEntity {
         this.paymentIn = paymentIn;
     }
 
-    public SaleEntity getSale() {
-        return sale;
+    public DocumentEntity getDocument() {
+        return document;
     }
 
-    public void setSale(SaleEntity sale) {
-        this.sale = sale;
+    public void setDocument(DocumentEntity document) {
+        this.document = document;
     }
 
     public Integer getAmount() {

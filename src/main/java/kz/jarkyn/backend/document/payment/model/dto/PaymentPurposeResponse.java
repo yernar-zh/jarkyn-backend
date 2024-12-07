@@ -5,8 +5,8 @@ import kz.jarkyn.backend.document.core.model.dto.DocumentResponse;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface PaymentInForSaleResponse {
+public interface PaymentPurposeResponse {
     DocumentResponse getPaymentIn();
-    DocumentResponse getSale();
+    DocumentResponse getDocument();
     Integer getAmount();
 }

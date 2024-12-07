@@ -1,182 +1,226 @@
 CREATE TABLE account
 (
-    id              UUID PRIMARY KEY,
+    id              UUID NOT NULL,
     counterparty_id UUID,
     name            VARCHAR(255),
-    balance         INT,
+    balance         INTEGER,
     bank            VARCHAR(255),
-    giro            VARCHAR(255)
+    giro            VARCHAR(255),
+    CONSTRAINT pk_account PRIMARY KEY (id)
 );
 
 CREATE TABLE attribute
 (
-    id       UUID PRIMARY KEY,
+    id       UUID NOT NULL,
     group_id UUID,
     name     VARCHAR(255),
-    position INT
+    position INTEGER,
+    CONSTRAINT pk_attribute PRIMARY KEY (id)
 );
 
 CREATE TABLE attribute_group
 (
-    id       UUID PRIMARY KEY,
+    id       UUID NOT NULL,
     name     VARCHAR(255),
-    position INT
+    position INTEGER,
+    CONSTRAINT pk_attribute_group PRIMARY KEY (id)
 );
 
 CREATE TABLE audit
 (
-    id               UUID PRIMARY KEY,
+    id               UUID NOT NULL,
     user_id          UUID,
-    moment           TIMESTAMP,
+    moment           TIMESTAMP WITHOUT TIME ZONE,
     entity_id        UUID,
     entity_parent_id UUID,
     field_name       VARCHAR(255),
-    field_value      VARCHAR(255)
+    field_value      VARCHAR(255),
+    CONSTRAINT pk_audit PRIMARY KEY (id)
 );
 
 CREATE TABLE cash_flow
 (
-    id          UUID PRIMARY KEY,
+    id          UUID NOT NULL,
     account_id  UUID,
     document_id UUID,
-    amount      INT
+    amount      INTEGER,
+    CONSTRAINT pk_cash_flow PRIMARY KEY (id)
 );
 
 CREATE TABLE counterparty
 (
-    id   UUID PRIMARY KEY,
-    name VARCHAR(255)
+    id   UUID NOT NULL,
+    name VARCHAR(255),
+    CONSTRAINT pk_counterparty PRIMARY KEY (id)
 );
 
 CREATE TABLE customer
 (
-    id               UUID PRIMARY KEY,
+    id               UUID NOT NULL,
     phone_number     VARCHAR(255),
     shipping_address VARCHAR(255),
-    discount         INT
+    discount         INTEGER,
+    CONSTRAINT pk_customer PRIMARY KEY (id)
 );
 
 CREATE TABLE document
 (
-    id           UUID PRIMARY KEY,
+    id           UUID NOT NULL,
     warehouse_id UUID,
     customer_id  UUID,
     name         VARCHAR(255),
-    moment       TIMESTAMP,
-    amount       INT,
+    moment       TIMESTAMP WITHOUT TIME ZONE,
+    amount       INTEGER,
     comment      VARCHAR(255),
-    deleted      BOOLEAN
+    deleted      BOOLEAN,
+    CONSTRAINT pk_document PRIMARY KEY (id)
 );
 
 CREATE TABLE good
 (
-    id            UUID PRIMARY KEY,
+    id            UUID NOT NULL,
     name          VARCHAR(255),
     group_id      UUID,
     image_id      UUID,
-    minimum_price INT,
-    archived      BOOLEAN
+    minimum_price INTEGER,
+    archived      BOOLEAN,
+    CONSTRAINT pk_good PRIMARY KEY (id)
 );
 
 CREATE TABLE good_attribute
 (
-    id           UUID PRIMARY KEY,
+    id           UUID NOT NULL,
     good_id      UUID,
-    attribute_id UUID
+    attribute_id UUID,
+    CONSTRAINT pk_good_attribute PRIMARY KEY (id)
 );
 
 CREATE TABLE groups
 (
-    id        UUID PRIMARY KEY,
+    id        UUID NOT NULL,
     name      VARCHAR(255),
     parent_id UUID,
-    position  INT
+    position  INTEGER,
+    CONSTRAINT pk_groups PRIMARY KEY (id)
 );
 
 CREATE TABLE image
 (
-    id UUID PRIMARY KEY
+    id UUID NOT NULL,
+    CONSTRAINT pk_image PRIMARY KEY (id)
 );
 
 CREATE TABLE item
 (
-    id          UUID PRIMARY KEY,
+    id          UUID NOT NULL,
     document_id UUID,
     good_id     UUID,
-    quantity    INT,
-    price       INT,
-    position    INT
+    price       INTEGER,
+    quantity    INTEGER,
+    position    INTEGER,
+    CONSTRAINT pk_item PRIMARY KEY (id)
 );
 
 CREATE TABLE organization
 (
-    id UUID PRIMARY KEY
+    id UUID NOT NULL,
+    CONSTRAINT pk_organization PRIMARY KEY (id)
 );
 
 CREATE TABLE payment_in
 (
-    id         UUID PRIMARY KEY,
+    id         UUID NOT NULL,
     account_id UUID,
-    state      VARCHAR(255)
+    state      VARCHAR(255),
+    CONSTRAINT pk_payment_in PRIMARY KEY (id)
 );
 
-CREATE TABLE payment_purpose
+CREATE TABLE payment_in_purpose
 (
-    id         UUID PRIMARY KEY,
-    payment_id UUID,
-    sale_id    UUID,
-    amount     INT
+    id          UUID NOT NULL,
+    payment_id  UUID,
+    document_id UUID,
+    amount      INTEGER,
+    CONSTRAINT pk_payment_in_purpose PRIMARY KEY (id)
 );
 
+CREATE TABLE payment_out
+(
+    id         UUID NOT NULL,
+    account_id UUID,
+    state      VARCHAR(255),
+    CONSTRAINT pk_payment_out PRIMARY KEY (id)
+);
+
+CREATE TABLE payment_out_purpose
+(
+    id          UUID NOT NULL,
+    payment_out UUID,
+    document_id UUID,
+    amount      INTEGER,
+    CONSTRAINT pk_payment_out_purpose PRIMARY KEY (id)
+);
 
 CREATE TABLE sale
 (
-    id              UUID PRIMARY KEY,
-    shipment_moment TIMESTAMP,
-    state           VARCHAR(255)
+    id              UUID NOT NULL,
+    shipment_moment TIMESTAMP WITHOUT TIME ZONE,
+    state           VARCHAR(255),
+    CONSTRAINT pk_sale PRIMARY KEY (id)
 );
 
 CREATE TABLE selling_price
 (
-    id       UUID PRIMARY KEY,
+    id       UUID NOT NULL,
     good_id  UUID,
-    quantity INT,
-    val      INT
+    quantity INTEGER,
+    val      INTEGER,
+    CONSTRAINT pk_selling_price PRIMARY KEY (id)
 );
 
 CREATE TABLE supplier
 (
-    id UUID PRIMARY KEY
+    id UUID NOT NULL,
+    CONSTRAINT pk_supplier PRIMARY KEY (id)
+);
+
+CREATE TABLE supply
+(
+    id            UUID NOT NULL,
+    exchange_rate INTEGER,
+    state         VARCHAR(255),
+    CONSTRAINT pk_supply PRIMARY KEY (id)
 );
 
 CREATE TABLE turnover
 (
-    id          UUID PRIMARY KEY,
+    id          UUID NOT NULL,
     document_id UUID,
     good_id     UUID,
-    moment      TIMESTAMP,
-    quantity    INT,
-    cost_price  INT,
-    remain      INT
+    moment      TIMESTAMP WITHOUT TIME ZONE,
+    quantity    INTEGER,
+    remain      INTEGER,
+    cost_price  INTEGER,
+    CONSTRAINT pk_turnover PRIMARY KEY (id)
 );
 
 CREATE TABLE users
 (
-    id              UUID PRIMARY KEY,
+    id              UUID NOT NULL,
     counterparty_id UUID,
     phone_number    VARCHAR(255),
     name            VARCHAR(255),
     auth_token      VARCHAR(255),
-    role            VARCHAR(255)
+    role            VARCHAR(255),
+    CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
 CREATE TABLE warehouse
 (
-    id   UUID PRIMARY KEY,
-    name VARCHAR(255)
+    id   UUID NOT NULL,
+    name VARCHAR(255),
+    CONSTRAINT pk_warehouse PRIMARY KEY (id)
 );
-
--- ADDING FOREIGN KEYS
 
 ALTER TABLE account
     ADD CONSTRAINT FK_ACCOUNT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
@@ -194,7 +238,7 @@ ALTER TABLE customer
     ADD CONSTRAINT FK_CUSTOMER_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);
 
 ALTER TABLE document
-    ADD CONSTRAINT FK_DOCUMENT_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES counterparty (id);
+    ADD CONSTRAINT FK_DOCUMENT_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES customer (id);
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
@@ -229,11 +273,23 @@ ALTER TABLE payment_in
 ALTER TABLE payment_in
     ADD CONSTRAINT FK_PAYMENT_IN_ON_ID FOREIGN KEY (id) REFERENCES document (id);
 
-ALTER TABLE payment_purpose
-    ADD CONSTRAINT FK_PAYMENT_PURPOSE_ON_PAYMENT FOREIGN KEY (payment_id) REFERENCES payment_in (id);
+ALTER TABLE payment_in_purpose
+    ADD CONSTRAINT FK_PAYMENT_IN_PURPOSE_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
 
-ALTER TABLE payment_purpose
-    ADD CONSTRAINT FK_PAYMENT_PURPOSE_ON_SALE FOREIGN KEY (sale_id) REFERENCES sale (id);
+ALTER TABLE payment_in_purpose
+    ADD CONSTRAINT FK_PAYMENT_IN_PURPOSE_ON_PAYMENT FOREIGN KEY (payment_id) REFERENCES payment_in (id);
+
+ALTER TABLE payment_out
+    ADD CONSTRAINT FK_PAYMENT_OUT_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
+
+ALTER TABLE payment_out
+    ADD CONSTRAINT FK_PAYMENT_OUT_ON_ID FOREIGN KEY (id) REFERENCES document (id);
+
+ALTER TABLE payment_out_purpose
+    ADD CONSTRAINT FK_PAYMENT_OUT_PURPOSE_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
+
+ALTER TABLE payment_out_purpose
+    ADD CONSTRAINT FK_PAYMENT_OUT_PURPOSE_ON_PAYMENT_OUT FOREIGN KEY (payment_out) REFERENCES payment_out (id);
 
 ALTER TABLE sale
     ADD CONSTRAINT FK_SALE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
@@ -243,6 +299,9 @@ ALTER TABLE selling_price
 
 ALTER TABLE supplier
     ADD CONSTRAINT FK_SUPPLIER_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);
+
+ALTER TABLE supply
+    ADD CONSTRAINT FK_SUPPLY_ON_ID FOREIGN KEY (id) REFERENCES document (id);
 
 ALTER TABLE turnover
     ADD CONSTRAINT FK_TURNOVER_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);

@@ -5,13 +5,11 @@ package kz.jarkyn.backend.document.sale.service;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
-import kz.jarkyn.backend.counterparty.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.core.service.ItemService;
-import kz.jarkyn.backend.document.payment.model.PaymentInForSaleEntity;
-import kz.jarkyn.backend.document.payment.repository.PaymentInForSaleRepository;
+import kz.jarkyn.backend.document.payment.model.PaymentInPurpose;
+import kz.jarkyn.backend.document.payment.repository.PaymentInPurposeRepository;
 import kz.jarkyn.backend.document.sale.model.SaleEntity;
 import kz.jarkyn.backend.document.sale.model.dto.SaleDetailResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
@@ -29,7 +27,7 @@ public class SaleService {
     private final SaleRepository saleRepository;
     private final SaleMapper saleMapper;
     private final ItemService itemService;
-    private final PaymentInForSaleRepository paymentInForSaleRepository;
+    private final PaymentInPurposeRepository paymentInPurposeRepository;
     private final DocumentService documentService;
     private final AuditService auditService;
 
@@ -37,14 +35,14 @@ public class SaleService {
             SaleRepository saleRepository,
             SaleMapper saleMapper,
             ItemService itemService,
-            PaymentInForSaleRepository paymentInForSaleRepository,
+            PaymentInPurposeRepository paymentInPurposeRepository,
             DocumentService documentService,
             AuditService auditService
     ) {
         this.saleRepository = saleRepository;
         this.saleMapper = saleMapper;
         this.itemService = itemService;
-        this.paymentInForSaleRepository = paymentInForSaleRepository;
+        this.paymentInPurposeRepository = paymentInPurposeRepository;
         this.documentService = documentService;
         this.auditService = auditService;
     }
@@ -53,8 +51,8 @@ public class SaleService {
     public SaleDetailResponse findApiById(UUID id) {
         SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<ItemResponse> items = itemService.findApiByDocument(sale);
-        List<PaymentInForSaleEntity> saleRepositoryBySale = paymentInForSaleRepository.findBySale(sale);
-        return saleMapper.toDetailResponse(sale, items, saleRepositoryBySale);
+        List<PaymentInPurpose> paymentInPurposes = paymentInPurposeRepository.findByDocument(sale);
+        return saleMapper.toDetailResponse(sale, items, paymentInPurposes);
     }
 
     @Transactional(readOnly = true)

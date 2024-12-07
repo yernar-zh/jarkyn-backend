@@ -2,17 +2,7 @@
 package kz.jarkyn.backend.stock.service;
 
 
-import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
-import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
-import kz.jarkyn.backend.document.core.service.ItemService;
-import kz.jarkyn.backend.document.payment.model.PaymentInForSaleEntity;
-import kz.jarkyn.backend.document.payment.repository.PaymentInForSaleRepository;
-import kz.jarkyn.backend.document.sale.mapper.SaleMapper;
-import kz.jarkyn.backend.document.sale.model.SaleEntity;
-import kz.jarkyn.backend.document.sale.model.dto.SaleDetailResponse;
-import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
-import kz.jarkyn.backend.document.sale.repository.SaleRepository;
 import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.stock.mode.TurnoverEntity;
 import kz.jarkyn.backend.stock.repository.TurnoverRepository;
