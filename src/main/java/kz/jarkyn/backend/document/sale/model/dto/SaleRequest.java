@@ -16,7 +16,7 @@ import java.util.List;
 public interface SaleRequest extends NamedDto {
     @Nullable String getName();
     IdDto getWarehouse();
-    IdDto getCustomer();
+    IdDto getCounterparty();
     LocalDateTime getMoment();
     Integer getAmount();
     String getComment();

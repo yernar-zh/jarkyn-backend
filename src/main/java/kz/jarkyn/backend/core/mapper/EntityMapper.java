@@ -33,25 +33,12 @@ public class EntityMapper {
         return toEntity(api, AttributeGroupEntity.class);
     }
 
-    // New methods for your entities
     public AccountEntity toAccountEntity(IdDto api) {
         return toEntity(api, AccountEntity.class);
     }
 
     public CounterpartyEntity toCounterpartyEntity(IdDto api) {
         return toEntity(api, CounterpartyEntity.class);
-    }
-
-    public CustomerEntity toCustomerEntity(IdDto api) {
-        return toEntity(api, CustomerEntity.class);
-    }
-
-    public OrganizationEntity toOrganizationEntity(IdDto api) {
-        return toEntity(api, OrganizationEntity.class);
-    }
-
-    public SupplierEntity toSupplierEntity(IdDto api) {
-        return toEntity(api, SupplierEntity.class);
     }
 
     public WarehouseEntity toWarehouseEntity(IdDto api) {

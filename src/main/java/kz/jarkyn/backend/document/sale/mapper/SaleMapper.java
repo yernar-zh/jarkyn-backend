@@ -8,11 +8,16 @@ import kz.jarkyn.backend.document.sale.model.SaleEntity;
 import kz.jarkyn.backend.document.sale.model.dto.SaleDetailResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class SaleMapper extends RequestMapper<SaleEntity, SaleRequest> {
+public abstract class SaleMapper {
     public abstract SaleDetailResponse toDetailResponse(
             SaleEntity entity, List<ItemResponse> items, List<PaymentInPurpose> payments);
+
+    public abstract SaleEntity toEntity(SaleRequest request);
+    public abstract void editEntity(@MappingTarget SaleEntity entity, SaleRequest request);
 }

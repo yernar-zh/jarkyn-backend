@@ -65,14 +65,14 @@ CREATE TABLE customer
 
 CREATE TABLE document
 (
-    id           UUID NOT NULL,
-    warehouse_id UUID,
-    customer_id  UUID,
-    name         VARCHAR(255),
-    moment       TIMESTAMP WITHOUT TIME ZONE,
-    amount       INTEGER,
-    comment      VARCHAR(255),
-    deleted      BOOLEAN,
+    id              UUID NOT NULL,
+    warehouse_id    UUID,
+    counterparty_id UUID,
+    name            VARCHAR(255),
+    moment          TIMESTAMP WITHOUT TIME ZONE,
+    amount          INTEGER,
+    comment         VARCHAR(255),
+    deleted         BOOLEAN,
     CONSTRAINT pk_document PRIMARY KEY (id)
 );
 
@@ -238,7 +238,7 @@ ALTER TABLE customer
     ADD CONSTRAINT FK_CUSTOMER_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);
 
 ALTER TABLE document
-    ADD CONSTRAINT FK_DOCUMENT_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES customer (id);
+    ADD CONSTRAINT FK_DOCUMENT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);

@@ -19,8 +19,8 @@ public class ItemEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "good_id")
     private GoodEntity good;
-    private Integer price;
     private Integer quantity;
+    private Integer price;
     private Integer position;
 
     public DocumentEntity getDocument() {

@@ -3,7 +3,7 @@ package kz.jarkyn.backend.document.core.model;
 
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
-import kz.jarkyn.backend.counterparty.model.CustomerEntity;
+import kz.jarkyn.backend.counterparty.model.CounterpartyEntity;
 import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 
 
@@ -17,8 +17,8 @@ public class DocumentEntity extends AbstractEntity {
     @JoinColumn(name = "warehouse_id")
     private WarehouseEntity warehouse;
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private CustomerEntity customer;
+    @JoinColumn(name = "counterparty_id")
+    private CounterpartyEntity counterparty;
     private String name;
     private LocalDateTime moment;
     private Integer amount;
@@ -33,12 +33,12 @@ public class DocumentEntity extends AbstractEntity {
         this.warehouse = warehouse;
     }
 
-    public CustomerEntity getCustomer() {
-        return customer;
+    public CounterpartyEntity getCounterparty() {
+        return counterparty;
     }
 
-    public void setCustomer(CustomerEntity customer) {
-        this.customer = customer;
+    public void setCounterparty(CounterpartyEntity counterparty) {
+        this.counterparty = counterparty;
     }
 
     public String getName() {

@@ -39,8 +39,8 @@ class SaleControllerTest {
                 .andExpect(jsonPath("$.amount").value(63800))
                 .andExpect(jsonPath("$.warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
                 .andExpect(jsonPath("$.warehouse.name").value("Кенжина"))
-                .andExpect(jsonPath("$.customer.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
-                .andExpect(jsonPath("$.customer.name").value("Заманбек Жетысай"))
+                .andExpect(jsonPath("$.counterparty.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(jsonPath("$.counterparty.name").value("Заманбек Жетысай"))
                 .andExpect(jsonPath("$.comment").value(""))
                 .andExpect(jsonPath("$.shipmentMoment").isEmpty())
                 .andExpect(jsonPath("$.items[0].id").value("2c7f1951-4ddb-4125-a52b-2183e013e65f"))
@@ -80,7 +80,7 @@ class SaleControllerTest {
                   "warehouse": {
                     "id": "523961a7-696d-4779-8bb0-fd327feaecf3"
                   },
-                  "customer": {
+                  "counterparty": {
                     "id": "1d468c04-6360-43e5-9d51-7771e9d9dcff"
                   },
                   "comment": "",
@@ -116,8 +116,8 @@ class SaleControllerTest {
                 .andExpect(jsonPath("$.amount").value(4800))
                 .andExpect(jsonPath("$.warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
                 .andExpect(jsonPath("$.warehouse.name").value("Кенжина"))
-                .andExpect(jsonPath("$.customer.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
-                .andExpect(jsonPath("$.customer.name").value("Заманбек Жетысай"))
+                .andExpect(jsonPath("$.counterparty.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(jsonPath("$.counterparty.name").value("Заманбек Жетысай"))
                 .andExpect(jsonPath("$.comment").value(""))
                 .andExpect(jsonPath("$.shipmentMoment").isEmpty())
                 .andExpect(jsonPath("$.items[0].good.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
@@ -148,7 +148,7 @@ class SaleControllerTest {
                   "warehouse": {
                     "id": "d1da1441-6598-4511-bc82-8fc06602e373"
                   },
-                  "customer": {
+                  "counterparty": {
                     "id": "43375a1e-1c91-46e5-9a10-a14200427fe9"
                   },
                   "comment": "comment",
@@ -190,8 +190,8 @@ class SaleControllerTest {
                 .andExpect(jsonPath("$.amount").value(53000))
                 .andExpect(jsonPath("$.warehouse.id").value("d1da1441-6598-4511-bc82-8fc06602e373"))
                 .andExpect(jsonPath("$.warehouse.name").value("Барыс"))
-                .andExpect(jsonPath("$.customer.id").value("43375a1e-1c91-46e5-9a10-a14200427fe9"))
-                .andExpect(jsonPath("$.customer.name").value("Оркен Алматы"))
+                .andExpect(jsonPath("$.counterparty.id").value("43375a1e-1c91-46e5-9a10-a14200427fe9"))
+                .andExpect(jsonPath("$.counterparty.name").value("Оркен Алматы"))
                 .andExpect(jsonPath("$.comment").value("comment"))
                 .andExpect(jsonPath("$.shipmentMoment").value("2024-12-05T22:57:00"))
                 .andExpect(jsonPath("$.items.length()").value(3))

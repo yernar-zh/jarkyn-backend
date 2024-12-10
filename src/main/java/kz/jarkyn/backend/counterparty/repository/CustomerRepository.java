@@ -26,7 +26,7 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, UUID> 
                 COALESCE(SUM(sle.amount),0) as totalSaleAmount
             FROM CustomerEntity ctr
             LEFT JOIN AccountEntity act ON ctr = act.counterparty
-            LEFT JOIN SaleEntity sle ON ctr = sle.customer
+            LEFT JOIN SaleEntity sle ON ctr = sle.counterparty
                 AND sle.state = kz.jarkyn.backend.document.sale.model.SaleState.SHIPPED
             GROUP BY ctr.id, ctr.name, ctr.phoneNumber, ctr.shippingAddress, ctr.discount, act.balance
             """)

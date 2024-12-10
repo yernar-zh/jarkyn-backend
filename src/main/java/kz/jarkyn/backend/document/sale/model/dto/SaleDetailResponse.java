@@ -14,7 +14,7 @@ import java.util.List;
 @Value.Immutable
 public interface SaleDetailResponse extends DocumentResponse {
     IdNamedDto getWarehouse();
-    IdNamedDto getCustomer();
+    IdNamedDto getCounterparty();
     String getComment();
     @Nullable LocalDateTime getShipmentMoment();
     List<ItemResponse> getItems();
