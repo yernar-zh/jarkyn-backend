@@ -6,6 +6,7 @@ import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import org.immutables.value.Value;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Value.Immutable
@@ -13,5 +14,5 @@ import java.util.UUID;
 public interface SellingPriceRequest extends IdDto {
     @Nullable UUID getId();
     Integer getQuantity();
-    Integer getValue();
+    BigDecimal getValue();
 }

@@ -14,6 +14,7 @@ import kz.jarkyn.backend.stock.service.TurnoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class ItemService {
                 return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());
             }
             Integer remain = absentGoodRemains.get(item.getGood());
-            return itemMapper.toResponse(item, remain, 0);
+            return itemMapper.toResponse(item, remain, BigDecimal.ZERO);
         }).toList();
     }
 

@@ -12,7 +12,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.math.BigDecimal;
+
 @Mapper(uses = EntityMapper.class)
 public abstract class ItemMapper extends RequestMapper<ItemEntity, ItemRequest> {
-    public abstract ItemResponse toResponse(ItemEntity entity, Integer remain, Integer costPrice);
+    public abstract ItemResponse toResponse(ItemEntity entity, Integer remain, BigDecimal costPrice);
 }

@@ -10,16 +10,15 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import org.springframework.cglib.proxy.InvocationHandler;
 import org.springframework.cglib.proxy.Proxy;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CriteriaSearch<R, E> {
+public class CriteriaSearch<R, E> implements Search<R> {
     private final EntityManager em;
     private final Class<R> responseClass;
     private final Class<E> entityClass;
@@ -34,6 +33,7 @@ public class CriteriaSearch<R, E> {
         this.searchByAttributeNames = searchByAttributeNames;
     }
 
+    @Override
     public PageResponse<R> getResult(QueryParams queryParams) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
 
@@ -100,7 +100,7 @@ public class CriteriaSearch<R, E> {
             if (expression == null) {
                 return cb.conjunction();
             }
-            Function<String, Object> convertor = getConvertor(expression.getJavaType());
+            Function<String, Object> convertor = SearchUtils.getConvertor(expression.getJavaType());
             Set<Object> filterValues = filter.getValues().stream()
                     .map(filterValue -> convertor.apply(filterValue)).collect(Collectors.toSet());
             Object firstFilterValues = filterValues.iterator().next();
@@ -139,33 +139,4 @@ public class CriteriaSearch<R, E> {
             };
         }).toList();
     }
-
-    private Function<String, Object> getConvertor(Class<?> javaClass) {
-        if (javaClass == Integer.class) {
-            return Integer::valueOf;
-        } else if (javaClass == Long.class) {
-            return Long::valueOf;
-        } else if (javaClass == Double.class) {
-            return Double::valueOf;
-        } else if (javaClass == Float.class) {
-            return Float::valueOf;
-        } else if (javaClass == Boolean.class) {
-            return Boolean::valueOf;
-        } else if (javaClass == String.class) {
-            return x -> x;
-        } else if (javaClass == LocalDate.class) {
-            return str -> LocalDate.parse(str, DateTimeFormatter.ISO_DATE);
-        } else if (javaClass == LocalDateTime.class) {
-            return str -> LocalDateTime.parse(str, DateTimeFormatter.ISO_DATE_TIME);
-        } else if (javaClass == BigInteger.class) {
-            return BigInteger::new;
-        } else if (javaClass == UUID.class) {
-            return UUID::fromString;
-        } else if (javaClass.isEnum()) {
-            return str -> Enum.valueOf((Class<? extends Enum>) javaClass, str);
-        } else {
-            return null;
-        }
-    }
-
 }

@@ -9,6 +9,8 @@ import kz.jarkyn.backend.audit.config.ParentAudit;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "item")
 public class ItemEntity extends AbstractEntity {
@@ -20,7 +22,7 @@ public class ItemEntity extends AbstractEntity {
     @JoinColumn(name = "good_id")
     private GoodEntity good;
     private Integer quantity;
-    private Integer price;
+    private BigDecimal price;
     private Integer position;
 
     public DocumentEntity getDocument() {
@@ -47,11 +49,11 @@ public class ItemEntity extends AbstractEntity {
         this.good = good;
     }
 
-    public Integer getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

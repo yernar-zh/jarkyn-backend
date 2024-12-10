@@ -6,7 +6,7 @@ import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.core.search.ListSearch;
+import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerListResponse;
@@ -49,7 +49,7 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public PageResponse<CustomerListResponse> findApiByFilter(QueryParams queryParams) {
-        ListSearch<CustomerListResponse> search = searchFactory.createListSearch(
+        Search<CustomerListResponse> search = searchFactory.createListSearch(
                 CustomerListResponse.class, List.of("name", "phoneNumber"),
                 customerRepository::findAllResponse);
         return search.getResult(queryParams);

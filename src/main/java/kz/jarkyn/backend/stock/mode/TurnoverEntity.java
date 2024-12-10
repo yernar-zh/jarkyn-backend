@@ -10,6 +10,7 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,7 +25,7 @@ public class TurnoverEntity extends AbstractEntity {
     private LocalDateTime moment;
     private Integer quantity;
     private Integer remain;
-    private Integer costPrice;
+    private BigDecimal costPrice;
 
     public DocumentEntity getDocument() {
         return document;
@@ -66,11 +67,11 @@ public class TurnoverEntity extends AbstractEntity {
         this.remain = remain;
     }
 
-    public Integer getCostPrice() {
+    public BigDecimal getCostPrice() {
         return costPrice;
     }
 
-    public void setCostPrice(Integer costPrice) {
+    public void setCostPrice(BigDecimal costPrice) {
         this.costPrice = costPrice;
     }
 }

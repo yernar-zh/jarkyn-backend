@@ -5,7 +5,6 @@ import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import kz.jarkyn.backend.document.core.model.dto.DocumentResponse;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
-import kz.jarkyn.backend.document.payment.model.PaymentOutPurpose;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentPurposeResponse;
 import org.immutables.value.Value;
 

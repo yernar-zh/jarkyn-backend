@@ -7,6 +7,7 @@ import kz.jarkyn.backend.counterparty.model.CounterpartyEntity;
 import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +22,7 @@ public class DocumentEntity extends AbstractEntity {
     private CounterpartyEntity counterparty;
     private String name;
     private LocalDateTime moment;
-    private Integer amount;
+    private BigDecimal amount;
     private String comment;
     private Boolean deleted;
 
@@ -57,11 +58,11 @@ public class DocumentEntity extends AbstractEntity {
         this.moment = moment;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

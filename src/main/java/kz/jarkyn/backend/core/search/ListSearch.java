@@ -11,16 +11,12 @@ import org.springframework.data.util.Pair;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class ListSearch<R> {
+public class ListSearch<R> implements Search<R> {
     private final List<Row> rows;
 
     public ListSearch(Class<R> javaClass, List<String> searchFields, List<R> list) {
@@ -41,14 +37,14 @@ public class ListSearch<R> {
         if (value == null) {
             return Collections.emptyList();
         }
-        Function<String, Object> convertor = getConvertor(valueClass);
+        Function<String, Object> convertor = SearchUtils.getConvertor(valueClass);
         if (convertor != null) {
             return List.of(Pair.of("", value));
         }
         List<Pair<String, Object>> result = new ArrayList<>();
         for (Method method : valueClass.getMethods()) {
             if (!method.getName().startsWith("get")) {
-                throw new RuntimeException();
+                throw new RuntimeException(method + " is not a getter");
             }
             String name = Introspector.decapitalize(method.getName().substring(3));
             method.setAccessible(true);
@@ -76,34 +72,7 @@ public class ListSearch<R> {
         return result;
     }
 
-    private Function<String, Object> getConvertor(Class<?> javaClass) {
-        if (javaClass == Integer.class) {
-            return Integer::valueOf;
-        } else if (javaClass == Long.class) {
-            return Long::valueOf;
-        } else if (javaClass == Double.class) {
-            return Double::valueOf;
-        } else if (javaClass == Float.class) {
-            return Float::valueOf;
-        } else if (javaClass == Boolean.class) {
-            return Boolean::valueOf;
-        } else if (javaClass == String.class) {
-            return x -> x;
-        } else if (javaClass == LocalDate.class) {
-            return str -> LocalDate.parse(str, DateTimeFormatter.ISO_DATE);
-        } else if (javaClass == LocalDateTime.class) {
-            return str -> LocalDateTime.parse(str, DateTimeFormatter.ISO_DATE_TIME);
-        } else if (javaClass == BigInteger.class) {
-            return BigInteger::new;
-        } else if (javaClass == UUID.class) {
-            return UUID::fromString;
-        } else if (javaClass.isEnum()) {
-            return str -> Enum.valueOf((Class<? extends Enum>) javaClass, str);
-        } else {
-            return null;
-        }
-    }
-
+    @Override
     public PageResponse<R> getResult(QueryParams queryParams) {
         List<R> result = rows.stream().filter(filter(queryParams)).sorted(sort(queryParams))
                 .map(Row::getData).toList();
@@ -130,7 +99,7 @@ public class ListSearch<R> {
                     return false;
                 }
                 Object firstRowValue = rowValues.iterator().next();
-                Function<String, Object> convertor = getConvertor(firstRowValue.getClass());
+                Function<String, Object> convertor = SearchUtils.getConvertor(firstRowValue.getClass());
                 Set<Object> filterValues = filter.getValues().stream()
                         .map(filterValue -> convertor.apply(filterValue)).collect(Collectors.toSet());
                 Object firstFilterValues = filterValues.iterator().next();

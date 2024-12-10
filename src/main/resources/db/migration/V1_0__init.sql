@@ -3,7 +3,7 @@ CREATE TABLE account
     id              UUID NOT NULL,
     counterparty_id UUID,
     name            VARCHAR(255),
-    balance         INTEGER,
+    balance         DECIMAL,
     bank            VARCHAR(255),
     giro            VARCHAR(255),
     CONSTRAINT pk_account PRIMARY KEY (id)
@@ -43,7 +43,7 @@ CREATE TABLE cash_flow
     id          UUID NOT NULL,
     account_id  UUID,
     document_id UUID,
-    amount      INTEGER,
+    amount      DECIMAL,
     CONSTRAINT pk_cash_flow PRIMARY KEY (id)
 );
 
@@ -70,7 +70,7 @@ CREATE TABLE document
     counterparty_id UUID,
     name            VARCHAR(255),
     moment          TIMESTAMP WITHOUT TIME ZONE,
-    amount          INTEGER,
+    amount          DECIMAL,
     comment         VARCHAR(255),
     deleted         BOOLEAN,
     CONSTRAINT pk_document PRIMARY KEY (id)
@@ -115,8 +115,8 @@ CREATE TABLE item
     id          UUID NOT NULL,
     document_id UUID,
     good_id     UUID,
-    price       INTEGER,
     quantity    INTEGER,
+    price       DECIMAL,
     position    INTEGER,
     CONSTRAINT pk_item PRIMARY KEY (id)
 );
@@ -140,7 +140,7 @@ CREATE TABLE payment_in_purpose
     id          UUID NOT NULL,
     payment_id  UUID,
     document_id UUID,
-    amount      INTEGER,
+    amount      DECIMAL,
     CONSTRAINT pk_payment_in_purpose PRIMARY KEY (id)
 );
 
@@ -157,7 +157,7 @@ CREATE TABLE payment_out_purpose
     id          UUID NOT NULL,
     payment_out UUID,
     document_id UUID,
-    amount      INTEGER,
+    amount      DECIMAL,
     CONSTRAINT pk_payment_out_purpose PRIMARY KEY (id)
 );
 
@@ -174,7 +174,7 @@ CREATE TABLE selling_price
     id       UUID NOT NULL,
     good_id  UUID,
     quantity INTEGER,
-    val      INTEGER,
+    val      DECIMAL,
     CONSTRAINT pk_selling_price PRIMARY KEY (id)
 );
 
@@ -200,7 +200,7 @@ CREATE TABLE turnover
     moment      TIMESTAMP WITHOUT TIME ZONE,
     quantity    INTEGER,
     remain      INTEGER,
-    cost_price  INTEGER,
+    cost_price  DECIMAL,
     CONSTRAINT pk_turnover PRIMARY KEY (id)
 );
 

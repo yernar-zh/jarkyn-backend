@@ -8,6 +8,8 @@ import jakarta.persistence.Table;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "payment_out_purpose")
 public class PaymentOutPurpose extends AbstractEntity {
@@ -19,7 +21,7 @@ public class PaymentOutPurpose extends AbstractEntity {
     @JoinColumn(name = "document_id")
     private DocumentEntity document;
 
-    private Integer amount;
+    private BigDecimal amount;
 
     public PaymentOutEntity getPaymentOut() {
         return paymentOut;
@@ -37,11 +39,11 @@ public class PaymentOutPurpose extends AbstractEntity {
         this.document = document;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 }

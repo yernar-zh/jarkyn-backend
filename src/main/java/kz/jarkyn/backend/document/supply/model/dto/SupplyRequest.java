@@ -8,6 +8,7 @@ import kz.jarkyn.backend.core.model.dto.NamedDto;
 import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
 import org.immutables.value.Value;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface SupplyRequest extends NamedDto {
     @Nullable String getName();
     IdDto getWarehouse();
     LocalDateTime getMoment();
-    Integer getAmount();
+    BigDecimal getAmount();
     String getComment();
     Integer getExchangeRate();
     List<ItemRequest> getItems();

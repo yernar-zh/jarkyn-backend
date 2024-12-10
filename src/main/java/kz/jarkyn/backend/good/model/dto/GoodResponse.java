@@ -15,5 +15,5 @@ public interface GoodResponse extends IdNamedDto {
     Integer getMinimumPrice();
     Boolean getArchived();
     List<IdNamedDto> getAttributes();
-    List<SellingPriceDto> getSellingPrices();
+    List<SellingPriceResponse> getSellingPrices();
 }

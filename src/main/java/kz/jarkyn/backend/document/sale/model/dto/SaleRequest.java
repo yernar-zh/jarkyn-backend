@@ -8,6 +8,7 @@ import kz.jarkyn.backend.core.model.dto.NamedDto;
 import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
 import org.immutables.value.Value;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface SaleRequest extends NamedDto {
     IdDto getWarehouse();
     IdDto getCounterparty();
     LocalDateTime getMoment();
-    Integer getAmount();
+    BigDecimal getAmount();
     String getComment();
     @Nullable LocalDateTime getShipmentMoment();
     List<ItemRequest> getItems();

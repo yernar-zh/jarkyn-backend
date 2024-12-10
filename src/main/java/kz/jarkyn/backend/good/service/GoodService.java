@@ -5,8 +5,8 @@ package kz.jarkyn.backend.good.service;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.core.search.ListSearch;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.good.model.AttributeEntity;
@@ -62,7 +62,7 @@ public class GoodService {
 
     @Transactional(readOnly = true)
     public PageResponse<GoodListResponse> findApiByFilter(QueryParams queryParams) {
-        ListSearch<GoodListResponse> search = searchFactory.createListSearch(
+        Search<GoodListResponse> search = searchFactory.createListSearch(
                 GoodListResponse.class, List.of("name", "groups.name"), () ->
                         goodRepository.findAll().stream().map(good -> {
                             List<AttributeEntity> attributes = attributeRepository.findByGood(good);

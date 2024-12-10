@@ -7,6 +7,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "account")
 public class AccountEntity extends AbstractEntity {
@@ -14,7 +16,7 @@ public class AccountEntity extends AbstractEntity {
     @JoinColumn(name = "counterparty_id")
     private CounterpartyEntity counterparty;
     private String name;
-    private Integer balance;
+    private BigDecimal balance;
     private String bank;
     private String giro;
 
@@ -34,11 +36,11 @@ public class AccountEntity extends AbstractEntity {
         this.name = name;
     }
 
-    public Integer getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Integer balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

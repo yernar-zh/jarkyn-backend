@@ -3,6 +3,8 @@ package kz.jarkyn.backend.good.model;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "selling_price")
 public class SellingPriceEntity extends AbstractEntity {
@@ -11,7 +13,7 @@ public class SellingPriceEntity extends AbstractEntity {
     private GoodEntity good;
     private Integer quantity;
     @Column(name = "val")
-    private Integer value;
+    private BigDecimal value;
 
     public GoodEntity getGood() {
         return good;
@@ -29,11 +31,11 @@ public class SellingPriceEntity extends AbstractEntity {
         this.quantity = quantity;
     }
 
-    public Integer getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue(BigDecimal value) {
         this.value = value;
     }
 }

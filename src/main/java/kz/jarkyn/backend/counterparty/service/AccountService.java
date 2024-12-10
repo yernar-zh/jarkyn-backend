@@ -15,6 +15,7 @@ import kz.jarkyn.backend.counterparty.mapper.AccountMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,7 +57,7 @@ public class AccountService {
         OrganizationEntity curOrganization = organizationService.getCurrent();
         AccountEntity account = accountRepository.save(accountMapper.toEntity(request));
         account.setCounterparty(curOrganization);
-        account.setBalance(0);
+        account.setBalance(BigDecimal.ZERO);
         auditService.saveChanges(account);
         return account.getId();
     }
@@ -65,7 +66,7 @@ public class AccountService {
     public void createForCustomer(CustomerEntity customer) {
         AccountEntity account = new AccountEntity();
         account.setCounterparty(customer);
-        account.setBalance(0);
+        account.setBalance(BigDecimal.ZERO);
         accountRepository.save(account);
         auditService.saveChanges(account);
     }
