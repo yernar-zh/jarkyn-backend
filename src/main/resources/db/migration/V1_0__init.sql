@@ -127,6 +127,15 @@ CREATE TABLE organization
     CONSTRAINT pk_organization PRIMARY KEY (id)
 );
 
+CREATE TABLE paid_document
+(
+    id          UUID NOT NULL,
+    payment     UUID,
+    document_id UUID,
+    amount      DECIMAL,
+    CONSTRAINT pk_paid_document PRIMARY KEY (id)
+);
+
 CREATE TABLE payment_in
 (
     id         UUID NOT NULL,
@@ -135,30 +144,12 @@ CREATE TABLE payment_in
     CONSTRAINT pk_payment_in PRIMARY KEY (id)
 );
 
-CREATE TABLE payment_in_purpose
-(
-    id          UUID NOT NULL,
-    payment_id  UUID,
-    document_id UUID,
-    amount      DECIMAL,
-    CONSTRAINT pk_payment_in_purpose PRIMARY KEY (id)
-);
-
 CREATE TABLE payment_out
 (
     id         UUID NOT NULL,
     account_id UUID,
     state      VARCHAR(255),
     CONSTRAINT pk_payment_out PRIMARY KEY (id)
-);
-
-CREATE TABLE payment_out_purpose
-(
-    id          UUID NOT NULL,
-    payment_out UUID,
-    document_id UUID,
-    amount      DECIMAL,
-    CONSTRAINT pk_payment_out_purpose PRIMARY KEY (id)
 );
 
 CREATE TABLE sale
@@ -267,29 +258,23 @@ ALTER TABLE item
 ALTER TABLE organization
     ADD CONSTRAINT FK_ORGANIZATION_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);
 
+ALTER TABLE paid_document
+    ADD CONSTRAINT FK_PAID_DOCUMENT_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
+
+ALTER TABLE paid_document
+    ADD CONSTRAINT FK_PAID_DOCUMENT_ON_PAYMENT FOREIGN KEY (payment) REFERENCES document (id);
+
 ALTER TABLE payment_in
     ADD CONSTRAINT FK_PAYMENT_IN_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
 
 ALTER TABLE payment_in
     ADD CONSTRAINT FK_PAYMENT_IN_ON_ID FOREIGN KEY (id) REFERENCES document (id);
 
-ALTER TABLE payment_in_purpose
-    ADD CONSTRAINT FK_PAYMENT_IN_PURPOSE_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
-
-ALTER TABLE payment_in_purpose
-    ADD CONSTRAINT FK_PAYMENT_IN_PURPOSE_ON_PAYMENT FOREIGN KEY (payment_id) REFERENCES payment_in (id);
-
 ALTER TABLE payment_out
     ADD CONSTRAINT FK_PAYMENT_OUT_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
 
 ALTER TABLE payment_out
     ADD CONSTRAINT FK_PAYMENT_OUT_ON_ID FOREIGN KEY (id) REFERENCES document (id);
-
-ALTER TABLE payment_out_purpose
-    ADD CONSTRAINT FK_PAYMENT_OUT_PURPOSE_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
-
-ALTER TABLE payment_out_purpose
-    ADD CONSTRAINT FK_PAYMENT_OUT_PURPOSE_ON_PAYMENT_OUT FOREIGN KEY (payment_out) REFERENCES payment_out (id);
 
 ALTER TABLE sale
     ADD CONSTRAINT FK_SALE_ON_ID FOREIGN KEY (id) REFERENCES document (id);

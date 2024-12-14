@@ -8,11 +8,11 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "payment_in_purpose")
-public class PaymentInPurpose extends AbstractEntity {
+@Table(name = "paid_document")
+public class PaidDocumentEntity extends AbstractEntity {
     @ManyToOne
-    @JoinColumn(name = "payment_id")
-    private PaymentInEntity paymentIn;
+    @JoinColumn(name = "payment")
+    private DocumentEntity payment;
 
     @ManyToOne
     @JoinColumn(name = "document_id")
@@ -20,12 +20,12 @@ public class PaymentInPurpose extends AbstractEntity {
 
     private BigDecimal amount;
 
-    public PaymentInEntity getPaymentIn() {
-        return paymentIn;
+    public DocumentEntity getPayment() {
+        return payment;
     }
 
-    public void setPaymentIn(PaymentInEntity paymentIn) {
-        this.paymentIn = paymentIn;
+    public void setPayment(DocumentEntity payment) {
+        this.payment = payment;
     }
 
     public DocumentEntity getDocument() {

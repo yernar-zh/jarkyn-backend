@@ -5,7 +5,7 @@ import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import kz.jarkyn.backend.document.core.model.dto.DocumentResponse;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
-import kz.jarkyn.backend.document.payment.model.dto.PaymentPurposeResponse;
+import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
 import org.immutables.value.Value;
 
 import java.time.LocalDateTime;
@@ -18,5 +18,5 @@ public interface SaleDetailResponse extends DocumentResponse {
     String getComment();
     @Nullable LocalDateTime getShipmentMoment();
     List<ItemResponse> getItems();
-    List<PaymentPurposeResponse> getPayments();
+    List<PaidDocumentResponse> getPayments();
 }

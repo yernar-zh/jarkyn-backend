@@ -8,8 +8,8 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.core.service.ItemService;
-import kz.jarkyn.backend.document.payment.model.PaymentInPurpose;
-import kz.jarkyn.backend.document.payment.repository.PaymentInPurposeRepository;
+import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
+import kz.jarkyn.backend.document.payment.service.PaidDocumentService;
 import kz.jarkyn.backend.document.sale.model.SaleEntity;
 import kz.jarkyn.backend.document.sale.model.dto.SaleDetailResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
@@ -27,7 +27,7 @@ public class SaleService {
     private final SaleRepository saleRepository;
     private final SaleMapper saleMapper;
     private final ItemService itemService;
-    private final PaymentInPurposeRepository paymentInPurposeRepository;
+    private final PaidDocumentService paidDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
 
@@ -35,14 +35,13 @@ public class SaleService {
             SaleRepository saleRepository,
             SaleMapper saleMapper,
             ItemService itemService,
-            PaymentInPurposeRepository paymentInPurposeRepository,
+            PaidDocumentService paidDocumentService,
             DocumentService documentService,
-            AuditService auditService
-    ) {
+            AuditService auditService) {
         this.saleRepository = saleRepository;
         this.saleMapper = saleMapper;
         this.itemService = itemService;
-        this.paymentInPurposeRepository = paymentInPurposeRepository;
+        this.paidDocumentService = paidDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
     }
@@ -51,8 +50,9 @@ public class SaleService {
     public SaleDetailResponse findApiById(UUID id) {
         SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<ItemResponse> items = itemService.findApiByDocument(sale);
-        List<PaymentInPurpose> paymentInPurposes = paymentInPurposeRepository.findByDocument(sale);
-        return saleMapper.toDetailResponse(sale, items, paymentInPurposes);
+        List<PaidDocumentResponse> inPaidDocuments = paidDocumentService.findInResponseByDocument(sale);
+        List<PaidDocumentResponse> outPaidDocuments = paidDocumentService.findOutResponseByDocument(sale);
+        return saleMapper.toDetailResponse(sale, items, inPaidDocuments);
     }
 
     @Transactional(readOnly = true)

@@ -11,4 +11,5 @@ import java.time.LocalDateTime;
 public interface DocumentResponse extends IdNamedDto {
     LocalDateTime getMoment();
     BigDecimal getAmount();
+    Boolean getDeleted();
 }

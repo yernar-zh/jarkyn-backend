@@ -43,8 +43,10 @@ public class DocumentService {
             throw new RuntimeException("document name is null");
         }
         String namePrefix = switch (document.getClass().getSimpleName()) {
+            case "SupplyEntity" -> "SP";
             case "SaleEntity" -> "SL";
             case "PaymentInEntity" -> "PI";
+            case "PaymentOutEntity" -> "PO";
             default -> throw new RuntimeException("unsupported document : " + document.getClass().getSimpleName());
         };
         String name = document.getName();

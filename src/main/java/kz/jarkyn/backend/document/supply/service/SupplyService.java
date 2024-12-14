@@ -7,6 +7,8 @@ import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.core.service.ItemService;
+import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
+import kz.jarkyn.backend.document.payment.service.PaidDocumentService;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyDetailResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
@@ -23,6 +25,7 @@ public class SupplyService {
     private final SupplyRepository supplyRepository;
     private final SupplyMapper supplyMapper;
     private final ItemService itemService;
+    private final PaidDocumentService paidDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
 
@@ -30,12 +33,14 @@ public class SupplyService {
             SupplyRepository supplyRepository,
             SupplyMapper supplyMapper,
             ItemService itemService,
+            PaidDocumentService paidDocumentService,
             DocumentService documentService,
             AuditService auditService
     ) {
         this.supplyRepository = supplyRepository;
         this.supplyMapper = supplyMapper;
         this.itemService = itemService;
+        this.paidDocumentService = paidDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
     }
@@ -44,7 +49,8 @@ public class SupplyService {
     public SupplyDetailResponse findApiById(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<ItemResponse> items = itemService.findApiByDocument(supply);
-        return supplyMapper.toDetailResponse(supply, items, null);
+        List<PaidDocumentResponse> outPaidDocuments = paidDocumentService.findOutResponseByDocument(supply);
+        return supplyMapper.toDetailResponse(supply, items, outPaidDocuments);
     }
 
     @Transactional
