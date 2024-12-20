@@ -1,34 +1,44 @@
 CREATE TABLE account
 (
-    id              UUID NOT NULL,
-    counterparty_id UUID,
-    name            VARCHAR(255),
-    balance         DECIMAL,
-    bank            VARCHAR(255),
-    giro            VARCHAR(255),
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    organization_id  UUID,
+    counterparty_id  UUID,
+    name             VARCHAR(255),
+    bank             VARCHAR(255),
+    giro             VARCHAR(255),
+    currency         VARCHAR(255),
+    balance          DECIMAL,
     CONSTRAINT pk_account PRIMARY KEY (id)
 );
 
 CREATE TABLE attribute
 (
-    id       UUID NOT NULL,
-    group_id UUID,
-    name     VARCHAR(255),
-    position INTEGER,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    group_id         UUID,
+    name             VARCHAR(255),
+    position         INTEGER,
     CONSTRAINT pk_attribute PRIMARY KEY (id)
 );
 
 CREATE TABLE attribute_group
 (
-    id       UUID NOT NULL,
-    name     VARCHAR(255),
-    position INTEGER,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    name             VARCHAR(255),
+    position         INTEGER,
     CONSTRAINT pk_attribute_group PRIMARY KEY (id)
 );
 
 CREATE TABLE audit
 (
     id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     user_id          UUID,
     moment           TIMESTAMP WITHOUT TIME ZONE,
     entity_id        UUID,
@@ -40,17 +50,21 @@ CREATE TABLE audit
 
 CREATE TABLE cash_flow
 (
-    id          UUID NOT NULL,
-    account_id  UUID,
-    document_id UUID,
-    amount      DECIMAL,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    account_id       UUID,
+    document_id      UUID,
+    amount           DECIMAL,
     CONSTRAINT pk_cash_flow PRIMARY KEY (id)
 );
 
 CREATE TABLE counterparty
 (
-    id   UUID NOT NULL,
-    name VARCHAR(255),
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    name             VARCHAR(255),
     CONSTRAINT pk_counterparty PRIMARY KEY (id)
 );
 
@@ -65,59 +79,72 @@ CREATE TABLE customer
 
 CREATE TABLE document
 (
-    id              UUID NOT NULL,
-    warehouse_id    UUID,
-    counterparty_id UUID,
-    name            VARCHAR(255),
-    moment          TIMESTAMP WITHOUT TIME ZONE,
-    amount          DECIMAL,
-    comment         VARCHAR(255),
-    deleted         BOOLEAN,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    warehouse_id     UUID,
+    counterparty_id  UUID,
+    name             VARCHAR(255),
+    moment           TIMESTAMP WITHOUT TIME ZONE,
+    amount           DECIMAL,
+    comment          VARCHAR(255),
+    deleted          BOOLEAN,
+    commited         BOOLEAN,
     CONSTRAINT pk_document PRIMARY KEY (id)
 );
 
 CREATE TABLE good
 (
-    id            UUID NOT NULL,
-    name          VARCHAR(255),
-    group_id      UUID,
-    image_id      UUID,
-    minimum_price INTEGER,
-    archived      BOOLEAN,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    name             VARCHAR(255),
+    group_id         UUID,
+    image_id         UUID,
+    minimum_price    INTEGER,
+    archived         BOOLEAN,
     CONSTRAINT pk_good PRIMARY KEY (id)
 );
 
 CREATE TABLE good_attribute
 (
-    id           UUID NOT NULL,
-    good_id      UUID,
-    attribute_id UUID,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    good_id          UUID,
+    attribute_id     UUID,
     CONSTRAINT pk_good_attribute PRIMARY KEY (id)
 );
 
 CREATE TABLE groups
 (
-    id        UUID NOT NULL,
-    name      VARCHAR(255),
-    parent_id UUID,
-    position  INTEGER,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    name             VARCHAR(255),
+    parent_id        UUID,
+    position         INTEGER,
     CONSTRAINT pk_groups PRIMARY KEY (id)
 );
 
 CREATE TABLE image
 (
-    id UUID NOT NULL,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_image PRIMARY KEY (id)
 );
 
 CREATE TABLE item
 (
-    id          UUID NOT NULL,
-    document_id UUID,
-    good_id     UUID,
-    quantity    INTEGER,
-    price       DECIMAL,
-    position    INTEGER,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    document_id      UUID,
+    good_id          UUID,
+    quantity         INTEGER,
+    price            DECIMAL,
+    position         INTEGER,
     CONSTRAINT pk_item PRIMARY KEY (id)
 );
 
@@ -129,10 +156,12 @@ CREATE TABLE organization
 
 CREATE TABLE paid_document
 (
-    id          UUID NOT NULL,
-    payment     UUID,
-    document_id UUID,
-    amount      DECIMAL,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    payment          UUID,
+    document_id      UUID,
+    amount           DECIMAL,
     CONSTRAINT pk_paid_document PRIMARY KEY (id)
 );
 
@@ -140,15 +169,14 @@ CREATE TABLE payment_in
 (
     id         UUID NOT NULL,
     account_id UUID,
-    state      VARCHAR(255),
     CONSTRAINT pk_payment_in PRIMARY KEY (id)
 );
 
 CREATE TABLE payment_out
 (
-    id         UUID NOT NULL,
-    account_id UUID,
-    state      VARCHAR(255),
+    id            UUID NOT NULL,
+    account_id    UUID,
+    exchange_rate DECIMAL,
     CONSTRAINT pk_payment_out PRIMARY KEY (id)
 );
 
@@ -162,10 +190,12 @@ CREATE TABLE sale
 
 CREATE TABLE selling_price
 (
-    id       UUID NOT NULL,
-    good_id  UUID,
-    quantity INTEGER,
-    val      DECIMAL,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    good_id          UUID,
+    quantity         INTEGER,
+    val              DECIMAL,
     CONSTRAINT pk_selling_price PRIMARY KEY (id)
 );
 
@@ -179,42 +209,50 @@ CREATE TABLE supply
 (
     id            UUID NOT NULL,
     exchange_rate INTEGER,
-    state         VARCHAR(255),
     CONSTRAINT pk_supply PRIMARY KEY (id)
 );
 
 CREATE TABLE turnover
 (
-    id          UUID NOT NULL,
-    document_id UUID,
-    good_id     UUID,
-    moment      TIMESTAMP WITHOUT TIME ZONE,
-    quantity    INTEGER,
-    remain      INTEGER,
-    cost_price  DECIMAL,
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    document_id      UUID,
+    good_id          UUID,
+    moment           TIMESTAMP WITHOUT TIME ZONE,
+    quantity         INTEGER,
+    remain           INTEGER,
+    cost_price       DECIMAL,
     CONSTRAINT pk_turnover PRIMARY KEY (id)
 );
 
 CREATE TABLE users
 (
-    id              UUID NOT NULL,
-    counterparty_id UUID,
-    phone_number    VARCHAR(255),
-    name            VARCHAR(255),
-    auth_token      VARCHAR(255),
-    role            VARCHAR(255),
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    counterparty_id  UUID,
+    phone_number     VARCHAR(255),
+    name             VARCHAR(255),
+    auth_token       VARCHAR(255),
+    role             VARCHAR(255),
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
 CREATE TABLE warehouse
 (
-    id   UUID NOT NULL,
-    name VARCHAR(255),
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    name             VARCHAR(255),
     CONSTRAINT pk_warehouse PRIMARY KEY (id)
 );
 
 ALTER TABLE account
     ADD CONSTRAINT FK_ACCOUNT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
+
+ALTER TABLE account
+    ADD CONSTRAINT FK_ACCOUNT_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organization (id);
 
 ALTER TABLE attribute
     ADD CONSTRAINT FK_ATTRIBUTE_ON_GROUP FOREIGN KEY (group_id) REFERENCES attribute_group (id);

@@ -2,8 +2,11 @@ package kz.jarkyn.backend.core.model;
 
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -12,12 +15,20 @@ public abstract class AbstractEntity implements Persistable<UUID> {
 
     @Id
     private UUID id;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastModifiedAt;
 
     @PrePersist
     private void prePersist() {
         if (this.id == null) {
             this.id = UUID.randomUUID();
         }
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        lastModifiedAt = LocalDateTime.now();
     }
 
     @Override
@@ -30,9 +41,24 @@ public abstract class AbstractEntity implements Persistable<UUID> {
         return this.id;
     }
 
-
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getLastModifiedAt() {
+        return lastModifiedAt;
+    }
+
+    public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
+        this.lastModifiedAt = lastModifiedAt;
     }
 
     @Override

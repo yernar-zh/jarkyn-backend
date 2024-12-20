@@ -10,8 +10,6 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 @PrimaryKeyJoinColumn(name = AbstractEntity_.ID)
 public class SupplyEntity extends DocumentEntity {
     private Integer exchangeRate;
-    @Enumerated(EnumType.STRING)
-    private SupplyState state;
 
     public Integer getExchangeRate() {
         return exchangeRate;
@@ -19,13 +17,5 @@ public class SupplyEntity extends DocumentEntity {
 
     public void setExchangeRate(Integer exchangeRate) {
         this.exchangeRate = exchangeRate;
-    }
-
-    public SupplyState getState() {
-        return state;
-    }
-
-    public void setState(SupplyState state) {
-        this.state = state;
     }
 }

@@ -13,8 +13,6 @@ public class PaymentInEntity extends DocumentEntity {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private AccountEntity account;
-    @Enumerated(EnumType.STRING)
-    private PaymentInState state;
 
     public AccountEntity getAccount() {
         return account;
@@ -22,13 +20,5 @@ public class PaymentInEntity extends DocumentEntity {
 
     public void setAccount(AccountEntity account) {
         this.account = account;
-    }
-
-    public PaymentInState getState() {
-        return state;
-    }
-
-    public void setState(PaymentInState state) {
-        this.state = state;
     }
 }

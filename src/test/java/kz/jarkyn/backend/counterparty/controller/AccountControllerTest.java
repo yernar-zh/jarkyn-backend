@@ -36,7 +36,8 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
                 .andExpect(jsonPath("$.name").value("Ернар Ж."))
                 .andExpect(jsonPath("$.bank").value("Kaspi Bank"))
-                .andExpect(jsonPath("$.giro").value("+7(775)216-6661"));
+                .andExpect(jsonPath("$.giro").value("+7(775)216-6661"))
+                .andExpect(jsonPath("$.currency").value("KZT"));
     }
 
     @Test
@@ -79,7 +80,8 @@ class AccountControllerTest {
                 {
                   "name": "Ақжол Б.",
                   "bank": "Kaspi Bank",
-                  "giro": "+7(747)421-5569"
+                  "giro": "+7(747)421-5569",
+                  "currency": "KZT"
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Account.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
@@ -90,9 +92,10 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TestUtils.extractId(result)))
                 .andExpect(jsonPath("$.name").value("Ақжол Б."))
-                .andExpect(jsonPath("$.balance").value(0))
                 .andExpect(jsonPath("$.bank").value("Kaspi Bank"))
-                .andExpect(jsonPath("$.giro").value("+7(747)421-5569"));
+                .andExpect(jsonPath("$.giro").value("+7(747)421-5569"))
+                .andExpect(jsonPath("$.currency").value("KZT"))
+                .andExpect(jsonPath("$.balance").value(0));
     }
 
     @Test

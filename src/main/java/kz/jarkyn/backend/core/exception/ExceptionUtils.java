@@ -11,9 +11,9 @@ public class ExceptionUtils {
         return () -> new DataValidationException(ENTITY_NOT_FOUND, "entity not found");
     }
 
-    public static <T> void requireEqualsApi(T first, T second, String message) {
+    public static <T> void requireEqualsApi(T first, T second, String fieldName) {
         if (!first.equals(second)) {
-            throw new ApiValidationException(message);
+            throw new ApiValidationException(fieldName + " should be same");
         }
     }
 

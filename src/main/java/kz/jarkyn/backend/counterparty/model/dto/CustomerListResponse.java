@@ -1,6 +1,8 @@
 package kz.jarkyn.backend.counterparty.model.dto;
 
+import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
+import kz.jarkyn.backend.counterparty.model.Currency;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
@@ -11,9 +13,10 @@ public interface CustomerListResponse extends IdNamedDto {
     String getPhoneNumber();
     String getShippingAddress();
     Integer getDiscount();
-    BigDecimal getBalance();
-    LocalDateTime getFirstSaleMoment();
-    LocalDateTime getLastSaleMoment();
+    BigDecimal getAccountBalance();
+    Currency getAccountCurrency();
+    @Nullable LocalDateTime getFirstSaleMoment();
+    @Nullable LocalDateTime getLastSaleMoment();
     Integer getTotalSaleCount();
-    Integer getTotalSaleAmount();
+    BigDecimal getTotalSaleAmount();
 }

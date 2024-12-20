@@ -1,7 +1,5 @@
 package kz.jarkyn.backend.core.mapper;
 
-import org.mapstruct.MappingTarget;
-
 import java.util.List;
 
 public abstract class RequestResponseMapper<E, Q, R> extends RequestMapper<E, Q> {

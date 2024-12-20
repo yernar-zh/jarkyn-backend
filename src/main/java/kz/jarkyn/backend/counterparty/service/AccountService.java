@@ -5,9 +5,8 @@ package kz.jarkyn.backend.counterparty.service;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
-import kz.jarkyn.backend.counterparty.model.AccountEntity;
-import kz.jarkyn.backend.counterparty.model.CustomerEntity;
-import kz.jarkyn.backend.counterparty.model.OrganizationEntity;
+import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.counterparty.model.*;
 import kz.jarkyn.backend.counterparty.model.dto.AccountRequest;
 import kz.jarkyn.backend.counterparty.model.dto.AccountResponse;
 import kz.jarkyn.backend.counterparty.repository.AccountRepository;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,33 +47,46 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public List<AccountResponse> findApiAll() {
-        OrganizationEntity curOrganization = organizationService.getCurrent();
-        List<AccountEntity> entities = accountRepository.findByCounterparty(curOrganization);
-        return accountMapper.toResponse(entities);
+        return null;
     }
 
     @Transactional
     public UUID createApi(AccountRequest request) {
-        OrganizationEntity curOrganization = organizationService.getCurrent();
         AccountEntity account = accountRepository.save(accountMapper.toEntity(request));
-        account.setCounterparty(curOrganization);
+        account.setCounterparty(null);
         account.setBalance(BigDecimal.ZERO);
         auditService.saveChanges(account);
         return account.getId();
     }
 
     @Transactional
-    public void createForCustomer(CustomerEntity customer) {
-        AccountEntity account = new AccountEntity();
-        account.setCounterparty(customer);
-        account.setBalance(BigDecimal.ZERO);
-        accountRepository.save(account);
-        auditService.saveChanges(account);
+    public AccountEntity findOrCreateForCounterparty(
+            OrganizationEntity organization, CounterpartyEntity counterparty, Currency currency) {
+        return accountRepository.findByOrganizationAndCounterpartyAndCurrency(organization, counterparty, currency)
+                .orElseGet(() -> {
+                    AccountEntity account = new AccountEntity();
+                    account.setOrganization(organization);
+                    account.setCounterparty(counterparty);
+                    account.setCurrency(currency);
+                    account.setBalance(BigDecimal.ZERO);
+                    accountRepository.save(account);
+                    auditService.saveChanges(account);
+                    return account;
+                });
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccountEntity> findByCounterparty(CounterpartyEntity counterparty) {
+        return accountRepository.findByCounterparty(counterparty).stream()
+                .filter(account -> account.getBalance().compareTo(BigDecimal.ZERO) > 0)
+                .sorted(Comparator.comparing(AbstractEntity::getLastModifiedAt).reversed())
+                .toList();
     }
 
     @Transactional
     public void editApi(UUID id, AccountRequest request) {
         AccountEntity account = accountRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        ExceptionUtils.requireEqualsApi(account.getCurrency(), request.getCurrency(), "currency");
         accountMapper.editEntity(account, request);
         auditService.saveChanges(account);
     }

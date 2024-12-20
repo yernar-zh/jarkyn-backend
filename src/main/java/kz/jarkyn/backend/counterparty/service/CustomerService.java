@@ -2,22 +2,28 @@
 package kz.jarkyn.backend.counterparty.service;
 
 
+import jakarta.persistence.Tuple;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.counterparty.model.Currency;
 import kz.jarkyn.backend.counterparty.model.CustomerEntity;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerListResponse;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerRequest;
 import kz.jarkyn.backend.counterparty.model.dto.CustomerResponse;
 import kz.jarkyn.backend.counterparty.repository.CustomerRepository;
 import kz.jarkyn.backend.counterparty.mapper.CustomerMapper;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CustomerService {
@@ -51,7 +57,19 @@ public class CustomerService {
     public PageResponse<CustomerListResponse> findApiByFilter(QueryParams queryParams) {
         Search<CustomerListResponse> search = searchFactory.createListSearch(
                 CustomerListResponse.class, List.of("name", "phoneNumber"),
-                customerRepository::findAllResponse);
+                () -> customerRepository.findAll().stream().map(customer -> {
+                    Pair<BigDecimal, Currency> account = accountService.findByCounterparty(customer)
+                            .stream().findFirst()
+                            .map(o -> Pair.of(o.getBalance(), o.getCurrency()))
+                            .orElse(Pair.of(BigDecimal.ZERO, Currency.KZT));
+                    Tuple results = customerRepository.findSaleInfo(customer);
+                    return customerMapper.toResponse(customer, account.getFirst(), account.getSecond(),
+                            results.get("firstSaleMoment", LocalDateTime.class),
+                            results.get("lastSaleMoment", LocalDateTime.class),
+                            results.get("totalSaleCount", Long.class).intValue(),
+                            results.get("totalSaleAmount", BigDecimal.class)
+                    );
+                }).toList());
         return search.getResult(queryParams);
     }
 
@@ -59,7 +77,6 @@ public class CustomerService {
     public UUID createApi(CustomerRequest request) {
         CustomerEntity customer = customerRepository.save(customerMapper.toEntity(request));
         auditService.saveChanges(customer);
-        accountService.createForCustomer(customer);
         return customer.getId();
     }
 

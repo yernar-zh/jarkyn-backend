@@ -25,6 +25,7 @@ public class DocumentEntity extends AbstractEntity {
     private BigDecimal amount;
     private String comment;
     private Boolean deleted;
+    private Boolean commited;
 
     public WarehouseEntity getWarehouse() {
         return warehouse;
@@ -80,5 +81,13 @@ public class DocumentEntity extends AbstractEntity {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Boolean getCommited() {
+        return commited;
+    }
+
+    public void setCommited(Boolean commited) {
+        this.commited = commited;
     }
 }

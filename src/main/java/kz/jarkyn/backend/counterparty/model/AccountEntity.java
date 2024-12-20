@@ -1,10 +1,7 @@
 package kz.jarkyn.backend.counterparty.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 
 import java.math.BigDecimal;
@@ -13,12 +10,25 @@ import java.math.BigDecimal;
 @Table(name = "account")
 public class AccountEntity extends AbstractEntity {
     @ManyToOne
+    @JoinColumn(name = "organization_id")
+    private OrganizationEntity organization;
+    @ManyToOne
     @JoinColumn(name = "counterparty_id")
     private CounterpartyEntity counterparty;
     private String name;
-    private BigDecimal balance;
     private String bank;
     private String giro;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+    private BigDecimal balance;
+
+    public OrganizationEntity getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(OrganizationEntity organization) {
+        this.organization = organization;
+    }
 
     public CounterpartyEntity getCounterparty() {
         return counterparty;
@@ -36,14 +46,6 @@ public class AccountEntity extends AbstractEntity {
         this.name = name;
     }
 
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
     public String getBank() {
         return bank;
     }
@@ -58,5 +60,21 @@ public class AccountEntity extends AbstractEntity {
 
     public void setGiro(String giro) {
         this.giro = giro;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }
