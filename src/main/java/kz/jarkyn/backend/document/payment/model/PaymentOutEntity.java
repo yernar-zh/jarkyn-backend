@@ -15,8 +15,6 @@ public class PaymentOutEntity extends DocumentEntity {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private AccountEntity account;
-    @JoinColumn(name = "exchange_rate")
-    private BigDecimal exchangeRate;
 
     public AccountEntity getAccount() {
         return account;
@@ -24,13 +22,5 @@ public class PaymentOutEntity extends DocumentEntity {
 
     public void setAccount(AccountEntity account) {
         this.account = account;
-    }
-
-    public BigDecimal getExchangeRate() {
-        return exchangeRate;
-    }
-
-    public void setExchangeRate(BigDecimal exchangeRate) {
-        this.exchangeRate = exchangeRate;
     }
 }

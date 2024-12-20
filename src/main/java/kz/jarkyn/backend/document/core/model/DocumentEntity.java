@@ -4,6 +4,7 @@ package kz.jarkyn.backend.document.core.model;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.counterparty.model.CounterpartyEntity;
+import kz.jarkyn.backend.counterparty.model.Currency;
 import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 
 
@@ -22,6 +23,9 @@ public class DocumentEntity extends AbstractEntity {
     private CounterpartyEntity counterparty;
     private String name;
     private LocalDateTime moment;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+    private BigDecimal exchangeRate;
     private BigDecimal amount;
     private String comment;
     private Boolean deleted;
@@ -65,6 +69,22 @@ public class DocumentEntity extends AbstractEntity {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getExchangeRate() {
+        return exchangeRate;
+    }
+
+    public void setExchangeRate(BigDecimal exchangeRate) {
+        this.exchangeRate = exchangeRate;
     }
 
     public String getComment() {

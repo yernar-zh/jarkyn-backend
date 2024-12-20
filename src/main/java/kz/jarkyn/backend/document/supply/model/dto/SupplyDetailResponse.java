@@ -14,7 +14,6 @@ public interface SupplyDetailResponse extends DocumentResponse {
     IdNamedDto getWarehouse();
     IdNamedDto getCounterparty();
     String getComment();
-    Integer getExchangeRate();
     List<ItemResponse> getItems();
     List<PaidDocumentResponse> getOutPaidDocuments();
 }

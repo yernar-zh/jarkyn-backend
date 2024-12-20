@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Table(name = "paid_document")
 public class PaidDocumentEntity extends AbstractEntity {
     @ManyToOne
-    @JoinColumn(name = "payment")
+    @JoinColumn(name = "payment_id")
     private DocumentEntity payment;
 
     @ManyToOne

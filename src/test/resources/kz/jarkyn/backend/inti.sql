@@ -103,44 +103,51 @@ VALUES ('4d4bc769-df3f-4e25-9f23-d01083bdb056', 'bf6f2ba4-f994-44c1-839f-36a75f0
         50, 550);
 
 ------------------- Supply ----------------------
-INSERT INTO document (id, warehouse_id, counterparty_id, name, moment, amount, comment, deleted, commited)
+INSERT INTO document (id, warehouse_id, counterparty_id, name, moment,
+                      currency, exchange_rate, amount, comment, deleted, commited)
 VALUES ('17c1285b-6514-45d5-88a2-3b9f673dc5e3', '523961a7-696d-4779-8bb0-fd327feaecf3',
         '94fadc9a-83bb-4639-be07-f825ab9eb40e', 'SP-00001', '2024-12-07 21:47',
-        710, '', false, false);
-INSERT INTO supply (id, exchange_rate)
-VALUES ('17c1285b-6514-45d5-88a2-3b9f673dc5e3', 68);
+        'CNY', 68, 710, '', false, false);
+INSERT INTO supply (id)
+VALUES ('17c1285b-6514-45d5-88a2-3b9f673dc5e3');
 INSERT INTO item (id, document_id, good_id, quantity, price, position)
 VALUES ('0098b2bc-da73-4451-bdb5-35f42f756f10', '17c1285b-6514-45d5-88a2-3b9f673dc5e3',
         '7f316872-1da3-44c8-9293-0fddda859435', 50, 6.2, 0),
        ('986378a0-271f-4293-96db-218f608599cd', '17c1285b-6514-45d5-88a2-3b9f673dc5e3',
         'bf6f2ba4-f994-44c1-839f-36a75f07242e', 100, 4, 1);
--- Supply PaymentOut
-INSERT INTO document (id, warehouse_id, counterparty_id, name, moment, amount, comment, deleted, commited)
+-- Supply supplier payment
+INSERT INTO document (id, warehouse_id, counterparty_id, name, moment,
+                      currency, exchange_rate, amount, comment, deleted, commited)
 VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', null,
         '94fadc9a-83bb-4639-be07-f825ab9eb40e', 'PO-00001', '2024-12-07 22:47',
-        48280, '', false, false),
-       ('74156916-47de-4ab5-a1d0-5767f778412d', null,
-        null, 'PO-00002', '2024-12-07 22:47',
-        48280, '', false, true);
+        'CNY', 68, 710, '', false, false);
 INSERT INTO payment_out (id, account_id)
-VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', '6057082b-041b-47b7-ba31-9fa693eb2a21');
-
-
-INSERT INTO turnover (id, document_id, good_id, moment, quantity, remain, cost_price)
-VALUES ('ac676a5b-eaf4-492c-848d-dc1024f19714', '17c1285b-6514-45d5-88a2-3b9f673dc5e3',
-        '7f316872-1da3-44c8-9293-0fddda859435', '2024-12-07 21:47',
-        50, 0, 201.2);
+VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', 'c8190dcc-1cbe-4df6-a582-0f85e9850335');
+INSERT INTO paid_document (id, payment_id, document_id, amount)
+VALUES ('538c3271-7398-4fab-ad05-0a886188de11', '5c799431-3bc3-400f-b9a3-209f27b935a0',
+        '17c1285b-6514-45d5-88a2-3b9f673dc5e3', 710);
+-- Supply supplier payment
+INSERT INTO document (id, warehouse_id, counterparty_id, name, moment,
+                      currency, exchange_rate, amount, comment, deleted, commited)
+VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', null,
+        null, 'PO-00002', '2024-12-07 23:47',
+        'USD', 525, 20, '', false, false);
+INSERT INTO payment_out (id, account_id)
+VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', '8d1ed49a-6964-4a3e-bc83-8c22601e70f8');
+INSERT INTO paid_document (id, payment_id, document_id, amount)
+VALUES ('e70efb3f-9124-4ef9-9b7e-7bc24385710f', 'fa81596d-a236-4256-8686-7f7f3be85ae4',
+        '17c1285b-6514-45d5-88a2-3b9f673dc5e3', 20);
 
 
 -- Sale
-INSERT INTO document (id, warehouse_id, counterparty_id, name, moment, amount, comment, deleted)
-VALUES ('9d56c02e-81e5-47a6-ab0a-fbeca21293af', '523961a7-696d-4779-8bb0-fd327feaecf3',
-        '1d468c04-6360-43e5-9d51-7771e9d9dcff', 'SL-00001', '2024-12-03 17:28',
-        63800, '', false);
-INSERT INTO sale (id, shipment_moment, state)
-VALUES ('9d56c02e-81e5-47a6-ab0a-fbeca21293af', null, 'NEW');
-INSERT INTO item (id, document_id, good_id, quantity, price, position)
-VALUES ('2c7f1951-4ddb-4125-a52b-2183e013e65f', '9d56c02e-81e5-47a6-ab0a-fbeca21293af',
-        '7f316872-1da3-44c8-9293-0fddda859435', 10, 880, 0),
-       ('49dfee7e-1683-4a53-92f2-bd65be5b045f', '9d56c02e-81e5-47a6-ab0a-fbeca21293af',
-        'bf6f2ba4-f994-44c1-839f-36a75f07242e', 100, 550, 1);
+-- INSERT INTO document (id, warehouse_id, counterparty_id, name, moment, amount, comment, deleted)
+-- VALUES ('9d56c02e-81e5-47a6-ab0a-fbeca21293af', '523961a7-696d-4779-8bb0-fd327feaecf3',
+--         '1d468c04-6360-43e5-9d51-7771e9d9dcff', 'SL-00001', '2024-12-03 17:28',
+--         63800, '', false);
+-- INSERT INTO sale (id, shipment_moment, state)
+-- VALUES ('9d56c02e-81e5-47a6-ab0a-fbeca21293af', null, 'NEW');
+-- INSERT INTO item (id, document_id, good_id, quantity, price, position)
+-- VALUES ('2c7f1951-4ddb-4125-a52b-2183e013e65f', '9d56c02e-81e5-47a6-ab0a-fbeca21293af',
+--         '7f316872-1da3-44c8-9293-0fddda859435', 10, 880, 0),
+--        ('49dfee7e-1683-4a53-92f2-bd65be5b045f', '9d56c02e-81e5-47a6-ab0a-fbeca21293af',
+--         'bf6f2ba4-f994-44c1-839f-36a75f07242e', 100, 550, 1);

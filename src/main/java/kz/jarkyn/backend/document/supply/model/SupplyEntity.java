@@ -9,13 +9,4 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 @Table(name = "supply")
 @PrimaryKeyJoinColumn(name = AbstractEntity_.ID)
 public class SupplyEntity extends DocumentEntity {
-    private Integer exchangeRate;
-
-    public Integer getExchangeRate() {
-        return exchangeRate;
-    }
-
-    public void setExchangeRate(Integer exchangeRate) {
-        this.exchangeRate = exchangeRate;
-    }
 }

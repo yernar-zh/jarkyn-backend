@@ -86,6 +86,8 @@ CREATE TABLE document
     counterparty_id  UUID,
     name             VARCHAR(255),
     moment           TIMESTAMP WITHOUT TIME ZONE,
+    currency         VARCHAR(255),
+    exchange_rate    DECIMAL,
     amount           DECIMAL,
     comment          VARCHAR(255),
     deleted          BOOLEAN,
@@ -159,7 +161,7 @@ CREATE TABLE paid_document
     id               UUID NOT NULL,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    payment          UUID,
+    payment_id       UUID,
     document_id      UUID,
     amount           DECIMAL,
     CONSTRAINT pk_paid_document PRIMARY KEY (id)
@@ -174,9 +176,8 @@ CREATE TABLE payment_in
 
 CREATE TABLE payment_out
 (
-    id            UUID NOT NULL,
-    account_id    UUID,
-    exchange_rate DECIMAL,
+    id         UUID NOT NULL,
+    account_id UUID,
     CONSTRAINT pk_payment_out PRIMARY KEY (id)
 );
 
@@ -207,8 +208,7 @@ CREATE TABLE supplier
 
 CREATE TABLE supply
 (
-    id            UUID NOT NULL,
-    exchange_rate INTEGER,
+    id UUID NOT NULL,
     CONSTRAINT pk_supply PRIMARY KEY (id)
 );
 
@@ -300,7 +300,7 @@ ALTER TABLE paid_document
     ADD CONSTRAINT FK_PAID_DOCUMENT_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
 
 ALTER TABLE paid_document
-    ADD CONSTRAINT FK_PAID_DOCUMENT_ON_PAYMENT FOREIGN KEY (payment) REFERENCES document (id);
+    ADD CONSTRAINT FK_PAID_DOCUMENT_ON_PAYMENT FOREIGN KEY (payment_id) REFERENCES document (id);
 
 ALTER TABLE payment_in
     ADD CONSTRAINT FK_PAYMENT_IN_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
