@@ -27,15 +27,20 @@ public interface Api {
         String PATH = Api.PATH + "/account";
     }
 
+    interface Supplier {
+        String PATH = Api.PATH + "/supplier";
+    }
+
     interface Customer {
         String PATH = Api.PATH + "/customer";
     }
 
-    interface Sale {
-        String PATH = Api.PATH + "/sale";
-    }
-
     interface Supply {
         String PATH = Api.PATH + "/supply";
+    }
+
+    interface Sale {
+        String PATH = Api.PATH + "/sale";
+
     }
 }
