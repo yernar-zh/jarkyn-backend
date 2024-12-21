@@ -20,13 +20,16 @@ VALUES ('523961a7-696d-4779-8bb0-fd327feaecf3', 'Кенжина'),
 
 
 ------------------- Supplier --------------------
+-- Урумчи Кытай
 INSERT INTO counterparty (id, name)
 VALUES ('94fadc9a-83bb-4639-be07-f825ab9eb40e', 'Урумчи Кытай');
 INSERT INTO supplier (id)
 VALUES ('94fadc9a-83bb-4639-be07-f825ab9eb40e');
-INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, currency, balance)
-VALUES ('f3b5e981-d9d4-4a50-ac68-30eb8629c67a', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
-        '94fadc9a-83bb-4639-be07-f825ab9eb40e', null, null, null, 'CNY', 0);
+-- Шанхай Кытай
+INSERT INTO counterparty (id, name)
+VALUES ('72b5a4b5-3133-4076-ab5f-84262ebcae65', 'Шанхай Кытай');
+INSERT INTO supplier (id)
+VALUES ('72b5a4b5-3133-4076-ab5f-84262ebcae65');
 
 -------------------- Customer -------------------
 -- Заманбек Жетысай
@@ -34,17 +37,11 @@ INSERT INTO counterparty (id, name)
 VALUES ('1d468c04-6360-43e5-9d51-7771e9d9dcff', 'Заманбек Жетысай');
 INSERT INTO customer (id, phone_number, shipping_address, discount)
 VALUES ('1d468c04-6360-43e5-9d51-7771e9d9dcff', '+7(707)145-1475', '', 3);
-INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, currency, balance)
-VALUES ('9052abdd-7767-4961-a17b-035993f7570b', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
-        '1d468c04-6360-43e5-9d51-7771e9d9dcff', null, null, null, 'KZT', 0);
 -- Оркен Алматы
 INSERT INTO counterparty (id, name)
 VALUES ('43375a1e-1c91-46e5-9a10-a14200427fe9', 'Оркен Алматы');
 INSERT INTO customer (id, phone_number, shipping_address, discount)
 VALUES ('43375a1e-1c91-46e5-9a10-a14200427fe9', '+7(775)457-4117', '', 4);
-INSERT INTO account (id, organization_id, counterparty_id, name, balance, bank, giro)
-VALUES ('054935c1-1369-4aa1-9c55-6f76e68a0dfb', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
-        '43375a1e-1c91-46e5-9a10-a14200427fe9', null, 0, null, null);
 
 --------------------- Group ---------------------
 INSERT INTO groups (ID, NAME, POSITION, PARENT_ID)
