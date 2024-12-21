@@ -15,12 +15,6 @@ public interface PaidDocumentRepository extends JpaRepository<PaidDocumentEntity
     List<PaidDocumentEntity> findByPayment(DocumentEntity payment);
 
     @Query("SELECT pd FROM PaidDocumentEntity pd " +
-           "WHERE pd.document = :document " +
-           "AND TYPE(pd.payment) = PaymentInEntity")
-    List<PaidDocumentEntity> findInByDocument(@Param("document") DocumentEntity document);
-
-    @Query("SELECT pd FROM PaidDocumentEntity pd " +
-           "WHERE pd.document = :document " +
-           "AND TYPE(pd.payment) = PaymentOutEntity")
-    List<PaidDocumentEntity> findOutByDocument(@Param("document") DocumentEntity document);
+           "WHERE pd.document = :document ")
+    List<PaidDocumentEntity> findByDocument(@Param("document") DocumentEntity document);
 }

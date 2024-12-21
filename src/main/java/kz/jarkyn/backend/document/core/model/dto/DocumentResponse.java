@@ -15,4 +15,6 @@ public interface DocumentResponse extends IdNamedDto {
     BigDecimal getExchangeRate();
     BigDecimal getAmount();
     Boolean getDeleted();
+    Boolean getCommited();
+    String getComment();
 }

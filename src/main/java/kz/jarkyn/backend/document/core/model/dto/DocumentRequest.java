@@ -1,0 +1,25 @@
+
+package kz.jarkyn.backend.document.core.model.dto;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.annotation.Nullable;
+import kz.jarkyn.backend.core.model.dto.IdDto;
+import kz.jarkyn.backend.core.model.dto.NamedDto;
+import kz.jarkyn.backend.counterparty.model.Currency;
+import kz.jarkyn.backend.document.supply.model.dto.ImmutableSupplyRequest;
+import org.immutables.value.Value;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Value.Immutable
+@JsonDeserialize(builder = ImmutableDocumentRequest.Builder.class)
+public interface DocumentRequest extends NamedDto {
+    @Nullable String getName();
+    LocalDateTime getMoment();
+    Currency getCurrency();
+    BigDecimal getExchangeRate();
+    BigDecimal getAmount();
+    String getComment();
+}

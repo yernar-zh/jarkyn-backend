@@ -21,11 +21,7 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public String findNextName(Class<? extends DocumentEntity> type) {
-        String namePrefix = switch (type.getSimpleName()) {
-            case "SaleEntity" -> "SL";
-            case "PaymentInEntity" -> "PI";
-            default -> throw new RuntimeException("unsupported document : " + type.getSimpleName());
-        };
+        String namePrefix = getNamePrefix(type);
         String lastName = documentRepository.getLastNameByNamePrefix(namePrefix);
         if (lastName == null) {
             return namePrefix + "-00001";
@@ -42,13 +38,7 @@ public class DocumentService {
         if (document.getName() == null) {
             throw new RuntimeException("document name is null");
         }
-        String namePrefix = switch (document.getClass().getSimpleName()) {
-            case "SupplyEntity" -> "SP";
-            case "SaleEntity" -> "SL";
-            case "PaymentInEntity" -> "PI";
-            case "PaymentOutEntity" -> "PO";
-            default -> throw new RuntimeException("unsupported document : " + document.getClass().getSimpleName());
-        };
+        String namePrefix = getNamePrefix(document.getClass());
         String name = document.getName();
         Matcher matcher = Pattern.compile(namePrefix + "-(\\d{5})").matcher(name);
         if (!matcher.find()) {
@@ -56,5 +46,14 @@ public class DocumentService {
         }
     }
 
+    private String getNamePrefix(Class<? extends DocumentEntity> type) {
+        return switch (type.getSimpleName()) {
+            case "SupplyEntity" -> "SP";
+            case "SaleEntity" -> "SL";
+            case "PaymentInEntity" -> "PI";
+            case "PaymentOutEntity" -> "PO";
+            default -> throw new RuntimeException("unsupported document : " + type.getSimpleName());
+        };
+    }
 
 }

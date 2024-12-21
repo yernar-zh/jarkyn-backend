@@ -33,37 +33,26 @@ public class PaidDocumentService {
     }
 
     @Transactional(readOnly = true)
-    public List<PaidDocumentResponse> findInResponseByDocument(DocumentEntity document) {
-        return paidDocumentMapper.toResponse(paidDocumentRepository.findInByDocument(document));
-    }
-
-    @Transactional(readOnly = true)
-    public List<PaidDocumentResponse> findOutResponseByDocument(DocumentEntity document) {
-        return paidDocumentMapper.toResponse(paidDocumentRepository.findOutByDocument(document));
+    public List<PaidDocumentResponse> findResponseByDocument(DocumentEntity document) {
+        return paidDocumentMapper.toResponse(paidDocumentRepository.findByDocument(document));
     }
 
     @Transactional
     public void saveApi(PaymentInEntity paymentIn, List<PaidDocumentRequest> paidDocumentRequests) {
-        EntityDivider<PaidDocumentEntity, PaidDocumentRequest> divider = new EntityDivider<>(
-                paidDocumentRepository.findInByDocument(paymentIn), paidDocumentRequests);
-        for (EntityDivider<PaidDocumentEntity, PaidDocumentRequest>.Entry entry : divider.newReceived()) {
-            PaidDocumentEntity paidDocument = paidDocumentMapper.toEntity(entry.getReceived());
-            paidDocument.setDocument(paymentIn);
-            paidDocumentRepository.save(paidDocument);
-        }
-        for (EntityDivider<PaidDocumentEntity, PaidDocumentRequest>.Entry entry : divider.edited()) {
-            paidDocumentMapper.editEntity(entry.getCurrent(), entry.getReceived());
-        }
-        paidDocumentRepository.deleteAll(divider.skippedCurrent());
+        save(paymentIn, paidDocumentRequests);
     }
 
     @Transactional
     public void saveApi(PaymentOutEntity paymentOut, List<PaidDocumentRequest> paidDocumentRequests) {
+        save(paymentOut, paidDocumentRequests);
+    }
+
+    private void save(DocumentEntity payment, List<PaidDocumentRequest> paidDocumentRequests) {
         EntityDivider<PaidDocumentEntity, PaidDocumentRequest> divider = new EntityDivider<>(
-                paidDocumentRepository.findOutByDocument(paymentOut), paidDocumentRequests);
+                paidDocumentRepository.findByDocument(payment), paidDocumentRequests);
         for (EntityDivider<PaidDocumentEntity, PaidDocumentRequest>.Entry entry : divider.newReceived()) {
             PaidDocumentEntity paidDocument = paidDocumentMapper.toEntity(entry.getReceived());
-            paidDocument.setDocument(paymentOut);
+            paidDocument.setDocument(payment);
             paidDocumentRepository.save(paidDocument);
         }
         for (EntityDivider<PaidDocumentEntity, PaidDocumentRequest>.Entry entry : divider.edited()) {

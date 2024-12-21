@@ -50,9 +50,8 @@ public class SaleService {
     public SaleDetailResponse findApiById(UUID id) {
         SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<ItemResponse> items = itemService.findApiByDocument(sale);
-        List<PaidDocumentResponse> inPaidDocuments = paidDocumentService.findInResponseByDocument(sale);
-        List<PaidDocumentResponse> outPaidDocuments = paidDocumentService.findOutResponseByDocument(sale);
-        return saleMapper.toDetailResponse(sale, items, inPaidDocuments);
+        List<PaidDocumentResponse> paidDocuments = paidDocumentService.findResponseByDocument(sale);
+        return saleMapper.toDetailResponse(sale, items, paidDocuments);
     }
 
     @Transactional(readOnly = true)

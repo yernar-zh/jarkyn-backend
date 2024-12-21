@@ -10,10 +10,9 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-public interface SupplyDetailResponse extends DocumentResponse {
+public interface SupplyResponse extends DocumentResponse {
     IdNamedDto getWarehouse();
     IdNamedDto getCounterparty();
-    String getComment();
     List<ItemResponse> getItems();
-    List<PaidDocumentResponse> getOutPaidDocuments();
+    List<PaidDocumentResponse> getPaidDocuments();
 }

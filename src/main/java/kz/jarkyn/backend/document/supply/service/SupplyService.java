@@ -10,7 +10,7 @@ import kz.jarkyn.backend.document.core.service.ItemService;
 import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
 import kz.jarkyn.backend.document.payment.service.PaidDocumentService;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
-import kz.jarkyn.backend.document.supply.model.dto.SupplyDetailResponse;
+import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
@@ -46,11 +46,11 @@ public class SupplyService {
     }
 
     @Transactional(readOnly = true)
-    public SupplyDetailResponse findApiById(UUID id) {
+    public SupplyResponse findApiById(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<ItemResponse> items = itemService.findApiByDocument(supply);
-        List<PaidDocumentResponse> outPaidDocuments = paidDocumentService.findOutResponseByDocument(supply);
-        return supplyMapper.toDetailResponse(supply, items, outPaidDocuments);
+        List<PaidDocumentResponse> paidDocuments = paidDocumentService.findResponseByDocument(supply);
+        return supplyMapper.toDetailResponse(supply, items, paidDocuments);
     }
 
     @Transactional
@@ -60,6 +60,8 @@ public class SupplyService {
             supply.setName(documentService.findNextName(SupplyEntity.class));
         }
         documentService.validateName(supply);
+        supply.setDeleted(false);
+        supply.setCommited(false);
         supplyRepository.save(supply);
         auditService.saveChanges(supply);
         itemService.saveApi(supply, request.getItems());
