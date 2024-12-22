@@ -2,15 +2,23 @@
 package kz.jarkyn.backend.counterparty.service;
 
 
+import jakarta.persistence.criteria.JoinType;
 import kz.jarkyn.backend.audit.service.AuditService;
-import kz.jarkyn.backend.core.exception.DataValidationException;
+import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.CriteriaAttributes;
+import kz.jarkyn.backend.core.search.Search;
+import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.counterparty.model.*;
 import kz.jarkyn.backend.counterparty.model.dto.AccountRequest;
 import kz.jarkyn.backend.counterparty.model.dto.AccountResponse;
 import kz.jarkyn.backend.counterparty.repository.AccountRepository;
 import kz.jarkyn.backend.counterparty.mapper.AccountMapper;
+import kz.jarkyn.backend.good.model.AttributeEntity;
+import kz.jarkyn.backend.good.model.SellingPriceEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,44 +27,51 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-import static kz.jarkyn.backend.core.exception.ExceptionUtils.ENTITY_NOT_FOUND;
-
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
     private final AuditService auditService;
-    private final OrganizationService organizationService;
     private final AccountMapper accountMapper;
+    private final SearchFactory searchFactory;
 
-    public AccountService(AccountRepository accountRepository, AuditService auditService, OrganizationService organizationService, AccountMapper accountMapper) {
+    public AccountService(
+            AccountRepository accountRepository,
+            AuditService auditService,
+            AccountMapper accountMapper, SearchFactory searchFactory) {
         this.accountRepository = accountRepository;
         this.auditService = auditService;
-        this.organizationService = organizationService;
         this.accountMapper = accountMapper;
+        this.searchFactory = searchFactory;
     }
 
     @Transactional(readOnly = true)
     public AccountResponse findApiById(UUID id) {
-        OrganizationEntity curOrganization = organizationService.getCurrent();
         AccountEntity account = accountRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (!account.getCounterparty().equals(curOrganization)) {
-            throw new DataValidationException(ENTITY_NOT_FOUND, "entity not found");
-        }
         return accountMapper.toResponse(account);
     }
 
     @Transactional(readOnly = true)
-    public List<AccountResponse> findApiAll() {
-        return null;
-    }
-
-    @Transactional
-    public UUID createApi(AccountRequest request) {
-        AccountEntity account = accountRepository.save(accountMapper.toEntity(request));
-        account.setCounterparty(null);
-        account.setBalance(BigDecimal.ZERO);
-        auditService.saveChanges(account);
-        return account.getId();
+    public PageResponse<AccountResponse> findApiByFilter(QueryParams queryParams) {
+        CriteriaAttributes<AccountEntity> attributes = CriteriaAttributes.<AccountEntity>builder()
+                .add("id", (root, query, cb) -> root.get(AccountEntity_.id))
+                .add("name", (root, query, cb) -> root.get(AccountEntity_.name))
+                .add("organization.id", (root, query, cb) -> root
+                        .get(AccountEntity_.organization).get(OrganizationEntity_.id))
+                .add("organization.name", (root, query, cb) -> root
+                        .get(AccountEntity_.organization).get(OrganizationEntity_.name))
+                .add("counterparty.id", (root, query, cb) -> root
+                        .join(AccountEntity_.counterparty, JoinType.LEFT).get(CounterpartyEntity_.id))
+                .add("counterparty.name", (root, query, cb) -> root
+                        .join(AccountEntity_.counterparty, JoinType.LEFT).get(CounterpartyEntity_.name))
+                .add("bank", (root, query, cb) -> root.get(AccountEntity_.bank))
+                .add("giro", (root, query, cb) -> root.get(AccountEntity_.giro))
+                .add("currency", (root, query, cb) -> root.get(AccountEntity_.currency))
+                .add("balance", (root, query, cb) -> root.get(AccountEntity_.balance))
+                .build();
+        Search<AccountResponse> search = searchFactory.createCriteriaSearch(
+                AccountResponse.class, List.of("name"),
+                AccountEntity.class, attributes);
+        return search.getResult(queryParams);
     }
 
     @Transactional
@@ -84,8 +99,20 @@ public class AccountService {
     }
 
     @Transactional
+    public UUID createApi(AccountRequest request) {
+        AccountEntity account = accountRepository.save(accountMapper.toEntity(request));
+        account.setCounterparty(null);
+        account.setBalance(BigDecimal.ZERO);
+        auditService.saveChanges(account);
+        return account.getId();
+    }
+
+    @Transactional
     public void editApi(UUID id, AccountRequest request) {
         AccountEntity account = accountRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (account.getCounterparty() != null) {
+            throw new ApiValidationException("cant update counterparty account");
+        }
         ExceptionUtils.requireEqualsApi(account.getCurrency(), request.getCurrency(), "currency");
         accountMapper.editEntity(account, request);
         auditService.saveChanges(account);

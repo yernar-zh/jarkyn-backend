@@ -35,9 +35,13 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
                 .andExpect(jsonPath("$.name").value("Ернар Ж."))
+                .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
+                .andExpect(jsonPath("$.counterparty").isEmpty())
                 .andExpect(jsonPath("$.bank").value("Kaspi Bank"))
                 .andExpect(jsonPath("$.giro").value("+7(775)216-6661"))
-                .andExpect(jsonPath("$.currency").value("KZT"));
+                .andExpect(jsonPath("$.currency").value("KZT"))
+                .andExpect(jsonPath("$.balance").value(0));
     }
 
     @Test
@@ -50,27 +54,45 @@ class AccountControllerTest {
 
     @Test
     @DirtiesContext
-    public void testDetail_notFoundCustomerAccount() throws Exception {
-        mockMvc.perform(get(Api.Account.PATH + "/054935c1-1369-4aa1-9c55-6f76e68a0dfb").with(TestUtils.auth()))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
-    }
-
-
-    @Test
-    @DirtiesContext
     public void testList_success() throws Exception {
-        mockMvc.perform(get(Api.Account.PATH).with(TestUtils.auth()))
+        mockMvc.perform(get(Api.Account.PATH).with(TestUtils.auth())
+                        .queryParam("counterparty.id[exists]", "false")
+                )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
-                .andExpect(jsonPath("$[0].name").value("Ернар Ж."))
-                .andExpect(jsonPath("$[0].bank").value("Kaspi Bank"))
-                .andExpect(jsonPath("$[0].giro").value("+7(775)216-6661"))
-                .andExpect(jsonPath("$[1].id").value("c8190dcc-1cbe-4df6-a582-0f85e9850335"))
-                .andExpect(jsonPath("$[1].name").value("Жайнагүл Қ."))
-                .andExpect(jsonPath("$[1].bank").value("Kaspi Bank"))
-                .andExpect(jsonPath("$[1].giro").value("+7(702)445-9711"));
+                .andExpect(jsonPath("$.page.first").value(0))
+                .andExpect(jsonPath("$.page.size").value(20))
+                .andExpect(jsonPath("$.page.totalCount").value(3))
+                .andExpect(jsonPath("$.row.length()").value(3))
+                .andExpect(jsonPath("$.row[0].id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
+                .andExpect(jsonPath("$.row[0].name").value("Ернар Ж."))
+                .andExpect(jsonPath("$.row[0].currency").value("KZT"))
+                .andExpect(jsonPath("$.row[0].giro").value("+7(775)216-6661"))
+                .andExpect(jsonPath("$.row[0].balance").value(0))
+                .andExpect(jsonPath("$.row[0].bank").value("Kaspi Bank"))
+                .andExpect(jsonPath("$.row[0].organization.name").value("ИП Жырқын"))
+                .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.row[0].counterparty.name").isEmpty())
+                .andExpect(jsonPath("$.row[0].counterparty.id").isEmpty())
+                .andExpect(jsonPath("$.row[1].id").value("c8190dcc-1cbe-4df6-a582-0f85e9850335"))
+                .andExpect(jsonPath("$.row[1].name").value("Наличный Юань"))
+                .andExpect(jsonPath("$.row[1].currency").value("CNY"))
+                .andExpect(jsonPath("$.row[1].giro").isEmpty())
+                .andExpect(jsonPath("$.row[1].balance").value(0))
+                .andExpect(jsonPath("$.row[1].bank").isEmpty())
+                .andExpect(jsonPath("$.row[1].organization.name").value("ИП Жырқын"))
+                .andExpect(jsonPath("$.row[1].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.row[1].counterparty.name").isEmpty())
+                .andExpect(jsonPath("$.row[1].counterparty.id").isEmpty())
+                .andExpect(jsonPath("$.row[2].id").value("8d1ed49a-6964-4a3e-bc83-8c22601e70f8"))
+                .andExpect(jsonPath("$.row[2].name").value("Наличный Доллар"))
+                .andExpect(jsonPath("$.row[2].currency").value("USD"))
+                .andExpect(jsonPath("$.row[2].giro").isEmpty())
+                .andExpect(jsonPath("$.row[2].balance").value(0))
+                .andExpect(jsonPath("$.row[2].bank").isEmpty())
+                .andExpect(jsonPath("$.row[2].organization.name").value("ИП Жырқын"))
+                .andExpect(jsonPath("$.row[2].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.row[2].counterparty.name").isEmpty())
+                .andExpect(jsonPath("$.row[2].counterparty.id").isEmpty());
     }
 
     @Test
@@ -78,6 +100,9 @@ class AccountControllerTest {
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
+                  "organization": {
+                     "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
+                  },
                   "name": "Ақжол Б.",
                   "bank": "Kaspi Bank",
                   "giro": "+7(747)421-5569",
@@ -92,6 +117,8 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TestUtils.extractId(result)))
                 .andExpect(jsonPath("$.name").value("Ақжол Б."))
+                .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.bank").value("Kaspi Bank"))
                 .andExpect(jsonPath("$.giro").value("+7(747)421-5569"))
                 .andExpect(jsonPath("$.currency").value("KZT"))
@@ -103,9 +130,13 @@ class AccountControllerTest {
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
+                  "organization": {
+                     "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
+                  },
                   "name": "Ернар Ж. 1",
                   "bank": "Kaspi Bank 2",
-                  "giro": "+7(775)216-6662"
+                  "giro": "+7(775)216-6662",
+                  "currency": "KZT"
                 }""";
         mockMvc.perform(put(Api.Account.PATH + "/6057082b-041b-47b7-ba31-9fa693eb2a21")
                         .with(TestUtils.auth()).content(requestData))
@@ -115,7 +146,11 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
                 .andExpect(jsonPath("$.name").value("Ернар Ж. 1"))
+                .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.bank").value("Kaspi Bank 2"))
-                .andExpect(jsonPath("$.giro").value("+7(775)216-6662"));
+                .andExpect(jsonPath("$.giro").value("+7(775)216-6662"))
+                .andExpect(jsonPath("$.currency").value("KZT"))
+                .andExpect(jsonPath("$.balance").value(0));
     }
 }

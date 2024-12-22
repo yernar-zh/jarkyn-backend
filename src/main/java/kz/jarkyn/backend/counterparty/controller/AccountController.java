@@ -1,12 +1,16 @@
 package kz.jarkyn.backend.counterparty.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.counterparty.model.dto.AccountRequest;
 import kz.jarkyn.backend.counterparty.model.dto.AccountResponse;
+import kz.jarkyn.backend.counterparty.model.dto.SupplierListResponse;
 import kz.jarkyn.backend.counterparty.service.AccountService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -26,9 +30,10 @@ public class AccountController {
     }
 
     @GetMapping
-    public List<AccountResponse> list() {
-        return accountService.findApiAll();
+    public PageResponse<AccountResponse> list(@RequestParam Map<String, String> allParams) {
+        return accountService.findApiByFilter(QueryParams.of(allParams));
     }
+
 
     @PostMapping
     public AccountResponse create(@RequestBody AccountRequest request) {

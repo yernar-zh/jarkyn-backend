@@ -10,6 +10,8 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.stock.mode.TurnoverEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
+import org.mapstruct.Named;
+import org.mapstruct.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,8 +39,8 @@ public class EntityMapper {
         return toEntity(api, AccountEntity.class);
     }
 
-    public CounterpartyEntity toCounterpartyEntity(IdDto api) {
-        return toEntity(api, CounterpartyEntity.class);
+    public <T extends CounterpartyEntity> T toCounterpartyEntity(IdDto api) {
+        return (T) toEntity(api, CounterpartyEntity.class);
     }
 
     public WarehouseEntity toWarehouseEntity(IdDto api) {

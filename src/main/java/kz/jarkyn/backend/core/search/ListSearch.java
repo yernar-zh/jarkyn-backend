@@ -1,47 +1,44 @@
 package kz.jarkyn.backend.core.search;
 
+import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.utils.PrefixSearch;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.data.util.Pair;
 
 import java.beans.Introspector;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class ListSearch<R> implements Search<R> {
     private final List<Row> rows;
 
     public ListSearch(Class<R> javaClass, List<String> searchFields, List<R> list) {
         rows = list.stream().map(data -> {
-            Map<String, Set<Object>> fields = getRowValues(javaClass, data).stream()
-                    .collect(Collectors.groupingBy(
-                            Pair::getFirst,
-                            Collectors.mapping(Pair::getSecond, Collectors.toSet())
-                    ));
-            String[] texts = searchFields.stream()
-                    .map(fields::get).filter(Objects::nonNull).flatMap(Set::stream)
+            Map<String, Object> fields = getRowValues(javaClass, data);
+            String[] searchTexts = searchFields.stream()
+                    .map(fields::get).filter(Objects::nonNull)
                     .map(Object::toString).toArray(String[]::new);
-            return new Row(data, new PrefixSearch(texts), fields);
+            return new Row(data, new PrefixSearch(searchTexts), fields);
         }).toList();
     }
 
-    private List<Pair<String, Object>> getRowValues(Class<?> valueClass, Object value) {
+    private Map<String, Object> getRowValues(Class<?> valueClass, Object value) {
         if (value == null) {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
         Function<String, Object> convertor = SearchUtils.getConvertor(valueClass);
         if (convertor != null) {
-            return List.of(Pair.of("", value));
+            return Map.of("", value);
         }
-        List<Pair<String, Object>> result = new ArrayList<>();
+        if (Collection.class.isAssignableFrom(valueClass)) {
+            throw new IllegalArgumentException("Collection type not supported");
+        }
+        Map<String, Object> result = new HashMap<>();
         for (Method method : valueClass.getMethods()) {
             if (!method.getName().startsWith("get")) {
                 throw new RuntimeException(method + " is not a getter");
@@ -54,19 +51,10 @@ public class ListSearch<R> implements Search<R> {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            List<Pair<String, Object>> subValues;
-            if (Collection.class.isAssignableFrom(method.getReturnType())) {
-                ParameterizedType genericType = (ParameterizedType) method.getGenericReturnType();
-                Class<?> itemClass = (Class<?>) genericType.getActualTypeArguments()[0];
-                subValues = ((Collection<?>) methodReturnValue).stream()
-                        .map(itemValue -> getRowValues(itemClass, itemValue))
-                        .flatMap(List::stream).toList();
-            } else {
-                subValues = getRowValues(method.getReturnType(), methodReturnValue);
-            }
-            for (Pair<String, Object> subValue : subValues) {
-                String childName = name + (Strings.isNotBlank(subValue.getFirst()) ? "." + subValue.getFirst() : "");
-                result.add(Pair.of(childName, subValue.getSecond()));
+            Map<String, Object> subValues = getRowValues(method.getReturnType(), methodReturnValue);
+            for (Map.Entry<String, Object> entry : subValues.entrySet()) {
+                String childName = name + (Strings.isNotBlank(entry.getKey()) ? "." + entry.getValue() : "");
+                result.put(childName, entry.getValue());
             }
         }
         return result;
@@ -90,37 +78,44 @@ public class ListSearch<R> implements Search<R> {
                     return false;
                 }
             }
-            for (QueryParams.Filter filter : queryParams.getFilters()) {
-                Set<Object> rowValues = row.getValues().get(filter.getName());
-                if (rowValues == null) {
-                    continue;
+            return queryParams.getFilters().stream().map(filter -> {
+                if (!row.getValues().containsKey(filter.getName())) {
+                    return true;
                 }
-                if (rowValues.isEmpty()) {
+                Object rowValue = row.getValues().get(filter.getName());
+                if (filter.getType().equals(QueryParams.Filter.Type.EXISTS)) {
+                    String value = filter.getValues().getFirst().trim().toLowerCase();
+                    if (value.equals("true")) {
+                        return rowValue != null;
+                    } else if (value.equals("false")) {
+                        return rowValue == null;
+                    } else {
+                        throw new ApiValidationException("[exist] can be only true or false");
+                    }
+                }
+                if (rowValue == null) {
                     return false;
                 }
-                Object firstRowValue = rowValues.iterator().next();
-                Function<String, Object> convertor = SearchUtils.getConvertor(firstRowValue.getClass());
-                Set<Object> filterValues = filter.getValues().stream()
-                        .map(filterValue -> convertor.apply(filterValue)).collect(Collectors.toSet());
-                Object firstFilterValues = filterValues.iterator().next();
-                return switch (filter.getType()) {
-                    case EQUAL_TO -> rowValues.containsAll(filterValues);
-                    case LESS_THEN -> ((Comparable) firstRowValue).compareTo(firstFilterValues) <= 0;
-                    case GREATER_THEN -> ((Comparable) firstRowValue).compareTo(firstFilterValues) >= 0;
-                };
-            }
-            return true;
+                return filter.getValues().stream().distinct()
+                        .map(Objects.requireNonNull(SearchUtils.getConvertor(rowValue.getClass())))
+                        .map(filterValue -> switch (filter.getType()) {
+                            case EQUAL_TO -> rowValue.equals(filterValue);
+                            case LESS_THEN -> ((Comparable) rowValue).compareTo(filterValue) <= 0;
+                            case GREATER_THEN -> ((Comparable) rowValue).compareTo(filterValue) >= 0;
+                            case EXISTS -> throw new IllegalStateException();
+                        }).reduce((b1, b2) -> b1 || b2).orElse(Boolean.TRUE);
+            }).reduce((b1, b2) -> b1 && b2).orElse(Boolean.TRUE);
         };
     }
 
     private Comparator<Row> sort(QueryParams queryParams) {
         return queryParams.getSorts().stream().map(sort -> {
             Comparator<Row> comparator = Comparator.comparing(row -> {
-                Set<Object> rowValues = row.getValues().get(sort.getName());
-                if (rowValues == null || rowValues.isEmpty()) {
+                Object rowValue = row.getValues().get(sort.getName());
+                if (rowValue == null) {
                     return null;
                 }
-                return (Comparable) rowValues.iterator().next();
+                return (Comparable) rowValue;
             });
             return switch (sort.getType()) {
                 case ASC -> comparator;
@@ -132,9 +127,9 @@ public class ListSearch<R> implements Search<R> {
     private class Row {
         private final R data;
         private final PrefixSearch search;
-        private final Map<String, Set<Object>> values;
+        private final Map<String, Object> values;
 
-        public Row(R data, PrefixSearch search, Map<String, Set<Object>> values) {
+        public Row(R data, PrefixSearch search, Map<String, Object> values) {
             this.data = data;
             this.search = search;
             this.values = values;
@@ -148,7 +143,7 @@ public class ListSearch<R> implements Search<R> {
             return search;
         }
 
-        public Map<String, Set<Object>> getValues() {
+        public Map<String, Object> getValues() {
             return values;
         }
     }

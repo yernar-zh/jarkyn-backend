@@ -9,6 +9,7 @@ public class QueryParams {
     private static final List<Pair<String, Filter.Type>> FILTER_SUFFIX = new ArrayList<>() {{
         add(Pair.of("[max]", Filter.Type.LESS_THEN));
         add(Pair.of("[min]", Filter.Type.GREATER_THEN));
+        add(Pair.of("[exists]", Filter.Type.EXISTS));
         add(Pair.of("", Filter.Type.EQUAL_TO));
     }};
     private static final List<Pair<String, Sort.Type>> SORT_PREFIX = new ArrayList<>() {{
@@ -107,7 +108,7 @@ public class QueryParams {
             return type;
         }
 
-        public enum Type {EQUAL_TO, GREATER_THEN, LESS_THEN}
+        public enum Type {EQUAL_TO, GREATER_THEN, LESS_THEN, EXISTS}
     }
 
     public static class Sort {

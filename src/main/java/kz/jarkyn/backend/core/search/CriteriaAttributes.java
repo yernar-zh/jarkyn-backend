@@ -26,8 +26,8 @@ public class CriteriaAttributes<E> {
             this.attributes = new HashMap<>();
         }
 
-        public Builder<E> add(String id, CriteriaAttribute<E> attribute) {
-            attributes.put(id, attribute);
+        public Builder<E> add(String fieldName, CriteriaAttribute<E> attribute) {
+            attributes.put(fieldName, attribute);
             return this;
         }
 

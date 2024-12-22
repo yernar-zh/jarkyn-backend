@@ -3,6 +3,8 @@ package kz.jarkyn.backend.core.search;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
+import kz.jarkyn.backend.core.exception.ApiValidationException;
+import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
@@ -14,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,7 +59,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
                 .getResultList();
 
         List<R> results = tupleList.stream()
-                .map(tuple -> createProxy(tuple, expressions.keySet(), responseClass))
+                .map(tuple -> (R) createProxy("", tuple, responseClass))
                 .toList();
 
         CriteriaQuery<Integer> countQuery = cb.createQuery(Integer.class);
@@ -75,18 +76,19 @@ public class CriteriaSearch<R, E> implements Search<R> {
                 .of(queryParams.getPageFirst(), queryParams.getPageSize(), count));
     }
 
-    private R createProxy(Tuple tuple, Set<String> attributeKeys, Class<R> resultClass) {
+    private Object createProxy(String prefix, Tuple tuple, Class<?> resultClass) {
         InvocationHandler handler = (proxy, method, args) -> {
             String methodName = method.getName();
             if (methodName.startsWith("get") && methodName.length() > 3) {
                 String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-                if (attributeKeys.contains(fieldName)) {
-                    return tuple.get(fieldName);
+                if (SearchUtils.getConvertor(method.getReturnType()) == null) {
+                    return createProxy(fieldName + ".", tuple, method.getReturnType());
                 }
+                return tuple.get(prefix + fieldName);
             }
             throw new UnsupportedOperationException("Method not supported: " + methodName);
         };
-        return (R) Proxy.newProxyInstance(
+        return Proxy.newProxyInstance(
                 resultClass.getClassLoader(),
                 new Class<?>[]{resultClass},
                 handler
@@ -100,21 +102,26 @@ public class CriteriaSearch<R, E> implements Search<R> {
             if (expression == null) {
                 return cb.conjunction();
             }
-            Function<String, Object> convertor = SearchUtils.getConvertor(expression.getJavaType());
-            Set<Object> filterValues = filter.getValues().stream()
-                    .map(filterValue -> convertor.apply(filterValue)).collect(Collectors.toSet());
-            Object firstFilterValues = filterValues.iterator().next();
-            return switch (filter.getType()) {
-                case EQUAL_TO -> {
-                    CriteriaBuilder.In<Object> in = cb.in(expression);
-                    filterValues.forEach(in::value);
-                    yield in;
+            if (filter.getType().equals(QueryParams.Filter.Type.EXISTS)) {
+                String value = filter.getValues().getFirst().trim().toLowerCase();
+                if (value.equals("true")) {
+                    return cb.isNotNull(expression);
+                } else if (value.equals("false")) {
+                    return cb.isNull(expression);
+                } else {
+                    throw new ApiValidationException("[exist] can be only true or false");
                 }
-                case LESS_THEN -> cb.lessThanOrEqualTo((Expression<Comparable>) expression,
-                        (Comparable) firstFilterValues);
-                case GREATER_THEN -> cb.greaterThanOrEqualTo((Expression<Comparable>) expression,
-                        (Comparable) firstFilterValues);
-            };
+            }
+            return filter.getValues().stream().distinct()
+                    .map(Objects.requireNonNull(SearchUtils.getConvertor(expression.getJavaType())))
+                    .map(filterValue -> switch (filter.getType()) {
+                        case EQUAL_TO -> cb.equal(expression, filterValue);
+                        case LESS_THEN -> cb.lessThanOrEqualTo((Expression<Comparable>) expression,
+                                (Comparable) filterValue);
+                        case GREATER_THEN -> cb.greaterThanOrEqualTo((Expression<Comparable>) expression,
+                                (Comparable) filterValue);
+                        case EXISTS -> throw new IllegalStateException();
+                    }).reduce(cb::or).orElse(cb.conjunction());
         }).toList();
         List<Expression<?>> searchFields = searchByAttributeNames.stream().map(expressions::get)
                 .filter(Objects::nonNull).collect(Collectors.toList());
