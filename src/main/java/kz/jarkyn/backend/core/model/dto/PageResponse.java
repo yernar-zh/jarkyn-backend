@@ -7,6 +7,7 @@ import java.util.List;
 @Value.Immutable
 public interface PageResponse<T> {
     List<T> getRow();
+    T getSum();
     Page getPage();
 
     @Value.Immutable

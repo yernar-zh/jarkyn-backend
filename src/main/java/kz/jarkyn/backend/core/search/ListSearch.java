@@ -68,7 +68,8 @@ public class ListSearch<R> implements Search<R> {
         int fromIndex = Math.min(totalCount, queryParams.getPageFirst());
         int toIndex = Math.min(totalCount, fromIndex + queryParams.getPageSize());
         List<R> pageResult = result.subList(fromIndex, toIndex);
-        return ImmutablePageResponse.of(pageResult, ImmutablePage.of(queryParams.getPageFirst(), queryParams.getPageSize(), totalCount));
+        return ImmutablePageResponse.of(pageResult, null,
+                ImmutablePage.of(queryParams.getPageFirst(), queryParams.getPageSize(), totalCount));
     }
 
     private Predicate<Row> filter(QueryParams queryParams) {

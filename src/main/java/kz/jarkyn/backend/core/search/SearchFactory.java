@@ -16,7 +16,7 @@ public class SearchFactory {
         this.entityManager = entityManager;
     }
 
-    public <R, E> CriteriaSearch<R, E> createCriteriaSearch(
+    public <R,S, E> CriteriaSearch<R, E> createCriteriaSearch(
             Class<R> responseClass, List<String> searchFields,
             Class<E> entityClass, CriteriaAttributes<E> criteriaAttributes) {
         return new CriteriaSearch<>(entityManager,

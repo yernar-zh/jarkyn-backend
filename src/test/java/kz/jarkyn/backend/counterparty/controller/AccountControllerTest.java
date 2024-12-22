@@ -62,6 +62,7 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.page.first").value(0))
                 .andExpect(jsonPath("$.page.size").value(20))
                 .andExpect(jsonPath("$.page.totalCount").value(3))
+                .andExpect(jsonPath("$.sum.balance").value(0))
                 .andExpect(jsonPath("$.row.length()").value(3))
                 .andExpect(jsonPath("$.row[0].id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
                 .andExpect(jsonPath("$.row[0].name").value("Ернар Ж."))

@@ -4,18 +4,17 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
 import kz.jarkyn.backend.core.exception.ApiValidationException;
-import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import org.springframework.cglib.proxy.InvocationHandler;
 import org.springframework.cglib.proxy.Proxy;
+import org.springframework.data.util.Pair;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,8 +35,14 @@ public class CriteriaSearch<R, E> implements Search<R> {
 
     @Override
     public PageResponse<R> getResult(QueryParams queryParams) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+        List<R> row = getRows(queryParams);
+        Pair<Integer, R> sum = getSum(queryParams);
+        return ImmutablePageResponse.of(row, sum.getSecond(),
+                ImmutablePage.of(queryParams.getPageFirst(), queryParams.getPageSize(), sum.getFirst()));
+    }
 
+    private List<R> getRows(QueryParams queryParams) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
         Root<E> root = query.from(entityClass);
         Map<String, Expression<?>> expressions = attributes.entrySet().stream()
@@ -58,22 +63,38 @@ public class CriteriaSearch<R, E> implements Search<R> {
                 .setFirstResult(queryParams.getPageFirst()).setMaxResults(queryParams.getPageSize())
                 .getResultList();
 
-        List<R> results = tupleList.stream()
+        return tupleList.stream()
                 .map(tuple -> (R) createProxy("", tuple, responseClass))
                 .toList();
 
-        CriteriaQuery<Integer> countQuery = cb.createQuery(Integer.class);
-        Root<E> countRoot = countQuery.from(entityClass);
-        Map<String, Expression<?>> countExpressions = attributes.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get(countRoot, countQuery, cb)));
-        countQuery.select(cb.count(cb.conjunction()).as(Integer.class));
-        List<Predicate> countWherePredicates = getWherePredicates(countExpressions, queryParams, cb);
-        if (!countWherePredicates.isEmpty()) {
-            countQuery.where(countWherePredicates.toArray(new Predicate[0]));
+    }
+
+    private Pair<Integer, R> getSum(QueryParams queryParams) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = cb.createTupleQuery();
+        Root<E> root = query.from(entityClass);
+        Map<String, Expression<?>> expressions = attributes.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get(root, query, cb)));
+        Stream<Selection<?>> selections = expressions.entrySet().stream()
+                .map(entry -> {
+                    if (!Number.class.isAssignableFrom(entry.getValue().getJavaType())) {
+                        return cb.nullLiteral(entry.getValue().getJavaType()).alias(entry.getKey());
+                    }
+                    return cb.sum((Expression<Number>) entry.getValue()).alias(entry.getKey());
+                });
+        query.multiselect(Stream.concat(Stream.of(cb.count(cb.conjunction()).alias("totalCount")), selections).toList());
+        List<Predicate> wherePredicates = getWherePredicates(expressions, queryParams, cb);
+        if (!wherePredicates.isEmpty()) {
+            query.where(wherePredicates.toArray(new Predicate[0]));
         }
-        Integer count = em.createQuery(countQuery).getSingleResult();
-        return ImmutablePageResponse.of(results, ImmutablePage
-                .of(queryParams.getPageFirst(), queryParams.getPageSize(), count));
+        Tuple tuple = em.createQuery(query)
+                .setFirstResult(queryParams.getPageFirst()).setMaxResults(queryParams.getPageSize())
+                .getSingleResult();
+
+        int count = tuple.get("totalCount", Long.class).intValue();
+        R result = (R) createProxy("", tuple, responseClass);
+        return Pair.of(count, result);
+
     }
 
     private Object createProxy(String prefix, Tuple tuple, Class<?> resultClass) {
