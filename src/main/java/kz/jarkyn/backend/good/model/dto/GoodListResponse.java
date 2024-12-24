@@ -6,14 +6,14 @@ import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import org.immutables.value.Value;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @Value.Immutable
 public interface GoodListResponse extends IdNamedDto {
-    List<IdNamedDto> getGroups();
+    IdNamedDto getGroup();
     @Nullable IdDto getImage();
     Integer getMinimumPrice();
     Boolean getArchived();
-    List<IdNamedDto> getAttributes();
-    List<SellingPriceResponse> getSellingPrices();
+    String getAttributes();
+    BigDecimal getSellingPrice();
 }

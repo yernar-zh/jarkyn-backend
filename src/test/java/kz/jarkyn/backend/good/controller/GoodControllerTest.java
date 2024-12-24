@@ -53,9 +53,9 @@ class GoodControllerTest {
     @DirtiesContext
     public void testList_success() throws Exception {
         mockMvc.perform(get(Api.Good.PATH).with(TestUtils.auth())
-                        .queryParam("search", "кикL")
+                        .queryParam("search", "кикxxL")
                         .queryParam("groups.id", "cdfcf458-7cca-11ef-0a80-152f001b4886")
-                        .queryParam("attributes.id", "e95420b5-3344-44ce-8d39-699f516ed715")
+                        .queryParam("attribute.id", "e95420b5-3344-44ce-8d39-699f516ed715")
                         .queryParam("archived", Boolean.FALSE.toString())
                         .queryParam("sort", "-name")
                         .queryParam("page.first", "0")
@@ -64,7 +64,7 @@ class GoodControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.first").value(0))
                 .andExpect(jsonPath("$.page.size").value(50))
-                .andExpect(jsonPath("$.page.totalCount").value(1))
+                .andExpect(jsonPath("$.page.totalCount").value(12))
                 .andExpect(jsonPath("$.row.length()").value(1));
     }
 

@@ -3,6 +3,7 @@ package kz.jarkyn.backend.good.service;
 
 
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
@@ -25,7 +26,9 @@ import kz.jarkyn.backend.core.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GoodService {
@@ -65,9 +68,14 @@ public class GoodService {
         Search<GoodListResponse> search = searchFactory.createListSearch(
                 GoodListResponse.class, List.of("name", "groups.name"), () ->
                         goodRepository.findAll().stream().map(good -> {
-                            List<AttributeEntity> attributes = attributeRepository.findByGood(good);
-                            List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
-                            return goodMapper.toListResponse(good, attributes, sellingPrices);
+                            String attributes = attributeRepository.findByGood(good).stream()
+                                    .map(AbstractEntity::getId)
+                                    .filter(Objects::nonNull).map(UUID::toString)
+                                    .collect(Collectors.joining(","));
+                            BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
+                                    .stream().map(SellingPriceEntity::getValue)
+                                    .findFirst().orElse(null);
+                            return goodMapper.toListResponse(good, attributes, sellingPrice);
                         }).toList());
         return search.getResult(queryParams);
     }

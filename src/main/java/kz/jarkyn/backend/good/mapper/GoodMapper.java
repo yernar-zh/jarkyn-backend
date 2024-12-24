@@ -18,6 +18,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -43,21 +44,6 @@ public abstract class GoodMapper {
     public abstract void editEntity(@MappingTarget GoodEntity entity, GoodRequest request);
     public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceRequest request);
 
-    @Mapping(target = "groups", source = "entity.group")
     public abstract GoodListResponse toListResponse(
-            GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices);
-
-    protected IdNamedDto map(List<IdNamedDto> value) {
-        if (value.isEmpty()) return null;
-        return value.getFirst();
-    }
-
-    protected List<IdNamedDto> toGroupList(GroupEntity entity) {
-        return Stream.iterate(entity, Objects::nonNull, GroupEntity::getParent)
-                .map(this::toApi).collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    protected abstract IdNamedDto toApi(GroupEntity entity);
-
-
+            GoodEntity entity, String attributes, BigDecimal sellingPrice);
 }

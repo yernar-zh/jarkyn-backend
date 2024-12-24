@@ -11,39 +11,41 @@ import org.apache.logging.log4j.util.Strings;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ListSearch<R> implements Search<R> {
     private final List<Row> rows;
+    private final Class<R> responseClass;
 
-    public ListSearch(Class<R> javaClass, List<String> searchFields, List<R> list) {
+    public ListSearch(Class<R> responseClass, List<String> searchFields, List<R> list) {
         rows = list.stream().map(data -> {
-            Map<String, Object> fields = getRowValues(javaClass, data);
+            Map<String, Object> fields = new HashMap<>();
+            getRowValues(fields, null, responseClass, data);
             String[] searchTexts = searchFields.stream()
                     .map(fields::get).filter(Objects::nonNull)
                     .map(Object::toString).toArray(String[]::new);
             return new Row(data, new PrefixSearch(searchTexts), fields);
         }).toList();
+        this.responseClass = responseClass;
     }
 
-    private Map<String, Object> getRowValues(Class<?> valueClass, Object value) {
+    private void getRowValues(Map<String, Object> fields, String fieldName, Class<?> valueClass, Object value) {
         if (value == null) {
-            return Collections.emptyMap();
+            return;
         }
-        Function<String, Object> convertor = SearchUtils.getConvertor(valueClass);
-        if (convertor != null) {
-            return Map.of("", value);
+        if (SearchUtils.getConvertor(valueClass) != null) {
+            fields.put(fieldName, value);
+            return;
         }
         if (Collection.class.isAssignableFrom(valueClass)) {
             throw new IllegalArgumentException("Collection type not supported");
         }
-        Map<String, Object> result = new HashMap<>();
         for (Method method : valueClass.getMethods()) {
-            if (!method.getName().startsWith("get")) {
-                throw new RuntimeException(method + " is not a getter");
+            String methodName = method.getName();
+            if (!methodName.startsWith("get") || methodName.length() == 3) {
+                throw new UnsupportedOperationException("Method not supported: " + methodName);
             }
-            String name = Introspector.decapitalize(method.getName().substring(3));
             method.setAccessible(true);
             Object methodReturnValue;
             try {
@@ -51,24 +53,32 @@ public class ListSearch<R> implements Search<R> {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            Map<String, Object> subValues = getRowValues(method.getReturnType(), methodReturnValue);
-            for (Map.Entry<String, Object> entry : subValues.entrySet()) {
-                String childName = name + (Strings.isNotBlank(entry.getKey()) ? "." + entry.getValue() : "");
-                result.put(childName, entry.getValue());
-            }
+            String subFiledName = (fieldName != null ? fieldName + "." : "") +
+                                  Introspector.decapitalize(method.getName().substring(3));
+            getRowValues(fields, subFiledName, method.getReturnType(), methodReturnValue);
         }
-        return result;
     }
 
     @Override
     public PageResponse<R> getResult(QueryParams queryParams) {
-        List<R> result = rows.stream().filter(filter(queryParams)).sorted(sort(queryParams))
-                .map(Row::getData).toList();
-        int totalCount = result.size();
+        List<Row> subRows = rows.stream().filter(filter(queryParams)).sorted(sort(queryParams))
+                .toList();
+        int totalCount = subRows.size();
         int fromIndex = Math.min(totalCount, queryParams.getPageFirst());
         int toIndex = Math.min(totalCount, fromIndex + queryParams.getPageSize());
-        List<R> pageResult = result.subList(fromIndex, toIndex);
-        return ImmutablePageResponse.of(pageResult, null,
+        List<R> pageResult = subRows.subList(fromIndex, toIndex).stream().map(Row::getData).toList();
+        Map<String, Object> sumMap = subRows.stream()
+                .map(Row::getValues).map(Map::entrySet)
+                .flatMap(Collection::stream)
+                .filter(entry -> SearchUtils.getSum(entry.getValue().getClass()) != null)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (v1, v2) -> SearchUtils.getSum(v1.getClass()).apply((Number) v1, (Number) v2),
+                        LinkedHashMap::new
+                ));
+        R sum = (R) SearchUtils.createProxy("", sumMap, responseClass);
+        return ImmutablePageResponse.of(pageResult, sum,
                 ImmutablePage.of(queryParams.getPageFirst(), queryParams.getPageSize(), totalCount));
     }
 

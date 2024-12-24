@@ -2,6 +2,7 @@ package kz.jarkyn.backend.core.search;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
+import jakarta.persistence.TupleElement;
 import jakarta.persistence.criteria.*;
 import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.model.dto.ImmutablePage;
@@ -59,14 +60,21 @@ public class CriteriaSearch<R, E> implements Search<R> {
         if (!orders.isEmpty()) {
             query.orderBy(orders.toArray(new Order[0]));
         }
-        List<Tuple> tupleList = em.createQuery(query)
+        return em.createQuery(query)
                 .setFirstResult(queryParams.getPageFirst()).setMaxResults(queryParams.getPageSize())
-                .getResultList();
-
-        return tupleList.stream()
-                .map(tuple -> (R) createProxy("", tuple, responseClass))
+                .getResultList().stream()
+                .map(tuple -> tupleToClass(tuple, responseClass))
                 .toList();
 
+    }
+
+    private R tupleToClass(Tuple tuple, Class<R> responseClass) {
+        Map<String, Object> map = tuple.getElements().stream()
+                .collect(Collectors.toMap(
+                        TupleElement::getAlias,
+                        tupleElement -> tuple.get(tupleElement.getAlias())
+                ));
+        return (R) SearchUtils.createProxy("", map, responseClass);
     }
 
     private Pair<Integer, R> getSum(QueryParams queryParams) {
@@ -92,29 +100,11 @@ public class CriteriaSearch<R, E> implements Search<R> {
                 .getSingleResult();
 
         int count = tuple.get("totalCount", Long.class).intValue();
-        R result = (R) createProxy("", tuple, responseClass);
+        R result = tupleToClass(tuple, responseClass);
         return Pair.of(count, result);
 
     }
 
-    private Object createProxy(String prefix, Tuple tuple, Class<?> resultClass) {
-        InvocationHandler handler = (proxy, method, args) -> {
-            String methodName = method.getName();
-            if (methodName.startsWith("get") && methodName.length() > 3) {
-                String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-                if (SearchUtils.getConvertor(method.getReturnType()) == null) {
-                    return createProxy(fieldName + ".", tuple, method.getReturnType());
-                }
-                return tuple.get(prefix + fieldName);
-            }
-            throw new UnsupportedOperationException("Method not supported: " + methodName);
-        };
-        return Proxy.newProxyInstance(
-                resultClass.getClassLoader(),
-                new Class<?>[]{resultClass},
-                handler
-        );
-    }
 
     private List<Predicate> getWherePredicates(
             Map<String, Expression<?>> expressions, QueryParams queryParams, CriteriaBuilder cb) {
