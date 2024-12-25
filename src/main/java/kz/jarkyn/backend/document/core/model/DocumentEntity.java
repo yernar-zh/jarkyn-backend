@@ -5,6 +5,7 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.counterparty.model.CounterpartyEntity;
 import kz.jarkyn.backend.counterparty.model.Currency;
+import kz.jarkyn.backend.counterparty.model.OrganizationEntity;
 import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 
 
@@ -15,6 +16,9 @@ import java.time.LocalDateTime;
 @Table(name = "document")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class DocumentEntity extends AbstractEntity {
+    @ManyToOne
+    @JoinColumn(name = "organization_id")
+    private OrganizationEntity organization;
     @ManyToOne
     @JoinColumn(name = "warehouse_id")
     private WarehouseEntity warehouse;
@@ -30,6 +34,14 @@ public class DocumentEntity extends AbstractEntity {
     private String comment;
     private Boolean deleted;
     private Boolean commited;
+
+    public OrganizationEntity getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(OrganizationEntity organization) {
+        this.organization = organization;
+    }
 
     public WarehouseEntity getWarehouse() {
         return warehouse;
@@ -63,14 +75,6 @@ public class DocumentEntity extends AbstractEntity {
         this.moment = moment;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
     public Currency getCurrency() {
         return currency;
     }
@@ -85,6 +89,14 @@ public class DocumentEntity extends AbstractEntity {
 
     public void setExchangeRate(BigDecimal exchangeRate) {
         this.exchangeRate = exchangeRate;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     public String getComment() {

@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ComponentScan(basePackages = "kz.jarkyn.backend")
-@Sql({"../../inti.sql"})
+@Sql({"../../init.sql"})
 class WarehouseControllerTest {
     @Autowired
     private MockMvc mockMvc;

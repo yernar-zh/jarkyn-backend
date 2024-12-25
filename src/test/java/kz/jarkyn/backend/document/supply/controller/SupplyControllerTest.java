@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ComponentScan(basePackages = "kz.jarkyn.backend")
-@Sql({"../../../inti.sql"})
+@Sql({"../../../init.sql"})
 class SupplyControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -34,6 +34,8 @@ class SupplyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"))
                 .andExpect(jsonPath("$.name").value("SP-00001"))
+                .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2024-12-07T21:47:00"))
                 .andExpect(jsonPath("$.currency").value("CNY"))
                 .andExpect(jsonPath("$.exchangeRate").value(68))
@@ -86,12 +88,29 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
 
+    @Test
+    @DirtiesContext
+    public void testList_success() throws Exception {
+        mockMvc.perform(get(Api.Supply.PATH).with(TestUtils.auth())
+                        .queryParam("search", "001")
+                        .queryParam("sort", "-name")
+                        .queryParam("page.first", "0")
+                        .queryParam("page.size", "50")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.first").value(0))
+                .andExpect(jsonPath("$.page.size").value(20))
+                .andExpect(jsonPath("$.page.totalCount").value(3));
+    }
 
     @Test
     @DirtiesContext
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
+                  "organization": {
+                    "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
+                  },
                   "moment": "2024-12-21T12:18:07",
                   "currency": "CNY",
                   "exchangeRate": 70,
@@ -130,6 +149,8 @@ class SupplyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TestUtils.extractId(result)))
                 .andExpect(jsonPath("$.name").value("SP-00002"))
+                .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2024-12-21T12:18:07"))
                 .andExpect(jsonPath("$.currency").value("CNY"))
                 .andExpect(jsonPath("$.exchangeRate").value(70))
@@ -165,6 +186,9 @@ class SupplyControllerTest {
                 {
                   "id": "17c1285b-6514-45d5-88a2-3b9f673dc5e3",
                   "name": "SP-00101",
+                  "organization": {
+                    "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
+                  },
                   "moment": "2024-12-21T22:29:00",
                   "currency": "KZT",
                   "exchangeRate": 1,
@@ -195,6 +219,8 @@ class SupplyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"))
                 .andExpect(jsonPath("$.name").value("SP-00101"))
+                .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2024-12-21T22:29:00"))
                 .andExpect(jsonPath("$.currency").value("KZT"))
                 .andExpect(jsonPath("$.exchangeRate").value(1))

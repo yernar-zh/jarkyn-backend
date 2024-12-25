@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Value.Immutable
 public interface DocumentResponse extends IdNamedDto {
+    IdNamedDto getOrganization();
     LocalDateTime getMoment();
     Currency getCurrency();
     BigDecimal getExchangeRate();

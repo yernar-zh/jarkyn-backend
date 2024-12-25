@@ -82,6 +82,7 @@ CREATE TABLE document
     id               UUID NOT NULL,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    organization_id  UUID,
     warehouse_id     UUID,
     counterparty_id  UUID,
     name             VARCHAR(255),
@@ -268,6 +269,9 @@ ALTER TABLE customer
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organization (id);
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
