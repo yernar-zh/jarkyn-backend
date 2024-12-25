@@ -2,17 +2,15 @@ package kz.jarkyn.backend.core.search;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
-import jakarta.persistence.TupleElement;
 import jakarta.persistence.criteria.*;
 import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import org.springframework.cglib.proxy.InvocationHandler;
-import org.springframework.cglib.proxy.Proxy;
 import org.springframework.data.util.Pair;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,10 +68,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
 
     private R tupleToClass(Tuple tuple, Class<R> responseClass) {
         Map<String, Object> map = tuple.getElements().stream()
-                .collect(Collectors.toMap(
-                        TupleElement::getAlias,
-                        tupleElement -> tuple.get(tupleElement.getAlias())
-                ));
+                .collect(HashMap::new, (m, v) -> m.put(v.getAlias(), tuple.get(v.getAlias())), HashMap::putAll);
         return (R) SearchUtils.createProxy("", map, responseClass);
     }
 
@@ -131,6 +126,8 @@ public class CriteriaSearch<R, E> implements Search<R> {
                                 (Comparable) filterValue);
                         case GREATER_THEN -> cb.greaterThanOrEqualTo((Expression<Comparable>) expression,
                                 (Comparable) filterValue);
+                        case CONTAINS -> cb.like((Expression<String>) expression,
+                                (String) filterValue);
                         case EXISTS -> throw new IllegalStateException();
                     }).reduce(cb::or).orElse(cb.conjunction());
         }).toList();

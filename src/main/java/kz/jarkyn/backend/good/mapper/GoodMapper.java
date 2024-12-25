@@ -5,25 +5,19 @@ import kz.jarkyn.backend.good.model.dto.GoodListResponse;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.good.model.dto.SellingPriceRequest;
 import kz.jarkyn.backend.core.model.dto.IdDto;
-import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import kz.jarkyn.backend.core.mapper.EntityMapper;
 import kz.jarkyn.backend.good.model.GoodAttributeEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.good.model.AttributeEntity;
 import kz.jarkyn.backend.good.model.SellingPriceEntity;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
-import kz.jarkyn.backend.good.model.GroupEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Mapper(uses = EntityMapper.class)
 public abstract class GoodMapper {
@@ -45,5 +39,5 @@ public abstract class GoodMapper {
     public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceRequest request);
 
     public abstract GoodListResponse toListResponse(
-            GoodEntity entity, String attributes, BigDecimal sellingPrice);
+            GoodEntity entity, String attributes, BigDecimal sellingPrice, Integer remain);
 }

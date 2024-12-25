@@ -113,6 +113,7 @@ public class ListSearch<R> implements Search<R> {
                             case EQUAL_TO -> rowValue.equals(filterValue);
                             case LESS_THEN -> ((Comparable) rowValue).compareTo(filterValue) <= 0;
                             case GREATER_THEN -> ((Comparable) rowValue).compareTo(filterValue) >= 0;
+                            case CONTAINS -> ((String) rowValue).contains((String) filterValue);
                             case EXISTS -> throw new IllegalStateException();
                         }).reduce((b1, b2) -> b1 || b2).orElse(Boolean.TRUE);
             }).reduce((b1, b2) -> b1 && b2).orElse(Boolean.TRUE);

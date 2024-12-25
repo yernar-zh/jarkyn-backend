@@ -53,7 +53,7 @@ class GoodControllerTest {
     @DirtiesContext
     public void testList_success() throws Exception {
         mockMvc.perform(get(Api.Good.PATH).with(TestUtils.auth())
-                        .queryParam("search", "кикxxL")
+                        .queryParam("search", "кикL")
                         .queryParam("groups.id", "cdfcf458-7cca-11ef-0a80-152f001b4886")
                         .queryParam("attribute.id", "e95420b5-3344-44ce-8d39-699f516ed715")
                         .queryParam("archived", Boolean.FALSE.toString())
@@ -62,10 +62,29 @@ class GoodControllerTest {
                         .queryParam("page.size", "50")
                 )
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.row[0].id").value("7f316872-1da3-44c8-9293-0fddda859435"))
+                .andExpect(jsonPath("$.row[0].name").value("Кикстартер L"))
+                .andExpect(jsonPath("$.row[0].group.id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
+                .andExpect(jsonPath("$.row[0].group.name").value("Кикстартер"))
+                .andExpect(jsonPath("$.row[0].image").isEmpty())
+                .andExpect(jsonPath("$.row[0].minimumPrice").value(800))
+                .andExpect(jsonPath("$.row[0].archived").value(false))
+                .andExpect(jsonPath("$.row[0].attributes").value("e95420b5-3344-44ce-8d39-699f516ed715"))
+                .andExpect(jsonPath("$.row[0].sellingPrice").value(880))
+                .andExpect(jsonPath("$.row[0].remain").value(0))
+                .andExpect(jsonPath("$.sum.name").isEmpty())
+                .andExpect(jsonPath("$.sum.id").isEmpty())
+                .andExpect(jsonPath("$.sum.attributes").isEmpty())
+                .andExpect(jsonPath("$.sum.minimumPrice").value(800))
+                .andExpect(jsonPath("$.sum.image.id").isEmpty())
+                .andExpect(jsonPath("$.sum.remain").value(0))
+                .andExpect(jsonPath("$.sum.group.name").isEmpty())
+                .andExpect(jsonPath("$.sum.group.id").isEmpty())
+                .andExpect(jsonPath("$.sum.sellingPrice").value(880))
+                .andExpect(jsonPath("$.sum.archived").isEmpty())
                 .andExpect(jsonPath("$.page.first").value(0))
                 .andExpect(jsonPath("$.page.size").value(50))
-                .andExpect(jsonPath("$.page.totalCount").value(12))
-                .andExpect(jsonPath("$.row.length()").value(1));
+                .andExpect(jsonPath("$.page.totalCount").value(1));
     }
 
     @Test

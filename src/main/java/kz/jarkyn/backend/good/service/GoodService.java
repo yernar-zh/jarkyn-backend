@@ -23,6 +23,7 @@ import kz.jarkyn.backend.good.repository.GoodAttributeRepository;
 import kz.jarkyn.backend.good.repository.SellingPriceRepository;
 import kz.jarkyn.backend.good.mapper.GoodMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
+import kz.jarkyn.backend.stock.service.TurnoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,19 +39,22 @@ public class GoodService {
     private final SellingPriceRepository sellingPriceRepository;
     private final GoodMapper goodMapper;
     private final SearchFactory searchFactory;
+    private final TurnoverService turnoverService;
 
     public GoodService(
             GoodRepository goodRepository,
             GoodAttributeRepository goodAttributeRepository,
             AttributeRepository attributeRepository,
             SellingPriceRepository sellingPriceRepository,
-            GoodMapper goodMapper, SearchFactory searchFactory) {
+            GoodMapper goodMapper, SearchFactory searchFactory,
+            TurnoverService turnoverService) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
         this.sellingPriceRepository = sellingPriceRepository;
         this.goodMapper = goodMapper;
         this.searchFactory = searchFactory;
+        this.turnoverService = turnoverService;
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +79,8 @@ public class GoodService {
                             BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
                                     .stream().map(SellingPriceEntity::getValue)
                                     .findFirst().orElse(null);
-                            return goodMapper.toListResponse(good, attributes, sellingPrice);
+                            Integer remain = turnoverService.findRemain(good);
+                            return goodMapper.toListResponse(good, attributes, sellingPrice, remain);
                         }).toList());
         return search.getResult(queryParams);
     }

@@ -26,6 +26,9 @@ public class TurnoverService {
 
     @Transactional(readOnly = true)
     public Map<GoodEntity, Integer> findRemain(List<GoodEntity> list) {
+        if (list.isEmpty()) {
+            return Map.of();
+        }
         Map<GoodEntity, Integer> remains = turnoverRepository.findRemain(list)
                 .stream().collect(Collectors.toMap(
                         x -> x.get("good", GoodEntity.class),
@@ -33,6 +36,11 @@ public class TurnoverService {
         return list.stream().distinct().collect(Collectors.toMap(
                 good -> good,
                 good -> remains.getOrDefault(good, 0)));
+    }
+
+    @Transactional(readOnly = true)
+    public Integer findRemain(GoodEntity good) {
+        return findRemain(List.of(good)).get(good);
     }
 
     @Transactional(readOnly = true)
