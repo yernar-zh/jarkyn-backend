@@ -8,6 +8,7 @@ import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.util.Pair;
 
 import java.util.HashMap;
@@ -131,15 +132,18 @@ public class CriteriaSearch<R, E> implements Search<R> {
                         case EXISTS -> throw new IllegalStateException();
                     }).reduce(cb::or).orElse(cb.conjunction());
         }).toList();
-        List<Expression<?>> searchFields = searchByAttributeNames.stream().map(expressions::get)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+        List<Expression<String>> searchFields = searchByAttributeNames.stream().map(expressions::get)
+                .filter(Objects::nonNull)
+                .map(expression -> (Expression<String>) expression)
+                .toList();
         List<Predicate> searchPredicates = Stream.of(queryParams.getSearch())
-                .filter(Objects::nonNull).map(cb::literal).map(pattern -> {
-                    List<Expression<?>> searchArgument = Stream.concat(Stream.of(pattern),
-                            searchFields.stream()).toList();
-                    return cb.isTrue(cb.function("search", Boolean.class,
-                            searchArgument.toArray(new Expression[0])));
-                }).toList();
+                .filter(Objects::nonNull).flatMap(s -> Stream.of(s.split("\\s")))
+                .map(String::trim).filter(Strings::isNotBlank)
+                .map(pattern -> "%" + pattern.toLowerCase() + "%")
+                .map(pattern -> searchFields.stream()
+                        .map(expression -> cb.like(cb.lower(expression), pattern))
+                        .reduce(cb::or).orElse(cb.conjunction()))
+                .toList();
 
         return Stream.concat(filterPredicates.stream(), searchPredicates.stream()).toList();
     }

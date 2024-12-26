@@ -92,7 +92,7 @@ class SupplyControllerTest {
     @DirtiesContext
     public void testList_success() throws Exception {
         mockMvc.perform(get(Api.Supply.PATH).with(TestUtils.auth())
-                        .queryParam("search", "001")
+                        .queryParam("search", "001 урум")
                         .queryParam("sort", "-name")
                         .queryParam("page.first", "0")
                         .queryParam("page.size", "50")

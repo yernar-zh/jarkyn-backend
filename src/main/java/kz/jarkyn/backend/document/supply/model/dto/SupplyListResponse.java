@@ -11,4 +11,5 @@ public interface SupplyListResponse extends DocumentResponse {
     IdNamedDto getWarehouse();
     IdNamedDto getCounterparty();
     BigDecimal getPaidAmount();
+    BigDecimal getNotPaidAmount();
 }
