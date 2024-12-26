@@ -2,6 +2,7 @@
 package kz.jarkyn.backend.document.supply.service;
 
 
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -76,28 +77,28 @@ public class SupplyService {
     @Transactional(readOnly = true)
     public PageResponse<SupplyListResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<SupplyEntity> attributes = CriteriaAttributes.<SupplyEntity>builder()
-                .add("id", (root, query, cb) -> root.get(SupplyEntity_.id))
-                .add("name", (root, query, cb) -> root.get(SupplyEntity_.name))
-                .add("organization.id", (root, query, cb) -> root
+                .add("id", (root) -> root.get(SupplyEntity_.id))
+                .add("name", (root) -> root.get(SupplyEntity_.name))
+                .add("organization.id", (root) -> root
                         .get(SupplyEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root, query, cb) -> root
+                .add("organization.name", (root) -> root
                         .get(SupplyEntity_.organization).get(OrganizationEntity_.name))
-                .add("moment", (root, query, cb) -> root.get(SupplyEntity_.moment))
-                .add("currency", (root, query, cb) -> root.get(SupplyEntity_.currency))
-                .add("exchangeRate", (root, query, cb) -> root.get(SupplyEntity_.exchangeRate))
-                .add("amount", (root, query, cb) -> root.get(SupplyEntity_.amount))
-                .add("deleted", (root, query, cb) -> root.get(SupplyEntity_.deleted))
-                .add("commited", (root, query, cb) -> root.get(SupplyEntity_.commited))
-                .add("comment", (root, query, cb) -> root.get(SupplyEntity_.comment))
-                .add("warehouse.id", (root, query, cb) -> root
+                .add("moment", (root) -> root.get(SupplyEntity_.moment))
+                .add("currency", (root) -> root.get(SupplyEntity_.currency))
+                .add("exchangeRate", (root) -> root.get(SupplyEntity_.exchangeRate))
+                .add("amount", (root) -> root.get(SupplyEntity_.amount))
+                .add("deleted", (root) -> root.get(SupplyEntity_.deleted))
+                .add("commited", (root) -> root.get(SupplyEntity_.commited))
+                .add("comment", (root) -> root.get(SupplyEntity_.comment))
+                .add("warehouse.id", (root) -> root
                         .get(SupplyEntity_.warehouse).get(WarehouseEntity_.id))
-                .add("warehouse.name", (root, query, cb) -> root
+                .add("warehouse.name", (root) -> root
                         .get(SupplyEntity_.warehouse).get(WarehouseEntity_.name))
-                .add("counterparty.id", (root, query, cb) -> root
+                .add("counterparty.id", (root) -> root
                         .get(SupplyEntity_.counterparty).get(CounterpartyEntity_.id))
-                .add("counterparty.name", (root, query, cb) -> root
+                .add("counterparty.name", (root) -> root
                         .get(SupplyEntity_.counterparty).get(CounterpartyEntity_.name))
-                .add("paidAmount", (root, query, cb) -> {
+                .add("paidAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
                     Root<PaidDocumentEntity> PaidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
                     subQuery.select(cb.sum(PaidDocumentRoot.get(PaidDocumentEntity_.amount)));
@@ -107,7 +108,8 @@ public class SupplyService {
                                     .get(DocumentEntity_.counterparty), root.get(DocumentEntity_.counterparty))));
                     return subQuery;
                 })
-                .add("notPaidAmount", (root, query, cb) -> cb.sum(root.get(SupplyEntity_.amount), 1))
+                .add("notPaidAmount", (root, query, cb, map) -> cb.diff(
+                        (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("paidAmount")))
                 .build();
         Search<SupplyListResponse> search = searchFactory.createCriteriaSearch(
                 SupplyListResponse.class, List.of("name", "counterparty.name"),

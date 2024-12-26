@@ -53,23 +53,23 @@ public class AccountService {
     @Transactional(readOnly = true)
     public PageResponse<AccountResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<AccountEntity> attributes = CriteriaAttributes.<AccountEntity>builder()
-                .add("id", (root, query, cb) -> root.get(AccountEntity_.id))
-                .add("name", (root, query, cb) -> root.get(AccountEntity_.name))
-                .add("organization.id", (root, query, cb) -> root
+                .add("id", (root) -> root.get(AccountEntity_.id))
+                .add("name", (root) -> root.get(AccountEntity_.name))
+                .add("organization.id", (root) -> root
                         .get(AccountEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root, query, cb) -> root
+                .add("organization.name", (root) -> root
                         .get(AccountEntity_.organization).get(OrganizationEntity_.name))
-                .add("counterparty.id", (root, query, cb) -> root
+                .add("counterparty.id", (root) -> root
                         .join(AccountEntity_.counterparty, JoinType.LEFT).get(CounterpartyEntity_.id))
-                .add("counterparty.name", (root, query, cb) -> root
+                .add("counterparty.name", (root) -> root
                         .join(AccountEntity_.counterparty, JoinType.LEFT).get(CounterpartyEntity_.name))
-                .add("bank", (root, query, cb) -> root.get(AccountEntity_.bank))
-                .add("giro", (root, query, cb) -> root.get(AccountEntity_.giro))
-                .add("currency", (root, query, cb) -> root.get(AccountEntity_.currency))
-                .add("balance", (root, query, cb) -> root.get(AccountEntity_.balance))
+                .add("bank", (root) -> root.get(AccountEntity_.bank))
+                .add("giro", (root) -> root.get(AccountEntity_.giro))
+                .add("currency", (root) -> root.get(AccountEntity_.currency))
+                .add("balance", (root) -> root.get(AccountEntity_.balance))
                 .build();
         Search<AccountResponse> search = searchFactory.createCriteriaSearch(
-                AccountResponse.class, List.of("name"),
+                AccountResponse.class, List.of("name", "giro"),
                 AccountEntity.class, attributes);
         return search.getResult(queryParams);
     }

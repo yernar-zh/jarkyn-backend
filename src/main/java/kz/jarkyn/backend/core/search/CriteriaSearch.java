@@ -22,10 +22,16 @@ public class CriteriaSearch<R, E> implements Search<R> {
     private final EntityManager em;
     private final Class<R> responseClass;
     private final Class<E> entityClass;
-    private final Map<String, CriteriaAttribute<E>> attributes;
+    private final Map<String, CriteriaAttributes.CriteriaAttribute<E>> attributes;
     private final List<String> searchByAttributeNames;
 
-    public CriteriaSearch(EntityManager entityManager, Class<R> responseClass, Class<E> entityClass, Map<String, CriteriaAttribute<E>> attributes, List<String> searchByAttributeNames) {
+    public CriteriaSearch(
+            EntityManager entityManager,
+            Class<R> responseClass,
+            Class<E> entityClass,
+            Map<String, CriteriaAttributes.CriteriaAttribute<E>> attributes,
+            List<String> searchByAttributeNames
+    ) {
         this.em = entityManager;
         this.responseClass = responseClass;
         this.entityClass = entityClass;
@@ -45,8 +51,11 @@ public class CriteriaSearch<R, E> implements Search<R> {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
         Root<E> root = query.from(entityClass);
-        Map<String, Expression<?>> expressions = attributes.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get(root, query, cb)));
+        Map<String, Expression<?>> expressions = new HashMap<>();
+        for (Map.Entry<String, CriteriaAttributes.CriteriaAttribute<E>> entry : attributes.entrySet()) {
+            Expression<?> expression = entry.getValue().get(root, query, cb, expressions);
+            expressions.put(entry.getKey(), expression);
+        }
         List<Selection<?>> selections = expressions.entrySet().stream()
                 .map(entry -> entry.getValue().alias(entry.getKey()))
                 .collect(Collectors.toList());
@@ -77,8 +86,11 @@ public class CriteriaSearch<R, E> implements Search<R> {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
         Root<E> root = query.from(entityClass);
-        Map<String, Expression<?>> expressions = attributes.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get(root, query, cb)));
+        Map<String, Expression<?>> expressions = new HashMap<>();
+        for (Map.Entry<String, CriteriaAttributes.CriteriaAttribute<E>> entry : attributes.entrySet()) {
+            Expression<?> expression = entry.getValue().get(root, query, cb, expressions);
+            expressions.put(entry.getKey(), expression);
+        }
         Stream<Selection<?>> selections = expressions.entrySet().stream()
                 .map(entry -> {
                     if (!Number.class.isAssignableFrom(entry.getValue().getJavaType())) {
