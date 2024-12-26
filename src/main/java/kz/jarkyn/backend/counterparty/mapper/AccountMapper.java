@@ -7,5 +7,5 @@ import kz.jarkyn.backend.counterparty.model.dto.*;
 import org.mapstruct.Mapper;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class AccountMapper extends RequestResponseMapper<AccountEntity, AccountRequest, AccountResponse> {
+public interface AccountMapper extends RequestResponseMapper<AccountEntity, AccountRequest, AccountResponse> {
 }

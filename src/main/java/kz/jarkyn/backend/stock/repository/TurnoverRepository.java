@@ -14,13 +14,12 @@ import java.util.UUID;
 public interface TurnoverRepository extends JpaRepository<TurnoverEntity, UUID> {
     List<TurnoverEntity> findByDocument(DocumentEntity document);
     @Query("""
-            SELECT trv.good as good,
-                   trv.remain+trv.quantity as remain
+            SELECT DISTINCT(trv)
             FROM TurnoverEntity trv
-            WHERE trv.moment = (
+            WHERE trv.good IN :goods
+            AND trv.moment = (
                 SELECT max(s_trv.moment) FROM TurnoverEntity s_trv
                 WHERE s_trv.good = trv.good)
-            AND trv.good IN :goods
             """)
-    List<Tuple> findRemain(@Param("goods") List<GoodEntity> goods);
+    List<TurnoverEntity> findLastByGood(@Param("goods") List<GoodEntity> goods);
 }

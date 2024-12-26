@@ -3,7 +3,6 @@ package kz.jarkyn.backend.document.supply.service;
 
 
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
@@ -14,8 +13,6 @@ import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.counterparty.model.*;
-import kz.jarkyn.backend.counterparty.model.dto.AccountResponse;
-import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity_;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
@@ -35,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
@@ -139,5 +137,25 @@ public class SupplyService {
         supplyMapper.editEntity(supply, request);
         auditService.saveChanges(supply);
         itemService.saveApi(supply, request.getItems());
+    }
+
+    @Transactional
+    public void commit(UUID id) {
+        SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        supply.setCommited(Boolean.TRUE);
+        auditService.saveChanges(supply);
+        List<ItemResponse> items = itemService.findApiByDocument(supply);
+        BigDecimal totalItemAmount = items.stream()
+                .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalPaidAmount = paidDocumentService.findResponseByDocument(supply).stream()
+                .map(PaidDocumentResponse::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        for (ItemResponse item : items) {
+            BigDecimal itemAmount = BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice());
+            BigDecimal costPrice = totalPaidAmount.multiply(itemAmount)
+                    .divide(totalItemAmount, 2, RoundingMode.HALF_UP);
+            itemService.commit(item.getId(), costPrice);
+        }
     }
 }

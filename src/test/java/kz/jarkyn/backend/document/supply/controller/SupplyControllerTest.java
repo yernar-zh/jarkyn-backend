@@ -298,4 +298,12 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.paidDocuments[1].document.name").value("SP-00101"))
                 .andExpect(jsonPath("$.paidDocuments[1].amount").value(20));
     }
+
+    @Test
+    @DirtiesContext
+    public void testCommit_success() throws Exception {
+        mockMvc.perform(put(Api.Supply.PATH + "/17c1285b-6514-45d5-88a2-3b9f673dc5e3/commit")
+                        .with(TestUtils.auth()))
+                .andExpect(status().isOk());
+    }
 }

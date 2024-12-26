@@ -17,4 +17,5 @@ public interface GoodListResponse extends IdNamedDto {
     String getAttributes();
     BigDecimal getSellingPrice();
     Integer getRemain();
+    BigDecimal getCostPrice();
 }

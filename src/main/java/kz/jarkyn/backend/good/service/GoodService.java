@@ -23,6 +23,7 @@ import kz.jarkyn.backend.good.repository.GoodAttributeRepository;
 import kz.jarkyn.backend.good.repository.SellingPriceRepository;
 import kz.jarkyn.backend.good.mapper.GoodMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
+import kz.jarkyn.backend.stock.mode.dto.TurnoverResponse;
 import kz.jarkyn.backend.stock.service.TurnoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,8 +80,10 @@ public class GoodService {
                             BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
                                     .stream().map(SellingPriceEntity::getValue)
                                     .findFirst().orElse(null);
-                            Integer remain = turnoverService.findRemain(good);
-                            return goodMapper.toListResponse(good, attributes, sellingPrice, remain);
+                            TurnoverResponse lastTurnover = turnoverService.findLast(good);
+                            return goodMapper.toListResponse(good, attributes, sellingPrice,
+                                    lastTurnover.getRemain() + lastTurnover.getQuantity(),
+                                    lastTurnover.getCostPrice());
                         }).toList());
         return search.getResult(queryParams);
     }

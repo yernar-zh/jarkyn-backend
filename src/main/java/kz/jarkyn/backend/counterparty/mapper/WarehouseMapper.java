@@ -8,6 +8,5 @@ import kz.jarkyn.backend.counterparty.model.dto.WarehouseResponse;
 import org.mapstruct.Mapper;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class WarehouseMapper extends
-        RequestResponseMapper<WarehouseEntity, WarehouseRequest, WarehouseResponse> {
+public interface WarehouseMapper extends RequestResponseMapper<WarehouseEntity, WarehouseRequest, WarehouseResponse> {
 }

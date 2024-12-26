@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class CustomerMapper extends RequestResponseMapper<CustomerEntity, CustomerRequest, CustomerResponse> {
-    public abstract CustomerListResponse toResponse(
+public interface CustomerMapper extends RequestResponseMapper<CustomerEntity, CustomerRequest, CustomerResponse> {
+    CustomerListResponse toResponse(
             CustomerEntity customer, BigDecimal accountBalance, Currency accountCurrency,
             LocalDateTime firstSaleMoment, LocalDateTime lastSaleMoment,
             Integer totalSaleCount, BigDecimal totalSaleAmount);

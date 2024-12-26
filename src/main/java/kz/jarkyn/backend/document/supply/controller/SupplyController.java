@@ -46,4 +46,10 @@ public class SupplyController {
         supplyService.editApi(id, request);
         return supplyService.findApiById(id);
     }
+
+    @PutMapping("{id}/commit")
+    public SupplyResponse commit(@PathVariable UUID id) {
+        supplyService.commit(id);
+        return supplyService.findApiById(id);
+    }
 }

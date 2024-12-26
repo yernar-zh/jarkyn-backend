@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class SupplierMapper extends RequestResponseMapper<SupplierEntity, SupplierRequest, SupplierResponse> {
-    public abstract SupplierListResponse toResponse(
+public interface SupplierMapper extends RequestResponseMapper<SupplierEntity, SupplierRequest, SupplierResponse> {
+    SupplierListResponse toResponse(
             SupplierEntity supplier, BigDecimal accountBalance, Currency accountCurrency,
             LocalDateTime firstSupplyMoment, LocalDateTime lastSupplyMoment,
             Integer totalSupplyCount, BigDecimal totalSupplyAmount);

@@ -4,7 +4,7 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-public abstract class RequestMapper<E, Q> {
-    public abstract E toEntity(Q request);
-    public abstract void editEntity(@MappingTarget E entity, Q request);
+public interface RequestMapper<E, Q> {
+    E toEntity(Q request);
+    void editEntity(@MappingTarget E entity, Q request);
 }

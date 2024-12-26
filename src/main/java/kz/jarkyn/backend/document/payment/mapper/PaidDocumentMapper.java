@@ -8,6 +8,6 @@ import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
 import org.mapstruct.Mapper;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class PaidDocumentMapper
+public interface PaidDocumentMapper
         extends RequestResponseMapper<PaidDocumentEntity, PaidDocumentRequest, PaidDocumentResponse> {
 }

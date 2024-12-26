@@ -12,7 +12,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class SupplyMapper extends RequestMapper<SupplyEntity, SupplyRequest> {
-    public abstract SupplyResponse toDetailResponse(
+public interface SupplyMapper extends RequestMapper<SupplyEntity, SupplyRequest> {
+    SupplyResponse toDetailResponse(
             SupplyEntity entity, List<ItemResponse> items, List<PaidDocumentResponse> paidDocuments);
 }

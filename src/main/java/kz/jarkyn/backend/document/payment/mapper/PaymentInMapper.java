@@ -11,6 +11,6 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class PaymentInMapper extends RequestMapper<PaymentInEntity, PaymentInRequest> {
-    public abstract PaymentInDetailResponse toResponse(PaymentInEntity entity, List<PaidDocumentResponse> paidDocuments);
+public interface PaymentInMapper extends RequestMapper<PaymentInEntity, PaymentInRequest> {
+    PaymentInDetailResponse toResponse(PaymentInEntity entity, List<PaidDocumentResponse> paidDocuments);
 }

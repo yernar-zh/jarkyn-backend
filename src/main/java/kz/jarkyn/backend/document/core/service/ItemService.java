@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.document.core.service;
 
 
+import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.ItemEntity;
 import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
@@ -8,8 +9,8 @@ import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.core.mapper.ItemMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
-import kz.jarkyn.backend.good.model.GoodEntity;
-import kz.jarkyn.backend.stock.mode.TurnoverEntity;
+import kz.jarkyn.backend.stock.mode.dto.TurnoverRequest;
+import kz.jarkyn.backend.stock.mode.dto.TurnoverResponse;
 import kz.jarkyn.backend.stock.service.TurnoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +19,8 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,20 +41,23 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemResponse> findApiByDocument(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
-
-        Map<GoodEntity, TurnoverEntity> turnovers = turnoverService.findByDocument(document)
-                .stream().collect(Collectors.toMap(TurnoverEntity::getGood, Function.identity()));
-        List<GoodEntity> absentGoods = items.stream().map(ItemEntity::getGood)
-                .filter(Predicate.not(turnovers::containsKey)).toList();
-        Map<GoodEntity, Integer> absentGoodRemains = turnoverService.findRemain(absentGoods);
-
+        Map<UUID, TurnoverResponse> turnovers = turnoverService.findByDocument(document).stream()
+                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
+        Map<UUID, TurnoverResponse> lastTurnovers = turnoverService.findLast(
+                        items.stream().map(ItemEntity::getGood).toList()).stream()
+                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
         return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
-            TurnoverEntity turnover = turnovers.get(item.getGood());
+            TurnoverResponse turnover = turnovers.get(item.getGood().getId());
             if (turnover != null) {
                 return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());
             }
-            Integer remain = absentGoodRemains.get(item.getGood());
-            return itemMapper.toResponse(item, remain, BigDecimal.ZERO);
+            TurnoverResponse lastTurnover = lastTurnovers.get(item.getGood().getId());
+            if (lastTurnover != null) {
+                return itemMapper.toResponse(item,
+                        lastTurnover.getRemain() + lastTurnover.getQuantity(),
+                        lastTurnover.getCostPrice());
+            }
+            throw new RuntimeException("No turnover found");
         }).toList();
     }
 
@@ -72,5 +76,12 @@ public class ItemService {
             entry.getCurrent().setPosition(entry.getReceivedPosition());
         }
         itemRepository.deleteAll(divider.skippedCurrent());
+    }
+
+    @Transactional
+    public void commit(UUID id, BigDecimal costPrice) {
+        ItemEntity item = itemRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        TurnoverRequest turnover = itemMapper.toTurnoverRequest(item, costPrice);
+        turnoverService.create(turnover);
     }
 }

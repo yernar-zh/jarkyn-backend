@@ -39,5 +39,5 @@ public abstract class GoodMapper {
     public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceRequest request);
 
     public abstract GoodListResponse toListResponse(
-            GoodEntity entity, String attributes, BigDecimal sellingPrice, Integer remain);
+            GoodEntity entity, String attributes, BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);
 }
