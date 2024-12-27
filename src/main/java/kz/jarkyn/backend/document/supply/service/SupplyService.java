@@ -142,8 +142,6 @@ public class SupplyService {
     @Transactional
     public void commit(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        supply.setCommited(Boolean.TRUE);
-        auditService.saveChanges(supply);
         List<ItemResponse> items = itemService.findApiByDocument(supply);
         BigDecimal totalItemAmount = items.stream()
                 .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
@@ -151,6 +149,8 @@ public class SupplyService {
         BigDecimal totalPaidAmount = paidDocumentService.findResponseByDocument(supply).stream()
                 .map(PaidDocumentResponse::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        supply.setCommited(Boolean.TRUE);
+        auditService.saveChanges(supply);
         for (ItemResponse item : items) {
             BigDecimal itemAmount = BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice());
             BigDecimal costPrice = totalPaidAmount.multiply(itemAmount)

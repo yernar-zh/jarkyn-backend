@@ -2,10 +2,9 @@
 package kz.jarkyn.backend.stock.service;
 
 
+import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
-import kz.jarkyn.backend.good.repository.GoodRepository;
-import kz.jarkyn.backend.good.service.GoodService;
 import kz.jarkyn.backend.stock.mapper.TurnoverMapper;
 import kz.jarkyn.backend.stock.mode.TurnoverEntity;
 import kz.jarkyn.backend.stock.mode.dto.TurnoverRequest;
@@ -16,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class TurnoverService {
@@ -26,8 +23,7 @@ public class TurnoverService {
 
     public TurnoverService(
             TurnoverRepository turnoverRepository,
-            TurnoverMapper turnoverMapper,
-            GoodService goodService) {
+            TurnoverMapper turnoverMapper) {
         this.turnoverRepository = turnoverRepository;
         this.turnoverMapper = turnoverMapper;
     }
@@ -35,11 +31,14 @@ public class TurnoverService {
     @Transactional
     public void create(TurnoverRequest request) {
         TurnoverEntity turnover = turnoverMapper.toEntity(request);
+        turnover.setWarehouse(turnover.getDocument().getWarehouse());
         turnover.setMoment(turnover.getDocument().getMoment());
-        TurnoverResponse lastTurnover = findLast(turnover.getGood());
-        turnover.setRemain(lastTurnover.getRemain() + lastTurnover.getQuantity());
+        Optional<TurnoverResponse> lastTurnover = findLast(
+                turnover.getDocument().getWarehouse(), List.of(turnover.getGood()))
+                .stream().findFirst();
+        turnover.setRemain(lastTurnover.map(o -> o.getRemain() + o.getQuantity()).orElse(0));
         if (turnover.getCostPrice() == null) {
-            turnover.setCostPrice(lastTurnover.getCostPrice());
+            turnover.setCostPrice(lastTurnover.map(TurnoverResponse::getCostPrice).orElse(BigDecimal.ZERO));
         }
         turnoverRepository.save(turnover);
     }
@@ -50,18 +49,14 @@ public class TurnoverService {
     }
 
     @Transactional(readOnly = true)
-    public TurnoverResponse findLast(GoodEntity good) {
-        return findLast(List.of(good)).stream().findFirst().orElseThrow();
+    public List<TurnoverResponse> findLast(GoodEntity good) {
+        return findLast(null, List.of(good));
     }
 
     @Transactional(readOnly = true)
-    public List<TurnoverResponse> findLast(List<GoodEntity> list) {
-        Map<GoodEntity, TurnoverEntity> turnovers = turnoverRepository.findLastByGood(list).stream()
-                .collect(Collectors.toMap(TurnoverEntity::getGood, Function.identity()));
-        return list.stream().map(good -> {
-            TurnoverEntity turnover = turnovers.get(good);
-            if (turnover != null) return turnoverMapper.toResponse(turnover);
-            else return turnoverMapper.toResponse(good, 0, 0, BigDecimal.ZERO);
-        }).toList();
+    public List<TurnoverResponse> findLast(WarehouseEntity warehouse, List<GoodEntity> list) {
+        return turnoverRepository.findLastByGood(list).stream()
+                .filter(turnover -> warehouse == null || turnover.getWarehouse().equals(warehouse))
+                .map(turnoverMapper::toResponse).toList();
     }
 }

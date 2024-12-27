@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface TurnoverRepository extends JpaRepository<TurnoverEntity, UUID> {
     List<TurnoverEntity> findByDocument(DocumentEntity document);
     @Query("""
-            SELECT DISTINCT(trv)
+            SELECT trv
             FROM TurnoverEntity trv
             WHERE trv.good IN :goods
             AND trv.moment = (

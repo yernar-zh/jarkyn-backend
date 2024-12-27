@@ -41,24 +41,28 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemResponse> findApiByDocument(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
-        Map<UUID, TurnoverResponse> turnovers = turnoverService.findByDocument(document).stream()
-                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
-        Map<UUID, TurnoverResponse> lastTurnovers = turnoverService.findLast(
-                        items.stream().map(ItemEntity::getGood).toList()).stream()
-                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
-        return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
-            TurnoverResponse turnover = turnovers.get(item.getGood().getId());
-            if (turnover != null) {
+        if (document.getCommited()) {
+            Map<UUID, TurnoverResponse> turnovers = turnoverService.findByDocument(document).stream()
+                    .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
+            return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
+                TurnoverResponse turnover = turnovers.get(item.getGood().getId());
                 return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());
-            }
-            TurnoverResponse lastTurnover = lastTurnovers.get(item.getGood().getId());
-            if (lastTurnover != null) {
-                return itemMapper.toResponse(item,
-                        lastTurnover.getRemain() + lastTurnover.getQuantity(),
-                        lastTurnover.getCostPrice());
-            }
-            throw new RuntimeException("No turnover found");
-        }).toList();
+            }).toList();
+        } else {
+            Map<UUID, TurnoverResponse> lastTurnovers = turnoverService.findLast(document.getWarehouse(),
+                            items.stream().map(ItemEntity::getGood).toList()).stream()
+                    .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
+            return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
+                TurnoverResponse lastTurnover = lastTurnovers.get(item.getGood().getId());
+                if (lastTurnover != null) {
+                    return itemMapper.toResponse(item,
+                            lastTurnover.getRemain() + lastTurnover.getQuantity(),
+                            lastTurnover.getCostPrice());
+                } else {
+                    return itemMapper.toResponse(item, 0, BigDecimal.ZERO);
+                }
+            }).toList();
+        }
     }
 
     @Transactional

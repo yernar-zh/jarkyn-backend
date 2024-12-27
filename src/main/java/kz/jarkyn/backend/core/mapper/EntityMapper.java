@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.counterparty.model.*;
+import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.IdDto;
@@ -37,10 +38,6 @@ public class EntityMapper {
         return toEntity(api, AccountEntity.class);
     }
 
-    public <T extends CounterpartyEntity> T toCounterpartyEntity(IdDto api) {
-        return (T) toEntity(api, CounterpartyEntity.class);
-    }
-
     public WarehouseEntity toWarehouseEntity(IdDto api) {
         return toEntity(api, WarehouseEntity.class);
     }
@@ -59,6 +56,14 @@ public class EntityMapper {
 
     public UserEntity toUserEntity(IdDto api) {
         return toEntity(api, UserEntity.class);
+    }
+
+    public <T extends CounterpartyEntity> T toCounterpartyEntity(IdDto api) {
+        return (T) toEntity(api, CounterpartyEntity.class);
+    }
+
+    public <T extends DocumentEntity> T toDocumentEntity(IdDto api) {
+        return (T) toEntity(api, DocumentEntity.class);
     }
 
     private <T extends AbstractEntity> T toEntity(IdDto api, Class<T> clazz) {

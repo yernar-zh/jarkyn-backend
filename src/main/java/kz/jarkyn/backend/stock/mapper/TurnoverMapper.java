@@ -4,6 +4,7 @@ import kz.jarkyn.backend.core.mapper.EntityMapper;
 import kz.jarkyn.backend.core.mapper.RequestMapper;
 import kz.jarkyn.backend.core.mapper.RequestResponseMapper;
 import kz.jarkyn.backend.core.model.dto.IdDto;
+import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
@@ -20,5 +21,4 @@ import java.util.List;
 
 @Mapper(uses = EntityMapper.class)
 public interface TurnoverMapper extends RequestResponseMapper<TurnoverEntity, TurnoverRequest, TurnoverResponse> {
-    TurnoverResponse toResponse(GoodEntity good, Integer remain, Integer quantity, BigDecimal costPrice);
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 
@@ -22,6 +23,9 @@ public class TurnoverEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "good_id")
     private GoodEntity good;
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id")
+    private WarehouseEntity warehouse;
     private LocalDateTime moment;
     private Integer quantity;
     private Integer remain;
@@ -41,6 +45,14 @@ public class TurnoverEntity extends AbstractEntity {
 
     public void setGood(GoodEntity good) {
         this.good = good;
+    }
+
+    public WarehouseEntity getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(WarehouseEntity warehouse) {
+        this.warehouse = warehouse;
     }
 
     public LocalDateTime getMoment() {

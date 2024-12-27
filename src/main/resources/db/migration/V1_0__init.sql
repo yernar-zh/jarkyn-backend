@@ -53,8 +53,8 @@ CREATE TABLE cash_flow
     id               UUID NOT NULL,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    account_id       UUID,
     document_id      UUID,
+    account_id       UUID,
     amount           DECIMAL,
     CONSTRAINT pk_cash_flow PRIMARY KEY (id)
 );
@@ -220,6 +220,7 @@ CREATE TABLE turnover
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     document_id      UUID,
     good_id          UUID,
+    warehouse_id     UUID,
     moment           TIMESTAMP WITHOUT TIME ZONE,
     quantity         INTEGER,
     remain           INTEGER,
@@ -335,6 +336,9 @@ ALTER TABLE turnover
 
 ALTER TABLE turnover
     ADD CONSTRAINT FK_TURNOVER_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
+
+ALTER TABLE turnover
+    ADD CONSTRAINT FK_TURNOVER_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
 
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);

@@ -15,11 +15,11 @@ import java.math.BigDecimal;
 @Table(name = "cash_flow")
 public class CashFlowEntity extends AbstractEntity {
     @ManyToOne
-    @JoinColumn(name = "account_id")
-    private AccountEntity account;
-    @ManyToOne
     @JoinColumn(name = "document_id")
     private DocumentEntity document;
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private AccountEntity account;
 
     private BigDecimal amount;
 

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,10 +81,16 @@ public class GoodService {
                             BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
                                     .stream().map(SellingPriceEntity::getValue)
                                     .findFirst().orElse(null);
-                            TurnoverResponse lastTurnover = turnoverService.findLast(good);
-                            return goodMapper.toListResponse(good, attributes, sellingPrice,
-                                    lastTurnover.getRemain() + lastTurnover.getQuantity(),
-                                    lastTurnover.getCostPrice());
+                            List<TurnoverResponse> lastTurnovers = turnoverService.findLast(good);
+                            Integer remind = lastTurnovers.stream()
+                                    .map(lastTurnover -> lastTurnover.getRemain() + lastTurnover.getQuantity())
+                                    .reduce(0, Integer::sum);
+                            BigDecimal averageCostPrice = lastTurnovers.stream()
+                                    .map(TurnoverResponse::getCostPrice)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                    .divide(BigDecimal.valueOf(Math.max(1, lastTurnovers.size())),
+                                            2, RoundingMode.HALF_UP);
+                            return goodMapper.toListResponse(good, attributes, sellingPrice, remind, averageCostPrice);
                         }).toList());
         return search.getResult(queryParams);
     }
