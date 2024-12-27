@@ -147,13 +147,12 @@ public class SupplyService {
                 .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalPaidAmount = paidDocumentService.findResponseByDocument(supply).stream()
-                .map(PaidDocumentResponse::getAmount)
+                .map(paidDocument -> paidDocument.getAmount().multiply(paidDocument.getPayment().getExchangeRate()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         supply.setCommited(Boolean.TRUE);
         auditService.saveChanges(supply);
         for (ItemResponse item : items) {
-            BigDecimal itemAmount = BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice());
-            BigDecimal costPrice = totalPaidAmount.multiply(itemAmount)
+            BigDecimal costPrice = totalPaidAmount.multiply(item.getPrice())
                     .divide(totalItemAmount, 2, RoundingMode.HALF_UP);
             itemService.commit(item.getId(), costPrice);
         }

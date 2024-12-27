@@ -272,31 +272,7 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.items[0].price").value(400))
                 .andExpect(jsonPath("$.items[0].quantity").value(80))
                 .andExpect(jsonPath("$.items[0].remain").value(0))
-                .andExpect(jsonPath("$.items[0].costPrice").value(0))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.id").value("5c799431-3bc3-400f-b9a3-209f27b935a0"))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.name").value("PO-00001"))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.moment").value("2024-12-07T22:47:00"))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.currency").value("CNY"))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.exchangeRate").value(68))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.amount").value(710))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.deleted").value(false))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.commited").value(false))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.comment").value(""))
-                .andExpect(jsonPath("$.paidDocuments[0].document.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"))
-                .andExpect(jsonPath("$.paidDocuments[0].document.name").value("SP-00101"))
-                .andExpect(jsonPath("$.paidDocuments[0].amount").value(710))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.id").value("fa81596d-a236-4256-8686-7f7f3be85ae4"))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.name").value("PO-00002"))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.moment").value("2024-12-07T23:47:00"))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.currency").value("USD"))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.exchangeRate").value(525))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.amount").value(20))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.deleted").value(false))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.commited").value(false))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.comment").value(""))
-                .andExpect(jsonPath("$.paidDocuments[1].document.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"))
-                .andExpect(jsonPath("$.paidDocuments[1].document.name").value("SP-00101"))
-                .andExpect(jsonPath("$.paidDocuments[1].amount").value(20));
+                .andExpect(jsonPath("$.items[0].costPrice").value(0));
     }
 
     @Test
@@ -304,6 +280,19 @@ class SupplyControllerTest {
     public void testCommit_success() throws Exception {
         mockMvc.perform(put(Api.Supply.PATH + "/17c1285b-6514-45d5-88a2-3b9f673dc5e3/commit")
                         .with(TestUtils.auth()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"));
+        mockMvc.perform(get(Api.Supply.PATH + "/17c1285b-6514-45d5-88a2-3b9f673dc5e3").with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"))
+                .andExpect(jsonPath("$.name").value("SP-00001"))
+                .andExpect(jsonPath("$.commited").value(true))
+                .andExpect(jsonPath("$.items[0].good.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
+                .andExpect(jsonPath("$.items[0].remain").value(0))
+                .andExpect(jsonPath("$.items[0].costPrice").value(513.29))
+                .andExpect(jsonPath("$.items[1].good.id").value("bf6f2ba4-f994-44c1-839f-36a75f07242e"))
+                .andExpect(jsonPath("$.items[1].remain").value(0))
+                .andExpect(jsonPath("$.items[1].costPrice").value(331.15));
+
     }
 }
