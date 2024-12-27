@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.good.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.good.model.dto.AttributeGroupDetailResponse;
 import kz.jarkyn.backend.good.model.dto.AttributeGroupResponse;
 import kz.jarkyn.backend.good.model.dto.AttributeGroupRequest;
 import kz.jarkyn.backend.core.model.dto.IdDto;
@@ -21,7 +22,7 @@ public class AttributeGroupController {
     }
 
     @GetMapping("{id}")
-    public AttributeGroupResponse detail(@PathVariable UUID id) {
+    public AttributeGroupDetailResponse detail(@PathVariable UUID id) {
         return attributeGroupService.findApiById(id);
     }
 
@@ -36,12 +37,12 @@ public class AttributeGroupController {
     }
 
     @PostMapping
-    public AttributeGroupResponse create(@RequestBody AttributeGroupRequest request) {
+    public AttributeGroupDetailResponse create(@RequestBody AttributeGroupRequest request) {
         return attributeGroupService.createApi(request);
     }
 
     @PutMapping("{id}")
-    public AttributeGroupResponse edit(@PathVariable UUID id, @RequestBody AttributeGroupRequest request) {
+    public AttributeGroupDetailResponse edit(@PathVariable UUID id, @RequestBody AttributeGroupRequest request) {
         return attributeGroupService.editApi(id, request);
     }
 

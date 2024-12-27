@@ -30,7 +30,7 @@ public class AttributeController {
     }
 
     @PutMapping("{id}")
-    public AttributeResponse edit(@PathVariable UUID id, @RequestBody AttributeEditRequest request) {
+    public AttributeResponse edit(@PathVariable UUID id, @RequestBody AttributeRequest request) {
         return attributeService.editApi(id, request);
     }
 

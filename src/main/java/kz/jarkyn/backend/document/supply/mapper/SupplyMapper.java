@@ -13,6 +13,6 @@ import java.util.List;
 
 @Mapper(uses = EntityMapper.class)
 public interface SupplyMapper extends RequestMapper<SupplyEntity, SupplyRequest> {
-    SupplyResponse toDetailResponse(
+    SupplyResponse toResponse(
             SupplyEntity entity, List<ItemResponse> items, List<PaidDocumentResponse> paidDocuments);
 }

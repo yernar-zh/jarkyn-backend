@@ -1,6 +1,7 @@
 
 package kz.jarkyn.backend.good.mapper;
 
+import kz.jarkyn.backend.core.mapper.RequestMapper;
 import kz.jarkyn.backend.good.model.dto.GoodListResponse;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.good.model.dto.SellingPriceRequest;
@@ -20,24 +21,14 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper(uses = EntityMapper.class)
-public abstract class GoodMapper {
-    public abstract GoodResponse toDetailApi(
+public interface GoodMapper extends RequestMapper<GoodEntity, GoodRequest> {
+    GoodResponse toResponse(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices);
+    GoodListResponse toListResponse(
+            GoodEntity entity, String attributes, BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);
 
-    public abstract GoodEntity toEntity(GoodRequest request);
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "good", source = "good")
     @Mapping(target = "attribute", source = "attribute")
-    public abstract GoodAttributeEntity toEntity(GoodEntity good, IdDto attribute);
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "good", source = "good")
-    @Mapping(target = "quantity", source = "sellingPrice.quantity")
-    @Mapping(target = "value", source = "sellingPrice.value")
-    public abstract SellingPriceEntity toEntity(GoodEntity good, SellingPriceRequest sellingPrice);
-
-    public abstract void editEntity(@MappingTarget GoodEntity entity, GoodRequest request);
-    public abstract void editEntity(@MappingTarget SellingPriceEntity entity, SellingPriceRequest request);
-
-    public abstract GoodListResponse toListResponse(
-            GoodEntity entity, String attributes, BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);
+    GoodAttributeEntity toEntity(GoodEntity good, IdDto attribute);
 }

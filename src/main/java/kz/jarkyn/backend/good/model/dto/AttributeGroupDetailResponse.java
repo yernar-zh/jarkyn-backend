@@ -6,5 +6,6 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-public interface AttributeGroupResponse extends IdNamedDto {
+public interface AttributeGroupDetailResponse extends IdNamedDto {
+    List<AttributeResponse> getAttributes();
 }

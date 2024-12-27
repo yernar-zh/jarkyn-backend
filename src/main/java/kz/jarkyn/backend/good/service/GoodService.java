@@ -8,6 +8,7 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.good.mapper.SellingPriceMapper;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.good.model.AttributeEntity;
@@ -40,6 +41,7 @@ public class GoodService {
     private final AttributeRepository attributeRepository;
     private final SellingPriceRepository sellingPriceRepository;
     private final GoodMapper goodMapper;
+    private final SellingPriceMapper sellingPriceMapper;
     private final SearchFactory searchFactory;
     private final TurnoverService turnoverService;
 
@@ -48,13 +50,16 @@ public class GoodService {
             GoodAttributeRepository goodAttributeRepository,
             AttributeRepository attributeRepository,
             SellingPriceRepository sellingPriceRepository,
-            GoodMapper goodMapper, SearchFactory searchFactory,
+            GoodMapper goodMapper,
+            SellingPriceMapper sellingPriceMapper,
+            SearchFactory searchFactory,
             TurnoverService turnoverService) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
         this.sellingPriceRepository = sellingPriceRepository;
         this.goodMapper = goodMapper;
+        this.sellingPriceMapper = sellingPriceMapper;
         this.searchFactory = searchFactory;
         this.turnoverService = turnoverService;
     }
@@ -66,7 +71,7 @@ public class GoodService {
         attributes.sort(Comparator.comparing(AttributeEntity::getName));
         List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
         sellingPrices.sort(Comparator.comparing(SellingPriceEntity::getQuantity));
-        return goodMapper.toDetailApi(good, attributes, sellingPrices);
+        return goodMapper.toResponse(good, attributes, sellingPrices);
     }
 
     @Transactional(readOnly = true)
@@ -104,7 +109,8 @@ public class GoodService {
             goodAttributeRepository.save(goodAttributeEntity);
         }
         for (SellingPriceRequest sellingPrice : request.getSellingPrices()) {
-            SellingPriceEntity sellingPriceEntity = goodMapper.toEntity(good, sellingPrice);
+            SellingPriceEntity sellingPriceEntity = sellingPriceMapper.toEntity(sellingPrice);
+            sellingPriceEntity.setGood(good);
             sellingPriceRepository.save(sellingPriceEntity);
         }
         return findApiById(good.getId());
@@ -132,11 +138,12 @@ public class GoodService {
                 sellingPriceRepository.findByGood(good), request.getSellingPrices()
         );
         for (EntityDivider<SellingPriceEntity, SellingPriceRequest>.Entry entry : sellingPriceDivider.newReceived()) {
-            SellingPriceEntity sellingPrice = goodMapper.toEntity(good, entry.getReceived());
+            SellingPriceEntity sellingPrice = sellingPriceMapper.toEntity(entry.getReceived());
+            sellingPrice.setGood(good);
             sellingPriceRepository.save(sellingPrice);
         }
         for (EntityDivider<SellingPriceEntity, SellingPriceRequest>.Entry entry : sellingPriceDivider.edited()) {
-            goodMapper.editEntity(entry.getCurrent(), entry.getReceived());
+            sellingPriceMapper.editEntity(entry.getCurrent(), entry.getReceived());
         }
         sellingPriceRepository.deleteAll(sellingPriceDivider.skippedCurrent());
         return findApiById(id);

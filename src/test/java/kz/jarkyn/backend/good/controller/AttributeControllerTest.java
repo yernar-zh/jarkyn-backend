@@ -84,6 +84,7 @@ class AttributeControllerTest {
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
+                  "group": {"id":  "c5a95fbd-121e-4f57-a84b-600a9919228a"},
                   "name": "Мотоцикл GN new"
                 }""";
         mockMvc.perform(put(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715")

@@ -12,7 +12,11 @@ public class ExceptionUtils {
     }
 
     public static <T> void requireEqualsApi(T first, T second, String fieldName) {
-        if (!first.equals(second)) {
+        if (first == null) {
+            if (second != null) {
+                throw new ApiValidationException(fieldName + " should be same");
+            }
+        } else if (!first.equals(second)) {
             throw new ApiValidationException(fieldName + " should be same");
         }
     }

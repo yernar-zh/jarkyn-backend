@@ -69,7 +69,7 @@ public class SupplyService {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<ItemResponse> items = itemService.findApiByDocument(supply);
         List<PaidDocumentResponse> paidDocuments = paidDocumentService.findResponseByDocument(supply);
-        return supplyMapper.toDetailResponse(supply, items, paidDocuments);
+        return supplyMapper.toResponse(supply, items, paidDocuments);
     }
 
     @Transactional(readOnly = true)

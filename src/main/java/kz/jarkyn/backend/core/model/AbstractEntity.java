@@ -2,8 +2,6 @@ package kz.jarkyn.backend.core.model;
 
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
