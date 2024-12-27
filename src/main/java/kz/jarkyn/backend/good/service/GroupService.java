@@ -6,6 +6,7 @@ import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.IdDto;
+import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import kz.jarkyn.backend.good.model.GroupEntity;
 import kz.jarkyn.backend.good.model.dto.GroupDetailResponse;
 import kz.jarkyn.backend.good.model.dto.GroupRequest;
@@ -54,17 +55,16 @@ public class GroupService {
         Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream()
                 .filter(group -> group.getParent() != null)
                 .collect(Collectors.groupingBy(GroupEntity::getParent,
-                        Collectors.collectingAndThen(
-                                Collectors.toList(), list -> {
-                                    list.sort(Comparator.comparing(GroupEntity::getPosition));
-                                    return list;
-                                }
+                        Collectors.collectingAndThen(Collectors.toList(), list ->
+                                list.stream().sorted(Comparator.comparing(GroupEntity::getPosition)).toList()
                         )
                 ));
-        List<GroupEntity> roots = entities.stream()
+        return entities.stream()
                 .sorted(Comparator.comparing(GroupEntity::getPosition))
-                .filter(group -> group.getParent() == null).toList();
-        return roots.stream().map(head -> groupMapper.toListApi(head, childrenMap)).collect(Collectors.toList());
+                .filter(group -> group.getParent() == null)
+                .map(head -> groupMapper.toListApi(head, childrenMap))
+                .sorted(Comparator.comparing(IdNamedDto::getName))
+                .toList();
     }
 
     @Transactional
