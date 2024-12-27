@@ -46,7 +46,37 @@ class GoodControllerTest {
                 .andExpect(jsonPath("$.sellingPrices[0].value").value(880))
                 .andExpect(jsonPath("$.sellingPrices[1].id").value("de14fc67-d461-4094-a79f-ed32e2e50518"))
                 .andExpect(jsonPath("$.sellingPrices[1].quantity").value(20))
-                .andExpect(jsonPath("$.sellingPrices[1].value").value(850));
+                .andExpect(jsonPath("$.sellingPrices[1].value").value(850))
+                .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.stock[0].warehouse.name").value("Кенжина"))
+                .andExpect(jsonPath("$.stock[0].remain").value(0))
+                .andExpect(jsonPath("$.stock[0].costPrice").value(0))
+                .andExpect(jsonPath("$.stock[1].warehouse.id").value("d1da1441-6598-4511-bc82-8fc06602e373"))
+                .andExpect(jsonPath("$.stock[1].warehouse.name").value("Барыс"))
+                .andExpect(jsonPath("$.stock[1].remain").value(0))
+                .andExpect(jsonPath("$.stock[1].costPrice").value(0));
+    }
+
+    @Test
+    @DirtiesContext
+    public void testDetail_afterSupplyCommit() throws Exception {
+        mockMvc.perform(put(Api.Supply.PATH + "/17c1285b-6514-45d5-88a2-3b9f673dc5e3/commit")
+                        .with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"));
+        mockMvc.perform(get(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435").with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
+                .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.stock[0].warehouse.name").value("Кенжина"))
+                .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.stock[0].warehouse.name").value("Кенжина"))
+                .andExpect(jsonPath("$.stock[0].remain").value(50))
+                .andExpect(jsonPath("$.stock[0].costPrice").value(513.29))
+                .andExpect(jsonPath("$.stock[1].warehouse.id").value("d1da1441-6598-4511-bc82-8fc06602e373"))
+                .andExpect(jsonPath("$.stock[1].warehouse.name").value("Барыс"))
+                .andExpect(jsonPath("$.stock[1].remain").value(0))
+                .andExpect(jsonPath("$.stock[1].costPrice").value(0));
     }
 
     @Test
@@ -117,7 +147,15 @@ class GoodControllerTest {
                 .andExpect(jsonPath("$.sellingPrices[0].value").value(920))
                 .andExpect(jsonPath("$.sellingPrices[1].id").exists())
                 .andExpect(jsonPath("$.sellingPrices[1].quantity").value(30))
-                .andExpect(jsonPath("$.sellingPrices[1].value").value(899));
+                .andExpect(jsonPath("$.sellingPrices[1].value").value(899))
+                .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.stock[0].warehouse.name").value("Кенжина"))
+                .andExpect(jsonPath("$.stock[0].remain").value(0))
+                .andExpect(jsonPath("$.stock[0].costPrice").value(0))
+                .andExpect(jsonPath("$.stock[1].warehouse.id").value("d1da1441-6598-4511-bc82-8fc06602e373"))
+                .andExpect(jsonPath("$.stock[1].warehouse.name").value("Барыс"))
+                .andExpect(jsonPath("$.stock[1].remain").value(0))
+                .andExpect(jsonPath("$.stock[1].costPrice").value(0));
     }
 
     @Test

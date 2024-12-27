@@ -24,7 +24,6 @@ import kz.jarkyn.backend.good.repository.GoodAttributeRepository;
 import kz.jarkyn.backend.good.repository.SellingPriceRepository;
 import kz.jarkyn.backend.good.mapper.GoodMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
-import kz.jarkyn.backend.stock.mode.TurnoverEntity;
 import kz.jarkyn.backend.stock.mode.dto.StockResponse;
 import kz.jarkyn.backend.stock.service.TurnoverService;
 import org.springframework.stereotype.Service;
