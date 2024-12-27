@@ -1,6 +1,5 @@
 package kz.jarkyn.backend.stock.repository;
 
-import jakarta.persistence.Tuple;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.stock.mode.TurnoverEntity;

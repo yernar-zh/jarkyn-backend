@@ -9,8 +9,8 @@ import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.core.mapper.ItemMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
-import kz.jarkyn.backend.stock.mode.dto.TurnoverRequest;
-import kz.jarkyn.backend.stock.mode.dto.TurnoverResponse;
+import kz.jarkyn.backend.stock.mode.TurnoverEntity;
+import kz.jarkyn.backend.stock.mode.dto.StockResponse;
 import kz.jarkyn.backend.stock.service.TurnoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,25 +42,19 @@ public class ItemService {
     public List<ItemResponse> findApiByDocument(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         if (document.getCommited()) {
-            Map<UUID, TurnoverResponse> turnovers = turnoverService.findByDocument(document).stream()
+            Map<UUID, TurnoverEntity> turnovers = turnoverService.findByDocument(document).stream()
                     .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
             return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
-                TurnoverResponse turnover = turnovers.get(item.getGood().getId());
+                TurnoverEntity turnover = turnovers.get(item.getGood().getId());
                 return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());
             }).toList();
         } else {
-            Map<UUID, TurnoverResponse> lastTurnovers = turnoverService.findLast(document.getWarehouse(),
+            Map<UUID, StockResponse> stocks = turnoverService.findStock(document.getWarehouse(),
                             items.stream().map(ItemEntity::getGood).toList()).stream()
                     .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
             return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
-                TurnoverResponse lastTurnover = lastTurnovers.get(item.getGood().getId());
-                if (lastTurnover != null) {
-                    return itemMapper.toResponse(item,
-                            lastTurnover.getRemain() + lastTurnover.getQuantity(),
-                            lastTurnover.getCostPrice());
-                } else {
-                    return itemMapper.toResponse(item, 0, BigDecimal.ZERO);
-                }
+                StockResponse stock = stocks.get(item.getGood().getId());
+                return itemMapper.toResponse(item, stock.getRemain(), stock.getCostPrice());
             }).toList();
         }
     }
@@ -83,9 +77,14 @@ public class ItemService {
     }
 
     @Transactional
-    public void commit(UUID id, BigDecimal costPrice) {
+    public void createPositiveTurnover(UUID id, BigDecimal costPrice) {
         ItemEntity item = itemRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        TurnoverRequest turnover = itemMapper.toTurnoverRequest(item, costPrice);
-        turnoverService.create(turnover);
+        turnoverService.create(item.getDocument(), item.getGood(), item.getQuantity(), costPrice);
+    }
+
+    @Transactional
+    public void createNegativeTurnover(UUID id) {
+        ItemEntity item = itemRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), null);
     }
 }

@@ -1,16 +1,15 @@
 
 package kz.jarkyn.backend.stock.mode.dto;
 
-import kz.jarkyn.backend.core.model.dto.IdDto;
+import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
 
 @Value.Immutable
-public interface TurnoverResponse {
-    IdDto getWarehouse();
-    IdDto getGood();
+public interface StockResponse {
+    IdNamedDto getWarehouse();
+    IdNamedDto getGood();
     Integer getRemain();
-    Integer getQuantity();
     BigDecimal getCostPrice();
 }

@@ -24,7 +24,8 @@ import kz.jarkyn.backend.good.repository.GoodAttributeRepository;
 import kz.jarkyn.backend.good.repository.SellingPriceRepository;
 import kz.jarkyn.backend.good.mapper.GoodMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
-import kz.jarkyn.backend.stock.mode.dto.TurnoverResponse;
+import kz.jarkyn.backend.stock.mode.TurnoverEntity;
+import kz.jarkyn.backend.stock.mode.dto.StockResponse;
 import kz.jarkyn.backend.stock.service.TurnoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +72,8 @@ public class GoodService {
         attributes.sort(Comparator.comparing(AttributeEntity::getName));
         List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
         sellingPrices.sort(Comparator.comparing(SellingPriceEntity::getQuantity));
-        return goodMapper.toResponse(good, attributes, sellingPrices);
+        List<StockResponse> stocks = turnoverService.findStock(good);
+        return goodMapper.toResponse(good, attributes, sellingPrices, stocks);
     }
 
     @Transactional(readOnly = true)
@@ -86,15 +88,14 @@ public class GoodService {
                             BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
                                     .stream().map(SellingPriceEntity::getValue)
                                     .findFirst().orElse(null);
-                            List<TurnoverResponse> lastTurnovers = turnoverService.findLast(good);
-                            Integer remind = lastTurnovers.stream()
-                                    .map(lastTurnover -> lastTurnover.getRemain() + lastTurnover.getQuantity())
-                                    .reduce(0, Integer::sum);
-                            BigDecimal averageCostPrice = lastTurnovers.stream()
-                                    .map(TurnoverResponse::getCostPrice)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                    .divide(BigDecimal.valueOf(Math.max(1, lastTurnovers.size())),
-                                            2, RoundingMode.HALF_UP);
+                            List<StockResponse> stock = turnoverService.findStock(good);
+                            Integer remind = stock.stream()
+                                    .map(StockResponse::getRemain)
+                                    .reduce(Integer::sum).orElseThrow();
+                            BigDecimal averageCostPrice = stock.stream()
+                                    .map(StockResponse::getCostPrice)
+                                    .reduce(BigDecimal::add).orElseThrow()
+                                    .divide(BigDecimal.valueOf(stock.size()), 2, RoundingMode.HALF_UP);
                             return goodMapper.toListResponse(good, attributes, sellingPrice, remind, averageCostPrice);
                         }).toList());
         return search.getResult(queryParams);

@@ -154,7 +154,7 @@ public class SupplyService {
         for (ItemResponse item : items) {
             BigDecimal costPrice = totalPaidAmount.multiply(item.getPrice())
                     .divide(totalItemAmount, 2, RoundingMode.HALF_UP);
-            itemService.commit(item.getId(), costPrice);
+            itemService.createPositiveTurnover(item.getId(), costPrice);
         }
     }
 }
