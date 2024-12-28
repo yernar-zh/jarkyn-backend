@@ -2,14 +2,12 @@
 package kz.jarkyn.backend.counterparty.service;
 
 
-import jakarta.persistence.criteria.JoinType;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.counterparty.model.*;
@@ -17,8 +15,8 @@ import kz.jarkyn.backend.counterparty.model.dto.AccountRequest;
 import kz.jarkyn.backend.counterparty.model.dto.AccountResponse;
 import kz.jarkyn.backend.counterparty.repository.AccountRepository;
 import kz.jarkyn.backend.counterparty.mapper.AccountMapper;
-import kz.jarkyn.backend.good.model.AttributeEntity;
-import kz.jarkyn.backend.good.model.SellingPriceEntity;
+import kz.jarkyn.backend.operation.service.CashFlowService;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,44 +31,34 @@ public class AccountService {
     private final AuditService auditService;
     private final AccountMapper accountMapper;
     private final SearchFactory searchFactory;
+    private final CashFlowService cashFlowService;
 
     public AccountService(
             AccountRepository accountRepository,
             AuditService auditService,
-            AccountMapper accountMapper, SearchFactory searchFactory) {
+            AccountMapper accountMapper,
+            SearchFactory searchFactory,
+            CashFlowService cashFlowService) {
         this.accountRepository = accountRepository;
         this.auditService = auditService;
         this.accountMapper = accountMapper;
         this.searchFactory = searchFactory;
+        this.cashFlowService = cashFlowService;
     }
 
     @Transactional(readOnly = true)
     public AccountResponse findApiById(UUID id) {
         AccountEntity account = accountRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        return accountMapper.toResponse(account);
+        return accountMapper.toResponse(account, cashFlowService.findBalance(account));
     }
 
     @Transactional(readOnly = true)
     public PageResponse<AccountResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaAttributes<AccountEntity> attributes = CriteriaAttributes.<AccountEntity>builder()
-                .add("id", (root) -> root.get(AccountEntity_.id))
-                .add("name", (root) -> root.get(AccountEntity_.name))
-                .add("organization.id", (root) -> root
-                        .get(AccountEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root) -> root
-                        .get(AccountEntity_.organization).get(OrganizationEntity_.name))
-                .add("counterparty.id", (root) -> root
-                        .join(AccountEntity_.counterparty, JoinType.LEFT).get(CounterpartyEntity_.id))
-                .add("counterparty.name", (root) -> root
-                        .join(AccountEntity_.counterparty, JoinType.LEFT).get(CounterpartyEntity_.name))
-                .add("bank", (root) -> root.get(AccountEntity_.bank))
-                .add("giro", (root) -> root.get(AccountEntity_.giro))
-                .add("currency", (root) -> root.get(AccountEntity_.currency))
-                .add("balance", (root) -> root.get(AccountEntity_.balance))
-                .build();
-        Search<AccountResponse> search = searchFactory.createCriteriaSearch(
+        Search<AccountResponse> search = searchFactory.createListSearch(
                 AccountResponse.class, List.of("name", "giro"),
-                AccountEntity.class, attributes);
+                () -> accountRepository.findAll().stream()
+                        .map(account -> accountMapper.toResponse(account, cashFlowService.findBalance(account)))
+                        .toList());
         return search.getResult(queryParams);
     }
 
@@ -83,7 +71,9 @@ public class AccountService {
                     account.setOrganization(organization);
                     account.setCounterparty(counterparty);
                     account.setCurrency(currency);
-                    account.setBalance(BigDecimal.ZERO);
+                    account.setName("");
+                    account.setBank("");
+                    account.setGiro("");
                     accountRepository.save(account);
                     auditService.saveChanges(account);
                     return account;
@@ -91,18 +81,22 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public List<AccountEntity> findByCounterparty(CounterpartyEntity counterparty) {
-        return accountRepository.findByCounterparty(counterparty).stream()
-                .filter(account -> account.getBalance().compareTo(BigDecimal.ZERO) > 0)
+    public List<Pair<BigDecimal, Currency>> findBalanceByCounterparty(CounterpartyEntity counterparty) {
+        List<Pair<BigDecimal, Currency>> result = accountRepository.findByCounterparty(counterparty).stream()
                 .sorted(Comparator.comparing(AbstractEntity::getLastModifiedAt).reversed())
+                .map(account -> Pair.of(cashFlowService.findBalance(account), account.getCurrency()))
+                .filter(pair -> pair.getFirst().compareTo(BigDecimal.ZERO) != 0)
                 .toList();
+        if (!result.isEmpty()) {
+            return result;
+        }
+        return List.of(Pair.of(BigDecimal.ZERO, Currency.KZT));
     }
 
     @Transactional
     public UUID createApi(AccountRequest request) {
         AccountEntity account = accountRepository.save(accountMapper.toEntity(request));
         account.setCounterparty(null);
-        account.setBalance(BigDecimal.ZERO);
         auditService.saveChanges(account);
         return account.getId();
     }

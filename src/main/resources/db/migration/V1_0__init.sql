@@ -9,7 +9,6 @@ CREATE TABLE account
     bank             VARCHAR(255),
     giro             VARCHAR(255),
     currency         VARCHAR(255),
-    balance          DECIMAL,
     CONSTRAINT pk_account PRIMARY KEY (id)
 );
 
@@ -55,6 +54,8 @@ CREATE TABLE cash_flow
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     document_id      UUID,
     account_id       UUID,
+    moment           TIMESTAMP WITHOUT TIME ZONE,
+    balance          DECIMAL,
     amount           DECIMAL,
     CONSTRAINT pk_cash_flow PRIMARY KEY (id)
 );

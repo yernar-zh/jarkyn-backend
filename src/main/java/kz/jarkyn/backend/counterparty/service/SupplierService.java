@@ -58,10 +58,8 @@ public class SupplierService {
         Search<SupplierListResponse> search = searchFactory.createListSearch(
                 SupplierListResponse.class, List.of("name"),
                 () -> supplierRepository.findAll().stream().map(supplier -> {
-                    Pair<BigDecimal, Currency> account = accountService.findByCounterparty(supplier)
-                            .stream().findFirst()
-                            .map(o -> Pair.of(o.getBalance(), o.getCurrency()))
-                            .orElse(Pair.of(BigDecimal.ZERO, Currency.KZT));
+                    Pair<BigDecimal, Currency> account = accountService.findBalanceByCounterparty(supplier)
+                            .stream().findFirst().orElseThrow();
                     Tuple results = supplierRepository.findSupplyInfo(supplier);
                     return supplierMapper.toResponse(supplier, account.getFirst(), account.getSecond(),
                             results.get("firstSupplyMoment", LocalDateTime.class),

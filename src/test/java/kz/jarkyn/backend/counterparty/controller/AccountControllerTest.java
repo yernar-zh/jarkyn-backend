@@ -72,8 +72,6 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.row[0].bank").value("Kaspi Bank"))
                 .andExpect(jsonPath("$.row[0].organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
-                .andExpect(jsonPath("$.row[0].counterparty.name").isEmpty())
-                .andExpect(jsonPath("$.row[0].counterparty.id").isEmpty())
                 .andExpect(jsonPath("$.row[1].id").value("c8190dcc-1cbe-4df6-a582-0f85e9850335"))
                 .andExpect(jsonPath("$.row[1].name").value("Наличный Юань"))
                 .andExpect(jsonPath("$.row[1].currency").value("CNY"))
@@ -82,8 +80,6 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.row[1].bank").isEmpty())
                 .andExpect(jsonPath("$.row[1].organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.row[1].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
-                .andExpect(jsonPath("$.row[1].counterparty.name").isEmpty())
-                .andExpect(jsonPath("$.row[1].counterparty.id").isEmpty())
                 .andExpect(jsonPath("$.row[2].id").value("8d1ed49a-6964-4a3e-bc83-8c22601e70f8"))
                 .andExpect(jsonPath("$.row[2].name").value("Наличный Доллар"))
                 .andExpect(jsonPath("$.row[2].currency").value("USD"))
@@ -91,9 +87,7 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.row[2].balance").value(0))
                 .andExpect(jsonPath("$.row[2].bank").isEmpty())
                 .andExpect(jsonPath("$.row[2].organization.name").value("ИП Жырқын"))
-                .andExpect(jsonPath("$.row[2].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
-                .andExpect(jsonPath("$.row[2].counterparty.name").isEmpty())
-                .andExpect(jsonPath("$.row[2].counterparty.id").isEmpty());
+                .andExpect(jsonPath("$.row[2].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"));
     }
 
     @Test

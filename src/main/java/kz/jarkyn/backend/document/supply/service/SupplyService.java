@@ -98,11 +98,11 @@ public class SupplyService {
                         .get(SupplyEntity_.counterparty).get(CounterpartyEntity_.name))
                 .add("paidAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
-                    Root<PaidDocumentEntity> PaidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
-                    subQuery.select(cb.sum(PaidDocumentRoot.get(PaidDocumentEntity_.amount)));
+                    Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
+                    subQuery.select(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)));
                     subQuery.where(cb.and(
-                            cb.equal(PaidDocumentRoot.get(PaidDocumentEntity_.document), root),
-                            cb.equal(PaidDocumentRoot.get(PaidDocumentEntity_.payment)
+                            cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.document), root),
+                            cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.payment)
                                     .get(DocumentEntity_.counterparty), root.get(DocumentEntity_.counterparty))));
                     return subQuery;
                 })

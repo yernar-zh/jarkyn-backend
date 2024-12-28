@@ -58,10 +58,8 @@ public class CustomerService {
         Search<CustomerListResponse> search = searchFactory.createListSearch(
                 CustomerListResponse.class, List.of("name", "phoneNumber"),
                 () -> customerRepository.findAll().stream().map(customer -> {
-                    Pair<BigDecimal, Currency> account = accountService.findByCounterparty(customer)
-                            .stream().findFirst()
-                            .map(o -> Pair.of(o.getBalance(), o.getCurrency()))
-                            .orElse(Pair.of(BigDecimal.ZERO, Currency.KZT));
+                    Pair<BigDecimal, Currency> account = accountService.findBalanceByCounterparty(customer)
+                            .stream().findFirst().orElseThrow();
                     Tuple results = customerRepository.findSaleInfo(customer);
                     return customerMapper.toResponse(customer, account.getFirst(), account.getSecond(),
                             results.get("firstSaleMoment", LocalDateTime.class),

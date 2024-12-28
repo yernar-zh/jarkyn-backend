@@ -10,6 +10,7 @@ import kz.jarkyn.backend.counterparty.model.AccountEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "cash_flow")
@@ -20,6 +21,7 @@ public class CashFlowEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private AccountEntity account;
+    private LocalDateTime moment;
     private BigDecimal balance;
     private BigDecimal amount;
 
@@ -37,6 +39,14 @@ public class CashFlowEntity extends AbstractEntity {
 
     public void setAccount(AccountEntity account) {
         this.account = account;
+    }
+
+    public LocalDateTime getMoment() {
+        return moment;
+    }
+
+    public void setMoment(LocalDateTime moment) {
+        this.moment = moment;
     }
 
     public BigDecimal getBalance() {

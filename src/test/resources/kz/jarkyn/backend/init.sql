@@ -5,13 +5,13 @@ WHERE id = 'f57382c9-35a1-4b64-b3f0-f172489dc90a';
 
 
 ------------- Organization accounts -------------
-INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, currency, balance)
+INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, currency)
 VALUES ('6057082b-041b-47b7-ba31-9fa693eb2a21', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Ернар Ж.', 'Kaspi Bank', '+7(775)216-6661', 'KZT', 0),
+        'Ернар Ж.', 'Kaspi Bank', '+7(775)216-6661', 'KZT'),
        ('c8190dcc-1cbe-4df6-a582-0f85e9850335', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Наличный Юань', null, null, 'CNY', 0),
+        'Наличный Юань', '', '', 'CNY'),
        ('8d1ed49a-6964-4a3e-bc83-8c22601e70f8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Наличный Доллар', null, null, 'USD', 0);
+        'Наличный Доллар', '', '', 'USD');
 
 ------------------- Warehouse -------------------
 INSERT INTO warehouse (id, name)

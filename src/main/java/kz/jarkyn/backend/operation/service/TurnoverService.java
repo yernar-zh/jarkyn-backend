@@ -27,8 +27,8 @@ public class TurnoverService {
 
     public TurnoverService(
             TurnoverRepository turnoverRepository,
-            TurnoverMapper turnoverMapper
-            , WarehouseRepository warehouseRepository) {
+            TurnoverMapper turnoverMapper,
+            WarehouseRepository warehouseRepository) {
         this.turnoverRepository = turnoverRepository;
         this.turnoverMapper = turnoverMapper;
         this.warehouseRepository = warehouseRepository;
