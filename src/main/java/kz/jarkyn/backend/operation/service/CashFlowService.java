@@ -28,8 +28,7 @@ public class CashFlowService {
         cashFlow.setAccount(account);
         cashFlow.setMoment(document.getMoment());
         cashFlow.setAmount(amount);
-        BigDecimal balance = findBalance(account);
-        cashFlow.setBalance(balance);
+        cashFlow.setBalance(findBalance(account));
         cashFlowRepository.save(cashFlow);
     }
 
