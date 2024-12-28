@@ -153,7 +153,6 @@ public class GoodService {
     public GoodResponse archive(UUID id, Boolean value) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         good.setArchived(value);
-        goodRepository.save(good);
         return findApiById(id);
     }
 }
