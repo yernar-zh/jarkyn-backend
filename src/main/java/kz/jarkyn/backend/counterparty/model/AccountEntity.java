@@ -4,8 +4,6 @@ package kz.jarkyn.backend.counterparty.model;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "account")
 public class AccountEntity extends AbstractEntity {
@@ -20,7 +18,6 @@ public class AccountEntity extends AbstractEntity {
     private String giro;
     @Enumerated(EnumType.STRING)
     private Currency currency;
-    private BigDecimal balance;
 
     public OrganizationEntity getOrganization() {
         return organization;
@@ -68,13 +65,5 @@ public class AccountEntity extends AbstractEntity {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
     }
 }

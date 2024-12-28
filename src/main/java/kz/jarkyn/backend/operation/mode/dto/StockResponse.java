@@ -1,5 +1,5 @@
 
-package kz.jarkyn.backend.stock.mode.dto;
+package kz.jarkyn.backend.operation.mode.dto;
 
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import org.immutables.value.Value;

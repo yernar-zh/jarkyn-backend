@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.cashflow.model;
+package kz.jarkyn.backend.operation.mode;
 
 
 import jakarta.persistence.Entity;
@@ -20,8 +20,16 @@ public class CashFlowEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private AccountEntity account;
-
+    private BigDecimal balance;
     private BigDecimal amount;
+
+    public DocumentEntity getDocument() {
+        return document;
+    }
+
+    public void setDocument(DocumentEntity document) {
+        this.document = document;
+    }
 
     public AccountEntity getAccount() {
         return account;
@@ -31,12 +39,12 @@ public class CashFlowEntity extends AbstractEntity {
         this.account = account;
     }
 
-    public DocumentEntity getDocument() {
-        return document;
+    public BigDecimal getBalance() {
+        return balance;
     }
 
-    public void setDocument(DocumentEntity document) {
-        this.document = document;
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     public BigDecimal getAmount() {

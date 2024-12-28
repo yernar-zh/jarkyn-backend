@@ -1,8 +1,8 @@
-package kz.jarkyn.backend.stock.repository;
+package kz.jarkyn.backend.operation.repository;
 
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
-import kz.jarkyn.backend.stock.mode.TurnoverEntity;
+import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

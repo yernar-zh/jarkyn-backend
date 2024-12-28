@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.stock.mode;
+package kz.jarkyn.backend.operation.mode;
 
 
 import jakarta.persistence.Entity;

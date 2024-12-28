@@ -1,16 +1,15 @@
 
-package kz.jarkyn.backend.stock.service;
+package kz.jarkyn.backend.operation.service;
 
 
 import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
 import kz.jarkyn.backend.counterparty.repository.WarehouseRepository;
-import kz.jarkyn.backend.counterparty.service.WarehouseService;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
-import kz.jarkyn.backend.stock.mapper.TurnoverMapper;
-import kz.jarkyn.backend.stock.mode.TurnoverEntity;
-import kz.jarkyn.backend.stock.mode.dto.StockResponse;
-import kz.jarkyn.backend.stock.repository.TurnoverRepository;
+import kz.jarkyn.backend.operation.mapper.TurnoverMapper;
+import kz.jarkyn.backend.operation.mode.TurnoverEntity;
+import kz.jarkyn.backend.operation.mode.dto.StockResponse;
+import kz.jarkyn.backend.operation.repository.TurnoverRepository;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

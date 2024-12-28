@@ -9,7 +9,7 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.IdDto;
-import kz.jarkyn.backend.stock.mode.TurnoverEntity;
+import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 import org.springframework.stereotype.Service;
 

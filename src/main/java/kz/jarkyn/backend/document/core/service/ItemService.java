@@ -9,9 +9,9 @@ import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.core.mapper.ItemMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
-import kz.jarkyn.backend.stock.mode.TurnoverEntity;
-import kz.jarkyn.backend.stock.mode.dto.StockResponse;
-import kz.jarkyn.backend.stock.service.TurnoverService;
+import kz.jarkyn.backend.operation.mode.TurnoverEntity;
+import kz.jarkyn.backend.operation.mode.dto.StockResponse;
+import kz.jarkyn.backend.operation.service.TurnoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
