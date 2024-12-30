@@ -142,19 +142,11 @@ public class SupplyService {
     @Transactional
     public void commit(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        List<ItemResponse> items = itemService.findApiByDocument(supply);
-        BigDecimal totalItemAmount = items.stream()
-                .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        supply.setCommited(Boolean.TRUE);
+        auditService.saveChanges(supply);
         BigDecimal totalPaidAmount = paidDocumentService.findResponseByDocument(supply).stream()
                 .map(paidDocument -> paidDocument.getAmount().multiply(paidDocument.getPayment().getExchangeRate()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        supply.setCommited(Boolean.TRUE);
-        auditService.saveChanges(supply);
-        for (ItemResponse item : items) {
-            BigDecimal costPrice = totalPaidAmount.multiply(item.getPrice())
-                    .divide(totalItemAmount, 2, RoundingMode.HALF_UP);
-            itemService.createPositiveTurnover(item.getId(), costPrice);
-        }
+        itemService.createPositiveTurnover(supply, totalPaidAmount);
     }
 }

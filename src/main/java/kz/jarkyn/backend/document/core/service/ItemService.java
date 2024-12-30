@@ -9,6 +9,7 @@ import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.core.mapper.ItemMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
+import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.mode.dto.StockResponse;
 import kz.jarkyn.backend.operation.service.TurnoverService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -41,22 +43,17 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemResponse> findApiByDocument(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
-        if (document.getCommited()) {
-            Map<UUID, TurnoverEntity> turnovers = turnoverService.findByDocument(document).stream()
-                    .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
-            return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
-                TurnoverEntity turnover = turnovers.get(item.getGood().getId());
-                return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());
-            }).toList();
-        } else {
-            Map<UUID, StockResponse> stocks = turnoverService.findStock(document.getWarehouse(),
-                            items.stream().map(ItemEntity::getGood).toList()).stream()
-                    .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
-            return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
-                StockResponse stock = stocks.get(item.getGood().getId());
-                return itemMapper.toResponse(item, stock.getRemain(), stock.getCostPrice());
-            }).toList();
-        }
+        Map<UUID, TurnoverEntity> turnovers = turnoverService.findByDocument(document).stream()
+                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
+        Map<UUID, StockResponse> stocks = turnoverService.findStock(document.getWarehouse(),
+                        items.stream().map(ItemEntity::getGood).toList()).stream()
+                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
+        return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
+            TurnoverEntity turnover = turnovers.get(item.getGood().getId());
+            if (turnover != null) return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());
+            StockResponse stock = stocks.get(item.getGood().getId());
+            return itemMapper.toResponse(item, stock.getRemain(), stock.getCostPrice());
+        }).toList();
     }
 
     @Transactional
@@ -77,14 +74,23 @@ public class ItemService {
     }
 
     @Transactional
-    public void createPositiveTurnover(UUID id, BigDecimal costPrice) {
-        ItemEntity item = itemRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        turnoverService.create(item.getDocument(), item.getGood(), item.getQuantity(), costPrice);
+    public void createPositiveTurnover(DocumentEntity document, BigDecimal totalCostPrice) {
+        List<ItemEntity> items = itemRepository.findByDocument(document);
+        BigDecimal totalItemAmount = items.stream()
+                .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        for (ItemEntity item : items) {
+            BigDecimal costPrice = totalCostPrice.multiply(item.getPrice())
+                    .divide(totalItemAmount, 2, RoundingMode.HALF_UP);
+            turnoverService.create(item.getDocument(), item.getGood(), item.getQuantity(), costPrice);
+        }
     }
 
     @Transactional
-    public void createNegativeTurnover(UUID id) {
-        ItemEntity item = itemRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), null);
+    public void createNegativeTurnover(DocumentEntity document) {
+        List<ItemEntity> items = itemRepository.findByDocument(document);
+        for (ItemEntity item : items) {
+            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), null);
+        }
     }
 }

@@ -293,6 +293,16 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.items[1].good.id").value("bf6f2ba4-f994-44c1-839f-36a75f07242e"))
                 .andExpect(jsonPath("$.items[1].remain").value(0))
                 .andExpect(jsonPath("$.items[1].costPrice").value(331.15));
+        mockMvc.perform(get(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435").with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.stock[0].remain").value(50))
+                .andExpect(jsonPath("$.stock[0].costPrice").value(513.29));
+        mockMvc.perform(get(Api.Good.PATH + "/bf6f2ba4-f994-44c1-839f-36a75f07242e").with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.stock[0].remain").value(100))
+                .andExpect(jsonPath("$.stock[0].costPrice").value(331.15));
 
     }
 }
