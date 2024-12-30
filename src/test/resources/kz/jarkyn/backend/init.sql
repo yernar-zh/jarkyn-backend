@@ -138,5 +138,29 @@ INSERT INTO paid_document (id, payment_id, document_id, amount)
 VALUES ('e70efb3f-9124-4ef9-9b7e-7bc24385710f', 'fa81596d-a236-4256-8686-7f7f3be85ae4',
         '17c1285b-6514-45d5-88a2-3b9f673dc5e3', 20);
 
-
 -------------------- Sale -----------------------
+INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
+                      currency, exchange_rate, amount, comment, deleted, commited)
+VALUES ('9f26476e-e143-4468-8a37-abdb479e89b8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
+        '523961a7-696d-4779-8bb0-fd327feaecf3', '1d468c04-6360-43e5-9d51-7771e9d9dcff',
+        'SL-00001', '2024-12-30 16:45',
+        'KZT', 1, 61500, '', false, false);
+INSERT INTO sale (id, shipment_moment, state)
+VALUES ('9f26476e-e143-4468-8a37-abdb479e89b8', null, 'NEW');
+INSERT INTO item (id, document_id, good_id, quantity, price, position)
+VALUES ('dcd46fd5-b931-4759-8b1b-c1ad39c3cffa', '9f26476e-e143-4468-8a37-abdb479e89b8',
+        '7f316872-1da3-44c8-9293-0fddda859435', 40, 850, 0),
+       ('d1c004c3-f3e8-4cd9-80f3-74233f91d9b9', '9f26476e-e143-4468-8a37-abdb479e89b8',
+        'bf6f2ba4-f994-44c1-839f-36a75f07242e', 50, 550, 1);
+-- Sale supplier payment
+INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
+                      currency, exchange_rate, amount, comment, deleted, commited)
+VALUES ('4aae4391-3bd4-4746-b06d-faedb32fefd8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
+        null, '1d468c04-6360-43e5-9d51-7771e9d9dcff',
+        'PI-00001', '2024-12-30 18:20',
+        'KZT', 1, 61500, '', false, false);
+INSERT INTO payment_out (id, account_id)
+VALUES ('4aae4391-3bd4-4746-b06d-faedb32fefd8', '6057082b-041b-47b7-ba31-9fa693eb2a21');
+INSERT INTO paid_document (id, payment_id, document_id, amount)
+VALUES ('e207245e-dc26-44ab-b679-ef52b89e76f7', '4aae4391-3bd4-4746-b06d-faedb32fefd8',
+        '9f26476e-e143-4468-8a37-abdb479e89b8', 61500);

@@ -74,13 +74,13 @@ public class ItemService {
     }
 
     @Transactional
-    public void createPositiveTurnover(DocumentEntity document, BigDecimal totalCostPrice) {
+    public void createPositiveTurnover(DocumentEntity document, BigDecimal documentCostPrice) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         BigDecimal totalItemAmount = items.stream()
                 .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         for (ItemEntity item : items) {
-            BigDecimal costPrice = totalCostPrice.multiply(item.getPrice())
+            BigDecimal costPrice = documentCostPrice.multiply(item.getPrice())
                     .divide(totalItemAmount, 2, RoundingMode.HALF_UP);
             turnoverService.create(item.getDocument(), item.getGood(), item.getQuantity(), costPrice);
         }

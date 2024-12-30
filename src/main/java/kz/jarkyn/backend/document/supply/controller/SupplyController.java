@@ -3,7 +3,6 @@ package kz.jarkyn.backend.document.supply.controller;
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.counterparty.model.dto.SupplierListResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;

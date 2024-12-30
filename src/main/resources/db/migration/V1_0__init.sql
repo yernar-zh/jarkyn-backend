@@ -225,7 +225,7 @@ CREATE TABLE turnover
     moment           TIMESTAMP WITHOUT TIME ZONE,
     quantity         INTEGER,
     remain           INTEGER,
-    cost_price       DECIMAL,
+    cost_price  DECIMAL,
     CONSTRAINT pk_turnover PRIMARY KEY (id)
 );
 
