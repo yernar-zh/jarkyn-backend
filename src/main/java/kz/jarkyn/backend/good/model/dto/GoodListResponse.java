@@ -14,7 +14,7 @@ public interface GoodListResponse extends IdNamedDto {
     @Nullable IdDto getImage();
     Integer getMinimumPrice();
     Boolean getArchived();
-    String getAttributes();
+    String getAttributeIds();
     BigDecimal getSellingPrice();
     Integer getRemain();
     BigDecimal getCostPrice();

@@ -25,7 +25,7 @@ public interface GoodMapper extends RequestMapper<GoodEntity, GoodRequest> {
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,
             List<StockResponse> stock);
     GoodListResponse toListResponse(
-            GoodEntity entity, String attributes, BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);
+            GoodEntity entity, String attributeIds, BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "good", source = "good")
