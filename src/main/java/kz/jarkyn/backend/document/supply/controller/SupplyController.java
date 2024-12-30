@@ -51,4 +51,10 @@ public class SupplyController {
         supplyService.commit(id);
         return supplyService.findApiById(id);
     }
+
+    @PutMapping("{id}/undoCommit")
+    public SupplyResponse undoCommit(@PathVariable UUID id) {
+        supplyService.undoCommit(id);
+        return supplyService.findApiById(id);
+    }
 }

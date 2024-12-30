@@ -120,8 +120,9 @@ VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', 'c6e5e4f9-93c0-40ea-91fa-e8a9bff
         null, '94fadc9a-83bb-4639-be07-f825ab9eb40e',
         'PO-00001', '2024-12-07 22:47',
         'CNY', 68, 710, '', false, false);
-INSERT INTO payment_out (id, account_id)
-VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', 'c8190dcc-1cbe-4df6-a582-0f85e9850335');
+INSERT INTO payment_out (id, account_id, item_of_expenditure)
+VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', 'c8190dcc-1cbe-4df6-a582-0f85e9850335',
+        'SUPPLY');
 INSERT INTO paid_document (id, payment_id, document_id, amount)
 VALUES ('538c3271-7398-4fab-ad05-0a886188de11', '5c799431-3bc3-400f-b9a3-209f27b935a0',
         '17c1285b-6514-45d5-88a2-3b9f673dc5e3', 710);
@@ -132,13 +133,14 @@ VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', 'c6e5e4f9-93c0-40ea-91fa-e8a9bff
         null, null,
         'PO-00002', '2024-12-07 23:47',
         'USD', 525, 20, '', false, false);
-INSERT INTO payment_out (id, account_id)
-VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', '8d1ed49a-6964-4a3e-bc83-8c22601e70f8');
+INSERT INTO payment_out (id, account_id, item_of_expenditure)
+VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', '8d1ed49a-6964-4a3e-bc83-8c22601e70f8',
+        'SUPPLY');
 INSERT INTO paid_document (id, payment_id, document_id, amount)
 VALUES ('e70efb3f-9124-4ef9-9b7e-7bc24385710f', 'fa81596d-a236-4256-8686-7f7f3be85ae4',
         '17c1285b-6514-45d5-88a2-3b9f673dc5e3', 20);
 
--------------------- Sale -----------------------
+-------------------- Sale ----------------------.-
 INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
                       currency, exchange_rate, amount, comment, deleted, commited)
 VALUES ('9f26476e-e143-4468-8a37-abdb479e89b8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',

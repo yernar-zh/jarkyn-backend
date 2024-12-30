@@ -93,4 +93,9 @@ public class ItemService {
             turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), null);
         }
     }
+
+    @Transactional
+    public void deleteTurnover(DocumentEntity document) {
+        turnoverService.delete(document);
+    }
 }

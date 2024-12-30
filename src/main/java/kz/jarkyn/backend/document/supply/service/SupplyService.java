@@ -29,8 +29,6 @@ import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
-import kz.jarkyn.backend.operation.mode.TurnoverEntity;
-import kz.jarkyn.backend.operation.mode.TurnoverEntity_;
 import kz.jarkyn.backend.operation.service.CashFlowService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -159,5 +157,14 @@ public class SupplyService {
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
         cashFlowService.create(supply, account, supply.getAmount());
+    }
+
+    @Transactional
+    public void undoCommit(UUID id) {
+        SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        supply.setCommited(Boolean.FALSE);
+        auditService.saveChanges(supply);
+        itemService.deleteTurnover(supply);
+        cashFlowService.delete(supply);
     }
 }

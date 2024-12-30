@@ -8,6 +8,7 @@ import kz.jarkyn.backend.document.sale.model.dto.SaleListResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.sale.service.SaleService;
+import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.document.sale.service.SaleService;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +54,12 @@ public class SaleController {
     @PutMapping("{id}/commit")
     public SaleResponse commit(@PathVariable UUID id) {
         saleService.commit(id);
+        return saleService.findApiById(id);
+    }
+
+    @PutMapping("{id}/undoCommit")
+    public SaleResponse undoCommit(@PathVariable UUID id) {
+        saleService.undoCommit(id);
         return saleService.findApiById(id);
     }
 }

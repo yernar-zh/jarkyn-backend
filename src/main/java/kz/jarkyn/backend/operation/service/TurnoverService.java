@@ -34,24 +34,6 @@ public class TurnoverService {
         this.warehouseRepository = warehouseRepository;
     }
 
-    @Transactional
-    public void create(DocumentEntity document, GoodEntity good, Integer quantity, BigDecimal costPrice) {
-        TurnoverEntity turnover = new TurnoverEntity();
-        turnover.setDocument(document);
-        turnover.setGood(good);
-        turnover.setQuantity(quantity);
-        turnover.setCostPrice(costPrice);
-        turnover.setWarehouse(document.getWarehouse());
-        turnover.setMoment(document.getMoment());
-        StockResponse stock = findStock(turnover.getDocument().getWarehouse(), List.of(turnover.getGood()))
-                .stream().findFirst().orElseThrow();
-        turnover.setRemain(stock.getRemain());
-        if (quantity < 0) {
-            turnover.setCostPrice(stock.getCostPrice());
-        }
-        turnoverRepository.save(turnover);
-    }
-
     @Transactional(readOnly = true)
     public List<TurnoverEntity> findByDocument(DocumentEntity document) {
         return turnoverRepository.findByDocument(document);
@@ -77,5 +59,28 @@ public class TurnoverService {
             return turnoverMapper.toStockResponse(warehouse, good,
                     lastTurnover.getRemain() + lastTurnover.getQuantity(), lastTurnover.getCostPrice());
         })).toList();
+    }
+
+    @Transactional
+    public void create(DocumentEntity document, GoodEntity good, Integer quantity, BigDecimal costPrice) {
+        TurnoverEntity turnover = new TurnoverEntity();
+        turnover.setDocument(document);
+        turnover.setGood(good);
+        turnover.setQuantity(quantity);
+        turnover.setCostPrice(costPrice);
+        turnover.setWarehouse(document.getWarehouse());
+        turnover.setMoment(document.getMoment());
+        StockResponse stock = findStock(turnover.getDocument().getWarehouse(), List.of(turnover.getGood()))
+                .stream().findFirst().orElseThrow();
+        turnover.setRemain(stock.getRemain());
+        if (quantity < 0) {
+            turnover.setCostPrice(stock.getCostPrice());
+        }
+        turnoverRepository.save(turnover);
+    }
+
+    @Transactional
+    public void delete(DocumentEntity document) {
+        turnoverRepository.deleteAll(turnoverRepository.findByDocument(document));
     }
 }

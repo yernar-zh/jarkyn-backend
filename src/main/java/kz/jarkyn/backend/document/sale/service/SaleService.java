@@ -33,6 +33,7 @@ import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.sale.repository.SaleRepository;
 import kz.jarkyn.backend.document.sale.mapper.SaleMapper;
 import kz.jarkyn.backend.document.sale.model.SaleEntity_;
+import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity_;
 import kz.jarkyn.backend.operation.service.CashFlowService;
@@ -169,5 +170,14 @@ public class SaleService {
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 sale.getOrganization(), sale.getCounterparty(), sale.getCurrency());
         cashFlowService.create(sale, account, sale.getAmount().negate());
+    }
+
+    @Transactional
+    public void undoCommit(UUID id) {
+        SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        sale.setCommited(Boolean.FALSE);
+        auditService.saveChanges(sale);
+        itemService.deleteTurnover(sale);
+        cashFlowService.delete(sale);
     }
 }

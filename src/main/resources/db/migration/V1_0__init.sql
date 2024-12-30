@@ -178,8 +178,11 @@ CREATE TABLE payment_in
 
 CREATE TABLE payment_out
 (
-    id         UUID NOT NULL,
-    account_id UUID,
+    id                  UUID NOT NULL,
+    account_id          UUID,
+    receipt_number      VARCHAR(255),
+    item_of_expenditure VARCHAR(255),
+    purpose             VARCHAR(255),
     CONSTRAINT pk_payment_out PRIMARY KEY (id)
 );
 
@@ -225,7 +228,7 @@ CREATE TABLE turnover
     moment           TIMESTAMP WITHOUT TIME ZONE,
     quantity         INTEGER,
     remain           INTEGER,
-    cost_price  DECIMAL,
+    cost_price       DECIMAL,
     CONSTRAINT pk_turnover PRIMARY KEY (id)
 );
 

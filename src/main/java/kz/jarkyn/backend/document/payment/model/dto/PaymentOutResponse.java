@@ -2,15 +2,20 @@
 package kz.jarkyn.backend.document.payment.model.dto;
 
 import jakarta.annotation.Nullable;
+import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import kz.jarkyn.backend.document.core.model.dto.DocumentResponse;
+import kz.jarkyn.backend.document.payment.model.ItemOfExpenditure;
 import org.immutables.value.Value;
 
 import java.util.List;
 
 @Value.Immutable
-public interface PaymentOutDetailResponse extends DocumentResponse {
+public interface PaymentOutResponse extends DocumentResponse {
+    IdNamedDto getAccount();
     @Nullable IdNamedDto getCounterparty();
-    String getComment();
+    @Nullable String getReceiptNumber();
+    ItemOfExpenditure getItemOfExpenditure();
+    @Nullable String getPurpose();
     List<PaidDocumentResponse> getPaidDocuments();
 }

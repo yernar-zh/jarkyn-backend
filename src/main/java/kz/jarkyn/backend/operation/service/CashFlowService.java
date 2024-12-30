@@ -21,6 +21,13 @@ public class CashFlowService {
         this.cashFlowRepository = cashFlowRepository;
     }
 
+    @Transactional(readOnly = true)
+    public BigDecimal findBalance(AccountEntity account) {
+        Optional<CashFlowEntity> cashFlowOpt = cashFlowRepository.findLastByAccount(account);
+        return cashFlowOpt.map(cashFlow -> cashFlow.getBalance().add(cashFlow.getAmount()))
+                .orElse(BigDecimal.ZERO);
+    }
+
     @Transactional
     public void create(DocumentEntity document, AccountEntity account, BigDecimal amount) {
         CashFlowEntity cashFlow = new CashFlowEntity();
@@ -32,10 +39,8 @@ public class CashFlowService {
         cashFlowRepository.save(cashFlow);
     }
 
-    @Transactional(readOnly = true)
-    public BigDecimal findBalance(AccountEntity account) {
-        Optional<CashFlowEntity> cashFlowOpt = cashFlowRepository.findLastByAccount(account);
-        return cashFlowOpt.map(cashFlow -> cashFlow.getBalance().add(cashFlow.getAmount()))
-                .orElse(BigDecimal.ZERO);
+    @Transactional
+    public void delete(DocumentEntity document) {
+        cashFlowRepository.deleteAll(cashFlowRepository.findByDocument(document));
     }
 }
