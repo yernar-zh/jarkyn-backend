@@ -303,6 +303,17 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
                 .andExpect(jsonPath("$.stock[0].remain").value(100))
                 .andExpect(jsonPath("$.stock[0].costPrice").value(331.15));
-
+        mockMvc.perform(get(Api.Account.PATH).with(TestUtils.auth())
+                        .queryParam("counterparty.id", "94fadc9a-83bb-4639-be07-f825ab9eb40e")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.first").value(0))
+                .andExpect(jsonPath("$.page.size").value(20))
+                .andExpect(jsonPath("$.page.totalCount").value(1))
+                .andExpect(jsonPath("$.sum.balance").value(-710))
+                .andExpect(jsonPath("$.row.length()").value(1))
+                .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.row[0].currency").value("CNY"))
+                .andExpect(jsonPath("$.row[0].balance").value(-710));
     }
 }

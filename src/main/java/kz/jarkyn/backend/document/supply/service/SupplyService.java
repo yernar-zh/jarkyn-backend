@@ -13,6 +13,7 @@ import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.counterparty.model.*;
+import kz.jarkyn.backend.counterparty.service.AccountService;
 import kz.jarkyn.backend.document.core.model.DocumentEntity_;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
@@ -28,11 +29,12 @@ import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
+import kz.jarkyn.backend.operation.mode.CashFlowEntity;
+import kz.jarkyn.backend.operation.service.CashFlowService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +47,8 @@ public class SupplyService {
     private final DocumentService documentService;
     private final AuditService auditService;
     private final SearchFactory searchFactory;
+    private final CashFlowService cashFlowService;
+    private final AccountService accountService;
 
     public SupplyService(
             SupplyRepository supplyRepository,
@@ -53,8 +57,9 @@ public class SupplyService {
             PaidDocumentService paidDocumentService,
             DocumentService documentService,
             AuditService auditService,
-            SearchFactory searchFactory
-    ) {
+            SearchFactory searchFactory,
+            CashFlowService cashFlowService,
+            AccountService accountService) {
         this.supplyRepository = supplyRepository;
         this.supplyMapper = supplyMapper;
         this.itemService = itemService;
@@ -62,6 +67,8 @@ public class SupplyService {
         this.documentService = documentService;
         this.auditService = auditService;
         this.searchFactory = searchFactory;
+        this.cashFlowService = cashFlowService;
+        this.accountService = accountService;
     }
 
     @Transactional(readOnly = true)
@@ -148,5 +155,8 @@ public class SupplyService {
                 .map(paidDocument -> paidDocument.getAmount().multiply(paidDocument.getPayment().getExchangeRate()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         itemService.createPositiveTurnover(supply, totalPaidAmount);
+        AccountEntity account = accountService.findOrCreateForCounterparty(
+                supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
+        cashFlowService.create(supply, account, supply.getAmount().negate());
     }
 }

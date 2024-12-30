@@ -90,9 +90,6 @@ public class ListSearch<R> implements Search<R> {
                 }
             }
             return queryParams.getFilters().stream().map(filter -> {
-                if (!row.getValues().containsKey(filter.getName())) {
-                    return true;
-                }
                 Object rowValue = row.getValues().get(filter.getName());
                 if (filter.getType().equals(QueryParams.Filter.Type.EXISTS)) {
                     String value = filter.getValues().getFirst().trim().toLowerCase();
