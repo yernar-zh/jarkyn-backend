@@ -238,41 +238,24 @@ class PaymentOutControllerTest {
     @Test
     @DirtiesContext
     public void testCommit_success() throws Exception {
-        mockMvc.perform(put(Api.Supply.PATH + "/17c1285b-6514-45d5-88a2-3b9f673dc5e3/commit")
-                        .with(TestUtils.auth()))
+        mockMvc.perform(put(Api.PaymentOut.PATH + "/5c799431-3bc3-400f-b9a3-209f27b935a0/commit").with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"));
-        mockMvc.perform(put(Api.PaymentOut.PATH + "/9f26476e-e143-4468-8a37-abdb479e89b8/commit")
-                        .with(TestUtils.auth()))
+                .andExpect(jsonPath("$.id").value("5c799431-3bc3-400f-b9a3-209f27b935a0"));
+        mockMvc.perform(get(Api.PaymentOut.PATH + "/5c799431-3bc3-400f-b9a3-209f27b935a0").with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("9f26476e-e143-4468-8a37-abdb479e89b8"));
-        mockMvc.perform(get(Api.PaymentOut.PATH + "/9f26476e-e143-4468-8a37-abdb479e89b8").with(TestUtils.auth()))
+                .andExpect(jsonPath("$.id").value("5c799431-3bc3-400f-b9a3-209f27b935a0"))
+                .andExpect(jsonPath("$.name").value("PO-00001"))
+                .andExpect(jsonPath("$.commited").value(true));
+        mockMvc.perform(get(Api.Account.PATH + "/c8190dcc-1cbe-4df6-a582-0f85e9850335").with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("9f26476e-e143-4468-8a37-abdb479e89b8"))
-                .andExpect(jsonPath("$.name").value("SL-00001"))
-                .andExpect(jsonPath("$.commited").value(true))
-                .andExpect(jsonPath("$.items[0].good.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
-                .andExpect(jsonPath("$.items[0].remain").value(50))
-                .andExpect(jsonPath("$.items[0].costPrice").value(513.29))
-                .andExpect(jsonPath("$.items[1].good.id").value("bf6f2ba4-f994-44c1-839f-36a75f07242e"))
-                .andExpect(jsonPath("$.items[1].remain").value(100))
-                .andExpect(jsonPath("$.items[1].costPrice").value(331.15));
-        mockMvc.perform(get(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435").with(TestUtils.auth()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.stock[0].remain").value(10))
-                .andExpect(jsonPath("$.stock[0].costPrice").value(513.29));
-        mockMvc.perform(get(Api.Good.PATH + "/bf6f2ba4-f994-44c1-839f-36a75f07242e").with(TestUtils.auth()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.stock[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.stock[0].remain").value(50))
-                .andExpect(jsonPath("$.stock[0].costPrice").value(331.15));
+                .andExpect(jsonPath("$.id").value("c8190dcc-1cbe-4df6-a582-0f85e9850335"))
+                .andExpect(jsonPath("$.balance").value(-710));
         mockMvc.perform(get(Api.Account.PATH).with(TestUtils.auth())
-                        .queryParam("counterparty.id", "1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                        .queryParam("counterparty.id", "94fadc9a-83bb-4639-be07-f825ab9eb40e"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row.length()").value(1))
                 .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
-                .andExpect(jsonPath("$.row[0].currency").value("KZT"))
-                .andExpect(jsonPath("$.row[0].balance").value(-61500));
+                .andExpect(jsonPath("$.row[0].currency").value("CNY"))
+                .andExpect(jsonPath("$.row[0].balance").value(-710));
     }
 }

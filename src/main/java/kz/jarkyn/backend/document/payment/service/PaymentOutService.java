@@ -148,8 +148,8 @@ public class PaymentOutService {
         auditService.saveChanges(paymentOut);
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 paymentOut.getOrganization(), paymentOut.getCounterparty(), paymentOut.getCurrency());
-        cashFlowService.create(paymentOut, account, paymentOut.getAmount());
-        cashFlowService.create(paymentOut, paymentOut.getAccount(), paymentOut.getAmount());
+        cashFlowService.create(paymentOut, account, paymentOut.getAmount().negate());
+        cashFlowService.create(paymentOut, paymentOut.getAccount(), paymentOut.getAmount().negate());
     }
 
     @Transactional
