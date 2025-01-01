@@ -46,4 +46,8 @@ public interface Api {
     interface PaymentOut {
         String PATH = Api.PATH + "/payment_out";
     }
+
+    interface PaymentIn {
+        String PATH = Api.PATH + "/payment_in";
+    }
 }

@@ -171,8 +171,9 @@ CREATE TABLE paid_document
 
 CREATE TABLE payment_in
 (
-    id         UUID NOT NULL,
-    account_id UUID,
+    id             UUID NOT NULL,
+    account_id     UUID,
+    receipt_number VARCHAR(255),
     CONSTRAINT pk_payment_in PRIMARY KEY (id)
 );
 
