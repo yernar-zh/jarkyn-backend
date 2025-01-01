@@ -9,8 +9,9 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-public interface PaymentInDetailResponse extends DocumentResponse {
+public interface PaymentInResponse extends DocumentResponse {
+    IdNamedDto getAccount();
     @Nullable IdNamedDto getCounterparty();
-    String getComment();
+    @Nullable String getReceiptNumber();
     List<PaidDocumentResponse> getPaidDocuments();
 }

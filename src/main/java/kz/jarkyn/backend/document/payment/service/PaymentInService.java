@@ -9,7 +9,7 @@ import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.payment.mapper.PaymentInMapper;
 import kz.jarkyn.backend.document.payment.model.PaymentInEntity;
 import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
-import kz.jarkyn.backend.document.payment.model.dto.PaymentInDetailResponse;
+import kz.jarkyn.backend.document.payment.model.dto.PaymentInResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentInRequest;
 import kz.jarkyn.backend.document.payment.repository.PaymentInRepository;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
@@ -42,7 +42,7 @@ public class PaymentInService {
     }
 
     @Transactional(readOnly = true)
-    public PaymentInDetailResponse findApiById(UUID id) {
+    public PaymentInResponse findApiById(UUID id) {
         PaymentInEntity paymentIn = paymentInRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<PaidDocumentResponse> paidDocuments = paidDocumentService.findResponseByPayment(paymentIn);
         return paymentInMapper.toResponse(paymentIn, paidDocuments);

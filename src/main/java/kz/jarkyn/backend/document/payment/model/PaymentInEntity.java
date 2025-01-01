@@ -13,6 +13,7 @@ public class PaymentInEntity extends DocumentEntity {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private AccountEntity account;
+    private String receiptNumber;
 
     public AccountEntity getAccount() {
         return account;
@@ -20,5 +21,13 @@ public class PaymentInEntity extends DocumentEntity {
 
     public void setAccount(AccountEntity account) {
         this.account = account;
+    }
+
+    public String getReceiptNumber() {
+        return receiptNumber;
+    }
+
+    public void setReceiptNumber(String receiptNumber) {
+        this.receiptNumber = receiptNumber;
     }
 }
