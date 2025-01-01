@@ -151,10 +151,73 @@ class PaymentInControllerTest {
     @Test
     @DirtiesContext
     public void testEdit_success() throws Exception {
+        String requestData = """
+                {
+                  "name": "PI-00101",
+                  "organization": {
+                    "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
+                  },
+                  "moment": "2025-01-01T16:17:07",
+                  "currency": "KZT",
+                  "exchangeRate": 69,
+                  "amount": 10000,
+                  "account": {
+                    "id": "6057082b-041b-47b7-ba31-9fa693eb2a21"
+                  },
+                  "counterparty": {
+                    "id": "1d468c04-6360-43e5-9d51-7771e9d9dcff"
+                  },
+                  "receiptNumber": "1234",
+                  "comment": "",
+                  "state": "NEW"
+                }
+                """;
+        mockMvc.perform(put(Api.PaymentIn.PATH + "/4aae4391-3bd4-4746-b06d-faedb32fefd8")
+                        .with(TestUtils.auth()).content(requestData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("4aae4391-3bd4-4746-b06d-faedb32fefd8"));
+        mockMvc.perform(get(Api.PaymentIn.PATH + "/4aae4391-3bd4-4746-b06d-faedb32fefd8").with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("4aae4391-3bd4-4746-b06d-faedb32fefd8"))
+                .andExpect(jsonPath("$.name").value("PI-00101"))
+                .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
+                .andExpect(jsonPath("$.moment").value("2025-01-01T16:17:07"))
+                .andExpect(jsonPath("$.currency").value("KZT"))
+                .andExpect(jsonPath("$.exchangeRate").value(69))
+                .andExpect(jsonPath("$.amount").value(10000))
+                .andExpect(jsonPath("$.deleted").value(false))
+                .andExpect(jsonPath("$.commited").value(false))
+                .andExpect(jsonPath("$.comment").value(""))
+                .andExpect(jsonPath("$.account.id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
+                .andExpect(jsonPath("$.account.name").value("Ернар Ж."))
+                .andExpect(jsonPath("$.counterparty.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(jsonPath("$.counterparty.name").value("Заманбек Жетысай"))
+                .andExpect(jsonPath("$.receiptNumber").value("1234"))
+                .andExpect(jsonPath("$.paidDocuments").isEmpty());
     }
 
     @Test
     @DirtiesContext
     public void testCommit_success() throws Exception {
+        mockMvc.perform(put(Api.PaymentIn.PATH + "/4aae4391-3bd4-4746-b06d-faedb32fefd8/commit").with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("4aae4391-3bd4-4746-b06d-faedb32fefd8"));
+        mockMvc.perform(get(Api.PaymentIn.PATH + "/4aae4391-3bd4-4746-b06d-faedb32fefd8").with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("4aae4391-3bd4-4746-b06d-faedb32fefd8"))
+                .andExpect(jsonPath("$.name").value("PI-00001"))
+                .andExpect(jsonPath("$.commited").value(true));
+        mockMvc.perform(get(Api.Account.PATH + "/6057082b-041b-47b7-ba31-9fa693eb2a21").with(TestUtils.auth()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
+                .andExpect(jsonPath("$.balance").value(61500));
+        mockMvc.perform(get(Api.Account.PATH).with(TestUtils.auth())
+                        .queryParam("counterparty.id", "1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.row.length()").value(1))
+                .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
+                .andExpect(jsonPath("$.row[0].currency").value("KZT"))
+                .andExpect(jsonPath("$.row[0].balance").value(61500));
     }
 }

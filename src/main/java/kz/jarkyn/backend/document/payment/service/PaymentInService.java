@@ -145,8 +145,8 @@ public class PaymentInService {
         auditService.saveChanges(paymentIn);
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 paymentIn.getOrganization(), paymentIn.getCounterparty(), paymentIn.getCurrency());
-        cashFlowService.create(paymentIn, account, paymentIn.getAmount().negate());
-        cashFlowService.create(paymentIn, paymentIn.getAccount(), paymentIn.getAmount().negate());
+        cashFlowService.create(paymentIn, account, paymentIn.getAmount());
+        cashFlowService.create(paymentIn, paymentIn.getAccount(), paymentIn.getAmount());
     }
 
     @Transactional
