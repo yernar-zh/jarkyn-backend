@@ -13,6 +13,7 @@ import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.counterparty.model.AccountEntity;
+import kz.jarkyn.backend.counterparty.model.AccountEntity_;
 import kz.jarkyn.backend.counterparty.model.CounterpartyEntity_;
 import kz.jarkyn.backend.counterparty.model.OrganizationEntity_;
 import kz.jarkyn.backend.counterparty.service.AccountService;
@@ -82,7 +83,10 @@ public class PaymentOutService {
                         .get(PaymentOutEntity_.organization).get(OrganizationEntity_.id))
                 .add("organization.name", (root) -> root
                         .get(PaymentOutEntity_.organization).get(OrganizationEntity_.name))
-                .add("account", (root) -> root.get(PaymentOutEntity_.account))
+                .add("account.id", (root) -> root
+                        .get(PaymentOutEntity_.account).get(AccountEntity_.id))
+                .add("account.name", (root) -> root
+                        .get(PaymentOutEntity_.account).get(AccountEntity_.name))
                 .add("counterparty.id", (root) -> root
                         .get(PaymentOutEntity_.counterparty).get(CounterpartyEntity_.id))
                 .add("counterparty.name", (root) -> root

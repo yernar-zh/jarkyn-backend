@@ -49,10 +49,10 @@ public class PaidDocumentService {
 
     private void save(DocumentEntity payment, List<PaidDocumentRequest> paidDocumentRequests) {
         EntityDivider<PaidDocumentEntity, PaidDocumentRequest> divider = new EntityDivider<>(
-                paidDocumentRepository.findByDocument(payment), paidDocumentRequests);
+                paidDocumentRepository.findByPayment(payment), paidDocumentRequests);
         for (EntityDivider<PaidDocumentEntity, PaidDocumentRequest>.Entry entry : divider.newReceived()) {
             PaidDocumentEntity paidDocument = paidDocumentMapper.toEntity(entry.getReceived());
-            paidDocument.setDocument(payment);
+            paidDocument.setPayment(payment);
             paidDocumentRepository.save(paidDocument);
         }
         for (EntityDivider<PaidDocumentEntity, PaidDocumentRequest>.Entry entry : divider.edited()) {

@@ -79,39 +79,33 @@ class PaymentOutControllerTest {
     @DirtiesContext
     public void testList_success() throws Exception {
         mockMvc.perform(get(Api.PaymentOut.PATH).with(TestUtils.auth())
-                        .queryParam("search", "001 зам")
+                        .queryParam("search", "001 урум")
                         .queryParam("sort", "-name")
                         .queryParam("page.first", "0")
                         .queryParam("page.size", "50")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row.length()").value(1))
-                .andExpect(jsonPath("$.row[0].name").value("SL-00001"))
-                .andExpect(jsonPath("$.row[0].id").value("9f26476e-e143-4468-8a37-abdb479e89b8"))
-                .andExpect(jsonPath("$.row[0].state").value("NEW"))
-                .andExpect(jsonPath("$.row[0].currency").value("KZT"))
+                .andExpect(jsonPath("$.row[0].name").value("PO-00001"))
+                .andExpect(jsonPath("$.row[0].id").value("5c799431-3bc3-400f-b9a3-209f27b935a0"))
+                .andExpect(jsonPath("$.row[0].currency").value("CNY"))
                 .andExpect(jsonPath("$.row[0].comment").value(""))
+                .andExpect(jsonPath("$.row[0].itemOfExpenditure").value("SUPPLY"))
+                .andExpect(jsonPath("$.row[0].amount").value(710))
+                .andExpect(jsonPath("$.row[0].account.name").value("Наличный Юань"))
+                .andExpect(jsonPath("$.row[0].account.id").value("c8190dcc-1cbe-4df6-a582-0f85e9850335"))
+                .andExpect(jsonPath("$.row[0].moment").value("2024-12-07T22:47:00"))
                 .andExpect(jsonPath("$.row[0].deleted").value(false))
-                .andExpect(jsonPath("$.row[0].moment").value("2024-12-30T16:45:00"))
-                .andExpect(jsonPath("$.row[0].amount").value(61500))
-                .andExpect(jsonPath("$.row[0].counterparty.name").value("Заманбек Жетысай"))
-                .andExpect(jsonPath("$.row[0].counterparty.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
+                .andExpect(jsonPath("$.row[0].purpose").isEmpty())
+                .andExpect(jsonPath("$.row[0].receiptNumber").isEmpty())
                 .andExpect(jsonPath("$.row[0].organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
-                .andExpect(jsonPath("$.row[0].warehouse.name").value("Кенжина"))
-                .andExpect(jsonPath("$.row[0].warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.row[0].shipmentMoment").isEmpty())
-                .andExpect(jsonPath("$.row[0].costPrice").value(0))
-                .andExpect(jsonPath("$.row[0].exchangeRate").value(1))
+                .andExpect(jsonPath("$.row[0].counterparty.name").value("Урумчи Кытай"))
+                .andExpect(jsonPath("$.row[0].counterparty.id").value("94fadc9a-83bb-4639-be07-f825ab9eb40e"))
                 .andExpect(jsonPath("$.row[0].commited").value(false))
-                .andExpect(jsonPath("$.row[0].profit").value(0))
-                .andExpect(jsonPath("$.row[0].paidAmount").value(61500))
-                .andExpect(jsonPath("$.row[0].notPaidAmount").value(0))
-                .andExpect(jsonPath("$.sum.amount").value(61500))
-                .andExpect(jsonPath("$.sum.costPrice").value(0))
-                .andExpect(jsonPath("$.sum.exchangeRate").value(1))
-                .andExpect(jsonPath("$.sum.paidAmount").value(61500))
-                .andExpect(jsonPath("$.sum.notPaidAmount").value(0))
+                .andExpect(jsonPath("$.row[0].exchangeRate").value(68))
+                .andExpect(jsonPath("$.sum.amount").value(710))
+                .andExpect(jsonPath("$.sum.exchangeRate").value(68))
                 .andExpect(jsonPath("$.page.first").value(0))
                 .andExpect(jsonPath("$.page.size").value(50))
                 .andExpect(jsonPath("$.page.totalCount").value(1));
@@ -125,34 +119,27 @@ class PaymentOutControllerTest {
                   "organization": {
                     "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
                   },
-                  "moment": "2024-12-30T18:59:07",
+                  "moment": "2025-01-01T16:17:07",
                   "currency": "KZT",
-                  "exchangeRate": 1,
-                  "amount": 210000,
-                  "warehouse": {
-                    "id": "523961a7-696d-4779-8bb0-fd327feaecf3"
+                  "exchangeRate": 69,
+                  "amount": 10000,
+                  "account": {
+                    "id": "c8190dcc-1cbe-4df6-a582-0f85e9850335"
                   },
                   "counterparty": {
-                    "id": "1d468c04-6360-43e5-9d51-7771e9d9dcff"
+                    "id": "94fadc9a-83bb-4639-be07-f825ab9eb40e"
                   },
+                  "itemOfExpenditure": "SUPPLY",
+                  "purpose": "aaa",
+                  "receiptNumber": "1234",
                   "comment": "",
                   "state": "NEW",
-                  "items": [
-                    {
-                      "good": {
-                        "id": "7f316872-1da3-44c8-9293-0fddda859435"
-                      },
-                      "price": 800,
-                      "quantity": 200
+                  "paidDocuments": [{
+                    "document": {
+                      "id": "17c1285b-6514-45d5-88a2-3b9f673dc5e3"
                     },
-                    {
-                      "good": {
-                        "id": "bf6f2ba4-f994-44c1-839f-36a75f07242e"
-                      },
-                      "price": 100,
-                      "quantity": 500
-                    }
-                  ]
+                    "amount": 5000
+                  }]
                 }
                 """;
         MvcResult result = mockMvc.perform(post(Api.PaymentOut.PATH).with(TestUtils.auth()).content(requestData))
@@ -163,38 +150,26 @@ class PaymentOutControllerTest {
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TestUtils.extractId(result)))
-                .andExpect(jsonPath("$.name").value("SL-00002"))
+                .andExpect(jsonPath("$.name").value("PO-00003"))
                 .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
-                .andExpect(jsonPath("$.moment").value("2024-12-30T18:59:07"))
+                .andExpect(jsonPath("$.moment").value("2025-01-01T16:17:07"))
                 .andExpect(jsonPath("$.currency").value("KZT"))
-                .andExpect(jsonPath("$.exchangeRate").value(1))
-                .andExpect(jsonPath("$.amount").value(210000))
+                .andExpect(jsonPath("$.exchangeRate").value(69))
+                .andExpect(jsonPath("$.amount").value(10000))
                 .andExpect(jsonPath("$.deleted").value(false))
                 .andExpect(jsonPath("$.commited").value(false))
                 .andExpect(jsonPath("$.comment").value(""))
-                .andExpect(jsonPath("$.warehouse.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.warehouse.name").value("Кенжина"))
-                .andExpect(jsonPath("$.counterparty.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
-                .andExpect(jsonPath("$.counterparty.name").value("Заманбек Жетысай"))
-                .andExpect(jsonPath("$.shipmentMoment").isEmpty())
-                .andExpect(jsonPath("$.state").value("NEW"))
-                .andExpect(jsonPath("$.items.length()").value(2))
-                .andExpect(jsonPath("$.items[0].good.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
-                .andExpect(jsonPath("$.items[0].good.name").value("Кикстартер L"))
-                .andExpect(jsonPath("$.items[0].good.archived").value(false))
-                .andExpect(jsonPath("$.items[0].price").value(800))
-                .andExpect(jsonPath("$.items[0].quantity").value(200))
-                .andExpect(jsonPath("$.items[0].remain").value(0))
-                .andExpect(jsonPath("$.items[0].costPrice").value(0))
-                .andExpect(jsonPath("$.items[1].good.id").value("bf6f2ba4-f994-44c1-839f-36a75f07242e"))
-                .andExpect(jsonPath("$.items[1].good.name").value("Педаль переключения передач WY (короткий)"))
-                .andExpect(jsonPath("$.items[1].good.archived").value(false))
-                .andExpect(jsonPath("$.items[1].price").value(100))
-                .andExpect(jsonPath("$.items[1].quantity").value(500))
-                .andExpect(jsonPath("$.items[1].remain").value(0))
-                .andExpect(jsonPath("$.items[1].costPrice").value(0))
-                .andExpect(jsonPath("$.paidDocuments.length()").value(0));
+                .andExpect(jsonPath("$.account.id").value("c8190dcc-1cbe-4df6-a582-0f85e9850335"))
+                .andExpect(jsonPath("$.account.name").value("Наличный Юань"))
+                .andExpect(jsonPath("$.counterparty.id").value("94fadc9a-83bb-4639-be07-f825ab9eb40e"))
+                .andExpect(jsonPath("$.counterparty.name").value("Урумчи Кытай"))
+                .andExpect(jsonPath("$.receiptNumber").value("1234"))
+                .andExpect(jsonPath("$.itemOfExpenditure").value("SUPPLY"))
+                .andExpect(jsonPath("$.purpose").value("aaa"))
+                .andExpect(jsonPath("$.paidDocuments[0].payment.id").value(TestUtils.extractId(result)))
+                .andExpect(jsonPath("$.paidDocuments[0].document.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"))
+                .andExpect(jsonPath("$.paidDocuments[0].amount").value(5000));
     }
 
     @Test
@@ -202,65 +177,62 @@ class PaymentOutControllerTest {
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
-                  "id": "9f26476e-e143-4468-8a37-abdb479e89b8",
-                  "name": "SL-00101",
+                  "name": "PO-00101",
                   "organization": {
                     "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
                   },
-                  "moment": "2024-12-31T19:12:00",
+                  "moment": "2025-01-01T17:01:00",
                   "currency": "KZT",
                   "exchangeRate": 1,
-                  "amount": 30000,
-                  "warehouse": {
-                    "id": "d1da1441-6598-4511-bc82-8fc06602e373"
+                  "amount": 2000,
+                  "deleted": false,
+                  "commited": false,
+                  "comment": "",
+                  "account": {
+                    "id": "6057082b-041b-47b7-ba31-9fa693eb2a21"
                   },
                   "counterparty": {
-                    "id": "43375a1e-1c91-46e5-9a10-a14200427fe9"
+                    "id": "94fadc9a-83bb-4639-be07-f825ab9eb40e"
                   },
-                  "comment": "я",
-                  "state": "NEW",
-                  "items": [
+                  "receiptNumber": "1234",
+                  "itemOfExpenditure": "SUPPLY",
+                  "purpose": "zxcv",
+                  "paidDocuments": [
                     {
-                      "good": {
-                        "id": "7f316872-1da3-44c8-9293-0fddda859435"
+                      "document": {
+                        "id": "17c1285b-6514-45d5-88a2-3b9f673dc5e3"
                       },
-                      "price": 700,
-                      "quantity": 80
+                      "amount": 1000
                     }
                   ]
                 }
                 """;
-        mockMvc.perform(put(Api.PaymentOut.PATH + "/9f26476e-e143-4468-8a37-abdb479e89b8")
+        mockMvc.perform(put(Api.PaymentOut.PATH + "/5c799431-3bc3-400f-b9a3-209f27b935a0")
                         .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("9f26476e-e143-4468-8a37-abdb479e89b8"));
-        mockMvc.perform(get(Api.PaymentOut.PATH + "/9f26476e-e143-4468-8a37-abdb479e89b8").with(TestUtils.auth()))
+                .andExpect(jsonPath("$.id").value("5c799431-3bc3-400f-b9a3-209f27b935a0"));
+        mockMvc.perform(get(Api.PaymentOut.PATH + "/5c799431-3bc3-400f-b9a3-209f27b935a0").with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("9f26476e-e143-4468-8a37-abdb479e89b8"))
-                .andExpect(jsonPath("$.name").value("SL-00101"))
+                .andExpect(jsonPath("$.id").value("5c799431-3bc3-400f-b9a3-209f27b935a0"))
+                .andExpect(jsonPath("$.name").value("PO-00101"))
                 .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
-                .andExpect(jsonPath("$.moment").value("2024-12-31T19:12:00"))
+                .andExpect(jsonPath("$.moment").value("2025-01-01T17:01:00"))
                 .andExpect(jsonPath("$.currency").value("KZT"))
                 .andExpect(jsonPath("$.exchangeRate").value(1))
-                .andExpect(jsonPath("$.amount").value(30000))
+                .andExpect(jsonPath("$.amount").value(2000))
                 .andExpect(jsonPath("$.deleted").value(false))
                 .andExpect(jsonPath("$.commited").value(false))
-                .andExpect(jsonPath("$.comment").value("я"))
-                .andExpect(jsonPath("$.warehouse.id").value("d1da1441-6598-4511-bc82-8fc06602e373"))
-                .andExpect(jsonPath("$.warehouse.name").value("Барыс"))
-                .andExpect(jsonPath("$.counterparty.id").value("43375a1e-1c91-46e5-9a10-a14200427fe9"))
-                .andExpect(jsonPath("$.counterparty.name").value("Оркен Алматы"))
-                .andExpect(jsonPath("$.shipmentMoment").isEmpty())
-                .andExpect(jsonPath("$.state").value("NEW"))
-                .andExpect(jsonPath("$.items.length()").value(1))
-                .andExpect(jsonPath("$.items[0].good.id").value("7f316872-1da3-44c8-9293-0fddda859435"))
-                .andExpect(jsonPath("$.items[0].good.name").value("Кикстартер L"))
-                .andExpect(jsonPath("$.items[0].good.archived").value(false))
-                .andExpect(jsonPath("$.items[0].price").value(700))
-                .andExpect(jsonPath("$.items[0].quantity").value(80))
-                .andExpect(jsonPath("$.items[0].remain").value(0))
-                .andExpect(jsonPath("$.items[0].costPrice").value(0));
+                .andExpect(jsonPath("$.comment").value(""))
+                .andExpect(jsonPath("$.account.id").value("6057082b-041b-47b7-ba31-9fa693eb2a21"))
+                .andExpect(jsonPath("$.account.name").value("Ернар Ж."))
+                .andExpect(jsonPath("$.counterparty.id").value("94fadc9a-83bb-4639-be07-f825ab9eb40e"))
+                .andExpect(jsonPath("$.counterparty.name").value("Урумчи Кытай"))
+                .andExpect(jsonPath("$.receiptNumber").value("1234"))
+                .andExpect(jsonPath("$.itemOfExpenditure").value("SUPPLY"))
+                .andExpect(jsonPath("$.purpose").value("zxcv"))
+                .andExpect(jsonPath("$.paidDocuments[0].document.id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"))
+                .andExpect(jsonPath("$.paidDocuments[0].amount").value(1000));
     }
 
     @Test

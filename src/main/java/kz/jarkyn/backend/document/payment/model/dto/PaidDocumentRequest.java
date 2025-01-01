@@ -14,7 +14,6 @@ import java.util.UUID;
 @JsonDeserialize(builder = ImmutablePaidDocumentRequest.Builder.class)
 public interface PaidDocumentRequest extends IdDto {
     @Nullable UUID getId();
-    IdDto getPayment();
     IdDto getDocument();
     BigDecimal getAmount();
 }
