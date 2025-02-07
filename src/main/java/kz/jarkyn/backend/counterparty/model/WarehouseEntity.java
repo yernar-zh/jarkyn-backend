@@ -9,6 +9,7 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 @Table(name = "warehouse")
 public class WarehouseEntity extends AbstractEntity {
     private String name;
+    private Boolean archived;
 
     public String getName() {
         return name;
@@ -16,5 +17,13 @@ public class WarehouseEntity extends AbstractEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
     }
 }

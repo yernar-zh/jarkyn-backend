@@ -34,7 +34,8 @@ class WarehouseControllerTest {
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.name").value("Кенжина"));
+                .andExpect(jsonPath("$.name").value("Кенжина"))
+                .andExpect(jsonPath("$.archived").value(false));
     }
 
     @Test
@@ -53,8 +54,11 @@ class WarehouseControllerTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
                 .andExpect(jsonPath("$[0].name").value("Кенжина"))
+                .andExpect(jsonPath("$[0].archived").value(false))
                 .andExpect(jsonPath("$[1].id").value("d1da1441-6598-4511-bc82-8fc06602e373"))
-                .andExpect(jsonPath("$[1].name").value("Барыс"));
+                .andExpect(jsonPath("$[1].name").value("Барыс"))
+                .andExpect(jsonPath("$[1].archived").value(false));
+
     }
 
     @Test
@@ -62,7 +66,8 @@ class WarehouseControllerTest {
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Толе би"
+                  "name": "Толе би",
+                  "archived": false
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Warehouse.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
@@ -72,7 +77,8 @@ class WarehouseControllerTest {
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TestUtils.extractId(result)))
-                .andExpect(jsonPath("$.name").value("Толе би"));
+                .andExpect(jsonPath("$.name").value("Толе би"))
+                .andExpect(jsonPath("$.archived").value(false));
     }
 
     @Test
@@ -80,7 +86,8 @@ class WarehouseControllerTest {
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Кенжина 5"
+                  "name": "Кенжина 5",
+                  "archived": true
                 }""";
         mockMvc.perform(put(Api.Warehouse.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3")
                         .with(TestUtils.auth()).content(requestData))
@@ -89,6 +96,8 @@ class WarehouseControllerTest {
         mockMvc.perform(get(Api.Warehouse.PATH + "/523961a7-696d-4779-8bb0-fd327feaecf3").with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$.name").value("Кенжина 5"));
+                .andExpect(jsonPath("$.name").value("Кенжина 5"))
+                .andExpect(jsonPath("$.archived").value(true));
+
     }
 }

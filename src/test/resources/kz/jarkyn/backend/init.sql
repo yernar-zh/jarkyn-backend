@@ -14,9 +14,9 @@ VALUES ('6057082b-041b-47b7-ba31-9fa693eb2a21', 'c6e5e4f9-93c0-40ea-91fa-e8a9bff
         'Наличный Доллар', '', '', 'USD');
 
 ------------------- Warehouse -------------------
-INSERT INTO warehouse (id, name)
-VALUES ('523961a7-696d-4779-8bb0-fd327feaecf3', 'Кенжина'),
-       ('d1da1441-6598-4511-bc82-8fc06602e373', 'Барыс');
+INSERT INTO warehouse (id, name, archived)
+VALUES ('523961a7-696d-4779-8bb0-fd327feaecf3', 'Кенжина', false),
+       ('d1da1441-6598-4511-bc82-8fc06602e373', 'Барыс', false);
 
 
 ------------------- Supplier --------------------
@@ -163,6 +163,6 @@ VALUES ('4aae4391-3bd4-4746-b06d-faedb32fefd8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bff
         'KZT', 1, 61500, '', false, false);
 INSERT INTO payment_in (id, account_id)
 VALUES ('4aae4391-3bd4-4746-b06d-faedb32fefd8', '6057082b-041b-47b7-ba31-9fa693eb2a21');
-INSERT INTO paid_document (id, payment_id,  document_id, amount)
+INSERT INTO paid_document (id, payment_id, document_id, amount)
 VALUES ('e207245e-dc26-44ab-b679-ef52b89e76f7', '4aae4391-3bd4-4746-b06d-faedb32fefd8',
         '9f26476e-e143-4468-8a37-abdb479e89b8', 61500);

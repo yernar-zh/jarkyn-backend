@@ -7,4 +7,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableWarehouseRequest.Builder.class)
 public interface WarehouseRequest extends NamedDto {
+    Boolean getArchived();
 }

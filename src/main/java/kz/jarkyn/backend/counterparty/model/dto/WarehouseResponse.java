@@ -5,4 +5,5 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 public interface WarehouseResponse extends IdNamedDto {
+    Boolean getArchived();
 }

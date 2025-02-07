@@ -252,6 +252,7 @@ CREATE TABLE warehouse
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     name             VARCHAR(255),
+    archived         BOOLEAN,
     CONSTRAINT pk_warehouse PRIMARY KEY (id)
 );
 
