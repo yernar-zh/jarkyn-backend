@@ -51,13 +51,13 @@ class WarehouseControllerTest {
     public void testList_success() throws Exception {
         mockMvc.perform(get(Api.Warehouse.PATH).with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
-                .andExpect(jsonPath("$[0].name").value("Кенжина"))
-                .andExpect(jsonPath("$[0].archived").value(false))
-                .andExpect(jsonPath("$[1].id").value("d1da1441-6598-4511-bc82-8fc06602e373"))
-                .andExpect(jsonPath("$[1].name").value("Барыс"))
-                .andExpect(jsonPath("$[1].archived").value(false));
+                .andExpect(jsonPath("$.row.length()").value(2))
+                .andExpect(jsonPath("$.row[0].id").value("523961a7-696d-4779-8bb0-fd327feaecf3"))
+                .andExpect(jsonPath("$.row[0].name").value("Кенжина"))
+                .andExpect(jsonPath("$.row[0].archived").value(false))
+                .andExpect(jsonPath("$.row[1].id").value("d1da1441-6598-4511-bc82-8fc06602e373"))
+                .andExpect(jsonPath("$.row[1].name").value("Барыс"))
+                .andExpect(jsonPath("$.row[1].archived").value(false));
 
     }
 

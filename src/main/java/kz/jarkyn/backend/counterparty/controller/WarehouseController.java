@@ -1,12 +1,15 @@
 package kz.jarkyn.backend.counterparty.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.counterparty.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.counterparty.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.counterparty.service.WarehouseService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -26,8 +29,8 @@ public class WarehouseController {
     }
 
     @GetMapping
-    public List<WarehouseResponse> list() {
-        return warehouseService.findApiAll();
+    public PageResponse<WarehouseResponse> list(@RequestParam Map<String, String> allParams) {
+        return warehouseService.findApiByFilter(QueryParams.of(allParams));
     }
 
     @PostMapping
