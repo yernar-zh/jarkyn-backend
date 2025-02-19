@@ -3,7 +3,7 @@ package kz.jarkyn.backend.document.payment.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity_;
-import kz.jarkyn.backend.counterparty.model.AccountEntity;
+import kz.jarkyn.backend.party.model.AccountEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 
 @Entity

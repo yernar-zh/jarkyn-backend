@@ -4,7 +4,7 @@ package kz.jarkyn.backend.core.mapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
-import kz.jarkyn.backend.counterparty.model.*;
+import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
@@ -58,8 +58,8 @@ public class EntityMapper {
         return toEntity(api, UserEntity.class);
     }
 
-    public <T extends CounterpartyEntity> T toCounterpartyEntity(IdDto api) {
-        return (T) toEntity(api, CounterpartyEntity.class);
+    public <T extends PartyEntity> T toPartyEntity(IdDto api) {
+        return (T) toEntity(api, PartyEntity.class);
     }
 
     public <T extends DocumentEntity> T toDocumentEntity(IdDto api) {

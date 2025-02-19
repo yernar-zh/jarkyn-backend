@@ -11,11 +11,11 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.counterparty.model.AccountEntity;
-import kz.jarkyn.backend.counterparty.model.AccountEntity_;
-import kz.jarkyn.backend.counterparty.model.CounterpartyEntity_;
-import kz.jarkyn.backend.counterparty.model.OrganizationEntity_;
-import kz.jarkyn.backend.counterparty.service.AccountService;
+import kz.jarkyn.backend.party.model.AccountEntity;
+import kz.jarkyn.backend.party.model.AccountEntity_;
+import kz.jarkyn.backend.party.model.PartyEntity_;
+import kz.jarkyn.backend.party.model.OrganizationEntity_;
+import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.payment.mapper.PaymentInMapper;
 import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity;
@@ -87,9 +87,9 @@ public class PaymentInService {
                 .add("account.name", (root) -> root
                         .get(PaymentInEntity_.account).get(AccountEntity_.name))
                 .add("counterparty.id", (root) -> root
-                        .get(PaymentInEntity_.counterparty).get(CounterpartyEntity_.id))
+                        .get(PaymentInEntity_.counterparty).get(PartyEntity_.id))
                 .add("counterparty.name", (root) -> root
-                        .get(PaymentInEntity_.counterparty).get(CounterpartyEntity_.name))
+                        .get(PaymentInEntity_.counterparty).get(PartyEntity_.name))
                 .add("moment", (root) -> root.get(PaymentInEntity_.moment))
                 .add("currency", (root) -> root.get(PaymentInEntity_.currency))
                 .add("exchangeRate", (root) -> root.get(PaymentInEntity_.exchangeRate))

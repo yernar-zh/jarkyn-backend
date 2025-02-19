@@ -3,10 +3,10 @@ package kz.jarkyn.backend.document.core.model;
 
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
-import kz.jarkyn.backend.counterparty.model.CounterpartyEntity;
-import kz.jarkyn.backend.counterparty.model.Currency;
-import kz.jarkyn.backend.counterparty.model.OrganizationEntity;
-import kz.jarkyn.backend.counterparty.model.WarehouseEntity;
+import kz.jarkyn.backend.party.model.PartyEntity;
+import kz.jarkyn.backend.party.model.Currency;
+import kz.jarkyn.backend.party.model.OrganizationEntity;
+import kz.jarkyn.backend.party.model.WarehouseEntity;
 
 
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ public class DocumentEntity extends AbstractEntity {
     private WarehouseEntity warehouse;
     @ManyToOne
     @JoinColumn(name = "counterparty_id")
-    private CounterpartyEntity counterparty;
+    private PartyEntity counterparty;
     private String name;
     private LocalDateTime moment;
     @Enumerated(EnumType.STRING)
@@ -51,11 +51,11 @@ public class DocumentEntity extends AbstractEntity {
         this.warehouse = warehouse;
     }
 
-    public CounterpartyEntity getCounterparty() {
+    public PartyEntity getCounterparty() {
         return counterparty;
     }
 
-    public void setCounterparty(CounterpartyEntity counterparty) {
+    public void setCounterparty(PartyEntity counterparty) {
         this.counterparty = counterparty;
     }
 

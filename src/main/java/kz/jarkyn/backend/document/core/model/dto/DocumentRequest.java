@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.dto.NamedDto;
-import kz.jarkyn.backend.counterparty.model.Currency;
+import kz.jarkyn.backend.party.model.Currency;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;

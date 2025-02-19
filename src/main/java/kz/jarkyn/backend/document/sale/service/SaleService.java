@@ -12,11 +12,11 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.counterparty.model.AccountEntity;
-import kz.jarkyn.backend.counterparty.model.CounterpartyEntity_;
-import kz.jarkyn.backend.counterparty.model.OrganizationEntity_;
-import kz.jarkyn.backend.counterparty.model.WarehouseEntity_;
-import kz.jarkyn.backend.counterparty.service.AccountService;
+import kz.jarkyn.backend.party.model.AccountEntity;
+import kz.jarkyn.backend.party.model.PartyEntity_;
+import kz.jarkyn.backend.party.model.OrganizationEntity_;
+import kz.jarkyn.backend.party.model.WarehouseEntity_;
+import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.DocumentEntity_;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
@@ -33,7 +33,6 @@ import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.sale.repository.SaleRepository;
 import kz.jarkyn.backend.document.sale.mapper.SaleMapper;
 import kz.jarkyn.backend.document.sale.model.SaleEntity_;
-import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity_;
 import kz.jarkyn.backend.operation.service.CashFlowService;
@@ -106,9 +105,9 @@ public class SaleService {
                 .add("warehouse.name", (root) -> root
                         .get(SaleEntity_.warehouse).get(WarehouseEntity_.name))
                 .add("counterparty.id", (root) -> root
-                        .get(SaleEntity_.counterparty).get(CounterpartyEntity_.id))
+                        .get(SaleEntity_.counterparty).get(PartyEntity_.id))
                 .add("counterparty.name", (root) -> root
-                        .get(SaleEntity_.counterparty).get(CounterpartyEntity_.name))
+                        .get(SaleEntity_.counterparty).get(PartyEntity_.name))
                 .add("shipmentMoment", (root) -> root.get(SaleEntity_.shipmentMoment))
                 .add("state", (root) -> root.get(SaleEntity_.state))
                 .add("paidAmount", (root, query, cb, map) -> {

@@ -1,4 +1,4 @@
-INSERT INTO public.counterparty (id, name, archived, created_at, last_modified_at)
+INSERT INTO public.party (id, name, archived, created_at, last_modified_at)
 VALUES ('c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', 'ИП Жырқын', false, now(), now());
 INSERT INTO public.organization (id)
 VALUES ('c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515');

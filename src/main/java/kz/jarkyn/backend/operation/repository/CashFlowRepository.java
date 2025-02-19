@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.operation.repository;
 
-import kz.jarkyn.backend.counterparty.model.AccountEntity;
+import kz.jarkyn.backend.party.model.AccountEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.operation.mode.CashFlowEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

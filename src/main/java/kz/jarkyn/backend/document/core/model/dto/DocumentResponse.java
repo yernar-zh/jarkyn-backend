@@ -2,7 +2,7 @@
 package kz.jarkyn.backend.document.core.model.dto;
 
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
-import kz.jarkyn.backend.counterparty.model.Currency;
+import kz.jarkyn.backend.party.model.Currency;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;

@@ -60,16 +60,6 @@ CREATE TABLE cash_flow
     CONSTRAINT pk_cash_flow PRIMARY KEY (id)
 );
 
-CREATE TABLE counterparty
-(
-    id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    name             VARCHAR(255),
-    archived         BOOLEAN,
-    CONSTRAINT pk_counterparty PRIMARY KEY (id)
-);
-
 CREATE TABLE customer
 (
     id               UUID NOT NULL,
@@ -170,6 +160,16 @@ CREATE TABLE paid_document
     CONSTRAINT pk_paid_document PRIMARY KEY (id)
 );
 
+CREATE TABLE party
+(
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
+    CONSTRAINT pk_party PRIMARY KEY (id)
+);
+
 CREATE TABLE payment_in
 (
     id             UUID NOT NULL,
@@ -258,7 +258,7 @@ CREATE TABLE warehouse
 );
 
 ALTER TABLE account
-    ADD CONSTRAINT FK_ACCOUNT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
+    ADD CONSTRAINT FK_ACCOUNT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES party (id);
 
 ALTER TABLE account
     ADD CONSTRAINT FK_ACCOUNT_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organization (id);
@@ -273,10 +273,10 @@ ALTER TABLE cash_flow
     ADD CONSTRAINT FK_CASH_FLOW_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
 
 ALTER TABLE customer
-    ADD CONSTRAINT FK_CUSTOMER_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);
+    ADD CONSTRAINT FK_CUSTOMER_ON_ID FOREIGN KEY (id) REFERENCES party (id);
 
 ALTER TABLE document
-    ADD CONSTRAINT FK_DOCUMENT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
+    ADD CONSTRAINT FK_DOCUMENT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES party (id);
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organization (id);
@@ -306,7 +306,7 @@ ALTER TABLE item
     ADD CONSTRAINT FK_ITEM_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
 
 ALTER TABLE organization
-    ADD CONSTRAINT FK_ORGANIZATION_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);
+    ADD CONSTRAINT FK_ORGANIZATION_ON_ID FOREIGN KEY (id) REFERENCES party (id);
 
 ALTER TABLE paid_document
     ADD CONSTRAINT FK_PAID_DOCUMENT_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
@@ -333,7 +333,7 @@ ALTER TABLE selling_price
     ADD CONSTRAINT FK_SELLING_PRICE_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
 
 ALTER TABLE supplier
-    ADD CONSTRAINT FK_SUPPLIER_ON_ID FOREIGN KEY (id) REFERENCES counterparty (id);
+    ADD CONSTRAINT FK_SUPPLIER_ON_ID FOREIGN KEY (id) REFERENCES party (id);
 
 ALTER TABLE supply
     ADD CONSTRAINT FK_SUPPLY_ON_ID FOREIGN KEY (id) REFERENCES document (id);
@@ -348,4 +348,4 @@ ALTER TABLE turnover
     ADD CONSTRAINT FK_TURNOVER_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
 
 ALTER TABLE users
-    ADD CONSTRAINT FK_USERS_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
+    ADD CONSTRAINT FK_USERS_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES party (id);

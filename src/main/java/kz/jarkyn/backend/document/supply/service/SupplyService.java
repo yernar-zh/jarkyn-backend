@@ -12,8 +12,8 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.counterparty.model.*;
-import kz.jarkyn.backend.counterparty.service.AccountService;
+import kz.jarkyn.backend.party.model.*;
+import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.DocumentEntity_;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
@@ -99,9 +99,9 @@ public class SupplyService {
                 .add("warehouse.name", (root) -> root
                         .get(SupplyEntity_.warehouse).get(WarehouseEntity_.name))
                 .add("counterparty.id", (root) -> root
-                        .get(SupplyEntity_.counterparty).get(CounterpartyEntity_.id))
+                        .get(SupplyEntity_.counterparty).get(PartyEntity_.id))
                 .add("counterparty.name", (root) -> root
-                        .get(SupplyEntity_.counterparty).get(CounterpartyEntity_.name))
+                        .get(SupplyEntity_.counterparty).get(PartyEntity_.name))
                 .add("paidAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
                     Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
