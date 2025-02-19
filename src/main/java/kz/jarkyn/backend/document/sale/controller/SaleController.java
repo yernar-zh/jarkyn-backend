@@ -5,15 +5,10 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import kz.jarkyn.backend.document.sale.model.dto.SaleListResponse;
-import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
-import kz.jarkyn.backend.document.sale.service.SaleService;
-import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
-import kz.jarkyn.backend.good.model.dto.GoodResponse;
 import kz.jarkyn.backend.document.sale.service.SaleService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 

@@ -1,8 +1,8 @@
 package kz.jarkyn.backend.operation.mapper;
 
 import kz.jarkyn.backend.core.mapper.EntityMapper;
-import kz.jarkyn.backend.good.model.WarehouseEntity;
-import kz.jarkyn.backend.good.model.GoodEntity;
+import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
+import kz.jarkyn.backend.warehouse.model.GoodEntity;
 import kz.jarkyn.backend.operation.mode.dto.StockResponse;
 import org.mapstruct.Mapper;
 

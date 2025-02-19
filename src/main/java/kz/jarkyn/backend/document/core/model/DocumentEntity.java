@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import kz.jarkyn.backend.party.model.PartyEntity;
 import kz.jarkyn.backend.party.model.Currency;
 import kz.jarkyn.backend.party.model.OrganizationEntity;
-import kz.jarkyn.backend.good.model.WarehouseEntity;
+import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 
 
 import java.math.BigDecimal;

@@ -6,9 +6,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.core.model.AbstractEntity;
-import kz.jarkyn.backend.good.model.WarehouseEntity;
+import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
-import kz.jarkyn.backend.good.model.GoodEntity;
+import kz.jarkyn.backend.warehouse.model.GoodEntity;
 
 
 import java.math.BigDecimal;
