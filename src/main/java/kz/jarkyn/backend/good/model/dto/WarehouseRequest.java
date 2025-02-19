@@ -1,7 +1,8 @@
-package kz.jarkyn.backend.party.model.dto;
+package kz.jarkyn.backend.good.model.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import kz.jarkyn.backend.core.model.dto.NamedDto;
+import kz.jarkyn.backend.party.model.dto.ImmutableWarehouseRequest;
 import org.immutables.value.Value;
 
 @Value.Immutable

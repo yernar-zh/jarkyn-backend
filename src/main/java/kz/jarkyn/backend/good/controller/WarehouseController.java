@@ -1,11 +1,11 @@
-package kz.jarkyn.backend.party.controller;
+package kz.jarkyn.backend.good.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.party.model.dto.WarehouseRequest;
-import kz.jarkyn.backend.party.model.dto.WarehouseResponse;
-import kz.jarkyn.backend.party.service.WarehouseService;
+import kz.jarkyn.backend.good.model.dto.WarehouseRequest;
+import kz.jarkyn.backend.good.model.dto.WarehouseResponse;
+import kz.jarkyn.backend.good.service.WarehouseService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;

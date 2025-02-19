@@ -2,8 +2,8 @@
 package kz.jarkyn.backend.operation.service;
 
 
-import kz.jarkyn.backend.party.model.WarehouseEntity;
-import kz.jarkyn.backend.party.repository.WarehouseRepository;
+import kz.jarkyn.backend.good.model.WarehouseEntity;
+import kz.jarkyn.backend.good.repository.WarehouseRepository;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.operation.mapper.TurnoverMapper;

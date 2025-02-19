@@ -1,6 +1,6 @@
-package kz.jarkyn.backend.party.repository;
+package kz.jarkyn.backend.good.repository;
 
-import kz.jarkyn.backend.party.model.WarehouseEntity;
+import kz.jarkyn.backend.good.model.WarehouseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
