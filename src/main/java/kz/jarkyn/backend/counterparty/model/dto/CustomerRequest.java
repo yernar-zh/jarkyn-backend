@@ -12,4 +12,5 @@ public interface CustomerRequest extends NamedDto {
     String getPhoneNumber();
     String getShippingAddress();
     Integer getDiscount();
+    Boolean getArchived();
 }

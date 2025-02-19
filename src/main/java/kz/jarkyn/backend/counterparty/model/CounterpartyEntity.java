@@ -9,6 +9,7 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class CounterpartyEntity extends AbstractEntity {
     private String name;
+    private Boolean archived;
 
     public String getName() {
         return name;
@@ -16,5 +17,13 @@ public class CounterpartyEntity extends AbstractEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
     }
 }

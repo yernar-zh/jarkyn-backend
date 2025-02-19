@@ -19,6 +19,10 @@ public interface Api {
         String PATH = Api.PATH + "/good";
     }
 
+    interface Organization {
+        String PATH = Api.PATH + "/organization";
+    }
+
     interface Warehouse {
         String PATH = Api.PATH + "/warehouse";
     }

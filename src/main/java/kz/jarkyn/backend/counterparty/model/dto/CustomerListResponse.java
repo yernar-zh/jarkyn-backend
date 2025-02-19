@@ -19,4 +19,5 @@ public interface CustomerListResponse extends IdNamedDto {
     @Nullable LocalDateTime getLastSaleMoment();
     Integer getTotalSaleCount();
     BigDecimal getTotalSaleAmount();
+    Boolean getArchived();
 }

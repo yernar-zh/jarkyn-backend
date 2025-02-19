@@ -16,4 +16,5 @@ public interface SupplierListResponse extends IdNamedDto {
     @Nullable LocalDateTime getLastSupplyMoment();
     Integer getTotalSupplyCount();
     BigDecimal getTotalSupplyAmount();
+    Boolean getArchived();
 }

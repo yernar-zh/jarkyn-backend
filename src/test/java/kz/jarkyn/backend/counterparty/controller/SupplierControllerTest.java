@@ -34,7 +34,8 @@ class SupplierControllerTest {
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("94fadc9a-83bb-4639-be07-f825ab9eb40e"))
-                .andExpect(jsonPath("$.name").value("Урумчи Кытай"));
+                .andExpect(jsonPath("$.name").value("Урумчи Кытай"))
+                .andExpect(jsonPath("$.archived").value(false));
     }
 
     @Test
@@ -66,7 +67,8 @@ class SupplierControllerTest {
                 .andExpect(jsonPath("$.row[0].firstSupplyMoment").isEmpty())
                 .andExpect(jsonPath("$.row[0].lastSupplyMoment").isEmpty())
                 .andExpect(jsonPath("$.row[0].totalSupplyCount").value(0))
-                .andExpect(jsonPath("$.row[0].totalSupplyAmount").value(0));
+                .andExpect(jsonPath("$.row[0].totalSupplyAmount").value(0))
+                .andExpect(jsonPath("$.row[0].archived").value(false));
 
     }
 
@@ -75,7 +77,8 @@ class SupplierControllerTest {
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Шанхай"
+                  "name": "Шанхай",
+                  "archived": false
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Supplier.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
@@ -93,7 +96,8 @@ class SupplierControllerTest {
                 .andExpect(jsonPath("$.row[0].firstSupplyMoment").isEmpty())
                 .andExpect(jsonPath("$.row[0].lastSupplyMoment").isEmpty())
                 .andExpect(jsonPath("$.row[0].totalSupplyCount").value(0))
-                .andExpect(jsonPath("$.row[0].totalSupplyAmount").value(0));
+                .andExpect(jsonPath("$.row[0].totalSupplyAmount").value(0))
+                .andExpect(jsonPath("$.row[0].archived").value(false));
     }
 
     @Test
@@ -101,7 +105,8 @@ class SupplierControllerTest {
     public void testEdit_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Урумчи Кытай 2"
+                  "name": "Урумчи Кытай 2",
+                  "archived": true
                 }""";
         mockMvc.perform(put(Api.Supplier.PATH + "/94fadc9a-83bb-4639-be07-f825ab9eb40e")
                         .with(TestUtils.auth()).content(requestData))
@@ -110,6 +115,7 @@ class SupplierControllerTest {
         mockMvc.perform(get(Api.Supplier.PATH + "/94fadc9a-83bb-4639-be07-f825ab9eb40e").with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("94fadc9a-83bb-4639-be07-f825ab9eb40e"))
-                .andExpect(jsonPath("$.name").value("Урумчи Кытай 2"));
+                .andExpect(jsonPath("$.name").value("Урумчи Кытай 2"))
+                .andExpect(jsonPath("$.archived").value(true));
     }
 }

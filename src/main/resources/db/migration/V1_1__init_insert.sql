@@ -1,5 +1,5 @@
-INSERT INTO public.counterparty (id, name, created_at, last_modified_at)
-VALUES ('c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', 'ИП Жырқын', now(), now());
+INSERT INTO public.counterparty (id, name, archived, created_at, last_modified_at)
+VALUES ('c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', 'ИП Жырқын', false, now(), now());
 INSERT INTO public.organization (id)
 VALUES ('c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515');
 INSERT INTO public.users (id, counterparty_id, phone_number, name, auth_token, role, created_at, last_modified_at)

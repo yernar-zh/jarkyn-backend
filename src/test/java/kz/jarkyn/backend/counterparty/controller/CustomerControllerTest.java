@@ -37,7 +37,8 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.name").value("Заманбек Жетысай"))
                 .andExpect(jsonPath("$.phoneNumber").value("+7(707)145-1475"))
                 .andExpect(jsonPath("$.shippingAddress").value(""))
-                .andExpect(jsonPath("$.discount").value(3));
+                .andExpect(jsonPath("$.discount").value(3))
+                .andExpect(jsonPath("$.archived").value(false));
     }
 
     @Test
@@ -75,7 +76,8 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.row[0].firstSaleMoment").isEmpty())
                 .andExpect(jsonPath("$.row[0].lastSaleMoment").isEmpty())
                 .andExpect(jsonPath("$.row[0].totalSaleCount").value(0))
-                .andExpect(jsonPath("$.row[0].totalSaleAmount").value(0));
+                .andExpect(jsonPath("$.row[0].totalSaleAmount").value(0))
+                .andExpect(jsonPath("$.row[0].archived").value(false));
 
     }
 
@@ -87,14 +89,15 @@ class CustomerControllerTest {
                   "name": "Зейнел Зайсан",
                   "phoneNumber": "+7(702)564-3638",
                   "shippingAddress": "Рынок Салем",
-                  "discount": 5
+                  "discount": 5,
+                  "archived": false
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Customer.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andReturn();
         mockMvc.perform(get(Api.Customer.PATH).with(TestUtils.auth())
-                                .queryParam("id", TestUtils.extractId(result))
+                        .queryParam("id", TestUtils.extractId(result))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row.length()").value(1))
@@ -108,7 +111,8 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.row[0].firstSaleMoment").isEmpty())
                 .andExpect(jsonPath("$.row[0].lastSaleMoment").isEmpty())
                 .andExpect(jsonPath("$.row[0].totalSaleCount").value(0))
-                .andExpect(jsonPath("$.row[0].totalSaleAmount").value(0));
+                .andExpect(jsonPath("$.row[0].totalSaleAmount").value(0))
+                .andExpect(jsonPath("$.row[0].archived").value(false));
     }
 
     @Test
@@ -119,7 +123,8 @@ class CustomerControllerTest {
                   "name": "Заманбек Жетысай 2",
                   "phoneNumber": "+7(707)145-1476",
                   "shippingAddress": "Рынок Салем",
-                  "discount": 5
+                  "discount": 5,
+                  "archived": true
                 }""";
         mockMvc.perform(put(Api.Customer.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff")
                         .with(TestUtils.auth()).content(requestData))
@@ -131,6 +136,7 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.name").value("Заманбек Жетысай 2"))
                 .andExpect(jsonPath("$.phoneNumber").value("+7(707)145-1476"))
                 .andExpect(jsonPath("$.shippingAddress").value("Рынок Салем"))
-                .andExpect(jsonPath("$.discount").value(5));
+                .andExpect(jsonPath("$.discount").value(5))
+                .andExpect(jsonPath("$.archived").value(true));
     }
 }

@@ -66,6 +66,7 @@ CREATE TABLE counterparty
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     name             VARCHAR(255),
+    archived         BOOLEAN,
     CONSTRAINT pk_counterparty PRIMARY KEY (id)
 );
 
