@@ -60,6 +60,17 @@ CREATE TABLE cash_flow
     CONSTRAINT pk_cash_flow PRIMARY KEY (id)
 );
 
+CREATE TABLE currency
+(
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    name             VARCHAR(255),
+    code             VARCHAR(255),
+    symbol           VARCHAR(255),
+    CONSTRAINT pk_currency PRIMARY KEY (id)
+);
+
 CREATE TABLE customer
 (
     id               UUID NOT NULL,

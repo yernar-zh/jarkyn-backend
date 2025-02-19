@@ -54,4 +54,8 @@ public interface Api {
     interface PaymentIn {
         String PATH = Api.PATH + "/payment_in";
     }
+
+    interface Currency {
+        String PATH = Api.PATH + "/currency";
+    }
 }

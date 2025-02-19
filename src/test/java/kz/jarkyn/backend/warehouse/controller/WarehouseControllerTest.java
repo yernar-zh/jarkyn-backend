@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.party.controller;
+package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.TestUtils;
 import kz.jarkyn.backend.core.controller.Api;
