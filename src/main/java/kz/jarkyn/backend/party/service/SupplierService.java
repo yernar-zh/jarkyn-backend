@@ -10,12 +10,12 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.party.mapper.SupplierMapper;
-import kz.jarkyn.backend.party.model.Currency;
 import kz.jarkyn.backend.party.model.SupplierEntity;
 import kz.jarkyn.backend.party.model.dto.SupplierListResponse;
 import kz.jarkyn.backend.party.model.dto.SupplierRequest;
 import kz.jarkyn.backend.party.model.dto.SupplierResponse;
 import kz.jarkyn.backend.party.repository.SupplierRepository;
+import kz.jarkyn.backend.reference.model.CurrencyEntity;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +58,7 @@ public class SupplierService {
         Search<SupplierListResponse> search = searchFactory.createListSearch(
                 SupplierListResponse.class, List.of("name"),
                 () -> supplierRepository.findAll().stream().map(supplier -> {
-                    Pair<BigDecimal, Currency> account = accountService.findBalanceByCounterparty(supplier)
+                    Pair<BigDecimal, CurrencyEntity> account = accountService.findBalanceByCounterparty(supplier)
                             .stream().findFirst().orElseThrow();
                     Tuple results = supplierRepository.findSupplyInfo(supplier);
                     return supplierMapper.toResponse(supplier, account.getFirst(), account.getSecond(),

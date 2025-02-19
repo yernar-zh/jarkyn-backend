@@ -2,7 +2,7 @@
 package kz.jarkyn.backend.document.core.model.dto;
 
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
-import kz.jarkyn.backend.party.model.Currency;
+import kz.jarkyn.backend.reference.model.dto.CurrencyResponse;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public interface DocumentResponse extends IdNamedDto {
     IdNamedDto getOrganization();
     LocalDateTime getMoment();
-    Currency getCurrency();
+    CurrencyResponse getCurrency();
     BigDecimal getExchangeRate();
     BigDecimal getAmount();
     Boolean getDeleted();

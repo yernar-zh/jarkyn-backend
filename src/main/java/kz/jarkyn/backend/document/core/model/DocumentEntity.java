@@ -4,8 +4,8 @@ package kz.jarkyn.backend.document.core.model;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.party.model.PartyEntity;
-import kz.jarkyn.backend.party.model.Currency;
 import kz.jarkyn.backend.party.model.OrganizationEntity;
+import kz.jarkyn.backend.reference.model.CurrencyEntity;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 
 
@@ -27,8 +27,9 @@ public class DocumentEntity extends AbstractEntity {
     private PartyEntity counterparty;
     private String name;
     private LocalDateTime moment;
-    @Enumerated(EnumType.STRING)
-    private Currency currency;
+    @ManyToOne
+    @JoinColumn(name = "currency_id")
+    private CurrencyEntity currency;
     private BigDecimal exchangeRate;
     private BigDecimal amount;
     private String comment;
@@ -75,11 +76,11 @@ public class DocumentEntity extends AbstractEntity {
         this.moment = moment;
     }
 
-    public Currency getCurrency() {
+    public CurrencyEntity getCurrency() {
         return currency;
     }
 
-    public void setCurrency(Currency currency) {
+    public void setCurrency(CurrencyEntity currency) {
         this.currency = currency;
     }
 

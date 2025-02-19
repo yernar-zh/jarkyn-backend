@@ -45,4 +45,10 @@ public class CurrencyService {
                 CurrencyResponse.class, List.of(), () -> currencyMapper.toResponse(currencyRepository.findAll()));
         return search.getResult(queryParams);
     }
+
+    @Transactional(readOnly = true)
+    public CurrencyEntity findKZT() {
+        return currencyRepository.findAll().stream()
+                .filter(currency -> currency.getCode().equals("KZT")).findFirst().orElseThrow();
+    }
 }

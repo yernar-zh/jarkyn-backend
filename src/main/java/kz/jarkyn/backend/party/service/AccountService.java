@@ -16,6 +16,8 @@ import kz.jarkyn.backend.party.model.dto.AccountResponse;
 import kz.jarkyn.backend.party.repository.AccountRepository;
 import kz.jarkyn.backend.party.mapper.AccountMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
+import kz.jarkyn.backend.reference.model.CurrencyEntity;
+import kz.jarkyn.backend.reference.service.CurrencyService;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,18 +34,21 @@ public class AccountService {
     private final AccountMapper accountMapper;
     private final SearchFactory searchFactory;
     private final CashFlowService cashFlowService;
+    private final CurrencyService currencyService;
 
     public AccountService(
             AccountRepository accountRepository,
             AuditService auditService,
             AccountMapper accountMapper,
             SearchFactory searchFactory,
-            CashFlowService cashFlowService) {
+            CashFlowService cashFlowService,
+            CurrencyService currencyService) {
         this.accountRepository = accountRepository;
         this.auditService = auditService;
         this.accountMapper = accountMapper;
         this.searchFactory = searchFactory;
         this.cashFlowService = cashFlowService;
+        this.currencyService = currencyService;
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +69,7 @@ public class AccountService {
 
     @Transactional
     public AccountEntity findOrCreateForCounterparty(
-            OrganizationEntity organization, PartyEntity counterparty, Currency currency) {
+            OrganizationEntity organization, PartyEntity counterparty, CurrencyEntity currency) {
         return accountRepository.findByOrganizationAndCounterpartyAndCurrency(organization, counterparty, currency)
                 .orElseGet(() -> {
                     AccountEntity account = new AccountEntity();
@@ -81,8 +86,8 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public List<Pair<BigDecimal, Currency>> findBalanceByCounterparty(PartyEntity counterparty) {
-        List<Pair<BigDecimal, Currency>> result = accountRepository.findByCounterparty(counterparty).stream()
+    public List<Pair<BigDecimal, CurrencyEntity>> findBalanceByCounterparty(PartyEntity counterparty) {
+        List<Pair<BigDecimal, CurrencyEntity>> result = accountRepository.findByCounterparty(counterparty).stream()
                 .sorted(Comparator.comparing(AbstractEntity::getLastModifiedAt).reversed())
                 .map(account -> Pair.of(cashFlowService.findBalance(account), account.getCurrency()))
                 .filter(pair -> pair.getFirst().compareTo(BigDecimal.ZERO) != 0)
@@ -90,7 +95,7 @@ public class AccountService {
         if (!result.isEmpty()) {
             return result;
         }
-        return List.of(Pair.of(BigDecimal.ZERO, Currency.KZT));
+        return List.of(Pair.of(BigDecimal.ZERO, currencyService.findKZT()));
     }
 
     @Transactional

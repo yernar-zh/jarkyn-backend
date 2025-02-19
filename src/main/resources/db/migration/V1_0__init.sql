@@ -8,7 +8,7 @@ CREATE TABLE account
     name             VARCHAR(255),
     bank             VARCHAR(255),
     giro             VARCHAR(255),
-    currency         VARCHAR(255),
+    currency_id         UUID,
     CONSTRAINT pk_account PRIMARY KEY (id)
 );
 
@@ -90,7 +90,7 @@ CREATE TABLE document
     counterparty_id  UUID,
     name             VARCHAR(255),
     moment           TIMESTAMP WITHOUT TIME ZONE,
-    currency         VARCHAR(255),
+    currency_id         UUID,
     exchange_rate    DECIMAL,
     amount           DECIMAL,
     comment          VARCHAR(255),

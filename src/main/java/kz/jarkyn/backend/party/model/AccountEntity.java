@@ -3,6 +3,7 @@ package kz.jarkyn.backend.party.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.reference.model.CurrencyEntity;
 
 @Entity
 @Table(name = "account")
@@ -16,8 +17,9 @@ public class AccountEntity extends AbstractEntity {
     private String name;
     private String bank;
     private String giro;
-    @Enumerated(EnumType.STRING)
-    private Currency currency;
+    @ManyToOne
+    @JoinColumn(name = "currency_id")
+    private CurrencyEntity currency;
 
     public OrganizationEntity getOrganization() {
         return organization;
@@ -59,11 +61,11 @@ public class AccountEntity extends AbstractEntity {
         this.giro = giro;
     }
 
-    public Currency getCurrency() {
+    public CurrencyEntity getCurrency() {
         return currency;
     }
 
-    public void setCurrency(Currency currency) {
+    public void setCurrency(CurrencyEntity currency) {
         this.currency = currency;
     }
 }

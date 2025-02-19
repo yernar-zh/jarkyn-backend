@@ -9,13 +9,13 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.party.model.Currency;
 import kz.jarkyn.backend.party.model.CustomerEntity;
 import kz.jarkyn.backend.party.model.dto.CustomerListResponse;
 import kz.jarkyn.backend.party.model.dto.CustomerRequest;
 import kz.jarkyn.backend.party.model.dto.CustomerResponse;
 import kz.jarkyn.backend.party.repository.CustomerRepository;
 import kz.jarkyn.backend.party.mapper.CustomerMapper;
+import kz.jarkyn.backend.reference.model.CurrencyEntity;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +58,7 @@ public class CustomerService {
         Search<CustomerListResponse> search = searchFactory.createListSearch(
                 CustomerListResponse.class, List.of("name", "phoneNumber"),
                 () -> customerRepository.findAll().stream().map(customer -> {
-                    Pair<BigDecimal, Currency> account = accountService.findBalanceByCounterparty(customer)
+                    Pair<BigDecimal, CurrencyEntity> account = accountService.findBalanceByCounterparty(customer)
                             .stream().findFirst().orElseThrow();
                     Tuple results = customerRepository.findSaleInfo(customer);
                     return customerMapper.toResponse(customer, account.getFirst(), account.getSecond(),
