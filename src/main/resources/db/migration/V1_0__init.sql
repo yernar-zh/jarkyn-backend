@@ -8,7 +8,7 @@ CREATE TABLE account
     name             VARCHAR(255),
     bank             VARCHAR(255),
     giro             VARCHAR(255),
-    currency_id         UUID,
+    currency_id      UUID,
     CONSTRAINT pk_account PRIMARY KEY (id)
 );
 
@@ -90,7 +90,7 @@ CREATE TABLE document
     counterparty_id  UUID,
     name             VARCHAR(255),
     moment           TIMESTAMP WITHOUT TIME ZONE,
-    currency_id         UUID,
+    currency_id      UUID,
     exchange_rate    DECIMAL,
     amount           DECIMAL,
     comment          VARCHAR(255),
@@ -272,6 +272,9 @@ ALTER TABLE account
     ADD CONSTRAINT FK_ACCOUNT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES party (id);
 
 ALTER TABLE account
+    ADD CONSTRAINT FK_ACCOUNT_ON_CURRENCY FOREIGN KEY (currency_id) REFERENCES currency (id);
+
+ALTER TABLE account
     ADD CONSTRAINT FK_ACCOUNT_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organization (id);
 
 ALTER TABLE attribute
@@ -288,6 +291,9 @@ ALTER TABLE customer
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES party (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_CURRENCY FOREIGN KEY (currency_id) REFERENCES currency (id);
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organization (id);
