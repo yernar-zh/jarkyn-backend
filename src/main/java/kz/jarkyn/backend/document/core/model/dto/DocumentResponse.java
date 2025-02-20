@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public interface DocumentResponse extends IdNamedDto {
     IdNamedDto getOrganization();
     LocalDateTime getMoment();
-    CurrencyResponse getCurrency();
+    IdNamedDto getCurrency();
     BigDecimal getExchangeRate();
     BigDecimal getAmount();
     Boolean getDeleted();

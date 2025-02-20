@@ -12,6 +12,7 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.payment.model.PaymentInEntity_;
 import kz.jarkyn.backend.party.model.AccountEntity;
 import kz.jarkyn.backend.party.model.PartyEntity_;
 import kz.jarkyn.backend.party.model.OrganizationEntity_;
@@ -34,6 +35,7 @@ import kz.jarkyn.backend.document.sale.model.SaleEntity_;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity_;
 import kz.jarkyn.backend.operation.service.CashFlowService;
+import kz.jarkyn.backend.reference.model.CurrencyEntity_;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,25 +90,20 @@ public class SaleService {
         CriteriaAttributes<SaleEntity> attributes = CriteriaAttributes.<SaleEntity>builder()
                 .add("id", (root) -> root.get(SaleEntity_.id))
                 .add("name", (root) -> root.get(SaleEntity_.name))
-                .add("organization.id", (root) -> root
-                        .get(SaleEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root) -> root
-                        .get(SaleEntity_.organization).get(OrganizationEntity_.name))
+                .add("organization.id", (root) -> root.get(SaleEntity_.organization).get(OrganizationEntity_.id))
+                .add("organization.name", (root) -> root.get(SaleEntity_.organization).get(OrganizationEntity_.name))
                 .add("moment", (root) -> root.get(SaleEntity_.moment))
-                .add("currency", (root) -> root.get(SaleEntity_.currency))
+                .add("currency.id", (root) -> root.get(SaleEntity_.currency).get(CurrencyEntity_.id))
+                .add("currency.name", (root) -> root.get(SaleEntity_.currency).get(CurrencyEntity_.name))
                 .add("exchangeRate", (root) -> root.get(SaleEntity_.exchangeRate))
                 .add("amount", (root) -> root.get(SaleEntity_.amount))
                 .add("deleted", (root) -> root.get(SaleEntity_.deleted))
                 .add("commited", (root) -> root.get(SaleEntity_.commited))
                 .add("comment", (root) -> root.get(SaleEntity_.comment))
-                .add("warehouse.id", (root) -> root
-                        .get(SaleEntity_.warehouse).get(WarehouseEntity_.id))
-                .add("warehouse.name", (root) -> root
-                        .get(SaleEntity_.warehouse).get(WarehouseEntity_.name))
-                .add("counterparty.id", (root) -> root
-                        .get(SaleEntity_.counterparty).get(PartyEntity_.id))
-                .add("counterparty.name", (root) -> root
-                        .get(SaleEntity_.counterparty).get(PartyEntity_.name))
+                .add("warehouse.id", (root) -> root.get(SaleEntity_.warehouse).get(WarehouseEntity_.id))
+                .add("warehouse.name", (root) -> root.get(SaleEntity_.warehouse).get(WarehouseEntity_.name))
+                .add("counterparty.id", (root) -> root.get(SaleEntity_.counterparty).get(PartyEntity_.id))
+                .add("counterparty.name", (root) -> root.get(SaleEntity_.counterparty).get(PartyEntity_.name))
                 .add("shipmentMoment", (root) -> root.get(SaleEntity_.shipmentMoment))
                 .add("state", (root) -> root.get(SaleEntity_.state))
                 .add("paidAmount", (root, query, cb, map) -> {

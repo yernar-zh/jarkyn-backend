@@ -37,7 +37,8 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2024-12-07T21:47:00"))
-                .andExpect(jsonPath("$.currency").value("CNY"))
+                .andExpect(jsonPath("$.currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.currency.name").value("Юань"))
                 .andExpect(jsonPath("$.exchangeRate").value(68))
                 .andExpect(jsonPath("$.amount").value(710))
                 .andExpect(jsonPath("$.deleted").value(false))
@@ -65,7 +66,8 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.paidDocuments[0].payment.id").value("5c799431-3bc3-400f-b9a3-209f27b935a0"))
                 .andExpect(jsonPath("$.paidDocuments[0].payment.name").value("PO-00001"))
                 .andExpect(jsonPath("$.paidDocuments[0].payment.moment").value("2024-12-07T22:47:00"))
-                .andExpect(jsonPath("$.paidDocuments[0].payment.currency").value("CNY"))
+                .andExpect(jsonPath("$.paidDocuments[0].payment.currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.paidDocuments[0].payment.currency.name").value("Юань"))
                 .andExpect(jsonPath("$.paidDocuments[0].payment.exchangeRate").value(68))
                 .andExpect(jsonPath("$.paidDocuments[0].payment.amount").value(710))
                 .andExpect(jsonPath("$.paidDocuments[0].payment.deleted").value(false))
@@ -73,7 +75,8 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.paidDocuments[1].payment.id").value("fa81596d-a236-4256-8686-7f7f3be85ae4"))
                 .andExpect(jsonPath("$.paidDocuments[1].payment.name").value("PO-00002"))
                 .andExpect(jsonPath("$.paidDocuments[1].payment.moment").value("2024-12-07T23:47:00"))
-                .andExpect(jsonPath("$.paidDocuments[1].payment.currency").value("USD"))
+                .andExpect(jsonPath("$.paidDocuments[1].payment.currency.id").value("24f15639-67da-4df4-aab4-56b85c872c3b"))
+                .andExpect(jsonPath("$.paidDocuments[1].payment.currency.name").value("Доллар"))
                 .andExpect(jsonPath("$.paidDocuments[1].payment.exchangeRate").value(525))
                 .andExpect(jsonPath("$.paidDocuments[1].payment.amount").value(20))
                 .andExpect(jsonPath("$.paidDocuments[1].payment.deleted").value(false))
@@ -100,7 +103,8 @@ class SupplyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row[0].name").value("SP-00001"))
                 .andExpect(jsonPath("$.row[0].id").value("17c1285b-6514-45d5-88a2-3b9f673dc5e3"))
-                .andExpect(jsonPath("$.row[0].currency").value("CNY"))
+                .andExpect(jsonPath("$.row[0].currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.row[0].currency.name").value("Юань"))
                 .andExpect(jsonPath("$.row[0].comment").isEmpty())
                 .andExpect(jsonPath("$.row[0].deleted").value(false))
                 .andExpect(jsonPath("$.row[0].amount").value(710))
@@ -146,7 +150,9 @@ class SupplyControllerTest {
                     "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
                   },
                   "moment": "2024-12-21T12:18:07",
-                  "currency": "CNY",
+                  "currency": {
+                    "id": "e6a3c207-a358-47bf-ac18-2d09973f3807"
+                  },
                   "exchangeRate": 70,
                   "amount": 700,
                   "warehouse": {
@@ -186,7 +192,8 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2024-12-21T12:18:07"))
-                .andExpect(jsonPath("$.currency").value("CNY"))
+                .andExpect(jsonPath("$.currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.currency.name").value("Юань"))
                 .andExpect(jsonPath("$.exchangeRate").value(70))
                 .andExpect(jsonPath("$.amount").value(700))
                 .andExpect(jsonPath("$.deleted").value(false))
@@ -224,7 +231,9 @@ class SupplyControllerTest {
                     "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
                   },
                   "moment": "2024-12-21T22:29:00",
-                  "currency": "KZT",
+                  "currency": {
+                    "id": "559109ea-f824-476d-8fa4-9990e53880ff"
+                  },
                   "exchangeRate": 1,
                   "amount": 30000,
                   "warehouse": {
@@ -256,7 +265,8 @@ class SupplyControllerTest {
                 .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2024-12-21T22:29:00"))
-                .andExpect(jsonPath("$.currency").value("KZT"))
+                .andExpect(jsonPath("$.currency.id").value("559109ea-f824-476d-8fa4-9990e53880ff"))
+                .andExpect(jsonPath("$.currency.name").value("Тенге"))
                 .andExpect(jsonPath("$.exchangeRate").value(1))
                 .andExpect(jsonPath("$.amount").value(30000))
                 .andExpect(jsonPath("$.deleted").value(false))
@@ -308,7 +318,8 @@ class SupplyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row.length()").value(1))
                 .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
-                .andExpect(jsonPath("$.row[0].currency").value("CNY"))
+                .andExpect(jsonPath("$.row[0].currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.row[0].currency.name").value("Юань"))
                 .andExpect(jsonPath("$.row[0].balance").value(710));
     }
 }

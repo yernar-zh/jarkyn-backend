@@ -6,6 +6,7 @@ import jakarta.persistence.PersistenceContext;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import kz.jarkyn.backend.reference.model.CurrencyEntity;
 import kz.jarkyn.backend.warehouse.model.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.IdDto;
@@ -56,6 +57,10 @@ public class EntityMapper {
 
     public UserEntity toUserEntity(IdDto api) {
         return toEntity(api, UserEntity.class);
+    }
+
+    public CurrencyEntity toCurrencyEntity(IdDto api) {
+        return toEntity(api, CurrencyEntity.class);
     }
 
     public <T extends PartyEntity> T toPartyEntity(IdDto api) {

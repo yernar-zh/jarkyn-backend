@@ -11,6 +11,7 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.payment.model.*;
 import kz.jarkyn.backend.party.model.AccountEntity;
 import kz.jarkyn.backend.party.model.AccountEntity_;
 import kz.jarkyn.backend.party.model.PartyEntity_;
@@ -18,16 +19,13 @@ import kz.jarkyn.backend.party.model.OrganizationEntity_;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.payment.mapper.PaymentOutMapper;
-import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity;
-import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity_;
-import kz.jarkyn.backend.document.payment.model.PaymentOutEntity;
-import kz.jarkyn.backend.document.payment.model.PaymentOutEntity_;
 import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutListResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutRequest;
 import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
 import kz.jarkyn.backend.operation.service.CashFlowService;
+import kz.jarkyn.backend.reference.model.CurrencyEntity_;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,20 +76,15 @@ public class PaymentOutService {
         CriteriaAttributes<PaymentOutEntity> attributes = CriteriaAttributes.<PaymentOutEntity>builder()
                 .add("id", (root) -> root.get(PaymentOutEntity_.id))
                 .add("name", (root) -> root.get(PaymentOutEntity_.name))
-                .add("organization.id", (root) -> root
-                        .get(PaymentOutEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root) -> root
-                        .get(PaymentOutEntity_.organization).get(OrganizationEntity_.name))
-                .add("account.id", (root) -> root
-                        .get(PaymentOutEntity_.account).get(AccountEntity_.id))
-                .add("account.name", (root) -> root
-                        .get(PaymentOutEntity_.account).get(AccountEntity_.name))
-                .add("counterparty.id", (root) -> root
-                        .get(PaymentOutEntity_.counterparty).get(PartyEntity_.id))
-                .add("counterparty.name", (root) -> root
-                        .get(PaymentOutEntity_.counterparty).get(PartyEntity_.name))
+                .add("organization.id", (root) -> root.get(PaymentOutEntity_.organization).get(OrganizationEntity_.id))
+                .add("organization.name", (root) -> root.get(PaymentOutEntity_.organization).get(OrganizationEntity_.name))
+                .add("account.id", (root) -> root.get(PaymentOutEntity_.account).get(AccountEntity_.id))
+                .add("account.name", (root) -> root.get(PaymentOutEntity_.account).get(AccountEntity_.name))
+                .add("counterparty.id", (root) -> root.get(PaymentOutEntity_.counterparty).get(PartyEntity_.id))
+                .add("counterparty.name", (root) -> root.get(PaymentOutEntity_.counterparty).get(PartyEntity_.name))
                 .add("moment", (root) -> root.get(PaymentOutEntity_.moment))
-                .add("currency", (root) -> root.get(PaymentOutEntity_.currency))
+                .add("currency.id", (root) -> root.get(PaymentOutEntity_.currency).get(CurrencyEntity_.id))
+                .add("currency.name", (root) -> root.get(PaymentOutEntity_.currency).get(CurrencyEntity_.name))
                 .add("exchangeRate", (root) -> root.get(PaymentOutEntity_.exchangeRate))
                 .add("amount", (root) -> root.get(PaymentOutEntity_.amount))
                 .add("deleted", (root) -> root.get(PaymentOutEntity_.deleted))

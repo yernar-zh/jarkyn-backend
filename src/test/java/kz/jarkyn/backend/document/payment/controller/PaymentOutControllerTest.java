@@ -38,7 +38,8 @@ class PaymentOutControllerTest {
                 .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2024-12-07T22:47:00"))
-                .andExpect(jsonPath("$.currency").value("CNY"))
+                .andExpect(jsonPath("$.currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.currency.name").value("Юань"))
                 .andExpect(jsonPath("$.exchangeRate").value(68))
                 .andExpect(jsonPath("$.amount").value(710))
                 .andExpect(jsonPath("$.deleted").value(false))
@@ -58,7 +59,8 @@ class PaymentOutControllerTest {
                 .andExpect(jsonPath("$.paidDocuments[0].document.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.paidDocuments[0].document.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.paidDocuments[0].document.moment").value("2024-12-07T21:47:00"))
-                .andExpect(jsonPath("$.paidDocuments[0].document.currency").value("CNY"))
+                .andExpect(jsonPath("$.paidDocuments[0].document.currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.paidDocuments[0].document.currency.name").value("Юань"))
                 .andExpect(jsonPath("$.paidDocuments[0].document.exchangeRate").value(68))
                 .andExpect(jsonPath("$.paidDocuments[0].document.amount").value(710))
                 .andExpect(jsonPath("$.paidDocuments[0].document.deleted").value(false))
@@ -87,7 +89,10 @@ class PaymentOutControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row[0].name").value("PO-00001"))
                 .andExpect(jsonPath("$.row[0].id").value("5c799431-3bc3-400f-b9a3-209f27b935a0"))
-                .andExpect(jsonPath("$.row[0].currency").value("CNY"))
+                .andExpect(jsonPath("$.row[0].currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.row[0].currency.name").value("Юань"))
+                .andExpect(jsonPath("$.row[0].currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.row[0].currency.name").value("Юань"))
                 .andExpect(jsonPath("$.row[0].comment").value(""))
                 .andExpect(jsonPath("$.row[0].attached").value(710))
                 .andExpect(jsonPath("$.row[0].purpose").isEmpty())
@@ -123,7 +128,9 @@ class PaymentOutControllerTest {
                     "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
                   },
                   "moment": "2025-01-01T16:17:07",
-                  "currency": "KZT",
+                  "currency": {
+                    "id": "559109ea-f824-476d-8fa4-9990e53880ff"
+                  },
                   "exchangeRate": 69,
                   "amount": 10000,
                   "account": {
@@ -157,7 +164,8 @@ class PaymentOutControllerTest {
                 .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2025-01-01T16:17:07"))
-                .andExpect(jsonPath("$.currency").value("KZT"))
+                .andExpect(jsonPath("$.currency.id").value("559109ea-f824-476d-8fa4-9990e53880ff"))
+                .andExpect(jsonPath("$.currency.name").value("Тенге"))
                 .andExpect(jsonPath("$.exchangeRate").value(69))
                 .andExpect(jsonPath("$.amount").value(10000))
                 .andExpect(jsonPath("$.deleted").value(false))
@@ -185,7 +193,9 @@ class PaymentOutControllerTest {
                     "id": "c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"
                   },
                   "moment": "2025-01-01T17:01:00",
-                  "currency": "KZT",
+                  "currency": {
+                    "id": "559109ea-f824-476d-8fa4-9990e53880ff"
+                  },
                   "exchangeRate": 1,
                   "amount": 2000,
                   "deleted": false,
@@ -221,7 +231,8 @@ class PaymentOutControllerTest {
                 .andExpect(jsonPath("$.organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.organization.name").value("ИП Жырқын"))
                 .andExpect(jsonPath("$.moment").value("2025-01-01T17:01:00"))
-                .andExpect(jsonPath("$.currency").value("KZT"))
+                .andExpect(jsonPath("$.currency.id").value("559109ea-f824-476d-8fa4-9990e53880ff"))
+                .andExpect(jsonPath("$.currency.name").value("Тенге"))
                 .andExpect(jsonPath("$.exchangeRate").value(1))
                 .andExpect(jsonPath("$.amount").value(2000))
                 .andExpect(jsonPath("$.deleted").value(false))
@@ -258,7 +269,8 @@ class PaymentOutControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row.length()").value(1))
                 .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
-                .andExpect(jsonPath("$.row[0].currency").value("CNY"))
+                .andExpect(jsonPath("$.row[0].currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
+                .andExpect(jsonPath("$.row[0].currency.symbol").value("¥"))
                 .andExpect(jsonPath("$.row[0].balance").value(-710));
     }
 }

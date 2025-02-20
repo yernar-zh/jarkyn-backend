@@ -28,10 +28,12 @@ import kz.jarkyn.backend.document.payment.model.dto.PaymentInRequest;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentInResponse;
 import kz.jarkyn.backend.document.payment.repository.PaymentInRepository;
 import kz.jarkyn.backend.operation.service.CashFlowService;
+import kz.jarkyn.backend.reference.model.CurrencyEntity_;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,20 +80,15 @@ public class PaymentInService {
         CriteriaAttributes<PaymentInEntity> attributes = CriteriaAttributes.<PaymentInEntity>builder()
                 .add("id", (root) -> root.get(PaymentInEntity_.id))
                 .add("name", (root) -> root.get(PaymentInEntity_.name))
-                .add("organization.id", (root) -> root
-                        .get(PaymentInEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root) -> root
-                        .get(PaymentInEntity_.organization).get(OrganizationEntity_.name))
-                .add("account.id", (root) -> root
-                        .get(PaymentInEntity_.account).get(AccountEntity_.id))
-                .add("account.name", (root) -> root
-                        .get(PaymentInEntity_.account).get(AccountEntity_.name))
-                .add("counterparty.id", (root) -> root
-                        .get(PaymentInEntity_.counterparty).get(PartyEntity_.id))
-                .add("counterparty.name", (root) -> root
-                        .get(PaymentInEntity_.counterparty).get(PartyEntity_.name))
+                .add("organization.id", (root) -> root.get(PaymentInEntity_.organization).get(OrganizationEntity_.id))
+                .add("organization.name", (root) -> root.get(PaymentInEntity_.organization).get(OrganizationEntity_.name))
+                .add("account.id", (root) -> root.get(PaymentInEntity_.account).get(AccountEntity_.id))
+                .add("account.name", (root) -> root.get(PaymentInEntity_.account).get(AccountEntity_.name))
+                .add("counterparty.id", (root) -> root.get(PaymentInEntity_.counterparty).get(PartyEntity_.id))
+                .add("counterparty.name", (root) -> root.get(PaymentInEntity_.counterparty).get(PartyEntity_.name))
                 .add("moment", (root) -> root.get(PaymentInEntity_.moment))
-                .add("currency", (root) -> root.get(PaymentInEntity_.currency))
+                .add("currency.id", (root) -> root.get(PaymentInEntity_.currency).get(CurrencyEntity_.id))
+                .add("currency.name", (root) -> root.get(PaymentInEntity_.currency).get(CurrencyEntity_.name))
                 .add("exchangeRate", (root) -> root.get(PaymentInEntity_.exchangeRate))
                 .add("amount", (root) -> root.get(PaymentInEntity_.amount))
                 .add("deleted", (root) -> root.get(PaymentInEntity_.deleted))

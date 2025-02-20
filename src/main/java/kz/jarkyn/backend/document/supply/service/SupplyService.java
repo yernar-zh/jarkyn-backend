@@ -30,6 +30,7 @@ import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
+import kz.jarkyn.backend.reference.model.CurrencyEntity_;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,25 +85,20 @@ public class SupplyService {
         CriteriaAttributes<SupplyEntity> attributes = CriteriaAttributes.<SupplyEntity>builder()
                 .add("id", (root) -> root.get(SupplyEntity_.id))
                 .add("name", (root) -> root.get(SupplyEntity_.name))
-                .add("organization.id", (root) -> root
-                        .get(SupplyEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root) -> root
-                        .get(SupplyEntity_.organization).get(OrganizationEntity_.name))
+                .add("organization.id", (root) -> root.get(SupplyEntity_.organization).get(OrganizationEntity_.id))
+                .add("organization.name", (root) -> root.get(SupplyEntity_.organization).get(OrganizationEntity_.name))
                 .add("moment", (root) -> root.get(SupplyEntity_.moment))
-                .add("currency", (root) -> root.get(SupplyEntity_.currency))
+                .add("currency.id", (root) -> root.get(SupplyEntity_.currency).get(CurrencyEntity_.id))
+                .add("currency.name", (root) -> root.get(SupplyEntity_.currency).get(CurrencyEntity_.name))
                 .add("exchangeRate", (root) -> root.get(SupplyEntity_.exchangeRate))
                 .add("amount", (root) -> root.get(SupplyEntity_.amount))
                 .add("deleted", (root) -> root.get(SupplyEntity_.deleted))
                 .add("commited", (root) -> root.get(SupplyEntity_.commited))
                 .add("comment", (root) -> root.get(SupplyEntity_.comment))
-                .add("warehouse.id", (root) -> root
-                        .get(SupplyEntity_.warehouse).get(WarehouseEntity_.id))
-                .add("warehouse.name", (root) -> root
-                        .get(SupplyEntity_.warehouse).get(WarehouseEntity_.name))
-                .add("counterparty.id", (root) -> root
-                        .get(SupplyEntity_.counterparty).get(PartyEntity_.id))
-                .add("counterparty.name", (root) -> root
-                        .get(SupplyEntity_.counterparty).get(PartyEntity_.name))
+                .add("warehouse.id", (root) -> root.get(SupplyEntity_.warehouse).get(WarehouseEntity_.id))
+                .add("warehouse.name", (root) -> root.get(SupplyEntity_.warehouse).get(WarehouseEntity_.name))
+                .add("counterparty.id", (root) -> root.get(SupplyEntity_.counterparty).get(PartyEntity_.id))
+                .add("counterparty.name", (root) -> root.get(SupplyEntity_.counterparty).get(PartyEntity_.name))
                 .add("paidAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
                     Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
