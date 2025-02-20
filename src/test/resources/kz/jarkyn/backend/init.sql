@@ -4,14 +4,14 @@ SET auth_token = '<AUTH_TOKEN>'
 WHERE id = 'f57382c9-35a1-4b64-b3f0-f172489dc90a';
 
 
-------------- Organization accounts -------------
-INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, currency)
+------------- Organization accounts -------------attribute
+INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, currency_id)
 VALUES ('6057082b-041b-47b7-ba31-9fa693eb2a21', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Ернар Ж.', 'Kaspi Bank', '+7(775)216-6661', 'KZT'),
+        'Ернар Ж.', 'Kaspi Bank', '+7(775)216-6661', '559109ea-f824-476d-8fa4-9990e53880ff'),
        ('c8190dcc-1cbe-4df6-a582-0f85e9850335', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Наличный Юань', '', '', 'CNY'),
+        'Наличный Юань', '', '', 'e6a3c207-a358-47bf-ac18-2d09973f3807'),
        ('8d1ed49a-6964-4a3e-bc83-8c22601e70f8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Наличный Доллар', '', '', 'USD');
+        'Наличный Доллар', '', '', '24f15639-67da-4df4-aab4-56b85c872c3b');
 
 ------------------- Warehouse -------------------
 INSERT INTO warehouse (id, name, archived)
@@ -101,11 +101,11 @@ VALUES ('4d4bc769-df3f-4e25-9f23-d01083bdb056', 'bf6f2ba4-f994-44c1-839f-36a75f0
 
 ------------------- Supply ----------------------
 INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
-                      currency, exchange_rate, amount, comment, deleted, commited)
+                      currency_id, exchange_rate, amount, comment, deleted, commited)
 VALUES ('17c1285b-6514-45d5-88a2-3b9f673dc5e3', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
         '523961a7-696d-4779-8bb0-fd327feaecf3', '94fadc9a-83bb-4639-be07-f825ab9eb40e',
         'SP-00001', '2024-12-07 21:47',
-        'CNY', 68, 710, '', false, false);
+        'e6a3c207-a358-47bf-ac18-2d09973f3807', 68, 710, '', false, false);
 INSERT INTO supply (id)
 VALUES ('17c1285b-6514-45d5-88a2-3b9f673dc5e3');
 INSERT INTO item (id, document_id, good_id, quantity, price, position)
@@ -115,11 +115,11 @@ VALUES ('0098b2bc-da73-4451-bdb5-35f42f756f10', '17c1285b-6514-45d5-88a2-3b9f673
         'bf6f2ba4-f994-44c1-839f-36a75f07242e', 100, 4, 1);
 -- Supply supplier payment
 INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
-                      currency, exchange_rate, amount, comment, deleted, commited)
+                      currency_id, exchange_rate, amount, comment, deleted, commited)
 VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
         null, '94fadc9a-83bb-4639-be07-f825ab9eb40e',
         'PO-00001', '2024-12-07 22:47',
-        'CNY', 68, 710, '', false, false);
+        'e6a3c207-a358-47bf-ac18-2d09973f3807', 68, 710, '', false, false);
 INSERT INTO payment_out (id, account_id, item_of_expenditure)
 VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', 'c8190dcc-1cbe-4df6-a582-0f85e9850335',
         'SUPPLY');
@@ -128,11 +128,11 @@ VALUES ('538c3271-7398-4fab-ad05-0a886188de11', '5c799431-3bc3-400f-b9a3-209f27b
         '17c1285b-6514-45d5-88a2-3b9f673dc5e3', 710);
 -- Supply cargo payment
 INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
-                      currency, exchange_rate, amount, comment, deleted, commited)
+                      currency_id, exchange_rate, amount, comment, deleted, commited)
 VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
         null, null,
         'PO-00002', '2024-12-07 23:47',
-        'USD', 525, 20, '', false, false);
+        '24f15639-67da-4df4-aab4-56b85c872c3b'  , 525, 20, '', false, false);
 INSERT INTO payment_out (id, account_id, item_of_expenditure)
 VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', '8d1ed49a-6964-4a3e-bc83-8c22601e70f8',
         'SUPPLY');
@@ -142,11 +142,11 @@ VALUES ('e70efb3f-9124-4ef9-9b7e-7bc24385710f', 'fa81596d-a236-4256-8686-7f7f3be
 
 -------------------- Sale ----------------------.-
 INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
-                      currency, exchange_rate, amount, comment, deleted, commited)
+                      currency_id, exchange_rate, amount, comment, deleted, commited)
 VALUES ('9f26476e-e143-4468-8a37-abdb479e89b8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
         '523961a7-696d-4779-8bb0-fd327feaecf3', '1d468c04-6360-43e5-9d51-7771e9d9dcff',
         'SL-00001', '2024-12-30 16:45',
-        'KZT', 1, 61500, '', false, false);
+        '559109ea-f824-476d-8fa4-9990e53880ff', 1, 61500, '', false, false);
 INSERT INTO sale (id, shipment_moment, state)
 VALUES ('9f26476e-e143-4468-8a37-abdb479e89b8', null, 'NEW');
 INSERT INTO item (id, document_id, good_id, quantity, price, position)
@@ -156,11 +156,11 @@ VALUES ('dcd46fd5-b931-4759-8b1b-c1ad39c3cffa', '9f26476e-e143-4468-8a37-abdb479
         'bf6f2ba4-f994-44c1-839f-36a75f07242e', 50, 550, 1);
 -- Sale customer payment
 INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
-                      currency, exchange_rate, amount, comment, deleted, commited)
+                      currency_id, exchange_rate, amount, comment, deleted, commited)
 VALUES ('4aae4391-3bd4-4746-b06d-faedb32fefd8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
         null, '1d468c04-6360-43e5-9d51-7771e9d9dcff',
         'PI-00001', '2024-12-30 18:20',
-        'KZT', 1, 61500, '', false, false);
+        '559109ea-f824-476d-8fa4-9990e53880ff', 1, 61500, '', false, false);
 INSERT INTO payment_in (id, account_id)
 VALUES ('4aae4391-3bd4-4746-b06d-faedb32fefd8', '6057082b-041b-47b7-ba31-9fa693eb2a21');
 INSERT INTO paid_document (id, payment_id, document_id, amount)
