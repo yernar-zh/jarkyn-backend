@@ -17,7 +17,7 @@ public class ExceptionUtils {
                 throw new ApiValidationException(fieldName + " should be same");
             }
         } else if (!first.equals(second)) {
-            throw new ApiValidationException(fieldName + " should be same");
+            throw new ApiValidationException(fieldName + " should be same, " + first + " != " + second);
         }
     }
 

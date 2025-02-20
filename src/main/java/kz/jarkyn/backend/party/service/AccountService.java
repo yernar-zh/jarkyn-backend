@@ -112,7 +112,7 @@ public class AccountService {
         if (account.getCounterparty() != null) {
             throw new ApiValidationException("cant update counterparty account");
         }
-        ExceptionUtils.requireEqualsApi(account.getCurrency(), request.getCurrency(), "currency");
+        ExceptionUtils.requireEqualsApi(account.getCurrency().getId(), request.getCurrency().getId(), "currency");
         accountMapper.editEntity(account, request);
         auditService.saveChanges(account);
     }

@@ -58,7 +58,7 @@ class CurrencyControllerTest {
                 .andExpect(jsonPath("$.row[0].symbol").value("₸"))
                 .andExpect(jsonPath("$.row[1].id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
                 .andExpect(jsonPath("$.row[1].name").value("Юань"))
-                .andExpect(jsonPath("$.row[1].code").value("CHY"))
+                .andExpect(jsonPath("$.row[1].code").value("CNY"))
                 .andExpect(jsonPath("$.row[1].symbol").value("¥"))
                 .andExpect(jsonPath("$.row[2].id").value("24f15639-67da-4df4-aab4-56b85c872c3b"))
                 .andExpect(jsonPath("$.row[2].name").value("Доллар"))
