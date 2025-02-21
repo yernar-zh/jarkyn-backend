@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.reference.model.dto;
+package kz.jarkyn.backend.global.model.dto;
 
 import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import org.immutables.value.Value;

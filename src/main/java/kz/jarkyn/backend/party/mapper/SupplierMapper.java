@@ -6,7 +6,7 @@ import kz.jarkyn.backend.party.model.SupplierEntity;
 import kz.jarkyn.backend.party.model.dto.SupplierListResponse;
 import kz.jarkyn.backend.party.model.dto.SupplierRequest;
 import kz.jarkyn.backend.party.model.dto.SupplierResponse;
-import kz.jarkyn.backend.reference.model.CurrencyEntity;
+import kz.jarkyn.backend.global.model.CurrencyEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

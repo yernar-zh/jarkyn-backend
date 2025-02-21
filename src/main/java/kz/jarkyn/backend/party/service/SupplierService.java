@@ -15,7 +15,7 @@ import kz.jarkyn.backend.party.model.dto.SupplierListResponse;
 import kz.jarkyn.backend.party.model.dto.SupplierRequest;
 import kz.jarkyn.backend.party.model.dto.SupplierResponse;
 import kz.jarkyn.backend.party.repository.SupplierRepository;
-import kz.jarkyn.backend.reference.model.CurrencyEntity;
+import kz.jarkyn.backend.global.model.CurrencyEntity;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

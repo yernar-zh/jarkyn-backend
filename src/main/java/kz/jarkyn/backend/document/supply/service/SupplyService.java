@@ -30,7 +30,7 @@ import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
-import kz.jarkyn.backend.reference.model.CurrencyEntity_;
+import kz.jarkyn.backend.global.model.CurrencyEntity_;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

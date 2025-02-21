@@ -3,7 +3,7 @@ package kz.jarkyn.backend.party.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
-import kz.jarkyn.backend.reference.model.CurrencyEntity;
+import kz.jarkyn.backend.global.model.CurrencyEntity;
 
 @Entity
 @Table(name = "account")

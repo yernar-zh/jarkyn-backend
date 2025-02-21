@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.reference.controller;
+package kz.jarkyn.backend.global.controller;
 
 import kz.jarkyn.backend.TestUtils;
 import kz.jarkyn.backend.core.controller.Api;
@@ -11,7 +11,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

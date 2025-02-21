@@ -25,7 +25,7 @@ import kz.jarkyn.backend.document.payment.model.dto.PaymentOutResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutRequest;
 import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
 import kz.jarkyn.backend.operation.service.CashFlowService;
-import kz.jarkyn.backend.reference.model.CurrencyEntity_;
+import kz.jarkyn.backend.global.model.CurrencyEntity_;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

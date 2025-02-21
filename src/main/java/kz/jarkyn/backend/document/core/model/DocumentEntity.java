@@ -5,7 +5,7 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.party.model.PartyEntity;
 import kz.jarkyn.backend.party.model.OrganizationEntity;
-import kz.jarkyn.backend.reference.model.CurrencyEntity;
+import kz.jarkyn.backend.global.model.CurrencyEntity;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 
 

@@ -1,7 +1,7 @@
 package kz.jarkyn.backend.party.repository;
 
 import kz.jarkyn.backend.party.model.*;
-import kz.jarkyn.backend.reference.model.CurrencyEntity;
+import kz.jarkyn.backend.global.model.CurrencyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

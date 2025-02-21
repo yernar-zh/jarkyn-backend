@@ -28,12 +28,11 @@ import kz.jarkyn.backend.document.payment.model.dto.PaymentInRequest;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentInResponse;
 import kz.jarkyn.backend.document.payment.repository.PaymentInRepository;
 import kz.jarkyn.backend.operation.service.CashFlowService;
-import kz.jarkyn.backend.reference.model.CurrencyEntity_;
+import kz.jarkyn.backend.global.model.CurrencyEntity_;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 

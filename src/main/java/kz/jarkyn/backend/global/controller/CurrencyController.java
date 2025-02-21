@@ -1,10 +1,10 @@
-package kz.jarkyn.backend.reference.controller;
+package kz.jarkyn.backend.global.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.reference.model.dto.CurrencyResponse;
-import kz.jarkyn.backend.reference.service.CurrencyService;
+import kz.jarkyn.backend.global.model.dto.CurrencyResponse;
+import kz.jarkyn.backend.global.service.CurrencyService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;

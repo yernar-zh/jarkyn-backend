@@ -1,5 +1,5 @@
 
-package kz.jarkyn.backend.reference.service;
+package kz.jarkyn.backend.global.service;
 
 
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
@@ -7,10 +7,10 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.reference.mapper.CurrencyMapper;
-import kz.jarkyn.backend.reference.model.CurrencyEntity;
-import kz.jarkyn.backend.reference.model.dto.CurrencyResponse;
-import kz.jarkyn.backend.reference.repository.CurrencyRepository;
+import kz.jarkyn.backend.global.mapper.CurrencyMapper;
+import kz.jarkyn.backend.global.model.CurrencyEntity;
+import kz.jarkyn.backend.global.model.dto.CurrencyResponse;
+import kz.jarkyn.backend.global.repository.CurrencyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

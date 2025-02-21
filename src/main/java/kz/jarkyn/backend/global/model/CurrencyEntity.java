@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.reference.model;
+package kz.jarkyn.backend.global.model;
 
 
 import jakarta.persistence.Entity;
