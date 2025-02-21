@@ -9,9 +9,9 @@ INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, cur
 VALUES ('6057082b-041b-47b7-ba31-9fa693eb2a21', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
         'Ернар Ж.', 'Kaspi Bank', '+7(775)216-6661', '559109ea-f824-476d-8fa4-9990e53880ff'),
        ('c8190dcc-1cbe-4df6-a582-0f85e9850335', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Наличный Юань', '', '', 'e6a3c207-a358-47bf-ac18-2d09973f3807'),
+        'Наличный CNY', '', '', 'e6a3c207-a358-47bf-ac18-2d09973f3807'),
        ('8d1ed49a-6964-4a3e-bc83-8c22601e70f8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Наличный Доллар', '', '', '24f15639-67da-4df4-aab4-56b85c872c3b');
+        'Наличный USD', '', '', '24f15639-67da-4df4-aab4-56b85c872c3b');
 
 ------------------- Warehouse -------------------
 INSERT INTO warehouse (id, name, archived)
