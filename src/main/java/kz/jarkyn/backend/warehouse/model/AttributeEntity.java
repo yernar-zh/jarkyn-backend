@@ -7,14 +7,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.core.model.ReferenceEntity;
 
 @Entity
 @Table(name = "attribute")
-public class AttributeEntity extends AbstractEntity {
+public class AttributeEntity extends ReferenceEntity {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private AttributeGroupEntity group;
-    private String name;
     private Integer position;
 
     public AttributeGroupEntity getGroup() {
@@ -23,14 +23,6 @@ public class AttributeEntity extends AbstractEntity {
 
     public void setGroup(AttributeGroupEntity group) {
         this.group = group;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Integer getPosition() {

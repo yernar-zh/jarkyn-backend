@@ -2,7 +2,7 @@
 package kz.jarkyn.backend.document.sale.model.dto;
 
 import jakarta.annotation.Nullable;
-import kz.jarkyn.backend.core.model.dto.IdNamedDto;
+import kz.jarkyn.backend.core.model.dto.ReferenceResponse;
 import kz.jarkyn.backend.document.core.model.dto.DocumentResponse;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
@@ -14,8 +14,8 @@ import java.util.List;
 
 @Value.Immutable
 public interface SaleResponse extends DocumentResponse {
-    IdNamedDto getWarehouse();
-    IdNamedDto getCounterparty();
+    ReferenceResponse getWarehouse();
+    ReferenceResponse getCounterparty();
     @Nullable LocalDateTime getShipmentMoment();
     SaleState getState();
     List<ItemResponse> getItems();

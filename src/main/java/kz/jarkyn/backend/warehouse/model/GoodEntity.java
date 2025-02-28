@@ -3,7 +3,7 @@ package kz.jarkyn.backend.warehouse.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
-import kz.jarkyn.backend.core.model.ImageEntity;
+import kz.jarkyn.backend.global.model.ImageEntity;
 
 @Entity
 @Table(name = "good")

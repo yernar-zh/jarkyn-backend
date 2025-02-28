@@ -33,9 +33,7 @@ class CurrencyControllerTest {
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("559109ea-f824-476d-8fa4-9990e53880ff"))
-                .andExpect(jsonPath("$.name").value("KZT"))
-                .andExpect(jsonPath("$.code").value("KZT"))
-                .andExpect(jsonPath("$.symbol").value("₸"));
+                .andExpect(jsonPath("$.name").value("KZT"));
     }
 
     @Test
@@ -53,16 +51,10 @@ class CurrencyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row[0].id").value("559109ea-f824-476d-8fa4-9990e53880ff"))
                 .andExpect(jsonPath("$.row[0].name").value("KZT"))
-                .andExpect(jsonPath("$.row[0].code").value("KZT"))
-                .andExpect(jsonPath("$.row[0].symbol").value("₸"))
                 .andExpect(jsonPath("$.row[1].id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
                 .andExpect(jsonPath("$.row[1].name").value("CNY"))
-                .andExpect(jsonPath("$.row[1].code").value("CNY"))
-                .andExpect(jsonPath("$.row[1].symbol").value("¥"))
                 .andExpect(jsonPath("$.row[2].id").value("24f15639-67da-4df4-aab4-56b85c872c3b"))
-                .andExpect(jsonPath("$.row[2].name").value("USD"))
-                .andExpect(jsonPath("$.row[2].code").value("USD"))
-                .andExpect(jsonPath("$.row[2].symbol").value("$"));
+                .andExpect(jsonPath("$.row[2].name").value("USD"));
 
     }
 }

@@ -79,6 +79,7 @@ public class AccountService {
                     account.setName("");
                     account.setBank("");
                     account.setGiro("");
+                    account.setArchived(false);
                     accountRepository.save(account);
                     auditService.saveChanges(account);
                     return account;

@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public interface SupplierMapper extends RequestResponseMapper<SupplierEntity, SupplierRequest, SupplierResponse> {
     @Mapping(target = "id", source = "supplier.id")
     @Mapping(target = "name", source = "supplier.name")
+    @Mapping(target = "archived", source = "supplier.archived")
     SupplierListResponse toResponse(
             SupplierEntity supplier, BigDecimal accountBalance, CurrencyEntity accountCurrency,
             LocalDateTime firstSupplyMoment, LocalDateTime lastSupplyMoment,

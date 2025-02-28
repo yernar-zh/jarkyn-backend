@@ -52,7 +52,8 @@ class AttributeControllerTest {
         String requestData = """
                 {
                   "group": {"id":  "c5a95fbd-121e-4f57-a84b-600a9919228a"},
-                  "name": "Скутер"
+                  "name": "Скутер",
+                  "archived": false
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Attribute.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
@@ -85,7 +86,8 @@ class AttributeControllerTest {
         String requestData = """
                 {
                   "group": {"id":  "c5a95fbd-121e-4f57-a84b-600a9919228a"},
-                  "name": "Мотоцикл GN new"
+                  "name": "Мотоцикл GN new",
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.Attribute.PATH + "/e95420b5-3344-44ce-8d39-699f516ed715")
                         .with(TestUtils.auth()).content(requestData))
@@ -104,7 +106,8 @@ class AttributeControllerTest {
     public void testEdit_notFound() throws Exception {
         String requestData = """
                 {
-                  "name": "Мотоцикл GN new"
+                  "name": "Мотоцикл GN new",
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.AttributeGroup.PATH + "/db689b56-4c87-40da-8969-e2bfbf89a84a")
                         .with(TestUtils.auth()).content(requestData))

@@ -1,17 +1,20 @@
 
 package kz.jarkyn.backend.document.core.model.dto;
 
-import kz.jarkyn.backend.core.model.dto.IdNamedDto;
+import kz.jarkyn.backend.core.model.dto.ReferenceResponse;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Value.Immutable
-public interface DocumentResponse extends IdNamedDto {
-    IdNamedDto getOrganization();
+public interface DocumentResponse {
+    UUID getId();
+    String getName();
+    ReferenceResponse getOrganization();
     LocalDateTime getMoment();
-    IdNamedDto getCurrency();
+    ReferenceResponse getCurrency();
     BigDecimal getExchangeRate();
     BigDecimal getAmount();
     Boolean getDeleted();

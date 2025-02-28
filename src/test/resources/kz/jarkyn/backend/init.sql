@@ -4,14 +4,14 @@ SET auth_token = '<AUTH_TOKEN>'
 WHERE id = 'f57382c9-35a1-4b64-b3f0-f172489dc90a';
 
 
-------------- Organization accounts -------------attribute
-INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, currency_id)
+------------- Organization accounts -------------
+INSERT INTO account (id, organization_id, counterparty_id, name, bank, giro, currency_id, archived)
 VALUES ('6057082b-041b-47b7-ba31-9fa693eb2a21', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Ернар Ж.', 'Kaspi Bank', '+7(775)216-6661', '559109ea-f824-476d-8fa4-9990e53880ff'),
+        'Ернар Ж.', 'Kaspi Bank', '+7(775)216-6661', '559109ea-f824-476d-8fa4-9990e53880ff', false),
        ('c8190dcc-1cbe-4df6-a582-0f85e9850335', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Наличный CNY', '', '', 'e6a3c207-a358-47bf-ac18-2d09973f3807'),
+        'Наличный CNY', '', '', 'e6a3c207-a358-47bf-ac18-2d09973f3807', false),
        ('8d1ed49a-6964-4a3e-bc83-8c22601e70f8', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', null,
-        'Наличный USD', '', '', '24f15639-67da-4df4-aab4-56b85c872c3b');
+        'Наличный USD', '', '', '24f15639-67da-4df4-aab4-56b85c872c3b', false);
 
 ------------------- Warehouse -------------------
 INSERT INTO warehouse (id, name, archived)
@@ -44,32 +44,32 @@ INSERT INTO customer (id, phone_number, shipping_address, discount)
 VALUES ('43375a1e-1c91-46e5-9a10-a14200427fe9', '+7(775)457-4117', '', 4);
 
 --------------------- Group ---------------------
-INSERT INTO groups (ID, NAME, POSITION, PARENT_ID)
+INSERT INTO groups (ID, NAME, POSITION, PARENT_ID, archived)
 VALUES ('da48c6fa-6739-11ee-0a80-039b000669e2',
-        'Педаль', 100, null),
+        'Педаль', 100, null, false),
        ('cdfcf458-7cca-11ef-0a80-152f001b4886',
-        'Кикстартер', 100, 'da48c6fa-6739-11ee-0a80-039b000669e2'),
+        'Кикстартер', 100, 'da48c6fa-6739-11ee-0a80-039b000669e2', false),
        ('6120deea-5b87-11ee-0a80-000c0039b0fd',
-        'Педаль переключения передач', 99, 'da48c6fa-6739-11ee-0a80-039b000669e2'),
+        'Педаль переключения передач', 99, 'da48c6fa-6739-11ee-0a80-039b000669e2', false),
        ('a590bc3a-9498-4f56-bce6-0e604b00590d',
-        'Свеча', 99, null);
+        'Свеча', 99, null, false);
 
 
 ------------------ Attribute --------------------
-INSERT INTO attribute_group (id, name, position)
+INSERT INTO attribute_group (id, name, position, archived)
 VALUES ('c5a95fbd-121e-4f57-a84b-600a9919228a',
-        'Транспорт', 100);
-INSERT INTO attribute (id, name, position, group_id)
+        'Транспорт', 100, false);
+INSERT INTO attribute (id, name, position, group_id, archived)
 VALUES ('e95420b5-3344-44ce-8d39-699f516ed715',
-        'Мотоцикл GN', 100, 'c5a95fbd-121e-4f57-a84b-600a9919228a'),
+        'Мотоцикл GN', 100, 'c5a95fbd-121e-4f57-a84b-600a9919228a', false),
        ('355785a2-0dd8-49f8-987f-06e3c48bf9a8',
-        'Мотоцикл WY', 99, 'c5a95fbd-121e-4f57-a84b-600a9919228a'),
+        'Мотоцикл WY', 99, 'c5a95fbd-121e-4f57-a84b-600a9919228a', false),
        ('797e7bc8-fca0-4d2b-b1ce-6975f54b48eb',
-        'Alpha', 101, 'c5a95fbd-121e-4f57-a84b-600a9919228a');
+        'Alpha', 101, 'c5a95fbd-121e-4f57-a84b-600a9919228a', false);
 
-INSERT INTO attribute_group (id, name, position)
+INSERT INTO attribute_group (id, name, position, archived)
 VALUES ('5d82a954-5b87-11ee-0a80-000c0039afd5',
-        'Цвет', 101);
+        'Цвет', 101, false);
 
 --------------------- Good ----------------------
 -- Кикстартер L
@@ -132,7 +132,7 @@ INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, 
 VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
         null, null,
         'PO-00002', '2024-12-07 23:47',
-        '24f15639-67da-4df4-aab4-56b85c872c3b'  , 525, 20, '', false, false);
+        '24f15639-67da-4df4-aab4-56b85c872c3b', 525, 20, '', false, false);
 INSERT INTO payment_out (id, account_id, item_of_expenditure)
 VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', '8d1ed49a-6964-4a3e-bc83-8c22601e70f8',
         'SUPPLY');

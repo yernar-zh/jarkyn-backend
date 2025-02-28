@@ -8,24 +8,16 @@ import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import kz.jarkyn.backend.core.model.ReferenceEntity;
 
 @Entity
 @Table(name = "groups")
-public class GroupEntity extends AbstractEntity {
-    private String name;
+public class GroupEntity extends ReferenceEntity {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private GroupEntity parent;
     @IgnoreAudit
     private Integer position;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public GroupEntity getParent() {
         return parent;

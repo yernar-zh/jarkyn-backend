@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public interface CustomerMapper extends RequestResponseMapper<CustomerEntity, CustomerRequest, CustomerResponse> {
     @Mapping(target = "id", source = "customer.id")
     @Mapping(target = "name", source = "customer.name")
+    @Mapping(target = "archived", source = "customer.archived")
     CustomerListResponse toResponse(
             CustomerEntity customer, BigDecimal accountBalance, CurrencyEntity accountCurrency,
             LocalDateTime firstSaleMoment, LocalDateTime lastSaleMoment,

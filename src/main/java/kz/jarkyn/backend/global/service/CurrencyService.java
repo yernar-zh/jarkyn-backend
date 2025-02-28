@@ -49,6 +49,6 @@ public class CurrencyService {
     @Transactional(readOnly = true)
     public CurrencyEntity findKZT() {
         return currencyRepository.findAll().stream()
-                .filter(currency -> currency.getCode().equals("KZT")).findFirst().orElseThrow();
+                .filter(currency -> currency.getName().equals("KZT")).findFirst().orElseThrow();
     }
 }

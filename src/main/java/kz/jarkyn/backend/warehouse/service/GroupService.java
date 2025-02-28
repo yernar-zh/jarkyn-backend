@@ -6,7 +6,6 @@ import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.IdDto;
-import kz.jarkyn.backend.core.model.dto.IdNamedDto;
 import kz.jarkyn.backend.warehouse.model.GroupEntity;
 import kz.jarkyn.backend.warehouse.model.dto.GroupDetailResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GroupRequest;
@@ -63,7 +62,7 @@ public class GroupService {
                 .sorted(Comparator.comparing(GroupEntity::getPosition))
                 .filter(group -> group.getParent() == null)
                 .map(head -> groupMapper.toListApi(head, childrenMap))
-                .sorted(Comparator.comparing(IdNamedDto::getName))
+                .sorted(Comparator.comparing(GroupResponse::getName))
                 .toList();
     }
 

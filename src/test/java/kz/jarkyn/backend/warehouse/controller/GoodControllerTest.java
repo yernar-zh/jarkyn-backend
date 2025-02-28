@@ -129,7 +129,8 @@ class GoodControllerTest {
                   "sellingPrices": [
                     {"quantity": 1, "value": 920},
                     {"quantity": 30, "value": 899}
-                  ]
+                  ],
+                  "archived": false
                 }""";
         mockMvc.perform(post(Api.Good.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
@@ -173,7 +174,8 @@ class GoodControllerTest {
                   "sellingPrices": [
                     {"id":"fbe70a5c-a0d1-414c-9507-7352739b1243", "quantity": 1, "value": 919},
                     {"quantity": 25, "value": 909}
-                  ]
+                  ],
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.Good.PATH + "/7f316872-1da3-44c8-9293-0fddda859435")
                         .with(TestUtils.auth()).content(requestData))

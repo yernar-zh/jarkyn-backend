@@ -70,7 +70,8 @@ class GroupControllerTest {
         String requestData = """
                 {
                   "name": "Тормоз",
-                  "parent": {"id": "da48c6fa-6739-11ee-0a80-039b000669e2"}
+                  "parent": {"id": "da48c6fa-6739-11ee-0a80-039b000669e2"},
+                  "archived": false
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Group.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
@@ -98,7 +99,8 @@ class GroupControllerTest {
                   "children": [
                     {"id":  "cdfcf458-7cca-11ef-0a80-152f001b4886"},
                     {"id":  "6120deea-5b87-11ee-0a80-000c0039b0fd"}
-                  ]
+                  ],
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
                         .with(TestUtils.auth()).content(requestData))
@@ -131,7 +133,8 @@ class GroupControllerTest {
                   "children": [
                     {"id":  "6120deea-5b87-11ee-0a80-000c0039b0fd"},
                     {"id":  "cdfcf458-7cca-11ef-0a80-152f001b4886"}
-                  ]
+                  ],
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
                         .with(TestUtils.auth()).content(requestData))
@@ -151,7 +154,8 @@ class GroupControllerTest {
                   "children": [
                     {"id":  "6120deea-5b87-11ee-0a80-000c0039b0fd"},
                     {"id":  "cdfcf458-7cca-11ef-0a80-152f001b4886"}
-                  ]
+                  ],
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/da48c6fa-6739-11ee-0a80-039b000669e2")
                         .with(TestUtils.auth()).content(requestData))
@@ -181,7 +185,8 @@ class GroupControllerTest {
         String requestData = """
                 {
                   "name": "Педаль",
-                  "children": []
+                  "children": [],
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.Group.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7")
                         .with(TestUtils.auth()).content(requestData))

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonDeserialize(builder = ImmutableIdNamedDto.Builder.class)
-public interface IdNamedDto extends IdDto {
+@JsonDeserialize(builder = ImmutableReferenceResponse.Builder.class)
+public interface ReferenceRequest {
     String getName();
+    Boolean getArchived();
 }

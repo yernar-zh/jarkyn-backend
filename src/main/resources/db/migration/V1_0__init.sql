@@ -1,11 +1,12 @@
 CREATE TABLE account
 (
     id               UUID NOT NULL,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     organization_id  UUID,
     counterparty_id  UUID,
-    name             VARCHAR(255),
     bank             VARCHAR(255),
     giro             VARCHAR(255),
     currency_id      UUID,
@@ -15,10 +16,11 @@ CREATE TABLE account
 CREATE TABLE attribute
 (
     id               UUID NOT NULL,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     group_id         UUID,
-    name             VARCHAR(255),
     position         INTEGER,
     CONSTRAINT pk_attribute PRIMARY KEY (id)
 );
@@ -26,9 +28,10 @@ CREATE TABLE attribute
 CREATE TABLE attribute_group
 (
     id               UUID NOT NULL,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    name             VARCHAR(255),
     position         INTEGER,
     CONSTRAINT pk_attribute_group PRIMARY KEY (id)
 );
@@ -63,11 +66,10 @@ CREATE TABLE cash_flow
 CREATE TABLE currency
 (
     id               UUID NOT NULL,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    name             VARCHAR(255),
-    code             VARCHAR(255),
-    symbol           VARCHAR(255),
     CONSTRAINT pk_currency PRIMARY KEY (id)
 );
 
@@ -125,9 +127,10 @@ CREATE TABLE good_attribute
 CREATE TABLE groups
 (
     id               UUID NOT NULL,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    name             VARCHAR(255),
     parent_id        UUID,
     position         INTEGER,
     CONSTRAINT pk_groups PRIMARY KEY (id)
@@ -174,10 +177,10 @@ CREATE TABLE paid_document
 CREATE TABLE party
 (
     id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     name             VARCHAR(255),
     archived         BOOLEAN,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_party PRIMARY KEY (id)
 );
 
@@ -248,11 +251,12 @@ CREATE TABLE turnover
 CREATE TABLE users
 (
     id               UUID NOT NULL,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     counterparty_id  UUID,
     phone_number     VARCHAR(255),
-    name             VARCHAR(255),
     auth_token       VARCHAR(255),
     role             VARCHAR(255),
     CONSTRAINT pk_users PRIMARY KEY (id)
@@ -261,10 +265,10 @@ CREATE TABLE users
 CREATE TABLE warehouse
 (
     id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     name             VARCHAR(255),
     archived         BOOLEAN,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_warehouse PRIMARY KEY (id)
 );
 

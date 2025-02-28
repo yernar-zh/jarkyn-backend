@@ -94,7 +94,8 @@ class AttributeGroupControllerTest {
     public void testCreate_success() throws Exception {
         String requestData = """
                 {
-                  "name": "Двигатель"
+                  "name": "Двигатель",
+                  "archived": false
                 }""";
         MvcResult result = mockMvc.perform(post(Api.AttributeGroup.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
@@ -118,7 +119,8 @@ class AttributeGroupControllerTest {
                     {"id":  "e95420b5-3344-44ce-8d39-699f516ed715"},
                     {"id":  "355785a2-0dd8-49f8-987f-06e3c48bf9a8"},
                     {"id":  "797e7bc8-fca0-4d2b-b1ce-6975f54b48eb"}
-                  ]
+                  ],
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.AttributeGroup.PATH + "/c5a95fbd-121e-4f57-a84b-600a9919228a")
                         .with(TestUtils.auth()).content(requestData))
@@ -141,7 +143,8 @@ class AttributeGroupControllerTest {
         String requestData = """
                 {
                   "name": "Транспорт new",
-                  "attributes": []
+                  "attributes": [],
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.AttributeGroup.PATH + "/db689b56-4c87-40da-8969-e2bfbf89a84a")
                         .with(TestUtils.auth()).content(requestData))

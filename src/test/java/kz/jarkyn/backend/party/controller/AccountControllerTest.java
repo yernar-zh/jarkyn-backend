@@ -107,7 +107,8 @@ class AccountControllerTest {
                   "giro": "+7(747)421-5569",
                   "currency": {
                     "id": "559109ea-f824-476d-8fa4-9990e53880ff"
-                  }
+                  },
+                  "archived": false
                 }""";
         MvcResult result = mockMvc.perform(post(Api.Account.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
@@ -140,7 +141,8 @@ class AccountControllerTest {
                   "giro": "+7(775)216-6662",
                   "currency": {
                     "id": "559109ea-f824-476d-8fa4-9990e53880ff"
-                  }
+                  },
+                  "archived": false
                 }""";
         mockMvc.perform(put(Api.Account.PATH + "/6057082b-041b-47b7-ba31-9fa693eb2a21")
                         .with(TestUtils.auth()).content(requestData))

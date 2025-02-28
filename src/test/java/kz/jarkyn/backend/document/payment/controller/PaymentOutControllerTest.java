@@ -270,7 +270,7 @@ class PaymentOutControllerTest {
                 .andExpect(jsonPath("$.row.length()").value(1))
                 .andExpect(jsonPath("$.row[0].organization.id").value("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"))
                 .andExpect(jsonPath("$.row[0].currency.id").value("e6a3c207-a358-47bf-ac18-2d09973f3807"))
-                .andExpect(jsonPath("$.row[0].currency.symbol").value("¥"))
+                .andExpect(jsonPath("$.row[0].currency.name").value("CNY"))
                 .andExpect(jsonPath("$.row[0].balance").value(-710));
     }
 }

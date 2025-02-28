@@ -4,21 +4,12 @@ package kz.jarkyn.backend.warehouse.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.core.model.ReferenceEntity;
 
 @Entity
 @Table(name = "attribute_group")
-public class AttributeGroupEntity extends AbstractEntity {
-    private String name;
+public class AttributeGroupEntity extends ReferenceEntity {
     private Integer position;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Integer getPosition() {
         return position;
