@@ -21,14 +21,14 @@ public class GroupController {
         this.groupService = groupService;
     }
 
+    @GetMapping("tree")
+    public GroupResponse tree() {
+        return groupService.findApiTree();
+    }
+
     @GetMapping("{id}")
     public GroupDetailResponse detail(@PathVariable UUID id) {
         return groupService.findApiById(id);
-    }
-
-    @GetMapping
-    public List<GroupResponse> list() {
-        return groupService.findApiAll();
     }
 
     @PostMapping

@@ -109,6 +109,7 @@ CREATE TABLE good
     name             VARCHAR(255),
     group_id         UUID,
     image_id         UUID,
+    weight           DECIMAL,
     minimum_price    INTEGER,
     archived         BOOLEAN,
     CONSTRAINT pk_good PRIMARY KEY (id)

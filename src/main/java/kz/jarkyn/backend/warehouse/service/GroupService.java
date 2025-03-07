@@ -48,22 +48,17 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupResponse> findApiAll() {
+    public GroupResponse findApiTree() {
         List<GroupEntity> entities = groupRepository.findAll().stream()
                 .sorted(Comparator.comparing(GroupEntity::getPosition)).toList();
         Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream()
                 .filter(group -> group.getParent() != null)
                 .collect(Collectors.groupingBy(GroupEntity::getParent,
                         Collectors.collectingAndThen(Collectors.toList(), list ->
-                                list.stream().sorted(Comparator.comparing(GroupEntity::getPosition)).toList()
-                        )
-                ));
-        return entities.stream()
-                .sorted(Comparator.comparing(GroupEntity::getPosition))
-                .filter(group -> group.getParent() == null)
+                                list.stream().sorted(Comparator.comparing(GroupEntity::getPosition)).toList())));
+        return entities.stream().filter(group -> group.getParent() == null).findFirst()
                 .map(head -> groupMapper.toListApi(head, childrenMap))
-                .sorted(Comparator.comparing(GroupResponse::getName))
-                .toList();
+                .orElseThrow();
     }
 
     @Transactional

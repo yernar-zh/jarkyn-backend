@@ -47,21 +47,23 @@ class GroupControllerTest {
 
     @Test
     @DirtiesContext
-    public void testList_success() throws Exception {
-        mockMvc.perform(get(Api.Group.PATH).with(TestUtils.auth()))
+    public void testTree_success() throws Exception {
+        mockMvc.perform(get(Api.Group.PATH+ "/tree").with(TestUtils.auth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
-                .andExpect(jsonPath("$[0].name").value("Педаль"))
-                .andExpect(jsonPath("$[0].children.length()").value(2))
-                .andExpect(jsonPath("$[0].children[0].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"))
-                .andExpect(jsonPath("$[0].children[0].name").value("Педаль переключения передач"))
-                .andExpect(jsonPath("$[0].children[0].children").isEmpty())
-                .andExpect(jsonPath("$[0].children[1].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
-                .andExpect(jsonPath("$[0].children[1].name").value("Кикстартер"))
-                .andExpect(jsonPath("$[0].children[1].children").isEmpty())
-                .andExpect(jsonPath("$[1].id").value("a590bc3a-9498-4f56-bce6-0e604b00590d"))
-                .andExpect(jsonPath("$[1].name").value("Свеча"));
+                .andExpect(jsonPath("$.id").value("656e38bc-bbc7-4e25-8b94-a2018783324c"))
+                .andExpect(jsonPath("$.name").value("Все товары"))
+                .andExpect(jsonPath("$.children[0].id").value("a590bc3a-9498-4f56-bce6-0e604b00590d"))
+                .andExpect(jsonPath("$.children[0].name").value("Свеча"))
+                .andExpect(jsonPath("$.children[1].id").value("da48c6fa-6739-11ee-0a80-039b000669e2"))
+                .andExpect(jsonPath("$.children[1].name").value("Педаль"))
+                .andExpect(jsonPath("$.children[1].children.length()").value(2))
+                .andExpect(jsonPath("$.children[1].children[0].id").value("6120deea-5b87-11ee-0a80-000c0039b0fd"))
+                .andExpect(jsonPath("$.children[1].children[0].name").value("Педаль переключения передач"))
+                .andExpect(jsonPath("$.children[1].children[0].children").isEmpty())
+                .andExpect(jsonPath("$.children[1].children[1].id").value("cdfcf458-7cca-11ef-0a80-152f001b4886"))
+                .andExpect(jsonPath("$.children[1].children[1].name").value("Кикстартер"))
+                .andExpect(jsonPath("$.children[1].children[1].children").isEmpty());
+
     }
 
     @Test

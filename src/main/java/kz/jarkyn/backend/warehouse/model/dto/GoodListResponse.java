@@ -13,6 +13,7 @@ public interface GoodListResponse extends ReferenceResponse {
     ReferenceResponse getGroup();
     @Nullable IdDto getImage();
     Integer getMinimumPrice();
+    BigDecimal getWeight();
     Boolean getArchived();
     String getAttributeIds();
     BigDecimal getSellingPrice();

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.global.model.ImageEntity;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "good")
 public class GoodEntity extends AbstractEntity {
@@ -15,6 +17,7 @@ public class GoodEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "image_id")
     private ImageEntity image;
+    private BigDecimal weight;
     @Column(name = "minimum_price")
     private Integer minimumPrice;
     private Boolean archived;
@@ -41,6 +44,14 @@ public class GoodEntity extends AbstractEntity {
 
     public void setImage(ImageEntity image) {
         this.image = image;
+    }
+
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
     }
 
     public Integer getMinimumPrice() {

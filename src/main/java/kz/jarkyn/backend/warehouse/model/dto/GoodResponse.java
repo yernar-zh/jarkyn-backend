@@ -6,14 +6,15 @@ import kz.jarkyn.backend.core.model.dto.ReferenceResponse;
 import kz.jarkyn.backend.operation.mode.dto.StockResponse;
 import org.immutables.value.Value;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Value.Immutable
 public interface GoodResponse extends ReferenceResponse {
     ReferenceResponse getGroup();
     @Nullable IdDto getImage();
+    BigDecimal getWeight();
     Integer getMinimumPrice();
-    Boolean getArchived();
     List<ReferenceResponse> getAttributes();
     List<SellingPriceResponse> getSellingPrices();
     List<StockResponse> getStock();

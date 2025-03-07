@@ -6,6 +6,7 @@ import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.dto.ReferenceRequest;
 import org.immutables.value.Value;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Value.Immutable
@@ -13,6 +14,7 @@ import java.util.List;
 public interface GoodRequest extends ReferenceRequest {
     IdDto getGroup();
     @Nullable IdDto getImage();
+    BigDecimal getWeight();
     Integer getMinimumPrice();
     List<IdDto> getAttributes();
     List<SellingPriceRequest> getSellingPrices();
