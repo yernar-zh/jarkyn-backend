@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -44,20 +45,6 @@ class SearchUtils {
         }
     }
 
-    public static Number getZero(Class<?> javaClass) {
-        if (javaClass == Integer.class) {
-            return 0;
-        } else if (javaClass == Long.class) {
-            return 0L;
-        } else if (javaClass == BigInteger.class) {
-            return BigInteger.ZERO;
-        } else if (javaClass == BigDecimal.class) {
-            return BigDecimal.ZERO;
-        } else {
-            return null;
-        }
-    }
-
     public static BiFunction<Number, Number, Number> getSum(Class<?> javaClass) {
         if (javaClass == Integer.class) {
             return (a, b) -> a.intValue() + b.intValue();
@@ -77,14 +64,11 @@ class SearchUtils {
             String methodName = method.getName();
             if (methodName.startsWith("get") && methodName.length() > 3) {
                 String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-                if (SearchUtils.getConvertor(method.getReturnType()) == null) {
+                if (SearchUtils.getConvertor(method.getReturnType()) == null &&
+                    !Collection.class.isAssignableFrom(method.getReturnType())) {
                     return createProxy(fieldName + ".", map, method.getReturnType());
                 }
-                Object value = map.get(prefix + fieldName);
-                if (value == null) {
-                    return SearchUtils.getZero(method.getReturnType());
-                }
-                return value;
+                return map.get(prefix + fieldName);
             }
             throw new UnsupportedOperationException("Method not supported: " + methodName);
         };

@@ -3,8 +3,11 @@ package kz.jarkyn.backend.warehouse.service;
 
 import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.Search;
+import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.warehouse.mapper.AttributeGroupMapper;
-import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupDetailResponse;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupRequest;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupResponse;
 import kz.jarkyn.backend.warehouse.model.AttributeEntity;
@@ -22,19 +25,20 @@ public class AttributeGroupService {
     private final AttributeGroupRepository attributeGroupRepository;
     private final AttributeService attributeService;
     private final AttributeGroupMapper attributeGroupMapper;
+    private final SearchFactory searchFactory;
 
     public AttributeGroupService(
             AttributeGroupRepository attributeGroupRepository,
             AttributeService attributeService,
-            AttributeGroupMapper attributeGroupMapper
-    ) {
+            AttributeGroupMapper attributeGroupMapper, SearchFactory searchFactory) {
         this.attributeGroupRepository = attributeGroupRepository;
         this.attributeService = attributeService;
         this.attributeGroupMapper = attributeGroupMapper;
+        this.searchFactory = searchFactory;
     }
 
     @Transactional(readOnly = true)
-    public AttributeGroupDetailResponse findApiById(UUID id) {
+    public AttributeGroupResponse findApiById(UUID id) {
         AttributeGroupEntity entity = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
         List<AttributeEntity> attributes = attributeService.findByGroup(entity);
@@ -42,14 +46,18 @@ public class AttributeGroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<AttributeGroupResponse> findApiAll() {
-        List<AttributeGroupEntity> entities = attributeGroupRepository.findAll();
-        entities.sort(Comparator.comparing(AttributeGroupEntity::getPosition));
-        return attributeGroupMapper.toResponse(entities);
+    public PageResponse<AttributeGroupResponse> findApiByFilter(QueryParams queryParams) {
+        Search<AttributeGroupResponse> search = searchFactory.createListSearch(
+                AttributeGroupResponse.class, List.of("name"), () ->
+                        attributeGroupRepository.findAll().stream().map(attributeGroup -> {
+                            List<AttributeEntity> attributes = attributeService.findByGroup(attributeGroup);
+                            return attributeGroupMapper.toResponse(attributeGroup, attributes);
+                        }).toList());
+        return search.getResult(queryParams);
     }
 
     @Transactional
-    public List<AttributeGroupResponse> moveApi(List<IdDto> apiList) {
+    public PageResponse<AttributeGroupResponse> moveApi(List<IdDto> apiList) {
         EntityDivider<AttributeGroupEntity, IdDto> divider = new EntityDivider<>(
                 attributeGroupRepository.findAll(), apiList
         );
@@ -61,18 +69,18 @@ public class AttributeGroupService {
             entity.setPosition(entry.getReceivedPosition());
             attributeGroupRepository.save(entity);
         }
-        return findApiAll();
+        return findApiByFilter(QueryParams.of(Map.of()));
     }
 
     @Transactional
-    public AttributeGroupDetailResponse createApi(AttributeGroupRequest request) {
+    public AttributeGroupResponse createApi(AttributeGroupRequest request) {
         AttributeGroupEntity entity = attributeGroupRepository.save(attributeGroupMapper.toEntity(request));
         entity.setPosition(1000);
         return findApiById(entity.getId());
     }
 
     @Transactional
-    public AttributeGroupDetailResponse editApi(UUID id, AttributeGroupRequest request) {
+    public AttributeGroupResponse editApi(UUID id, AttributeGroupRequest request) {
         AttributeGroupEntity entity = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
         attributeGroupMapper.editEntity(entity, request);

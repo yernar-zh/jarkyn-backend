@@ -1,7 +1,8 @@
 package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
-import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupDetailResponse;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupResponse;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupRequest;
 import kz.jarkyn.backend.core.model.dto.IdDto;
@@ -10,6 +11,7 @@ import kz.jarkyn.backend.warehouse.service.AttributeGroupService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -22,27 +24,27 @@ public class AttributeGroupController {
     }
 
     @GetMapping("{id}")
-    public AttributeGroupDetailResponse detail(@PathVariable UUID id) {
+    public AttributeGroupResponse detail(@PathVariable UUID id) {
         return attributeGroupService.findApiById(id);
     }
 
     @GetMapping
-    public List<AttributeGroupResponse> list() {
-        return attributeGroupService.findApiAll();
+    public PageResponse<AttributeGroupResponse> list(@RequestParam Map<String, String> allParams) {
+        return attributeGroupService.findApiByFilter(QueryParams.of(allParams));
     }
 
     @PutMapping
-    public List<AttributeGroupResponse> move(@RequestBody List<IdDto> apiList) {
+    public PageResponse<AttributeGroupResponse> move(@RequestBody List<IdDto> apiList) {
         return attributeGroupService.moveApi(apiList);
     }
 
     @PostMapping
-    public AttributeGroupDetailResponse create(@RequestBody AttributeGroupRequest request) {
+    public AttributeGroupResponse create(@RequestBody AttributeGroupRequest request) {
         return attributeGroupService.createApi(request);
     }
 
     @PutMapping("{id}")
-    public AttributeGroupDetailResponse edit(@PathVariable UUID id, @RequestBody AttributeGroupRequest request) {
+    public AttributeGroupResponse edit(@PathVariable UUID id, @RequestBody AttributeGroupRequest request) {
         return attributeGroupService.editApi(id, request);
     }
 

@@ -39,7 +39,7 @@ public class ListSearch<R> implements Search<R> {
             return;
         }
         if (Collection.class.isAssignableFrom(valueClass)) {
-            throw new IllegalArgumentException("Collection type not supported");
+            return;
         }
         for (Method method : valueClass.getMethods()) {
             String methodName = method.getName();
