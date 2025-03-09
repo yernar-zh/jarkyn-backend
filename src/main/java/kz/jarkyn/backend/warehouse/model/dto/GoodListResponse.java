@@ -15,6 +15,8 @@ public interface GoodListResponse extends ReferenceResponse {
     Integer getMinimumPrice();
     BigDecimal getWeight();
     Boolean getArchived();
+    String getPath();
+    String getGroupIds();
     String getAttributeIds();
     BigDecimal getSellingPrice();
     Integer getRemain();

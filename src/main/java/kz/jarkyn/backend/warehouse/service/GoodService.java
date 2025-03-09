@@ -9,13 +9,10 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.warehouse.mapper.SellingPriceMapper;
+import kz.jarkyn.backend.warehouse.model.*;
 import kz.jarkyn.backend.warehouse.model.dto.GoodRequest;
 import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
-import kz.jarkyn.backend.warehouse.model.AttributeEntity;
 import kz.jarkyn.backend.core.model.dto.IdDto;
-import kz.jarkyn.backend.warehouse.model.GoodAttributeEntity;
-import kz.jarkyn.backend.warehouse.model.GoodEntity;
-import kz.jarkyn.backend.warehouse.model.SellingPriceEntity;
 import kz.jarkyn.backend.warehouse.model.dto.GoodListResponse;
 import kz.jarkyn.backend.warehouse.model.dto.SellingPriceRequest;
 import kz.jarkyn.backend.warehouse.repository.AttributeRepository;
@@ -33,6 +30,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class GoodService {
@@ -80,6 +78,10 @@ public class GoodService {
         Search<GoodListResponse> search = searchFactory.createListSearch(
                 GoodListResponse.class, List.of("name", "groups.name"), () ->
                         goodRepository.findAll().stream().map(good -> {
+                            String path = getParentGroups(good.getGroup()).stream().map(GroupEntity::getName)
+                                                  .collect(Collectors.joining("/")) + "/" + good.getName();
+                            String groupIds = getParentGroups(good.getGroup()).stream().map(GroupEntity::getId)
+                                    .filter(Objects::nonNull).map(UUID::toString).collect(Collectors.joining("/"));
                             String attributes = attributeRepository.findByGood(good).stream()
                                     .map(AbstractEntity::getId)
                                     .filter(Objects::nonNull).map(UUID::toString)
@@ -95,7 +97,7 @@ public class GoodService {
                                     .map(StockResponse::getCostPrice)
                                     .reduce(BigDecimal::add).orElseThrow()
                                     .divide(BigDecimal.valueOf(stock.size()), 2, RoundingMode.HALF_UP);
-                            return goodMapper.toListResponse(good, attributes, sellingPrice, remind, averageCostPrice);
+                            return goodMapper.toListResponse(good, path, groupIds, attributes, sellingPrice, remind, averageCostPrice);
                         }).toList());
         return search.getResult(queryParams);
     }
@@ -154,5 +156,12 @@ public class GoodService {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         good.setArchived(value);
         return findApiById(id);
+    }
+
+    private List<GroupEntity> getParentGroups(GroupEntity group) {
+        ArrayList<GroupEntity> result = Stream.iterate(group, Objects::nonNull, GroupEntity::getParent)
+                .collect(Collectors.toCollection(ArrayList::new));
+        Collections.reverse(result);
+        return result;
     }
 }

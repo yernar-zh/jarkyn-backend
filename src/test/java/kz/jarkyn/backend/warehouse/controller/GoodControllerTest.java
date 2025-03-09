@@ -99,6 +99,8 @@ class GoodControllerTest {
                 .andExpect(jsonPath("$.row[0].image").isEmpty())
                 .andExpect(jsonPath("$.row[0].minimumPrice").value(800))
                 .andExpect(jsonPath("$.row[0].archived").value(false))
+                .andExpect(jsonPath("$.row[0].path").value("Все товары/Педаль/Кикстартер/Кикстартер L"))
+                .andExpect(jsonPath("$.row[0].groupIds").value("656e38bc-bbc7-4e25-8b94-a2018783324c/da48c6fa-6739-11ee-0a80-039b000669e2/cdfcf458-7cca-11ef-0a80-152f001b4886"))
                 .andExpect(jsonPath("$.row[0].attributeIds").value("e95420b5-3344-44ce-8d39-699f516ed715"))
                 .andExpect(jsonPath("$.row[0].sellingPrice").value(880))
                 .andExpect(jsonPath("$.row[0].remain").value(0))
