@@ -4,7 +4,6 @@ package kz.jarkyn.backend.warehouse.service;
 
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
-import kz.jarkyn.backend.core.exception.ValidationException;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
