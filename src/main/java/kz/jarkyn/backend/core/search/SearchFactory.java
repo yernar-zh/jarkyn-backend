@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.core.search;
 
 import jakarta.persistence.EntityManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class SearchFactory {
         this.entityManager = entityManager;
     }
 
-    public <R,S, E> CriteriaSearch<R, E> createCriteriaSearch(
+    public <R, S, E> CriteriaSearch<R, E> createCriteriaSearch(
             Class<R> responseClass, List<String> searchFields,
             Class<E> entityClass, CriteriaAttributes<E> criteriaAttributes) {
         return new CriteriaSearch<>(entityManager,
@@ -24,11 +25,14 @@ public class SearchFactory {
 
     }
 
-    @Cacheable(value = "response_cache", key = "#javaClass.name")
+    @Cacheable(value = "response_cache", key = "#javaClass")
     public <R> ListSearch<R> createListSearch(
             Class<R> javaClass, List<String> searchFields,
             Supplier<List<R>> responseSupplier) {
         return new ListSearch<>(javaClass, searchFields, responseSupplier.get());
+    }
 
+    @CacheEvict(value = "response_cache", key = "#javaClass")
+    public <R> void clearCache(Class<R> javaClass) {
     }
 }

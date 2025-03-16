@@ -2,7 +2,9 @@
 package kz.jarkyn.backend.warehouse.service;
 
 
+import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.exception.ValidationException;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
@@ -88,7 +90,7 @@ public class GoodService {
                                     .collect(Collectors.joining(","));
                             BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
                                     .stream().map(SellingPriceEntity::getValue)
-                                    .findFirst().orElse(null);
+                                    .max(BigDecimal::compareTo).orElseThrow();
                             List<StockResponse> stock = turnoverService.findStock(good);
                             Integer remind = stock.stream()
                                     .map(StockResponse::getRemain)
@@ -115,6 +117,8 @@ public class GoodService {
             sellingPriceEntity.setGood(good);
             sellingPriceRepository.save(sellingPriceEntity);
         }
+        validate(good);
+        searchFactory.clearCache(GoodListResponse.class);
         return findApiById(good.getId());
     }
 
@@ -148,6 +152,8 @@ public class GoodService {
             sellingPriceMapper.editEntity(entry.getCurrent(), entry.getReceived());
         }
         sellingPriceRepository.deleteAll(sellingPriceDivider.skippedCurrent());
+        validate(good);
+        searchFactory.clearCache(GoodListResponse.class);
         return findApiById(id);
     }
 
@@ -155,6 +161,7 @@ public class GoodService {
     public GoodResponse archive(UUID id, Boolean value) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         good.setArchived(value);
+        searchFactory.clearCache(GoodListResponse.class);
         return findApiById(id);
     }
 
@@ -163,5 +170,12 @@ public class GoodService {
                 .collect(Collectors.toCollection(ArrayList::new));
         Collections.reverse(result);
         return result;
+    }
+
+    private void validate(GoodEntity good) {
+        int size = sellingPriceRepository.findByGood(good).size();
+        if (size == 0) {
+            throw new DataValidationException("Необходимо указать хотя бы одну цену продажи");
+        }
     }
 }

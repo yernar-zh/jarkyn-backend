@@ -8,6 +8,12 @@ public class DataValidationException extends ValidationException {
         this.code = code;
     }
 
+    public DataValidationException(String message) {
+        super(message);
+        this.code = "USER_EXCEPTION";
+    }
+
+
     public String getCode() {
         return code;
     }

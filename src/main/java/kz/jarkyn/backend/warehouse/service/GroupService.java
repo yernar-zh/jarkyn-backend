@@ -76,7 +76,7 @@ public class GroupService {
         groupMapper.editEntity(entity, request);
         for (GroupEntity parent = entity.getParent(); parent != null; parent = parent.getParent()) {
             if (parent.equals(entity)) {
-                throw new DataValidationException("EXIST_PARENT_LOOP", "You are trying to move a group into itself");
+                throw new DataValidationException("You are trying to move a group into itself");
             }
         }
         groupRepository.save(entity);

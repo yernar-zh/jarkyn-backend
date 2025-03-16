@@ -7,6 +7,5 @@ import org.springframework.lang.Nullable;
 public interface ExceptionResponse {
     String getCode();
     String getMessage();
-    @Nullable Object getDetail();
     @Nullable String getStacktrace();
 }
