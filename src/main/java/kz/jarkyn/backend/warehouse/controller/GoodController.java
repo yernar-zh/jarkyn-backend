@@ -8,6 +8,7 @@ import kz.jarkyn.backend.warehouse.model.dto.GoodRequest;
 import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
 import kz.jarkyn.backend.core.model.dto.ValueDto;
 import kz.jarkyn.backend.warehouse.service.GoodService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -28,7 +29,7 @@ public class GoodController {
     }
 
     @GetMapping
-    public PageResponse<GoodListResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<GoodListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return goodService.findApiByFilter(QueryParams.of(allParams));
     }
 

@@ -2,6 +2,8 @@ package kz.jarkyn.backend.core.model.filter;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.MultiValueMap;
 
 import java.util.*;
 
@@ -18,12 +20,10 @@ public class QueryParams {
         add(Pair.of("", Sort.Type.ASC));
     }};
     private static final String SORT_FIELD = "sort";
-    private static final String SORT_SPLITTER = ",";
     private static final String SEARCH_FIELD = "search";
     private static final String PAGE_FIRST_FIELD = "page.first";
     private static final String PAGE_SIZE_FIELD = "page.size";
-    private static final Set<String> STATIC_FIELDS = Set.of(
-            SORT_FIELD, SORT_SPLITTER, SEARCH_FIELD, PAGE_FIRST_FIELD, PAGE_SIZE_FIELD);
+    private static final Set<String> STATIC_FIELDS = Set.of(SORT_FIELD, SEARCH_FIELD, PAGE_FIRST_FIELD, PAGE_SIZE_FIELD);
 
     private final String search;
     private final Integer pageFirst;
@@ -31,30 +31,32 @@ public class QueryParams {
     private final List<Filter> filters;
     private final List<Sort> sorts;
 
-
-    public static QueryParams of(Map<String, String> allParams) {
+    public static QueryParams of(MultiValueMap<String, String> allParams) {
         return new QueryParams(allParams);
     }
 
-    public QueryParams(Map<String, String> allParams) {
-        this.search = allParams.get(SEARCH_FIELD);
-        this.pageFirst = Integer.valueOf(allParams.getOrDefault(PAGE_FIRST_FIELD, "0"));
-        this.pageSize = Integer.valueOf(allParams.getOrDefault(PAGE_SIZE_FIELD, "20"));
+    public static QueryParams of() {
+        return new QueryParams(new HttpHeaders());
+    }
+
+    public QueryParams(MultiValueMap<String, String> allParams) {
+        this.search = getFirst(allParams, SEARCH_FIELD, null);
+        this.pageFirst = Integer.valueOf(getFirst(allParams, PAGE_FIRST_FIELD, "0"));
+        this.pageSize = Integer.valueOf(getFirst(allParams, PAGE_SIZE_FIELD, "20"));
         this.filters = allParams.entrySet().stream()
                 .filter(entry -> !STATIC_FIELDS.contains(entry.getKey()))
                 .map(entry -> {
-                    List<String> values = Arrays.stream(entry.getValue().split(SORT_SPLITTER)).toList();
                     for (Pair<String, Filter.Type> suffix : FILTER_SUFFIX) {
                         if (entry.getKey().endsWith(suffix.getFirst())) {
                             String name = entry.getKey()
                                     .substring(0, entry.getKey().length() - suffix.getFirst().length());
-                            return new Filter(name, values, suffix.getSecond());
+                            return new Filter(name, entry.getValue(), suffix.getSecond());
                         }
                     }
                     throw new RuntimeException("Invalid filter suffix: " + entry.getKey());
                 }).toList();
-        this.sorts = Arrays.stream(allParams.getOrDefault(SORT_FIELD, "").split(SORT_SPLITTER))
-                .filter(Strings::isNotBlank)
+        this.sorts = allParams.getOrDefault(SORT_FIELD, List.of())
+                .stream().filter(Strings::isNotBlank)
                 .map(paramName -> {
                     for (Pair<String, Sort.Type> prefix : SORT_PREFIX) {
                         if (paramName.startsWith(prefix.getFirst())) {
@@ -64,6 +66,10 @@ public class QueryParams {
                     }
                     throw new RuntimeException("Invalid filter suffix: " + paramName);
                 }).toList();
+    }
+
+    private String getFirst(MultiValueMap<String, String> allParams, String key, String defaultValue) {
+        return allParams.getOrDefault(key, List.of()).stream().findFirst().orElse(defaultValue);
     }
 
     public String getSearch() {

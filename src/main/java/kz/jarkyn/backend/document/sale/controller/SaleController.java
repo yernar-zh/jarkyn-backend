@@ -7,6 +7,7 @@ import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import kz.jarkyn.backend.document.sale.model.dto.SaleListResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.sale.service.SaleService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,7 +30,7 @@ public class SaleController {
 
 
     @GetMapping
-    public PageResponse<SaleListResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<SaleListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return saleService.findApiByFilter(QueryParams.of(allParams));
     }
 

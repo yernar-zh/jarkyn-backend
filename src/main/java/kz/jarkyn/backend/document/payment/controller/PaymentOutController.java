@@ -7,6 +7,7 @@ import kz.jarkyn.backend.document.payment.model.dto.PaymentOutListResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutRequest;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutResponse;
 import kz.jarkyn.backend.document.payment.service.PaymentOutService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,7 +30,7 @@ public class PaymentOutController {
 
 
     @GetMapping
-    public PageResponse<PaymentOutListResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<PaymentOutListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return paymentOutService.findApiByFilter(QueryParams.of(allParams));
     }
 

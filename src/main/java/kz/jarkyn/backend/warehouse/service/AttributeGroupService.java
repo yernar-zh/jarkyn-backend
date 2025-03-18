@@ -69,7 +69,7 @@ public class AttributeGroupService {
             entity.setPosition(entry.getReceivedPosition());
             attributeGroupRepository.save(entity);
         }
-        return findApiByFilter(QueryParams.of(Map.of()));
+        return findApiByFilter(QueryParams.of());
     }
 
     @Transactional

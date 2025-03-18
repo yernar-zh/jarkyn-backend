@@ -7,6 +7,7 @@ import kz.jarkyn.backend.document.payment.model.dto.PaymentInListResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentInRequest;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentInResponse;
 import kz.jarkyn.backend.document.payment.service.PaymentInService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,7 +30,7 @@ public class PaymentInController {
 
 
     @GetMapping
-    public PageResponse<PaymentInListResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<PaymentInListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return paymentInService.findApiByFilter(QueryParams.of(allParams));
     }
 

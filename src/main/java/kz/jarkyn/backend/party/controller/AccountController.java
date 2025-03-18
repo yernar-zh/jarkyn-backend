@@ -6,6 +6,7 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.party.model.dto.AccountRequest;
 import kz.jarkyn.backend.party.model.dto.AccountResponse;
 import kz.jarkyn.backend.party.service.AccountService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -28,7 +29,7 @@ public class AccountController {
     }
 
     @GetMapping
-    public PageResponse<AccountResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<AccountResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return accountService.findApiByFilter(QueryParams.of(allParams));
     }
 

@@ -7,6 +7,7 @@ import kz.jarkyn.backend.party.model.dto.CustomerListResponse;
 import kz.jarkyn.backend.party.model.dto.CustomerRequest;
 import kz.jarkyn.backend.party.model.dto.CustomerResponse;
 import kz.jarkyn.backend.party.service.CustomerService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,7 +30,7 @@ public class CustomerController {
     }
 
     @GetMapping
-    public PageResponse<CustomerListResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<CustomerListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return customerService.findApiByFilter(QueryParams.of(allParams));
     }
 

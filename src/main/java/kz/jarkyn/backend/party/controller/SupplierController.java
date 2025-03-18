@@ -7,6 +7,7 @@ import kz.jarkyn.backend.party.model.dto.SupplierListResponse;
 import kz.jarkyn.backend.party.model.dto.SupplierRequest;
 import kz.jarkyn.backend.party.model.dto.SupplierResponse;
 import kz.jarkyn.backend.party.service.SupplierService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,7 +30,7 @@ public class SupplierController {
     }
 
     @GetMapping
-    public PageResponse<SupplierListResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<SupplierListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return supplierService.findApiByFilter(QueryParams.of(allParams));
     }
 

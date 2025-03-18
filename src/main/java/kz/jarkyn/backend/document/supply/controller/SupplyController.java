@@ -7,6 +7,7 @@ import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
 import kz.jarkyn.backend.document.supply.service.SupplyService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,7 +30,7 @@ public class SupplyController {
 
 
     @GetMapping
-    public PageResponse<SupplyListResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<SupplyListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return supplyService.findApiByFilter(QueryParams.of(allParams));
     }
 

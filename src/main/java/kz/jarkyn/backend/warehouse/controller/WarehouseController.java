@@ -6,6 +6,7 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.warehouse.service.WarehouseService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -28,7 +29,7 @@ public class WarehouseController {
     }
 
     @GetMapping
-    public PageResponse<WarehouseResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<WarehouseResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return warehouseService.findApiByFilter(QueryParams.of(allParams));
     }
 

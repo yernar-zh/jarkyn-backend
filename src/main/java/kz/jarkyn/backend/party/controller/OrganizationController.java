@@ -6,6 +6,7 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.party.model.dto.OrganizationRequest;
 import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
 import kz.jarkyn.backend.party.service.OrganizationService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -28,7 +29,7 @@ public class OrganizationController {
     }
 
     @GetMapping
-    public PageResponse<OrganizationResponse> list(@RequestParam Map<String, String> allParams) {
+    public PageResponse<OrganizationResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return organizationService.findApiByFilter(QueryParams.of(allParams));
     }
 
