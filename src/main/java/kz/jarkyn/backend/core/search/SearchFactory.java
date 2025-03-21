@@ -25,14 +25,9 @@ public class SearchFactory {
 
     }
 
-    @Cacheable(value = "response_cache", key = "#javaClass")
     public <R> ListSearch<R> createListSearch(
             Class<R> javaClass, List<String> searchFields,
             Supplier<List<R>> responseSupplier) {
         return new ListSearch<>(javaClass, searchFields, responseSupplier.get());
-    }
-
-    @CacheEvict(value = "response_cache", key = "#javaClass")
-    public <R> void clearCache(Class<R> javaClass) {
     }
 }

@@ -5,12 +5,17 @@ package kz.jarkyn.backend.global.service;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.global.mapper.CurrencyMapper;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
+import kz.jarkyn.backend.global.model.CurrencyEntity_;
 import kz.jarkyn.backend.global.model.dto.CurrencyResponse;
 import kz.jarkyn.backend.global.repository.CurrencyRepository;
+import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
+import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
+import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,8 +46,14 @@ public class CurrencyService {
 
     @Transactional(readOnly = true)
     public PageResponse<CurrencyResponse> findApiByFilter(QueryParams queryParams) {
-        Search<CurrencyResponse> search = searchFactory.createListSearch(
-                CurrencyResponse.class, List.of(), () -> currencyMapper.toResponse(currencyRepository.findAll()));
+        CriteriaAttributes<CurrencyEntity> attributes = CriteriaAttributes.<CurrencyEntity>builder()
+                .add("id", (root) -> root.get(CurrencyEntity_.id))
+                .add("name", (root) -> root.get(CurrencyEntity_.name))
+                .add("archived", (root) -> root.get(CurrencyEntity_.archived))
+                .build();
+        Search<CurrencyResponse> search = searchFactory.createCriteriaSearch(
+                CurrencyResponse.class, List.of("name"),
+                CurrencyEntity.class, attributes);
         return search.getResult(queryParams);
     }
 

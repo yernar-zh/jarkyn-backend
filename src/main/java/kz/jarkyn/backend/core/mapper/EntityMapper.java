@@ -14,6 +14,8 @@ import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class EntityMapper {
     @PersistenceContext
@@ -76,6 +78,14 @@ public class EntityMapper {
             return null;
         }
         T entity = entityManager.find(clazz, api.getId());
+        return ExceptionUtils.requireNonNullApi(entity, clazz.getName());
+    }
+
+    public <T extends AbstractEntity> T toEntity(UUID id, Class<T> clazz) {
+        if (id == null) {
+            return null;
+        }
+        T entity = entityManager.find(clazz, id);
         return ExceptionUtils.requireNonNullApi(entity, clazz.getName());
     }
 }

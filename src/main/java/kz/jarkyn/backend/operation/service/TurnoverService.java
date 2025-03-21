@@ -40,14 +40,9 @@ public class TurnoverService {
     }
 
     @Transactional(readOnly = true)
-    public List<StockResponse> findStock(GoodEntity good) {
-        return findStock(null, List.of(good));
-    }
-
-    @Transactional(readOnly = true)
-    public List<StockResponse> findStock(WarehouseEntity warehouseFilter, List<GoodEntity> list) {
+    public List<StockResponse> findStock(WarehouseEntity warehouseEntity, List<GoodEntity> list) {
         List<WarehouseEntity> warehouses = warehouseRepository.findAll().stream()
-                .filter(warehouse -> warehouseFilter == null || warehouse.equals(warehouseFilter)).toList();
+                .filter(warehouse -> warehouseEntity == null || warehouse.equals(warehouseEntity)).toList();
         Map<Pair<WarehouseEntity, GoodEntity>, TurnoverEntity> map = turnoverRepository.findLastByGood(list).stream()
                 .collect(Collectors.toMap(turnover ->
                         Pair.of(turnover.getWarehouse(), turnover.getGood()), Function.identity()));

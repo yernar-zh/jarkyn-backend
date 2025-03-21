@@ -4,6 +4,7 @@ package kz.jarkyn.backend.warehouse.service;
 
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.mapper.EntityMapper;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
@@ -16,10 +17,7 @@ import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.warehouse.model.dto.GoodListResponse;
 import kz.jarkyn.backend.warehouse.model.dto.SellingPriceRequest;
-import kz.jarkyn.backend.warehouse.repository.AttributeRepository;
-import kz.jarkyn.backend.warehouse.repository.GoodRepository;
-import kz.jarkyn.backend.warehouse.repository.GoodAttributeRepository;
-import kz.jarkyn.backend.warehouse.repository.SellingPriceRepository;
+import kz.jarkyn.backend.warehouse.repository.*;
 import kz.jarkyn.backend.warehouse.mapper.GoodMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.operation.mode.dto.StockResponse;
@@ -52,7 +50,8 @@ public class GoodService {
             GoodMapper goodMapper,
             SellingPriceMapper sellingPriceMapper,
             SearchFactory searchFactory,
-            TurnoverService turnoverService) {
+            TurnoverService turnoverService,
+            EntityMapper entityMapper) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
@@ -70,12 +69,12 @@ public class GoodService {
         attributes.sort(Comparator.comparing(AttributeEntity::getName));
         List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
         sellingPrices.sort(Comparator.comparing(SellingPriceEntity::getQuantity));
-        List<StockResponse> stocks = turnoverService.findStock(good);
+        List<StockResponse> stocks = turnoverService.findStock(null, List.of(good));
         return goodMapper.toResponse(good, attributes, sellingPrices, stocks);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<GoodListResponse> findApiByFilter(QueryParams queryParams) {
+    public PageResponse<GoodListResponse> findApiByFilter(QueryParams queryParams, WarehouseEntity warehouse) {
         Search<GoodListResponse> search = searchFactory.createListSearch(
                 GoodListResponse.class, List.of("name", "groups.name"), () ->
                         goodRepository.findAll().stream().map(good -> {
@@ -90,7 +89,7 @@ public class GoodService {
                             BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
                                     .stream().map(SellingPriceEntity::getValue)
                                     .max(BigDecimal::compareTo).orElseThrow();
-                            List<StockResponse> stock = turnoverService.findStock(good);
+                            List<StockResponse> stock = turnoverService.findStock(warehouse, List.of(good));
                             Integer remind = stock.stream()
                                     .map(StockResponse::getRemain)
                                     .reduce(Integer::sum).orElseThrow();
@@ -117,7 +116,6 @@ public class GoodService {
             sellingPriceRepository.save(sellingPriceEntity);
         }
         validate(good);
-        searchFactory.clearCache(GoodListResponse.class);
         return findApiById(good.getId());
     }
 
@@ -152,7 +150,6 @@ public class GoodService {
         }
         sellingPriceRepository.deleteAll(sellingPriceDivider.skippedCurrent());
         validate(good);
-        searchFactory.clearCache(GoodListResponse.class);
         return findApiById(id);
     }
 
@@ -160,7 +157,6 @@ public class GoodService {
     public GoodResponse archive(UUID id, Boolean value) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         good.setArchived(value);
-        searchFactory.clearCache(GoodListResponse.class);
         return findApiById(id);
     }
 
