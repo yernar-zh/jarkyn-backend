@@ -45,9 +45,10 @@ public class ItemService {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         Map<UUID, TurnoverEntity> turnovers = turnoverService.findByDocument(document).stream()
                 .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
-        Map<UUID, StockResponse> stocks = turnoverService.findStock(document.getWarehouse(),
-                        items.stream().map(ItemEntity::getGood).toList()).stream()
-                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
+        Map<UUID, StockResponse> stocks = turnoverService
+                .findStock(document.getWarehouse(), items.stream().map(ItemEntity::getGood).toList()).stream()
+                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity(),
+                        (existing, _) -> existing));
         return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
             TurnoverEntity turnover = turnovers.get(item.getGood().getId());
             if (turnover != null) return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());

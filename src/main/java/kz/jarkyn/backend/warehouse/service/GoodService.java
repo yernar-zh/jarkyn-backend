@@ -50,8 +50,7 @@ public class GoodService {
             GoodMapper goodMapper,
             SellingPriceMapper sellingPriceMapper,
             SearchFactory searchFactory,
-            TurnoverService turnoverService,
-            EntityMapper entityMapper) {
+            TurnoverService turnoverService) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
