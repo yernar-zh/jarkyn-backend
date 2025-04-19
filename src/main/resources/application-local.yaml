@@ -9,3 +9,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
+
+cloud:
+  s3:
+    key: minioadmin
+    secret: minioadmin
+    endpoint: http://localhost:9000
+    region: us-east-1
