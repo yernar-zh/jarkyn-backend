@@ -9,21 +9,14 @@ services:
       POSTGRES_PASSWORD: 123qwe123
     ports:
       - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-  minio:
-    image: quay.io/minio/minio
-    container_name: minio
+  localstack:
+    image: localstack/localstack
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "4566:4566"  # LocalStack services port
+      - "4510-4559:4510-4559"  # Optional: LocalStack service internal ports
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    volumes:
-      - minio-data:/data
-    command: server /data --console-address ":9001"
-volumes:
-  pgdata:
-  minio-data:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    networks:
+      - localstack-network
+    restart: always
 
