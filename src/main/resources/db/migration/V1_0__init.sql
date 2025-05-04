@@ -139,9 +139,12 @@ CREATE TABLE groups
 
 CREATE TABLE image
 (
-    id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    id                UUID NOT NULL,
+    created_at        TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at  TIMESTAMP WITHOUT TIME ZONE,
+    original_file_id  UUID,
+    medium_file_id    UUID,
+    thumbnail_file_id UUID,
     CONSTRAINT pk_image PRIMARY KEY (id)
 );
 
