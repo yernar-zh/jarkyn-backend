@@ -4,6 +4,7 @@ package kz.jarkyn.backend.core.mapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.global.model.ImageEntity;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
@@ -20,6 +21,10 @@ import java.util.UUID;
 public class EntityMapper {
     @PersistenceContext
     private EntityManager entityManager;
+
+    public ImageEntity toImageEntity(IdDto api) {
+        return toEntity(api, ImageEntity.class);
+    }
 
     public GoodEntity toGoodEntity(IdDto api) {
         return toEntity(api, GoodEntity.class);
