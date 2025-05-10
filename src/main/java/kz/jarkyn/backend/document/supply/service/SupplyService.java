@@ -148,13 +148,10 @@ public class SupplyService {
         if (supply.getCommited()) return;
         supply.setCommited(Boolean.TRUE);
         auditService.saveChanges(supply);
-        BigDecimal totalPaidAmount = paidDocumentService.findResponseByDocument(supply).stream()
-                .map(paidDocument -> paidDocument.getAmount().multiply(paidDocument.getPayment().getExchangeRate()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        itemService.createPositiveTurnover(supply, totalPaidAmount);
-        AccountEntity account = accountService.findOrCreateForCounterparty(
+        itemService.createPositiveTurnover(supply, supply.getAmount().multiply(supply.getExchangeRate()));
+        AccountEntity supplerAccount = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
-        cashFlowService.create(supply, account, supply.getAmount());
+        cashFlowService.create(supply, supplerAccount, supply.getAmount());
     }
 
     @Transactional
