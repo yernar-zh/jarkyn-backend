@@ -145,6 +145,7 @@ public class SupplyService {
     @Transactional
     public void commit(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (supply.getCommited()) return;
         supply.setCommited(Boolean.TRUE);
         auditService.saveChanges(supply);
         BigDecimal totalPaidAmount = paidDocumentService.findResponseByDocument(supply).stream()
@@ -159,6 +160,7 @@ public class SupplyService {
     @Transactional
     public void undoCommit(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (!supply.getCommited()) return;
         supply.setCommited(Boolean.FALSE);
         auditService.saveChanges(supply);
         itemService.deleteTurnover(supply);
