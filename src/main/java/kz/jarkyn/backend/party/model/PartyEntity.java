@@ -2,7 +2,6 @@ package kz.jarkyn.backend.party.model;
 
 
 import jakarta.persistence.*;
-import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.ReferenceEntity;
 
 @Entity

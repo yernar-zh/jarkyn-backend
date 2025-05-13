@@ -23,14 +23,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @ComponentScan(basePackages = "kz.jarkyn.backend")
 @Sql({"../../init.sql"})
-class CustomerControllerTest {
+class CounterpartyControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     @DirtiesContext
     public void testDetail_success() throws Exception {
-        mockMvc.perform(get(Api.Customer.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff")
+        mockMvc.perform(get(Api.Counterparty.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff")
                         .with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
@@ -44,7 +44,7 @@ class CustomerControllerTest {
     @Test
     @DirtiesContext
     public void testDetail_notFound() throws Exception {
-        mockMvc.perform(get(Api.Customer.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7").with(TestUtils.auth()))
+        mockMvc.perform(get(Api.Counterparty.PATH + "/a5747a2c-c97c-11ee-0a80-0777003791a7").with(TestUtils.auth()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ENTITY_NOT_FOUND"));
     }
@@ -52,7 +52,7 @@ class CustomerControllerTest {
     @Test
     @DirtiesContext
     public void testList_success() throws Exception {
-        mockMvc.perform(get(Api.Customer.PATH).with(TestUtils.auth())
+        mockMvc.perform(get(Api.Counterparty.PATH).with(TestUtils.auth())
                                 .queryParam("search", "Зам 145")
 //                              .queryParam("firstSale[min]", "2024-11-24T14:54")
                                 .queryParam("discount[min]", "2")
@@ -93,11 +93,11 @@ class CustomerControllerTest {
                   "discount": 5,
                   "archived": false
                 }""";
-        MvcResult result = mockMvc.perform(post(Api.Customer.PATH).with(TestUtils.auth()).content(requestData))
+        MvcResult result = mockMvc.perform(post(Api.Counterparty.PATH).with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andReturn();
-        mockMvc.perform(get(Api.Customer.PATH).with(TestUtils.auth())
+        mockMvc.perform(get(Api.Counterparty.PATH).with(TestUtils.auth())
                         .queryParam("id", TestUtils.extractId(result))
                 )
                 .andExpect(status().isOk())
@@ -128,11 +128,11 @@ class CustomerControllerTest {
                   "discount": 5,
                   "archived": true
                 }""";
-        mockMvc.perform(put(Api.Customer.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff")
+        mockMvc.perform(put(Api.Counterparty.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff")
                         .with(TestUtils.auth()).content(requestData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"));
-        mockMvc.perform(get(Api.Customer.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff").with(TestUtils.auth()))
+        mockMvc.perform(get(Api.Counterparty.PATH + "/1d468c04-6360-43e5-9d51-7771e9d9dcff").with(TestUtils.auth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1d468c04-6360-43e5-9d51-7771e9d9dcff"))
                 .andExpect(jsonPath("$.name").value("Заманбек Жетысай 2"))

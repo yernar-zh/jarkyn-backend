@@ -3,6 +3,7 @@ package kz.jarkyn.backend.document.core.model;
 
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
+import kz.jarkyn.backend.party.model.CounterpartyEntity;
 import kz.jarkyn.backend.party.model.PartyEntity;
 import kz.jarkyn.backend.party.model.OrganizationEntity;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
@@ -24,7 +25,7 @@ public class DocumentEntity extends AbstractEntity {
     private WarehouseEntity warehouse;
     @ManyToOne
     @JoinColumn(name = "counterparty_id")
-    private PartyEntity counterparty;
+    private CounterpartyEntity counterparty;
     private String name;
     private LocalDateTime moment;
     @ManyToOne
@@ -52,11 +53,11 @@ public class DocumentEntity extends AbstractEntity {
         this.warehouse = warehouse;
     }
 
-    public PartyEntity getCounterparty() {
+    public CounterpartyEntity getCounterparty() {
         return counterparty;
     }
 
-    public void setCounterparty(PartyEntity counterparty) {
+    public void setCounterparty(CounterpartyEntity counterparty) {
         this.counterparty = counterparty;
     }
 

@@ -31,12 +31,8 @@ public interface Api {
         String PATH = Api.PATH + "/account";
     }
 
-    interface Supplier {
-        String PATH = Api.PATH + "/supplier";
-    }
-
-    interface Customer {
-        String PATH = Api.PATH + "/customer";
+    interface Counterparty {
+        String PATH = Api.PATH + "/counterparty";
     }
 
     interface Supply {

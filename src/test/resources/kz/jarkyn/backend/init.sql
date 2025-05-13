@@ -23,24 +23,24 @@ VALUES ('523961a7-696d-4779-8bb0-fd327feaecf3', 'Кенжина', false),
 -- Урумчи Кытай
 INSERT INTO party (id, name, archived)
 VALUES ('94fadc9a-83bb-4639-be07-f825ab9eb40e', 'Урумчи Кытай', false);
-INSERT INTO supplier (id)
-VALUES ('94fadc9a-83bb-4639-be07-f825ab9eb40e');
+INSERT INTO counterparty (id, phone_number, shipping_address, discount)
+VALUES ('94fadc9a-83bb-4639-be07-f825ab9eb40e', null, '', 0);
 -- Шанхай Кытай
 INSERT INTO party (id, name, archived)
 VALUES ('72b5a4b5-3133-4076-ab5f-84262ebcae65', 'Шанхай Кытай', false);
-INSERT INTO supplier (id)
-VALUES ('72b5a4b5-3133-4076-ab5f-84262ebcae65');
+INSERT INTO counterparty (id, phone_number, shipping_address, discount)
+VALUES ('72b5a4b5-3133-4076-ab5f-84262ebcae65', null, '', 0);
 
 -------------------- Customer -------------------
 -- Заманбек Жетысай
 INSERT INTO party (id, name, archived)
 VALUES ('1d468c04-6360-43e5-9d51-7771e9d9dcff', 'Заманбек Жетысай', false);
-INSERT INTO customer (id, phone_number, shipping_address, discount)
+INSERT INTO counterparty (id, phone_number, shipping_address, discount)
 VALUES ('1d468c04-6360-43e5-9d51-7771e9d9dcff', '+7(707)145-1475', '', 3);
 -- Оркен Алматы
 INSERT INTO party (id, name, archived)
 VALUES ('43375a1e-1c91-46e5-9a10-a14200427fe9', 'Оркен Алматы', false);
-INSERT INTO customer (id, phone_number, shipping_address, discount)
+INSERT INTO counterparty (id, phone_number, shipping_address, discount)
 VALUES ('43375a1e-1c91-46e5-9a10-a14200427fe9', '+7(775)457-4117', '', 4);
 
 --------------------- Group ---------------------

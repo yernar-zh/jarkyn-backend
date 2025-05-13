@@ -69,7 +69,7 @@ public class AccountService {
 
     @Transactional
     public AccountEntity findOrCreateForCounterparty(
-            OrganizationEntity organization, PartyEntity counterparty, CurrencyEntity currency) {
+            OrganizationEntity organization, CounterpartyEntity counterparty, CurrencyEntity currency) {
         return accountRepository.findByOrganizationAndCounterpartyAndCurrency(organization, counterparty, currency)
                 .orElseGet(() -> {
                     AccountEntity account = new AccountEntity();

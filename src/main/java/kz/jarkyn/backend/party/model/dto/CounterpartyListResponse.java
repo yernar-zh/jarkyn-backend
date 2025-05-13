@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Value.Immutable
-public interface CustomerListResponse extends ReferenceResponse {
-    String getPhoneNumber();
+public interface CounterpartyListResponse extends ReferenceResponse {
+    @Nullable String getPhoneNumber();
     String getShippingAddress();
     Integer getDiscount();
     BigDecimal getAccountBalance();

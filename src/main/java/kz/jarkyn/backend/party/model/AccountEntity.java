@@ -2,7 +2,6 @@ package kz.jarkyn.backend.party.model;
 
 
 import jakarta.persistence.*;
-import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.ReferenceEntity;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
 
@@ -14,7 +13,7 @@ public class AccountEntity extends ReferenceEntity {
     private OrganizationEntity organization;
     @ManyToOne
     @JoinColumn(name = "counterparty_id")
-    private PartyEntity counterparty;
+    private CounterpartyEntity counterparty;
     private String bank;
     private String giro;
     @ManyToOne
@@ -29,11 +28,11 @@ public class AccountEntity extends ReferenceEntity {
         this.organization = organization;
     }
 
-    public PartyEntity getCounterparty() {
+    public CounterpartyEntity getCounterparty() {
         return counterparty;
     }
 
-    public void setCounterparty(PartyEntity counterparty) {
+    public void setCounterparty(CounterpartyEntity counterparty) {
         this.counterparty = counterparty;
     }
 

@@ -1,7 +1,7 @@
 package kz.jarkyn.backend.party.repository;
 
 import jakarta.persistence.Tuple;
-import kz.jarkyn.backend.party.model.CustomerEntity;
+import kz.jarkyn.backend.party.model.CounterpartyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +11,7 @@ import java.util.UUID;
 
 
 @Repository
-public interface CustomerRepository extends JpaRepository<CustomerEntity, UUID> {
+public interface CounterpartyRepository extends JpaRepository<CounterpartyEntity, UUID> {
     @Query("""
             SELECT
                 MIN(sle.moment) as firstSaleMoment,
@@ -19,8 +19,8 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, UUID> 
                 COUNT(sle) as totalSaleCount,
                 COALESCE(SUM(sle.amount),0) as totalSaleAmount
             FROM SaleEntity sle
-            WHERE sle.counterparty = :customer
+            WHERE sle.counterparty = :counterparty
                 AND sle.commited = TRUE
             """)
-    Tuple findSaleInfo(@Param("customer") CustomerEntity customer);
+    Tuple findSaleInfo(@Param("counterparty") CounterpartyEntity counterparty);
 }

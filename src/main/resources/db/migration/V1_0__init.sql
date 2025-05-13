@@ -63,6 +63,15 @@ CREATE TABLE cash_flow
     CONSTRAINT pk_cash_flow PRIMARY KEY (id)
 );
 
+CREATE TABLE counterparty
+(
+    id               UUID NOT NULL,
+    phone_number     VARCHAR(255),
+    shipping_address VARCHAR(255),
+    discount         INTEGER,
+    CONSTRAINT pk_counterparty PRIMARY KEY (id)
+);
+
 CREATE TABLE currency
 (
     id               UUID NOT NULL,
@@ -71,15 +80,6 @@ CREATE TABLE currency
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_currency PRIMARY KEY (id)
-);
-
-CREATE TABLE customer
-(
-    id               UUID NOT NULL,
-    phone_number     VARCHAR(255),
-    shipping_address VARCHAR(255),
-    discount         INTEGER,
-    CONSTRAINT pk_customer PRIMARY KEY (id)
 );
 
 CREATE TABLE document
@@ -225,12 +225,6 @@ CREATE TABLE selling_price
     CONSTRAINT pk_selling_price PRIMARY KEY (id)
 );
 
-CREATE TABLE supplier
-(
-    id UUID NOT NULL,
-    CONSTRAINT pk_supplier PRIMARY KEY (id)
-);
-
 CREATE TABLE supply
 (
     id UUID NOT NULL,
@@ -277,7 +271,7 @@ CREATE TABLE warehouse
 );
 
 ALTER TABLE account
-    ADD CONSTRAINT FK_ACCOUNT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES party (id);
+    ADD CONSTRAINT FK_ACCOUNT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
 
 ALTER TABLE account
     ADD CONSTRAINT FK_ACCOUNT_ON_CURRENCY FOREIGN KEY (currency_id) REFERENCES currency (id);
@@ -294,11 +288,11 @@ ALTER TABLE cash_flow
 ALTER TABLE cash_flow
     ADD CONSTRAINT FK_CASH_FLOW_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
 
-ALTER TABLE customer
-    ADD CONSTRAINT FK_CUSTOMER_ON_ID FOREIGN KEY (id) REFERENCES party (id);
+ALTER TABLE counterparty
+    ADD CONSTRAINT FK_COUNTERPARTY_ON_ID FOREIGN KEY (id) REFERENCES party (id);
 
 ALTER TABLE document
-    ADD CONSTRAINT FK_DOCUMENT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES party (id);
+    ADD CONSTRAINT FK_DOCUMENT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_CURRENCY FOREIGN KEY (currency_id) REFERENCES currency (id);
@@ -356,9 +350,6 @@ ALTER TABLE sale
 
 ALTER TABLE selling_price
     ADD CONSTRAINT FK_SELLING_PRICE_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
-
-ALTER TABLE supplier
-    ADD CONSTRAINT FK_SUPPLIER_ON_ID FOREIGN KEY (id) REFERENCES party (id);
 
 ALTER TABLE supply
     ADD CONSTRAINT FK_SUPPLY_ON_ID FOREIGN KEY (id) REFERENCES document (id);

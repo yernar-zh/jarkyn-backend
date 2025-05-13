@@ -5,9 +5,9 @@ import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity_;
 
 @Entity
-@Table(name = "customer")
+@Table(name = "counterparty")
 @PrimaryKeyJoinColumn(name = AbstractEntity_.ID)
-public class CustomerEntity extends PartyEntity {
+public class CounterpartyEntity extends PartyEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
     @Column(name = "shipping_address")
