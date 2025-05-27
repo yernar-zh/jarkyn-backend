@@ -11,5 +11,6 @@ import java.math.BigDecimal;
 public interface PaidDocumentResponse extends IdDto {
     DocumentResponse getPayment();
     DocumentResponse getDocument();
+    BigDecimal getNotPaidAmount();
     BigDecimal getAmount();
 }

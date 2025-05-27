@@ -5,7 +5,6 @@ package kz.jarkyn.backend.warehouse.model;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import kz.jarkyn.backend.audit.config.IgnoreAudit;
-import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.core.model.ReferenceEntity;

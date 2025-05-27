@@ -103,10 +103,7 @@ public class SupplyService {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
                     Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
                     subQuery.select(cb.coalesce(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)), BigDecimal.ZERO));
-                    subQuery.where(cb.and(
-                            cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.document), root),
-                            cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.payment)
-                                    .get(DocumentEntity_.counterparty), root.get(DocumentEntity_.counterparty))));
+                    subQuery.where(cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.document), root));
                     return subQuery;
                 })
                 .add("notPaidAmount", (root, query, cb, map) -> cb.diff(

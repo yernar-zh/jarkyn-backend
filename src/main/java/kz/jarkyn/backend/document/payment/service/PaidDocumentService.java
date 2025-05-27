@@ -13,6 +13,7 @@ import kz.jarkyn.backend.document.payment.repository.PaidDocumentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -29,12 +30,19 @@ public class PaidDocumentService {
 
     @Transactional(readOnly = true)
     public List<PaidDocumentResponse> findResponseByPayment(DocumentEntity payment) {
-        return paidDocumentMapper.toResponse(paidDocumentRepository.findByPayment(payment));
+        return paidDocumentRepository.findByPayment(payment).stream().map(entity -> {
+            BigDecimal paidAmount = paidDocumentRepository.findByDocument(entity.getDocument()).stream()
+                    .map(PaidDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            return paidDocumentMapper.toResponse(entity, paidAmount);
+        }).toList();
     }
 
     @Transactional(readOnly = true)
     public List<PaidDocumentResponse> findResponseByDocument(DocumentEntity document) {
-        return paidDocumentMapper.toResponse(paidDocumentRepository.findByDocument(document));
+        List<PaidDocumentEntity> paidDocuments = paidDocumentRepository.findByDocument(document);
+        BigDecimal paidAmount = paidDocuments.stream().map(PaidDocumentEntity::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return paidDocuments.stream().map(entity -> paidDocumentMapper.toResponse(entity, paidAmount)).toList();
     }
 
     @Transactional

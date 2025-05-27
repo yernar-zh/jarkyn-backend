@@ -93,15 +93,15 @@ public class PaymentOutService {
                 .add("receiptNumber", (root) -> root.get(PaymentOutEntity_.receiptNumber))
                 .add("itemOfExpenditure", (root) -> root.get(PaymentOutEntity_.itemOfExpenditure))
                 .add("purpose", (root) -> root.get(PaymentOutEntity_.purpose))
-                .add("attached", (root, query, cb, map) -> {
+                .add("attachedAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
                     Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
                     subQuery.select(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)));
                     subQuery.where(cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.payment), root));
                     return subQuery;
                 })
-                .add("notAttached", (root, query, cb, map) -> cb.diff(
-                        (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("attached")))
+                .add("notAttachedAmount", (root, query, cb, map) -> cb.diff(
+                        (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("attachedAmount")))
                 .build();
         Search<PaymentOutListResponse> search = searchFactory.createCriteriaSearch(
                 PaymentOutListResponse.class, List.of("name", "counterparty.name"),

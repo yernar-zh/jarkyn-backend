@@ -16,6 +16,6 @@ public interface PaymentOutListResponse extends DocumentResponse {
     @Nullable String getReceiptNumber();
     ItemOfExpenditure getItemOfExpenditure();
     @Nullable String getPurpose();
-    @Nullable BigDecimal getAttached();
-    @Nullable BigDecimal getNotAttached();
+    @Nullable BigDecimal getAttachedAmount();
+    @Nullable BigDecimal getNotAttachedAmount();
 }

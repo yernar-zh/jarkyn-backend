@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.core.model;
 
 import jakarta.persistence.*;
+import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Persistable;
 
@@ -13,7 +14,9 @@ public abstract class AbstractEntity implements Persistable<UUID> {
 
     @Id
     private UUID id;
+    @IgnoreAudit
     private LocalDateTime createdAt;
+    @IgnoreAudit
     private LocalDateTime lastModifiedAt;
 
     @PrePersist
@@ -22,6 +25,7 @@ public abstract class AbstractEntity implements Persistable<UUID> {
             this.id = UUID.randomUUID();
         }
         createdAt = LocalDateTime.now();
+        lastModifiedAt = LocalDateTime.now();
     }
 
     @PreUpdate

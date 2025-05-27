@@ -9,11 +9,11 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AuditService {
@@ -25,7 +25,10 @@ public class AuditService {
 
     @Transactional
     public <E extends AbstractEntity> void saveChanges(E entity) {
-        Field[] fields = entity.getClass().getDeclaredFields();
+        List<Field> fields = new ArrayList<>();
+        for (Class<?> clazz = entity.getClass(); clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
+            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        }
         try {
             UUID entityParentId = null;
             for (Field field : fields) {
@@ -65,7 +68,7 @@ public class AuditService {
     private void save(UUID entityId, UUID entityParentId, String fieldName, String fieldValue) {
         AuditEntity oldAudit = auditRepository.getLastByEntityIdAndFieldName(entityId, fieldName);
         if (oldAudit != null) {
-            if (!oldAudit.getEntityParentId().equals(entityParentId)) {
+            if (!Objects.equals(oldAudit.getEntityParentId(), entityParentId)) {
                 throw new RuntimeException();
             }
             if (oldAudit.getFieldValue().equals(fieldValue)) {

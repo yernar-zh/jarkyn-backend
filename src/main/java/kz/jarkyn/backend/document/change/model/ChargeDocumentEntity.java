@@ -10,8 +10,8 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "charge_document")
+//@Entity
+//@Table(name = "charge_document")
 public class ChargeDocumentEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "charge_id")
