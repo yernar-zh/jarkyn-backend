@@ -3,6 +3,7 @@ package kz.jarkyn.backend.document.payment.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity_;
+import kz.jarkyn.backend.global.model.ItemOfExpenditureEntity;
 import kz.jarkyn.backend.party.model.AccountEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 
@@ -14,8 +15,9 @@ public class PaymentOutEntity extends DocumentEntity {
     @JoinColumn(name = "account_id")
     private AccountEntity account;
     private String receiptNumber;
-    @Enumerated(EnumType.STRING)
-    private ItemOfExpenditure itemOfExpenditure;
+    @ManyToOne
+    @JoinColumn(name = "item_of_expenditure_id")
+    private ItemOfExpenditureEntity itemOfExpenditure;
     private String purpose;
 
     public AccountEntity getAccount() {
@@ -34,11 +36,11 @@ public class PaymentOutEntity extends DocumentEntity {
         this.receiptNumber = receiptNumber;
     }
 
-    public ItemOfExpenditure getItemOfExpenditure() {
+    public ItemOfExpenditureEntity getItemOfExpenditure() {
         return itemOfExpenditure;
     }
 
-    public void setItemOfExpenditure(ItemOfExpenditure itemOfExpenditure) {
+    public void setItemOfExpenditure(ItemOfExpenditureEntity itemOfExpenditure) {
         this.itemOfExpenditure = itemOfExpenditure;
     }
 

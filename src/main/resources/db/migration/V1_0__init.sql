@@ -161,6 +161,17 @@ CREATE TABLE item
     CONSTRAINT pk_item PRIMARY KEY (id)
 );
 
+CREATE TABLE item_of_expenditure
+(
+    id               UUID NOT NULL,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    code             VARCHAR(255),
+    CONSTRAINT pk_item_of_expenditure PRIMARY KEY (id)
+);
+
 CREATE TABLE organization
 (
     id UUID NOT NULL,
@@ -198,11 +209,11 @@ CREATE TABLE payment_in
 
 CREATE TABLE payment_out
 (
-    id                  UUID NOT NULL,
-    account_id          UUID,
-    receipt_number      VARCHAR(255),
-    item_of_expenditure VARCHAR(255),
-    purpose             VARCHAR(255),
+    id                     UUID NOT NULL,
+    account_id             UUID,
+    receipt_number         VARCHAR(255),
+    item_of_expenditure_id UUID,
+    purpose                VARCHAR(255),
     CONSTRAINT pk_payment_out PRIMARY KEY (id)
 );
 
@@ -344,6 +355,9 @@ ALTER TABLE payment_out
 
 ALTER TABLE payment_out
     ADD CONSTRAINT FK_PAYMENT_OUT_ON_ID FOREIGN KEY (id) REFERENCES document (id);
+
+ALTER TABLE payment_out
+    ADD CONSTRAINT FK_PAYMENT_OUT_ON_ITEM_OF_EXPENDITURE FOREIGN KEY (item_of_expenditure_id) REFERENCES item_of_expenditure (id);
 
 ALTER TABLE sale
     ADD CONSTRAINT FK_SALE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
