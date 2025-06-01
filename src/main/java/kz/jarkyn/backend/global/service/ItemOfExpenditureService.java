@@ -43,6 +43,7 @@ public class ItemOfExpenditureService {
         CriteriaAttributes<ItemOfExpenditureEntity> attributes = CriteriaAttributes.<ItemOfExpenditureEntity>builder()
                 .add("id", (root) -> root.get(ItemOfExpenditureEntity_.id))
                 .add("name", (root) -> root.get(ItemOfExpenditureEntity_.name))
+                .add("code", (root) -> root.get(ItemOfExpenditureEntity_.code))
                 .add("archived", (root) -> root.get(ItemOfExpenditureEntity_.archived))
                 .build();
         Search<ItemOfExpenditureResponse> search = searchFactory.createCriteriaSearch(

@@ -3,8 +3,10 @@ package kz.jarkyn.backend.core.mapper;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.global.model.ImageEntity;
+import kz.jarkyn.backend.global.model.ItemOfExpenditureEntity;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
@@ -68,6 +70,10 @@ public class EntityMapper {
 
     public CurrencyEntity toCurrencyEntity(IdDto api) {
         return toEntity(api, CurrencyEntity.class);
+    }
+
+    public ItemOfExpenditureEntity toItemOfExpenditure(IdDto api) {
+        return toEntity(api, ItemOfExpenditureEntity.class);
     }
 
     public <T extends PartyEntity> T toPartyEntity(IdDto api) {
