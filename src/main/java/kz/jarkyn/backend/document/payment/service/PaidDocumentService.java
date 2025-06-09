@@ -3,6 +3,7 @@ package kz.jarkyn.backend.document.payment.service;
 
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.payment.mapper.PaidDocumentMapper;
 import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity;
 import kz.jarkyn.backend.document.payment.model.PaymentInEntity;
@@ -20,12 +21,14 @@ import java.util.List;
 public class PaidDocumentService {
     private final PaidDocumentRepository paidDocumentRepository;
     private final PaidDocumentMapper paidDocumentMapper;
+    private final DocumentService documentService;
 
     public PaidDocumentService(
             PaidDocumentRepository paidDocumentRepository,
-            PaidDocumentMapper paidDocumentMapper) {
+            PaidDocumentMapper paidDocumentMapper, DocumentService documentService) {
         this.paidDocumentRepository = paidDocumentRepository;
         this.paidDocumentMapper = paidDocumentMapper;
+        this.documentService = documentService;
     }
 
     @Transactional(readOnly = true)
@@ -33,7 +36,8 @@ public class PaidDocumentService {
         return paidDocumentRepository.findByPayment(payment).stream().map(entity -> {
             BigDecimal paidAmount = paidDocumentRepository.findByDocument(entity.getDocument()).stream()
                     .map(PaidDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            return paidDocumentMapper.toResponse(entity, paidAmount);
+            return paidDocumentMapper.toResponse(entity, documentService.getType(entity.getDocument()),
+                    entity.getAmount().subtract(paidAmount));
         }).toList();
     }
 
@@ -42,7 +46,8 @@ public class PaidDocumentService {
         List<PaidDocumentEntity> paidDocuments = paidDocumentRepository.findByDocument(document);
         BigDecimal paidAmount = paidDocuments.stream().map(PaidDocumentEntity::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return paidDocuments.stream().map(entity -> paidDocumentMapper.toResponse(entity, paidAmount)).toList();
+        return paidDocuments.stream().map(entity -> paidDocumentMapper.toResponse(
+                entity, documentService.getType(document), paidAmount)).toList();
     }
 
     @Transactional

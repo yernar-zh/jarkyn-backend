@@ -1,6 +1,7 @@
 
 package kz.jarkyn.backend.document.core.model.dto;
 
+import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.ReferenceResponse;
 import org.immutables.value.Value;
 
@@ -13,6 +14,7 @@ public interface DocumentResponse {
     UUID getId();
     String getName();
     ReferenceResponse getOrganization();
+    @Nullable ReferenceResponse getCounterparty();
     LocalDateTime getMoment();
     ReferenceResponse getCurrency();
     BigDecimal getExchangeRate();

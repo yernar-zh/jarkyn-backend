@@ -3,6 +3,8 @@ package kz.jarkyn.backend.document.core.service;
 
 
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import kz.jarkyn.backend.document.core.model.dto.DocumentTypeResponse;
+import kz.jarkyn.backend.document.core.model.dto.ImmutableDocumentTypeResponse;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.sale.model.SaleEntity;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,16 @@ public class DocumentService {
         if (!matcher.find()) {
             throw new RuntimeException("unsupported name : " + name);
         }
+    }
+
+    public DocumentTypeResponse getType(DocumentEntity document) {
+        return switch (document.getClass().getSimpleName()) {
+            case "SupplyEntity" -> ImmutableDocumentTypeResponse.of("Приемка", "SUPPLY_ENTITY");
+            case "SaleEntity" -> ImmutableDocumentTypeResponse.of("Продажа", "SUPPLY_ENTITY");
+            case "PaymentInEntity" -> ImmutableDocumentTypeResponse.of("PAYMENT_IN_ENTITY", "PAYMENT_IN_ENTITY");
+            case "PaymentOutEntity" -> ImmutableDocumentTypeResponse.of("PAYMENT_OUT_ENTITY", "PAYMENT_OUT_ENTITY");
+            default -> throw new RuntimeException("unsupported document : " + document.getClass().getSimpleName());
+        };
     }
 
     private String getNamePrefix(Class<? extends DocumentEntity> type) {
