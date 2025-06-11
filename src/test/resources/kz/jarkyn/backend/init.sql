@@ -127,19 +127,6 @@ VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', 'c8190dcc-1cbe-4df6-a582-0f85e98
 INSERT INTO paid_document (id, payment_id, document_id, amount)
 VALUES ('538c3271-7398-4fab-ad05-0a886188de11', '5c799431-3bc3-400f-b9a3-209f27b935a0',
         '17c1285b-6514-45d5-88a2-3b9f673dc5e3', 710);
--- Supply cargo payment
-INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,
-                      currency_id, exchange_rate, amount, comment, deleted, commited)
-VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
-        null, null,
-        'PO-00002', '2024-12-07 23:47',
-        '24f15639-67da-4df4-aab4-56b85c872c3b', 525, 20, '', false, false);
-INSERT INTO payment_out (id, account_id, item_of_expenditure_id)
-VALUES ('fa81596d-a236-4256-8686-7f7f3be85ae4', '8d1ed49a-6964-4a3e-bc83-8c22601e70f8',
-        'ac03d34e-2274-4f35-8939-46f17ddc05ed');
-INSERT INTO paid_document (id, payment_id, document_id, amount)
-VALUES ('e70efb3f-9124-4ef9-9b7e-7bc24385710f', 'fa81596d-a236-4256-8686-7f7f3be85ae4',
-        '17c1285b-6514-45d5-88a2-3b9f673dc5e3', 20);
 
 -------------------- Sale ----------------------.-
 INSERT INTO document (id, organization_id, warehouse_id, counterparty_id, name, moment,

@@ -96,7 +96,7 @@ public class PaymentOutService {
                 .add("attachedAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
                     Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
-                    subQuery.select(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)));
+                    subQuery.select(cb.coalesce(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)), BigDecimal.ZERO));
                     subQuery.where(cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.payment), root));
                     return subQuery;
                 })

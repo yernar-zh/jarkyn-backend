@@ -9,10 +9,14 @@ import java.util.*;
 
 public class QueryParams {
     private static final List<Pair<String, Filter.Type>> FILTER_SUFFIX = new ArrayList<>() {{
-        add(Pair.of("[max]", Filter.Type.LESS_THEN));
-        add(Pair.of("[min]", Filter.Type.GREATER_THEN));
+        add(Pair.of("[lte]", Filter.Type.LESS_OR_EQ));
+        add(Pair.of("[gte]", Filter.Type.GREATER_OR_EQ));
+        add(Pair.of("[lt]", Filter.Type.LESS));
+        add(Pair.of("[gt]", Filter.Type.GREATER));
         add(Pair.of("[like]", Filter.Type.CONTAINS));
+        add(Pair.of("[notLike]", Filter.Type.NOT_CONTAINS));
         add(Pair.of("[exists]", Filter.Type.EXISTS));
+        add(Pair.of("[not]", Filter.Type.NOT_EQUAL_TO));
         add(Pair.of("", Filter.Type.EQUAL_TO));
     }};
     private static final List<Pair<String, Sort.Type>> SORT_PREFIX = new ArrayList<>() {{
@@ -115,7 +119,13 @@ public class QueryParams {
             return type;
         }
 
-        public enum Type {EQUAL_TO, GREATER_THEN, LESS_THEN, CONTAINS, EXISTS}
+        public enum Type {
+            EQUAL_TO, NOT_EQUAL_TO,
+            GREATER_OR_EQ, LESS_OR_EQ,
+            GREATER, LESS,
+            CONTAINS, NOT_CONTAINS,
+            EXISTS
+        }
     }
 
     public static class Sort {

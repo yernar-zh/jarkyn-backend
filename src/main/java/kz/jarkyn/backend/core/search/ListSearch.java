@@ -108,9 +108,13 @@ public class ListSearch<R> implements Search<R> {
                         .map(Objects.requireNonNull(SearchUtils.getConvertor(rowValue.getClass())))
                         .map(filterValue -> switch (filter.getType()) {
                             case EQUAL_TO -> rowValue.equals(filterValue);
-                            case LESS_THEN -> ((Comparable) rowValue).compareTo(filterValue) <= 0;
-                            case GREATER_THEN -> ((Comparable) rowValue).compareTo(filterValue) >= 0;
+                            case NOT_EQUAL_TO -> !rowValue.equals(filterValue);
+                            case LESS_OR_EQ -> ((Comparable) rowValue).compareTo(filterValue) <= 0;
+                            case GREATER_OR_EQ -> ((Comparable) rowValue).compareTo(filterValue) >= 0;
+                            case LESS -> ((Comparable) rowValue).compareTo(filterValue) < 0;
+                            case GREATER -> ((Comparable) rowValue).compareTo(filterValue) > 0;
                             case CONTAINS -> ((String) rowValue).contains((String) filterValue);
+                            case NOT_CONTAINS -> !((String) rowValue).contains((String) filterValue);
                             case EXISTS -> throw new IllegalStateException();
                         }).reduce((b1, b2) -> b1 || b2).orElse(Boolean.TRUE);
             }).reduce((b1, b2) -> b1 && b2).orElse(Boolean.TRUE);

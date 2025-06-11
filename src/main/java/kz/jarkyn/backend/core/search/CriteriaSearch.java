@@ -135,12 +135,15 @@ public class CriteriaSearch<R, E> implements Search<R> {
                     .map(Objects.requireNonNull(SearchUtils.getConvertor(expression.getJavaType())))
                     .map(filterValue -> switch (filter.getType()) {
                         case EQUAL_TO -> cb.equal(expression, filterValue);
-                        case LESS_THEN -> cb.lessThanOrEqualTo((Expression<Comparable>) expression,
-                                (Comparable) filterValue);
-                        case GREATER_THEN -> cb.greaterThanOrEqualTo((Expression<Comparable>) expression,
-                                (Comparable) filterValue);
-                        case CONTAINS -> cb.like((Expression<String>) expression,
-                                (String) filterValue);
+                        case NOT_EQUAL_TO -> cb.notEqual(expression, filterValue);
+                        case LESS_OR_EQ ->
+                                cb.lessThanOrEqualTo((Expression<Comparable>) expression, (Comparable) filterValue);
+                        case GREATER_OR_EQ ->
+                                cb.greaterThanOrEqualTo((Expression<Comparable>) expression, (Comparable) filterValue);
+                        case LESS -> cb.lessThan((Expression<Comparable>) expression, (Comparable) filterValue);
+                        case GREATER -> cb.greaterThan((Expression<Comparable>) expression, (Comparable) filterValue);
+                        case CONTAINS -> cb.like((Expression<String>) expression, (String) filterValue);
+                        case NOT_CONTAINS -> cb.notLike((Expression<String>) expression, (String) filterValue);
                         case EXISTS -> throw new IllegalStateException();
                     }).reduce(cb::or).orElse(cb.conjunction());
         }).toList();
