@@ -17,8 +17,9 @@ import java.time.LocalDateTime;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class DocumentEntity extends AbstractEntity {
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, updatable = false)
-    private DocumentType type;
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    private DocumentTypeEntity type;
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private OrganizationEntity organization;
@@ -39,11 +40,11 @@ public class DocumentEntity extends AbstractEntity {
     private Boolean deleted;
     private Boolean commited;
 
-    public DocumentType getType() {
+    public DocumentTypeEntity getType() {
         return type;
     }
 
-    protected void setType(DocumentType type) {
+    public void setType(DocumentTypeEntity type) {
         this.type = type;
     }
 

@@ -18,6 +18,13 @@ VALUES ('559109ea-f824-476d-8fa4-9990e53880ff', 'KZT', false, now(), now()),
        ('e6a3c207-a358-47bf-ac18-2d09973f3807', 'CNY', false, now(), now()),
        ('24f15639-67da-4df4-aab4-56b85c872c3b', 'USD', false, now(), now());
 
+INSERT INTO public.document_type (id, name, code, archived, created_at, last_modified_at)
+VALUES ('c837fc94-4cd4-4918-a38c-9bd9dd9c3271','Продажа' ,'SALE', false, now(), now()),
+       ('3873fc3e-58da-4ecc-81a8-70728d8d3297','Приемка' ,'SUPPLY', false, now(), now()),
+       ('b112027c-bf9b-45e4-bcff-74f74b27cff0','Входящий платеж' ,'PAYMENT_IN', false, now(), now()),
+       ('9b755b4e-61fa-457d-855d-6b231d3bfed2','Исходящий платеж' ,'PAYMENT_OUT', false, now(), now());
+
+
 INSERT INTO public.item_of_expenditure (id, name, code, archived, created_at, last_modified_at)
 VALUES ('ac03d34e-2274-4f35-8939-46f17ddc05ed', 'Закупка товаров', 'SUPPLY', false, now(), now()),
        ('f18c785e-9bd9-4446-81f8-c3b64c474cf4', 'Возврат', 'REFUND', false, now(), now()),

@@ -2,20 +2,23 @@ package kz.jarkyn.backend.document.payment.service;
 
 
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.EnumTypeEntity_;
+import kz.jarkyn.backend.core.model.ReferenceEntity;
+import kz.jarkyn.backend.core.model.ReferenceEntity_;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.core.model.DocumentTypeEntity;
+import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.*;
-import kz.jarkyn.backend.party.model.AccountEntity;
-import kz.jarkyn.backend.party.model.AccountEntity_;
-import kz.jarkyn.backend.party.model.PartyEntity_;
-import kz.jarkyn.backend.party.model.OrganizationEntity_;
+import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.payment.mapper.PaymentOutMapper;
@@ -26,6 +29,7 @@ import kz.jarkyn.backend.document.payment.model.dto.PaymentOutRequest;
 import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
 import kz.jarkyn.backend.operation.service.CashFlowService;
 import kz.jarkyn.backend.global.model.CurrencyEntity_;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +47,7 @@ public class PaymentOutService {
     private final SearchFactory searchFactory;
     private final AccountService accountService;
     private final CashFlowService cashFlowService;
+    private final DocumentTypeService documentTypeService;
 
     public PaymentOutService(
             PaymentOutRepository paymentOutRepository,
@@ -52,7 +57,8 @@ public class PaymentOutService {
             AuditService auditService,
             SearchFactory searchFactory,
             AccountService accountService,
-            CashFlowService cashFlowService
+            CashFlowService cashFlowService,
+            DocumentTypeService documentTypeService
     ) {
         this.paymentOutRepository = paymentOutRepository;
         this.paymentOutMapper = paymentOutMapper;
@@ -62,6 +68,7 @@ public class PaymentOutService {
         this.searchFactory = searchFactory;
         this.accountService = accountService;
         this.cashFlowService = cashFlowService;
+        this.documentTypeService = documentTypeService;
     }
 
     @Transactional(readOnly = true)
@@ -75,16 +82,13 @@ public class PaymentOutService {
     public PageResponse<PaymentOutListResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<PaymentOutEntity> attributes = CriteriaAttributes.<PaymentOutEntity>builder()
                 .add("id", (root) -> root.get(PaymentOutEntity_.id))
+                .addEnumType("type", (root) -> root.get(PaymentOutEntity_.type))
                 .add("name", (root) -> root.get(PaymentOutEntity_.name))
-                .add("organization.id", (root) -> root.get(PaymentOutEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root) -> root.get(PaymentOutEntity_.organization).get(OrganizationEntity_.name))
-                .add("account.id", (root) -> root.get(PaymentOutEntity_.account).get(AccountEntity_.id))
-                .add("account.name", (root) -> root.get(PaymentOutEntity_.account).get(AccountEntity_.name))
-                .add("counterparty.id", (root) -> root.get(PaymentOutEntity_.counterparty).get(PartyEntity_.id))
-                .add("counterparty.name", (root) -> root.get(PaymentOutEntity_.counterparty).get(PartyEntity_.name))
+                .addReference("organization", (root) -> root.get(PaymentOutEntity_.organization))
+                .addReference("account", (root) -> root.get(PaymentOutEntity_.account))
+                .addReference("counterparty", (root) -> root.get(PaymentOutEntity_.counterparty))
                 .add("moment", (root) -> root.get(PaymentOutEntity_.moment))
-                .add("currency.id", (root) -> root.get(PaymentOutEntity_.currency).get(CurrencyEntity_.id))
-                .add("currency.name", (root) -> root.get(PaymentOutEntity_.currency).get(CurrencyEntity_.name))
+                .addReference("currency", (root) -> root.get(PaymentOutEntity_.currency))
                 .add("exchangeRate", (root) -> root.get(PaymentOutEntity_.exchangeRate))
                 .add("amount", (root) -> root.get(PaymentOutEntity_.amount))
                 .add("deleted", (root) -> root.get(PaymentOutEntity_.deleted))
@@ -112,10 +116,12 @@ public class PaymentOutService {
     @Transactional
     public UUID createApi(PaymentOutRequest request) {
         PaymentOutEntity paymentOut = paymentOutMapper.toEntity(request);
-        if (paymentOut.getName() == null) {
-            paymentOut.setName(documentService.findNextName(PaymentOutEntity.class));
+        paymentOut.setType(documentTypeService.findByCode(DocumentTypeService.DocumentTypeCode.PAYMENT_OUT));
+        if (Strings.isBlank(paymentOut.getName())) {
+            paymentOut.setName(documentService.findNextName(paymentOut.getType()));
+        } else {
+            documentService.validateName(paymentOut);
         }
-        documentService.validateName(paymentOut);
         paymentOut.setDeleted(false);
         paymentOut.setCommited(false);
         paymentOutRepository.save(paymentOut);

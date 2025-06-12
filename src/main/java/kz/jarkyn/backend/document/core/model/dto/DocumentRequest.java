@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableDocumentRequest.Builder.class)
 public interface DocumentRequest {
-    @Nullable String getName();
+    String getName();
     IdDto getOrganization();
     LocalDateTime getMoment();
     IdDto getCurrency();

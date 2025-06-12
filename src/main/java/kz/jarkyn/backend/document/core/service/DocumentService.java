@@ -3,10 +3,8 @@ package kz.jarkyn.backend.document.core.service;
 
 
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
-import kz.jarkyn.backend.document.core.model.dto.DocumentTypeResponse;
-import kz.jarkyn.backend.document.core.model.dto.ImmutableDocumentTypeResponse;
+import kz.jarkyn.backend.document.core.model.DocumentTypeEntity;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
-import kz.jarkyn.backend.document.sale.model.SaleEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +21,12 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public String findNextName(Class<? extends DocumentEntity> type) {
+        throw new RuntimeException();
+    }
+
+
+    @Transactional(readOnly = true)
+    public String findNextName(DocumentTypeEntity type) {
         String namePrefix = getNamePrefix(type);
         String lastName = documentRepository.getLastNameByNamePrefix(namePrefix);
         if (lastName == null) {
@@ -40,7 +44,7 @@ public class DocumentService {
         if (document.getName() == null) {
             throw new RuntimeException("document name is null");
         }
-        String namePrefix = getNamePrefix(document.getClass());
+        String namePrefix = getNamePrefix(document.getType());
         String name = document.getName();
         Matcher matcher = Pattern.compile(namePrefix + "-(\\d{5})").matcher(name);
         if (!matcher.find()) {
@@ -48,23 +52,12 @@ public class DocumentService {
         }
     }
 
-    public DocumentTypeResponse getType(DocumentEntity document) {
-        return switch (document.getClass().getSimpleName()) {
-            case "SupplyEntity" -> ImmutableDocumentTypeResponse.of("Приемка", "SUPPLY_ENTITY");
-            case "SaleEntity" -> ImmutableDocumentTypeResponse.of("Продажа", "SUPPLY_ENTITY");
-            case "PaymentInEntity" -> ImmutableDocumentTypeResponse.of("PAYMENT_IN_ENTITY", "PAYMENT_IN_ENTITY");
-            case "PaymentOutEntity" -> ImmutableDocumentTypeResponse.of("PAYMENT_OUT_ENTITY", "PAYMENT_OUT_ENTITY");
-            default -> throw new RuntimeException("unsupported document : " + document.getClass().getSimpleName());
-        };
-    }
-
-    private String getNamePrefix(Class<? extends DocumentEntity> type) {
-        return switch (type.getSimpleName()) {
-            case "SupplyEntity" -> "SP";
-            case "SaleEntity" -> "SL";
-            case "PaymentInEntity" -> "PI";
-            case "PaymentOutEntity" -> "PO";
-            default -> throw new RuntimeException("unsupported document : " + type.getSimpleName());
+    private String getNamePrefix(DocumentTypeEntity type) {
+        return switch (DocumentTypeService.DocumentTypeCode.valueOf(type.getCode())) {
+            case SALE -> "SP";
+            case SUPPLY -> "SL";
+            case PAYMENT_IN -> "PI";
+            case PAYMENT_OUT -> "PO";
         };
     }
 

@@ -3,11 +3,8 @@ package kz.jarkyn.backend.core.mapper;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
-import kz.jarkyn.backend.document.core.model.DocumentType;
-import kz.jarkyn.backend.document.core.model.dto.DocumentTypeResponse;
-import kz.jarkyn.backend.document.core.model.dto.ImmutableDocumentTypeResponse;
+import kz.jarkyn.backend.document.core.model.DocumentTypeEntity;
 import kz.jarkyn.backend.global.model.ImageEntity;
 import kz.jarkyn.backend.global.model.ItemOfExpenditureEntity;
 import kz.jarkyn.backend.party.model.*;
@@ -75,6 +72,10 @@ public class EntityMapper {
         return toEntity(api, CurrencyEntity.class);
     }
 
+    public DocumentTypeEntity toDocumentTypeEntity(IdDto api) {
+        return toEntity(api, DocumentTypeEntity.class);
+    }
+
     public ItemOfExpenditureEntity toItemOfExpenditure(IdDto api) {
         return toEntity(api, ItemOfExpenditureEntity.class);
     }
@@ -101,14 +102,5 @@ public class EntityMapper {
         }
         T entity = entityManager.find(clazz, id);
         return ExceptionUtils.requireNonNullApi(entity, clazz.getName());
-    }
-
-    public DocumentTypeResponse toResponse(DocumentType documentType) {
-        return switch (documentType) {
-            case SALE -> ImmutableDocumentTypeResponse.of("Продажа", "SALE");
-            case SUPPLY -> ImmutableDocumentTypeResponse.of("Приемка", "SUPPLY");
-            case PAYMENT_IN -> ImmutableDocumentTypeResponse.of("PAYMENT_IN_ENTITY", "PAYMENT_IN");
-            case PAYMENT_OUT -> ImmutableDocumentTypeResponse.of("PAYMENT_OUT_ENTITY", "PAYMENT_OUT");
-        };
     }
 }

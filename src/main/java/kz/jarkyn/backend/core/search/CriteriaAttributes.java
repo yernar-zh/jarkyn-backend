@@ -1,9 +1,14 @@
 package kz.jarkyn.backend.core.search;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
+import jakarta.persistence.metamodel.SingularAttribute;
+import kz.jarkyn.backend.core.model.EnumTypeEntity;
+import kz.jarkyn.backend.core.model.EnumTypeEntity_;
+import kz.jarkyn.backend.core.model.ReferenceEntity;
+import kz.jarkyn.backend.core.model.ReferenceEntity_;
+import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import kz.jarkyn.backend.party.model.OrganizationEntity;
+import org.springframework.data.util.Pair;
 
 import java.util.*;
 
@@ -41,6 +46,21 @@ public class CriteriaAttributes<E> {
             return this;
         }
 
+        public Builder<E> addReference(String fieldName, ReferenceCriteriaAttribute<E> attribute) {
+            add(fieldName + ".id", root -> attribute.get(root).get(ReferenceEntity_.id));
+            add(fieldName + ".name", root -> attribute.get(root).get(ReferenceEntity_.name));
+            add(fieldName + ".archived", root -> attribute.get(root).get(ReferenceEntity_.archived));
+            return this;
+        }
+
+        public Builder<E> addEnumType(String fieldName, EnumTypeCriteriaAttribute<E> attribute) {
+            add(fieldName + ".id", root -> attribute.get(root).get(EnumTypeEntity_.id));
+            add(fieldName + ".name", root -> attribute.get(root).get(EnumTypeEntity_.name));
+            add(fieldName + ".code", root -> attribute.get(root).get(EnumTypeEntity_.code));
+            add(fieldName + ".archived", root -> attribute.get(root).get(EnumTypeEntity_.archived));
+            return this;
+        }
+
         public CriteriaAttributes<E> build() {
             return new CriteriaAttributes<>(attributes);
         }
@@ -53,5 +73,13 @@ public class CriteriaAttributes<E> {
 
     public interface ShortCriteriaAttribute<E> {
         Expression<?> get(Root<E> root);
+    }
+
+    public interface ReferenceCriteriaAttribute<E> {
+        Path<? extends ReferenceEntity> get(Root<E> root);
+    }
+
+    public interface EnumTypeCriteriaAttribute<E> {
+        Path<? extends EnumTypeEntity> get(Root<E> root);
     }
 }

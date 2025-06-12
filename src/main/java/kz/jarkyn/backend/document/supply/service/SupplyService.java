@@ -7,11 +7,13 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.EnumTypeEntity_;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.payment.model.PaymentOutEntity_;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.DocumentEntity_;
@@ -84,6 +86,9 @@ public class SupplyService {
     public PageResponse<SupplyListResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<SupplyEntity> attributes = CriteriaAttributes.<SupplyEntity>builder()
                 .add("id", (root) -> root.get(SupplyEntity_.id))
+                .add("type.id", (root) -> root.get(PaymentOutEntity_.type).get(EnumTypeEntity_.id))
+                .add("type.name", (root) -> root.get(PaymentOutEntity_.type).get(EnumTypeEntity_.name))
+                .add("type.code", (root) -> root.get(PaymentOutEntity_.type).get(EnumTypeEntity_.code))
                 .add("name", (root) -> root.get(SupplyEntity_.name))
                 .add("organization.id", (root) -> root.get(SupplyEntity_.organization).get(OrganizationEntity_.id))
                 .add("organization.name", (root) -> root.get(SupplyEntity_.organization).get(OrganizationEntity_.name))

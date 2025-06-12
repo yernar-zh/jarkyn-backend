@@ -84,10 +84,10 @@ CREATE TABLE currency
 
 CREATE TABLE document
 (
-    id               UUID         NOT NULL,
+    id               UUID NOT NULL,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    type             VARCHAR(255) NOT NULL,
+    type_id          UUID,
     organization_id  UUID,
     warehouse_id     UUID,
     counterparty_id  UUID,
@@ -100,6 +100,17 @@ CREATE TABLE document
     deleted          BOOLEAN,
     commited         BOOLEAN,
     CONSTRAINT pk_document PRIMARY KEY (id)
+);
+
+CREATE TABLE document_type
+(
+    id               UUID NOT NULL,
+    code             VARCHAR(255),
+    name             VARCHAR(255),
+    archived         BOOLEAN,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    CONSTRAINT pk_document_type PRIMARY KEY (id)
 );
 
 CREATE TABLE good
@@ -311,6 +322,9 @@ ALTER TABLE document
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organization (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_TYPE FOREIGN KEY (type_id) REFERENCES document_type (id);
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
