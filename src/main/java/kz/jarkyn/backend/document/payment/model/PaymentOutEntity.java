@@ -3,6 +3,7 @@ package kz.jarkyn.backend.document.payment.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity_;
+import kz.jarkyn.backend.document.core.model.DocumentType;
 import kz.jarkyn.backend.global.model.ItemOfExpenditureEntity;
 import kz.jarkyn.backend.party.model.AccountEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
@@ -19,6 +20,10 @@ public class PaymentOutEntity extends DocumentEntity {
     @JoinColumn(name = "item_of_expenditure_id")
     private ItemOfExpenditureEntity itemOfExpenditure;
     private String purpose;
+
+    public PaymentOutEntity() {
+        setType(DocumentType.PAYMENT_OUT);
+    }
 
     public AccountEntity getAccount() {
         return account;

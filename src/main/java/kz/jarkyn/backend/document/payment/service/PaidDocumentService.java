@@ -21,14 +21,12 @@ import java.util.List;
 public class PaidDocumentService {
     private final PaidDocumentRepository paidDocumentRepository;
     private final PaidDocumentMapper paidDocumentMapper;
-    private final DocumentService documentService;
 
     public PaidDocumentService(
             PaidDocumentRepository paidDocumentRepository,
             PaidDocumentMapper paidDocumentMapper, DocumentService documentService) {
         this.paidDocumentRepository = paidDocumentRepository;
         this.paidDocumentMapper = paidDocumentMapper;
-        this.documentService = documentService;
     }
 
     @Transactional(readOnly = true)
@@ -36,8 +34,7 @@ public class PaidDocumentService {
         return paidDocumentRepository.findByPayment(payment).stream().map(entity -> {
             BigDecimal paidAmount = paidDocumentRepository.findByDocument(entity.getDocument()).stream()
                     .map(PaidDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            return paidDocumentMapper.toResponse(entity, documentService.getType(entity.getDocument()),
-                    entity.getAmount().subtract(paidAmount));
+            return paidDocumentMapper.toResponse(entity, entity.getAmount().subtract(paidAmount));
         }).toList();
     }
 
@@ -46,8 +43,7 @@ public class PaidDocumentService {
         List<PaidDocumentEntity> paidDocuments = paidDocumentRepository.findByDocument(document);
         BigDecimal paidAmount = paidDocuments.stream().map(PaidDocumentEntity::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return paidDocuments.stream().map(entity -> paidDocumentMapper.toResponse(
-                entity, documentService.getType(document), paidAmount)).toList();
+        return paidDocuments.stream().map(entity -> paidDocumentMapper.toResponse(entity, paidAmount)).toList();
     }
 
     @Transactional

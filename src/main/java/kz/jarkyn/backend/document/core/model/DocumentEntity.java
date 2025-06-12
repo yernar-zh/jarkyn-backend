@@ -4,7 +4,6 @@ package kz.jarkyn.backend.document.core.model;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.party.model.CounterpartyEntity;
-import kz.jarkyn.backend.party.model.PartyEntity;
 import kz.jarkyn.backend.party.model.OrganizationEntity;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
@@ -17,6 +16,9 @@ import java.time.LocalDateTime;
 @Table(name = "document")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class DocumentEntity extends AbstractEntity {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, updatable = false)
+    private DocumentType type;
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private OrganizationEntity organization;
@@ -36,6 +38,14 @@ public class DocumentEntity extends AbstractEntity {
     private String comment;
     private Boolean deleted;
     private Boolean commited;
+
+    public DocumentType getType() {
+        return type;
+    }
+
+    protected void setType(DocumentType type) {
+        this.type = type;
+    }
 
     public OrganizationEntity getOrganization() {
         return organization;

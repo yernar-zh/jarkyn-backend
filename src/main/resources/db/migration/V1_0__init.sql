@@ -84,9 +84,10 @@ CREATE TABLE currency
 
 CREATE TABLE document
 (
-    id               UUID NOT NULL,
+    id               UUID         NOT NULL,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    type             VARCHAR(255) NOT NULL,
     organization_id  UUID,
     warehouse_id     UUID,
     counterparty_id  UUID,

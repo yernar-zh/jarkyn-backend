@@ -54,7 +54,7 @@ public class AccountService {
     @Transactional(readOnly = true)
     public AccountResponse findApiById(UUID id) {
         AccountEntity account = accountRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        return accountMapper.toResponse(account, cashFlowService.findBalance(account));
+        return accountMapper.toResponse(account, cashFlowService.findCurrentBalance(account));
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +62,7 @@ public class AccountService {
         Search<AccountResponse> search = searchFactory.createListSearch(
                 AccountResponse.class, List.of("name", "giro"),
                 () -> accountRepository.findAll().stream()
-                        .map(account -> accountMapper.toResponse(account, cashFlowService.findBalance(account)))
+                        .map(account -> accountMapper.toResponse(account, cashFlowService.findCurrentBalance(account)))
                         .toList());
         return search.getResult(queryParams);
     }
@@ -90,7 +90,7 @@ public class AccountService {
     public List<Pair<BigDecimal, CurrencyEntity>> findBalanceByCounterparty(PartyEntity counterparty) {
         List<Pair<BigDecimal, CurrencyEntity>> result = accountRepository.findByCounterparty(counterparty).stream()
                 .sorted(Comparator.comparing(AbstractEntity::getLastModifiedAt).reversed())
-                .map(account -> Pair.of(cashFlowService.findBalance(account), account.getCurrency()))
+                .map(account -> Pair.of(cashFlowService.findCurrentBalance(account), account.getCurrency()))
                 .filter(pair -> pair.getFirst().compareTo(BigDecimal.ZERO) != 0)
                 .toList();
         if (!result.isEmpty()) {

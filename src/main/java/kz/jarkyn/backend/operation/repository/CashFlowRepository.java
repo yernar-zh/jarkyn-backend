@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,9 +17,14 @@ public interface CashFlowRepository extends JpaRepository<CashFlowEntity, UUID> 
             SELECT cfl
             FROM CashFlowEntity cfl
             WHERE cfl.account = :account
+            AND cfl.moment < :moment
             ORDER BY cfl.moment DESC
             LIMIT 1
             """)
-    Optional<CashFlowEntity> findLastByAccount(@Param("account") AccountEntity account);
+    Optional<CashFlowEntity> findLastByAccountAndMoment(
+            @Param("account") AccountEntity account,
+            @Param("moment") LocalDateTime moment
+    );
     List<CashFlowEntity> findByDocument(DocumentEntity document);
+    List<CashFlowEntity> findByAccountAndMomentGreaterThanEqual(AccountEntity account, LocalDateTime moment);
 }

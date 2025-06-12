@@ -12,5 +12,5 @@ import java.math.BigDecimal;
 
 @Mapper(uses = EntityMapper.class)
 public interface PaidDocumentMapper extends RequestMapper<PaidDocumentEntity, PaidDocumentRequest> {
-    PaidDocumentResponse toResponse(PaidDocumentEntity entity, DocumentTypeResponse documentType, BigDecimal notPaidAmount);
+    PaidDocumentResponse toResponse(PaidDocumentEntity entity, BigDecimal notPaidAmount);
 }

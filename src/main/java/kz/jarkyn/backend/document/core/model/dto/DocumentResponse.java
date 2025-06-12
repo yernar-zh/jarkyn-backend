@@ -12,6 +12,7 @@ import java.util.UUID;
 @Value.Immutable
 public interface DocumentResponse {
     UUID getId();
+    DocumentTypeResponse getType();
     String getName();
     ReferenceResponse getOrganization();
     @Nullable ReferenceResponse getCounterparty();
