@@ -5,12 +5,12 @@ import kz.jarkyn.backend.warehouse.model.GroupEntity;
 import kz.jarkyn.backend.warehouse.model.dto.GroupDetailResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GroupRequest;
 import kz.jarkyn.backend.warehouse.model.dto.GroupResponse;
-import kz.jarkyn.backend.core.mapper.EntityMapper;
+import kz.jarkyn.backend.core.mapper.BaseMapperConfig;
 import org.mapstruct.Mapper;
 
 import java.util.*;
 
-@Mapper(uses = EntityMapper.class)
+@Mapper(config = BaseMapperConfig.class)
 public abstract class GroupMapper implements RequestMapper<GroupEntity, GroupRequest> {
     public GroupResponse toListApi(GroupEntity entity, Map<GroupEntity, List<GroupEntity>> childrenMap) {
         List<GroupResponse> children = childrenMap.getOrDefault(entity, List.of()).stream()

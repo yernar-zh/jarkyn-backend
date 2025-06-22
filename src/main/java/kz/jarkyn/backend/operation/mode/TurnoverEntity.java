@@ -12,7 +12,7 @@ import kz.jarkyn.backend.warehouse.model.GoodEntity;
 
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "turnover")
@@ -26,7 +26,7 @@ public class TurnoverEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "warehouse_id")
     private WarehouseEntity warehouse;
-    private LocalDateTime moment;
+    private Instant moment;
     private Integer quantity;
     private Integer remain;
     private BigDecimal costPrice;
@@ -55,11 +55,11 @@ public class TurnoverEntity extends AbstractEntity {
         this.warehouse = warehouse;
     }
 
-    public LocalDateTime getMoment() {
+    public Instant getMoment() {
         return moment;
     }
 
-    public void setMoment(LocalDateTime moment) {
+    public void setMoment(Instant moment) {
         this.moment = moment;
     }
 

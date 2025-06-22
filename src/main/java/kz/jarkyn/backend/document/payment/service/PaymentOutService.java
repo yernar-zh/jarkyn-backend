@@ -2,20 +2,15 @@ package kz.jarkyn.backend.document.payment.service;
 
 
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
-import kz.jarkyn.backend.core.model.EnumTypeEntity_;
-import kz.jarkyn.backend.core.model.ReferenceEntity;
-import kz.jarkyn.backend.core.model.ReferenceEntity_;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.document.core.model.DocumentTypeEntity;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.*;
 import kz.jarkyn.backend.party.model.*;
@@ -28,7 +23,6 @@ import kz.jarkyn.backend.document.payment.model.dto.PaymentOutResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutRequest;
 import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
 import kz.jarkyn.backend.operation.service.CashFlowService;
-import kz.jarkyn.backend.global.model.CurrencyEntity_;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,14 +82,14 @@ public class PaymentOutService {
                 .addReference("account", (root) -> root.get(PaymentOutEntity_.account))
                 .addReference("counterparty", (root) -> root.get(PaymentOutEntity_.counterparty))
                 .add("moment", (root) -> root.get(PaymentOutEntity_.moment))
-                .addReference("currency", (root) -> root.get(PaymentOutEntity_.currency))
+                .addEnumType("currency", (root) -> root.get(PaymentOutEntity_.currency))
                 .add("exchangeRate", (root) -> root.get(PaymentOutEntity_.exchangeRate))
                 .add("amount", (root) -> root.get(PaymentOutEntity_.amount))
                 .add("deleted", (root) -> root.get(PaymentOutEntity_.deleted))
                 .add("commited", (root) -> root.get(PaymentOutEntity_.commited))
                 .add("comment", (root) -> root.get(PaymentOutEntity_.comment))
                 .add("receiptNumber", (root) -> root.get(PaymentOutEntity_.receiptNumber))
-                .add("itemOfExpenditure", (root) -> root.get(PaymentOutEntity_.itemOfExpenditure))
+                .addEnumType("itemOfExpenditure", (root) -> root.get(PaymentOutEntity_.itemOfExpenditure))
                 .add("purpose", (root) -> root.get(PaymentOutEntity_.purpose))
                 .add("attachedAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
@@ -156,5 +150,14 @@ public class PaymentOutService {
         paymentOut.setCommited(Boolean.FALSE);
         auditService.saveChanges(paymentOut);
         cashFlowService.delete(paymentOut);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (paymentOut.getCommited()) ExceptionUtils.throwCommitedDeleteException();
+        paymentOut.setDeleted(Boolean.TRUE);
+        auditService.saveChanges(paymentOut);
+        paidDocumentService.saveApi(paymentOut, List.of());
     }
 }

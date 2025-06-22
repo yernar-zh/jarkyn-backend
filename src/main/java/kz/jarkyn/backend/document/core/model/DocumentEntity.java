@@ -10,7 +10,7 @@ import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "document")
@@ -30,7 +30,7 @@ public class DocumentEntity extends AbstractEntity {
     @JoinColumn(name = "counterparty_id")
     private CounterpartyEntity counterparty;
     private String name;
-    private LocalDateTime moment;
+    private Instant moment;
     @ManyToOne
     @JoinColumn(name = "currency_id")
     private CurrencyEntity currency;
@@ -80,11 +80,11 @@ public class DocumentEntity extends AbstractEntity {
         this.name = name;
     }
 
-    public LocalDateTime getMoment() {
+    public Instant getMoment() {
         return moment;
     }
 
-    public void setMoment(LocalDateTime moment) {
+    public void setMoment(Instant moment) {
         this.moment = moment;
     }
 

@@ -62,6 +62,7 @@ public class AccountService {
         Search<AccountResponse> search = searchFactory.createListSearch(
                 AccountResponse.class, List.of("name", "giro"),
                 () -> accountRepository.findAll().stream()
+                        .filter(account -> account.getCounterparty() == null)
                         .map(account -> accountMapper.toResponse(account, cashFlowService.findCurrentBalance(account)))
                         .toList());
         return search.getResult(queryParams);

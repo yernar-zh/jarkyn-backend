@@ -97,10 +97,10 @@ public class GroupService {
     public void delete(UUID id) {
         GroupEntity good = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         if (!groupRepository.findByParent(good).isEmpty()) {
-            ExceptionUtils.throwRelationException();
+            ExceptionUtils.throwRelationDeleteException();
         }
         if (!goodRepository.findByGroup(good).isEmpty()) {
-            ExceptionUtils.throwRelationException();
+            ExceptionUtils.throwRelationDeleteException();
         }
         groupRepository.delete(good);
     }

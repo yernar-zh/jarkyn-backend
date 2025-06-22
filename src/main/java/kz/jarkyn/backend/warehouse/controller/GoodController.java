@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.mapper.BaseMapperConfig;
 import kz.jarkyn.backend.core.mapper.EntityMapper;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;

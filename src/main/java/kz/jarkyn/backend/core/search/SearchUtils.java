@@ -5,8 +5,9 @@ import org.springframework.cglib.proxy.Proxy;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Map;
@@ -28,10 +29,12 @@ class SearchUtils {
             return Boolean::valueOf;
         } else if (javaClass == String.class) {
             return x -> x;
-        } else if (javaClass == LocalDate.class) {
-            return str -> LocalDate.parse(str, DateTimeFormatter.ISO_DATE);
-        } else if (javaClass == LocalDateTime.class) {
-            return str -> LocalDateTime.parse(str, DateTimeFormatter.ISO_DATE_TIME);
+        } else if (javaClass == Instant.class) {
+            return Instant::parse;
+        } else if (javaClass == OffsetTime.class) {
+            return str -> OffsetTime.parse(str, DateTimeFormatter.ISO_DATE);
+        } else if (javaClass == OffsetDateTime.class) {
+            return str -> OffsetDateTime.parse(str, DateTimeFormatter.ISO_DATE_TIME);
         } else if (javaClass == BigInteger.class) {
             return BigInteger::new;
         } else if (javaClass == BigDecimal.class) {

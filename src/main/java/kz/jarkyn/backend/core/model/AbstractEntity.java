@@ -5,7 +5,7 @@ import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Persistable;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,22 +15,22 @@ public abstract class AbstractEntity implements Persistable<UUID> {
     @Id
     private UUID id;
     @IgnoreAudit
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     @IgnoreAudit
-    private LocalDateTime lastModifiedAt;
+    private Instant lastModifiedAt;
 
     @PrePersist
     private void prePersist() {
         if (this.id == null) {
             this.id = UUID.randomUUID();
         }
-        createdAt = LocalDateTime.now();
-        lastModifiedAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        lastModifiedAt = Instant.now();
     }
 
     @PreUpdate
     private void preUpdate() {
-        lastModifiedAt = LocalDateTime.now();
+        lastModifiedAt = Instant.now();
     }
 
     @Override
@@ -47,19 +47,19 @@ public abstract class AbstractEntity implements Persistable<UUID> {
         this.id = id;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getLastModifiedAt() {
+    public Instant getLastModifiedAt() {
         return lastModifiedAt;
     }
 
-    public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
+    public void setLastModifiedAt(Instant lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
     }
 

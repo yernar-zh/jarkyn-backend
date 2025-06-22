@@ -102,7 +102,7 @@ public class AttributeGroupService {
         AttributeGroupEntity entity = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
         if (!attributeService.findByGroup(entity).isEmpty()) {
-            ExceptionUtils.throwRelationException();
+            ExceptionUtils.throwRelationDeleteException();
         }
         attributeGroupRepository.delete(entity);
     }

@@ -15,11 +15,12 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
+@Component
 public class EntityMapper {
     @PersistenceContext
     private EntityManager entityManager;

@@ -13,6 +13,7 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.PaymentOutEntity_;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
@@ -34,6 +35,7 @@ import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
 import kz.jarkyn.backend.global.model.CurrencyEntity_;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +54,7 @@ public class SupplyService {
     private final SearchFactory searchFactory;
     private final CashFlowService cashFlowService;
     private final AccountService accountService;
+    private final DocumentTypeService documentTypeService;
 
     public SupplyService(
             SupplyRepository supplyRepository,
@@ -62,7 +65,7 @@ public class SupplyService {
             AuditService auditService,
             SearchFactory searchFactory,
             CashFlowService cashFlowService,
-            AccountService accountService) {
+            AccountService accountService, DocumentTypeService documentTypeService) {
         this.supplyRepository = supplyRepository;
         this.supplyMapper = supplyMapper;
         this.itemService = itemService;
@@ -72,6 +75,7 @@ public class SupplyService {
         this.searchFactory = searchFactory;
         this.cashFlowService = cashFlowService;
         this.accountService = accountService;
+        this.documentTypeService = documentTypeService;
     }
 
     @Transactional(readOnly = true)
@@ -123,10 +127,12 @@ public class SupplyService {
     @Transactional
     public UUID createApi(SupplyRequest request) {
         SupplyEntity supply = supplyMapper.toEntity(request);
-        if (supply.getName() == null) {
-            supply.setName(documentService.findNextName(SupplyEntity.class));
+        supply.setType(documentTypeService.findByCode(DocumentTypeService.DocumentTypeCode.SUPPLY));
+        if (Strings.isBlank(supply.getName())) {
+            supply.setName(documentService.findNextName(supply.getType()));
+        } else {
+            documentService.validateName(supply);
         }
-        documentService.validateName(supply);
         supply.setDeleted(false);
         supply.setCommited(false);
         supplyRepository.save(supply);

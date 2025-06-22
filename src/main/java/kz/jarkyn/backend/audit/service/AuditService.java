@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -78,7 +78,7 @@ public class AuditService {
         UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         AuditEntity newAudit = new AuditEntity();
         newAudit.setUserId(Objects.requireNonNull(userId));
-        newAudit.setMoment(LocalDateTime.now());
+        newAudit.setMoment(Instant.now());
         newAudit.setEntityId(entityId);
         newAudit.setEntityParentId(entityParentId);
         newAudit.setFieldName(fieldName);

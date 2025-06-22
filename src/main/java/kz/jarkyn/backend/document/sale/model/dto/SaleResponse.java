@@ -9,14 +9,14 @@ import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
 import kz.jarkyn.backend.document.sale.model.SaleState;
 import org.immutables.value.Value;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Value.Immutable
 public interface SaleResponse extends DocumentResponse {
     ReferenceResponse getWarehouse();
     ReferenceResponse getCounterparty();
-    @Nullable LocalDateTime getShipmentMoment();
+    @Nullable Instant getShipmentMoment();
     SaleState getState();
     List<ItemResponse> getItems();
     List<PaidDocumentResponse> getPaidDocuments();

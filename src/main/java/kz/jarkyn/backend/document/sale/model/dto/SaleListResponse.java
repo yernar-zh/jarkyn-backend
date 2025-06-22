@@ -7,13 +7,13 @@ import kz.jarkyn.backend.document.sale.model.SaleState;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Value.Immutable
 public interface SaleListResponse extends DocumentResponse {
     ReferenceResponse getWarehouse();
     ReferenceResponse getCounterparty();
-    @Nullable LocalDateTime getShipmentMoment();
+    @Nullable Instant getShipmentMoment();
     SaleState getState();
     BigDecimal getPaidAmount();
     BigDecimal getNotPaidAmount();

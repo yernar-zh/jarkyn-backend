@@ -5,7 +5,7 @@ import kz.jarkyn.backend.core.mapper.RequestMapper;
 import kz.jarkyn.backend.warehouse.model.dto.GoodListResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
 import kz.jarkyn.backend.core.model.dto.IdDto;
-import kz.jarkyn.backend.core.mapper.EntityMapper;
+import kz.jarkyn.backend.core.mapper.BaseMapperConfig;
 import kz.jarkyn.backend.warehouse.model.GoodAttributeEntity;
 import kz.jarkyn.backend.warehouse.model.GoodEntity;
 import kz.jarkyn.backend.warehouse.model.AttributeEntity;
@@ -19,7 +19,7 @@ import org.mapstruct.Mapping;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Mapper(uses = EntityMapper.class)
+@Mapper(config = BaseMapperConfig.class)
 public interface GoodMapper extends RequestMapper<GoodEntity, GoodRequest> {
     GoodResponse toResponse(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,

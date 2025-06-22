@@ -58,4 +58,10 @@ public class PaymentOutController {
         paymentOutService.undoCommit(id);
         return paymentOutService.findApiById(id);
     }
+
+    @DeleteMapping("{id}")
+    public PaymentOutResponse delete(@PathVariable UUID id) {
+        paymentOutService.delete(id);
+        return paymentOutService.findApiById(id);
+    }
 }

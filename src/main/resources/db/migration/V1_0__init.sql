@@ -79,6 +79,7 @@ CREATE TABLE currency
     archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    code             VARCHAR(255),
     CONSTRAINT pk_currency PRIMARY KEY (id)
 );
 

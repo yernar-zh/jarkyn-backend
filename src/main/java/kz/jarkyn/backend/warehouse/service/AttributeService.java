@@ -57,7 +57,7 @@ public class AttributeService {
     public void delete(UUID id) {
         AttributeEntity attribute = attributeRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         if (!goodRepository.findByAttribute(attribute).isEmpty()) {
-            ExceptionUtils.throwRelationException();
+            ExceptionUtils.throwRelationDeleteException();
         }
         attributeRepository.delete(attribute);
     }

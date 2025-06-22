@@ -10,7 +10,7 @@ import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.global.mapper.ItemOfExpenditureMapper;
 import kz.jarkyn.backend.global.model.ItemOfExpenditureEntity;
 import kz.jarkyn.backend.global.model.ItemOfExpenditureEntity_;
-import kz.jarkyn.backend.global.model.dto.ItemOfExpenditureResponse;
+import kz.jarkyn.backend.core.model.dto.EnumTypeResponse;
 import kz.jarkyn.backend.global.repository.ItemOfExpenditureRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,21 +33,21 @@ public class ItemOfExpenditureService {
     }
 
     @Transactional(readOnly = true)
-    public ItemOfExpenditureResponse findApiById(UUID id) {
+    public EnumTypeResponse findApiById(UUID id) {
         ItemOfExpenditureEntity itemOfExpenditure = itemOfExpenditureRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         return itemOfExpenditureMapper.toResponse(itemOfExpenditure);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<ItemOfExpenditureResponse> findApiByFilter(QueryParams queryParams) {
+    public PageResponse<EnumTypeResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<ItemOfExpenditureEntity> attributes = CriteriaAttributes.<ItemOfExpenditureEntity>builder()
                 .add("id", (root) -> root.get(ItemOfExpenditureEntity_.id))
                 .add("name", (root) -> root.get(ItemOfExpenditureEntity_.name))
                 .add("code", (root) -> root.get(ItemOfExpenditureEntity_.code))
                 .add("archived", (root) -> root.get(ItemOfExpenditureEntity_.archived))
                 .build();
-        Search<ItemOfExpenditureResponse> search = searchFactory.createCriteriaSearch(
-                ItemOfExpenditureResponse.class, List.of("name"),
+        Search<EnumTypeResponse> search = searchFactory.createCriteriaSearch(
+                EnumTypeResponse.class, List.of("name"),
                 ItemOfExpenditureEntity.class, attributes);
         return search.getResult(queryParams);
     }

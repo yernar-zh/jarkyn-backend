@@ -7,7 +7,8 @@ import kz.jarkyn.backend.core.model.dto.ReferenceResponse;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Value.Immutable
@@ -17,8 +18,8 @@ public interface DocumentResponse {
     String getName();
     ReferenceResponse getOrganization();
     @Nullable ReferenceResponse getCounterparty();
-    LocalDateTime getMoment();
-    ReferenceResponse getCurrency();
+    Instant getMoment();
+    EnumTypeResponse getCurrency();
     BigDecimal getExchangeRate();
     BigDecimal getAmount();
     Boolean getDeleted();

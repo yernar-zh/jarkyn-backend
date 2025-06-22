@@ -3,6 +3,7 @@ package kz.jarkyn.backend.global.service;
 
 
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.dto.EnumTypeResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
@@ -11,11 +12,7 @@ import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.global.mapper.CurrencyMapper;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
 import kz.jarkyn.backend.global.model.CurrencyEntity_;
-import kz.jarkyn.backend.global.model.dto.CurrencyResponse;
 import kz.jarkyn.backend.global.repository.CurrencyRepository;
-import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
-import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
-import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,20 +36,21 @@ public class CurrencyService {
     }
 
     @Transactional(readOnly = true)
-    public CurrencyResponse findApiById(UUID id) {
+    public EnumTypeResponse findApiById(UUID id) {
         CurrencyEntity currency = currencyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         return currencyMapper.toResponse(currency);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<CurrencyResponse> findApiByFilter(QueryParams queryParams) {
+    public PageResponse<EnumTypeResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<CurrencyEntity> attributes = CriteriaAttributes.<CurrencyEntity>builder()
                 .add("id", (root) -> root.get(CurrencyEntity_.id))
                 .add("name", (root) -> root.get(CurrencyEntity_.name))
+                .add("code", (root) -> root.get(CurrencyEntity_.code))
                 .add("archived", (root) -> root.get(CurrencyEntity_.archived))
                 .build();
-        Search<CurrencyResponse> search = searchFactory.createCriteriaSearch(
-                CurrencyResponse.class, List.of("name"),
+        Search<EnumTypeResponse> search = searchFactory.createCriteriaSearch(
+                EnumTypeResponse.class, List.of("name"),
                 CurrencyEntity.class, attributes);
         return search.getResult(queryParams);
     }
@@ -60,6 +58,6 @@ public class CurrencyService {
     @Transactional(readOnly = true)
     public CurrencyEntity findKZT() {
         return currencyRepository.findAll().stream()
-                .filter(currency -> currency.getName().equals("KZT")).findFirst().orElseThrow();
+                .filter(currency -> currency.getCode().equals("KZT")).findFirst().orElseThrow();
     }
 }

@@ -28,7 +28,11 @@ public class ExceptionUtils {
         return entity;
     }
 
-    public static void throwRelationException() {
+    public static void throwRelationDeleteException() {
         throw new DataValidationException("Невозможно удалить объект, так как он используется в других ресурсах.");
+    }
+
+    public static void throwCommitedDeleteException() {
+        throw new DataValidationException("Невозможно удалить проведённый документ. Сначала отмените проведение.");
     }
 }

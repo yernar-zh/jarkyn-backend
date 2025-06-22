@@ -9,7 +9,7 @@ import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
 import kz.jarkyn.backend.document.sale.model.SaleState;
 import org.immutables.value.Value;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Value.Immutable
@@ -17,7 +17,7 @@ import java.util.List;
 public interface SaleRequest extends DocumentRequest {
     IdDto getWarehouse();
     IdDto getCounterparty();
-    @Nullable LocalDateTime getShipmentMoment();
+    @Nullable Instant getShipmentMoment();
     SaleState getState();
     List<ItemRequest> getItems();
 }

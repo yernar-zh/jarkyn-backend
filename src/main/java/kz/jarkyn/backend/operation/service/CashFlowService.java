@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +26,11 @@ public class CashFlowService {
 
     @Transactional(readOnly = true)
     public BigDecimal findCurrentBalance(AccountEntity account) {
-        return findLastBalanceByAccountAndMoment(account, LocalDateTime.now());
+        return findLastBalanceByAccountAndMoment(account, Instant.now());
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal findLastBalanceByAccountAndMoment(AccountEntity account, LocalDateTime moment) {
+    public BigDecimal findLastBalanceByAccountAndMoment(AccountEntity account, Instant moment) {
         Optional<CashFlowEntity> cashFlowOpt = cashFlowRepository.findLastByAccountAndMoment(account, moment);
         return cashFlowOpt.map(cashFlow -> cashFlow.getBalance().add(cashFlow.getAmount()))
                 .orElse(BigDecimal.ZERO);
@@ -58,7 +58,7 @@ public class CashFlowService {
     }
 
     @SuppressWarnings("SpringTransactionalMethodCallsInspection")
-    private void fixBalances(AccountEntity account, LocalDateTime moment) {
+    private void fixBalances(AccountEntity account, Instant moment) {
         List<CashFlowEntity> cashFlowEntities = cashFlowRepository
                 .findByAccountAndMomentGreaterThanEqual(account, moment).stream()
                 .sorted(Comparator.comparing(CashFlowEntity::getMoment)

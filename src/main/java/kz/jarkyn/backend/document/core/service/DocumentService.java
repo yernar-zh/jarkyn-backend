@@ -54,8 +54,8 @@ public class DocumentService {
 
     private String getNamePrefix(DocumentTypeEntity type) {
         return switch (DocumentTypeService.DocumentTypeCode.valueOf(type.getCode())) {
-            case SALE -> "SP";
-            case SUPPLY -> "SL";
+            case SALE -> "SL";
+            case SUPPLY -> "SP";
             case PAYMENT_IN -> "PI";
             case PAYMENT_OUT -> "PO";
         };

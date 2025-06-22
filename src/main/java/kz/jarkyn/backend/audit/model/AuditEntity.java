@@ -3,7 +3,7 @@ package kz.jarkyn.backend.audit.model;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -11,7 +11,7 @@ import java.util.UUID;
 public class AuditEntity extends AbstractEntity {
     @Column(name = "user_id")
     private UUID userId;
-    private LocalDateTime moment;
+    private Instant moment;
     @Column(name = "entity_id")
     private UUID entityId;
     @Column(name = "entity_parent_id")
@@ -29,11 +29,11 @@ public class AuditEntity extends AbstractEntity {
         this.userId = userId;
     }
 
-    public LocalDateTime getMoment() {
+    public Instant getMoment() {
         return moment;
     }
 
-    public void setMoment(LocalDateTime moment) {
+    public void setMoment(Instant moment) {
         this.moment = moment;
     }
 

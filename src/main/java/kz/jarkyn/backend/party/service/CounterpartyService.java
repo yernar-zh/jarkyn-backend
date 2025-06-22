@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,8 +62,8 @@ public class CounterpartyService {
                             .stream().findFirst().orElseThrow();
                     Tuple results = counterpartyRepository.findSaleInfo(customer);
                     return counterpartyMapper.toResponse(customer, account.getFirst(), account.getSecond(),
-                            results.get("firstSaleMoment", LocalDateTime.class),
-                            results.get("lastSaleMoment", LocalDateTime.class),
+                            results.get("firstSaleMoment", Instant.class),
+                            results.get("lastSaleMoment", Instant.class),
                             results.get("totalSaleCount", Long.class).intValue(),
                             results.get("totalSaleAmount", BigDecimal.class)
                     );
