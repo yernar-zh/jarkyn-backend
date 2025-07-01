@@ -74,20 +74,9 @@ public class PaymentOutService {
 
     @Transactional(readOnly = true)
     public PageResponse<PaymentOutListResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaAttributes<PaymentOutEntity> attributes = CriteriaAttributes.<PaymentOutEntity>builder()
-                .add("id", (root) -> root.get(PaymentOutEntity_.id))
-                .addEnumType("type", (root) -> root.get(PaymentOutEntity_.type))
-                .add("name", (root) -> root.get(PaymentOutEntity_.name))
-                .addReference("organization", (root) -> root.get(PaymentOutEntity_.organization))
+        CriteriaAttributes<PaymentOutEntity> attributes = documentService
+                .generateCriteriaAttributesBuilderFor(PaymentOutEntity.class)
                 .addReference("account", (root) -> root.get(PaymentOutEntity_.account))
-                .addReference("counterparty", (root) -> root.get(PaymentOutEntity_.counterparty))
-                .add("moment", (root) -> root.get(PaymentOutEntity_.moment))
-                .addEnumType("currency", (root) -> root.get(PaymentOutEntity_.currency))
-                .add("exchangeRate", (root) -> root.get(PaymentOutEntity_.exchangeRate))
-                .add("amount", (root) -> root.get(PaymentOutEntity_.amount))
-                .add("deleted", (root) -> root.get(PaymentOutEntity_.deleted))
-                .add("commited", (root) -> root.get(PaymentOutEntity_.commited))
-                .add("comment", (root) -> root.get(PaymentOutEntity_.comment))
                 .add("receiptNumber", (root) -> root.get(PaymentOutEntity_.receiptNumber))
                 .addEnumType("itemOfExpenditure", (root) -> root.get(PaymentOutEntity_.itemOfExpenditure))
                 .add("purpose", (root) -> root.get(PaymentOutEntity_.purpose))

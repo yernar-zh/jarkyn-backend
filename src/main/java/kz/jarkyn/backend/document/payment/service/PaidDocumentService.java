@@ -34,16 +34,17 @@ public class PaidDocumentService {
         return paidDocumentRepository.findByPayment(payment).stream().map(entity -> {
             BigDecimal paidAmount = paidDocumentRepository.findByDocument(entity.getDocument()).stream()
                     .map(PaidDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            return paidDocumentMapper.toResponse(entity, entity.getAmount().subtract(paidAmount));
+            return paidDocumentMapper.toResponse(entity, entity.getDocument().getAmount().subtract(paidAmount));
         }).toList();
     }
 
     @Transactional(readOnly = true)
     public List<PaidDocumentResponse> findResponseByDocument(DocumentEntity document) {
-        List<PaidDocumentEntity> paidDocuments = paidDocumentRepository.findByDocument(document);
-        BigDecimal paidAmount = paidDocuments.stream().map(PaidDocumentEntity::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return paidDocuments.stream().map(entity -> paidDocumentMapper.toResponse(entity, paidAmount)).toList();
+        return paidDocumentRepository.findByDocument(document).stream().map(entity -> {
+            BigDecimal paidAmount = paidDocumentRepository.findByPayment(entity.getPayment()).stream()
+                    .map(PaidDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            return paidDocumentMapper.toResponse(entity, entity.getPayment().getAmount().subtract(paidAmount));
+        }).toList();
     }
 
     @Transactional

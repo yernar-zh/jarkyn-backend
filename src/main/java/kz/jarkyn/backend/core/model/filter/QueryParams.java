@@ -8,6 +8,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.*;
 
 public class QueryParams {
+    public static final String IN_SEPARATOR = "<%sep%>";
     private static final List<Pair<String, Filter.Type>> FILTER_SUFFIX = new ArrayList<>() {{
         add(Pair.of("[lte]", Filter.Type.LESS_OR_EQ));
         add(Pair.of("[gte]", Filter.Type.GREATER_OR_EQ));
@@ -16,6 +17,8 @@ public class QueryParams {
         add(Pair.of("[like]", Filter.Type.CONTAINS));
         add(Pair.of("[notLike]", Filter.Type.NOT_CONTAINS));
         add(Pair.of("[exists]", Filter.Type.EXISTS));
+        add(Pair.of("[in]", Filter.Type.IN));
+        add(Pair.of("[notIn]", Filter.Type.NOT_IN));
         add(Pair.of("[not]", Filter.Type.NOT_EQUAL_TO));
         add(Pair.of("", Filter.Type.EQUAL_TO));
     }};
@@ -124,6 +127,7 @@ public class QueryParams {
             GREATER_OR_EQ, LESS_OR_EQ,
             GREATER, LESS,
             CONTAINS, NOT_CONTAINS,
+            IN, NOT_IN,
             EXISTS
         }
     }

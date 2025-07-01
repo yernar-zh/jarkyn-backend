@@ -75,11 +75,11 @@ CREATE TABLE counterparty
 CREATE TABLE currency
 (
     id               UUID NOT NULL,
+    code             VARCHAR(255),
     name             VARCHAR(255),
     archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    code             VARCHAR(255),
     CONSTRAINT pk_currency PRIMARY KEY (id)
 );
 
@@ -91,6 +91,7 @@ CREATE TABLE document
     type_id          UUID,
     organization_id  UUID,
     warehouse_id     UUID,
+    account_id       UUID,
     counterparty_id  UUID,
     name             VARCHAR(255),
     moment           TIMESTAMP WITHOUT TIME ZONE,
@@ -177,11 +178,11 @@ CREATE TABLE item
 CREATE TABLE item_of_expenditure
 (
     id               UUID NOT NULL,
+    code             VARCHAR(255),
     name             VARCHAR(255),
     archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    code             VARCHAR(255),
     CONSTRAINT pk_item_of_expenditure PRIMARY KEY (id)
 );
 
@@ -215,7 +216,6 @@ CREATE TABLE party
 CREATE TABLE payment_in
 (
     id             UUID NOT NULL,
-    account_id     UUID,
     receipt_number VARCHAR(255),
     CONSTRAINT pk_payment_in PRIMARY KEY (id)
 );
@@ -223,7 +223,6 @@ CREATE TABLE payment_in
 CREATE TABLE payment_out
 (
     id                     UUID NOT NULL,
-    account_id             UUID,
     receipt_number         VARCHAR(255),
     item_of_expenditure_id UUID,
     purpose                VARCHAR(255),
@@ -316,6 +315,9 @@ ALTER TABLE counterparty
     ADD CONSTRAINT FK_COUNTERPARTY_ON_ID FOREIGN KEY (id) REFERENCES party (id);
 
 ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
+
+ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
 
 ALTER TABLE document
@@ -361,13 +363,7 @@ ALTER TABLE paid_document
     ADD CONSTRAINT FK_PAID_DOCUMENT_ON_PAYMENT FOREIGN KEY (payment_id) REFERENCES document (id);
 
 ALTER TABLE payment_in
-    ADD CONSTRAINT FK_PAYMENT_IN_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
-
-ALTER TABLE payment_in
     ADD CONSTRAINT FK_PAYMENT_IN_ON_ID FOREIGN KEY (id) REFERENCES document (id);
-
-ALTER TABLE payment_out
-    ADD CONSTRAINT FK_PAYMENT_OUT_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
 
 ALTER TABLE payment_out
     ADD CONSTRAINT FK_PAYMENT_OUT_ON_ID FOREIGN KEY (id) REFERENCES document (id);

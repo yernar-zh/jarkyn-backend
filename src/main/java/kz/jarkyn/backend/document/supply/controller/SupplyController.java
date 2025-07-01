@@ -3,6 +3,7 @@ package kz.jarkyn.backend.document.supply.controller;
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.document.payment.model.dto.PaymentOutResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
@@ -56,6 +57,12 @@ public class SupplyController {
     @PutMapping("{id}/undoCommit")
     public SupplyResponse undoCommit(@PathVariable UUID id) {
         supplyService.undoCommit(id);
+        return supplyService.findApiById(id);
+    }
+
+    @DeleteMapping("{id}")
+    public SupplyResponse delete(@PathVariable UUID id) {
+        supplyService.delete(id);
         return supplyService.findApiById(id);
     }
 }

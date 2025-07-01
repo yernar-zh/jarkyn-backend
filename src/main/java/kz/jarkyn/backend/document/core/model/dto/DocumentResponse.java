@@ -8,7 +8,6 @@ import org.immutables.value.Value;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Value.Immutable
@@ -18,6 +17,8 @@ public interface DocumentResponse {
     String getName();
     ReferenceResponse getOrganization();
     @Nullable ReferenceResponse getCounterparty();
+    @Nullable ReferenceResponse getWarehouse();
+    @Nullable ReferenceResponse getAccount();
     Instant getMoment();
     EnumTypeResponse getCurrency();
     BigDecimal getExchangeRate();

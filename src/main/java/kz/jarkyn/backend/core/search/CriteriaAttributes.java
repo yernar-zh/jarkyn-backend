@@ -1,14 +1,10 @@
 package kz.jarkyn.backend.core.search;
 
 import jakarta.persistence.criteria.*;
-import jakarta.persistence.metamodel.SingularAttribute;
 import kz.jarkyn.backend.core.model.EnumTypeEntity;
 import kz.jarkyn.backend.core.model.EnumTypeEntity_;
 import kz.jarkyn.backend.core.model.ReferenceEntity;
 import kz.jarkyn.backend.core.model.ReferenceEntity_;
-import kz.jarkyn.backend.document.core.model.DocumentEntity;
-import kz.jarkyn.backend.party.model.OrganizationEntity;
-import org.springframework.data.util.Pair;
 
 import java.util.*;
 

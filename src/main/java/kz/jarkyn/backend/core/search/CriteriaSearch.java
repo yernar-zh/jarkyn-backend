@@ -11,10 +11,7 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.util.Pair;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -144,6 +141,9 @@ public class CriteriaSearch<R, E> implements Search<R> {
                         case GREATER -> cb.greaterThan((Expression<Comparable>) expression, (Comparable) filterValue);
                         case CONTAINS -> cb.like((Expression<String>) expression, (String) filterValue);
                         case NOT_CONTAINS -> cb.notLike((Expression<String>) expression, (String) filterValue);
+                        case IN -> expression.in(List.of(((String) filterValue).split(QueryParams.IN_SEPARATOR)));
+                        case NOT_IN ->
+                                expression.in(List.of(((String) filterValue).split(QueryParams.IN_SEPARATOR))).not();
                         case EXISTS -> throw new IllegalStateException();
                     }).reduce(cb::or).orElse(cb.conjunction());
         }).toList();

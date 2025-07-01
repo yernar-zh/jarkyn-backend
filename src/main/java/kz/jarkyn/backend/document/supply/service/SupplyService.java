@@ -7,7 +7,6 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
-import kz.jarkyn.backend.core.model.EnumTypeEntity_;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
@@ -17,7 +16,6 @@ import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.PaymentOutEntity_;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
-import kz.jarkyn.backend.document.core.model.DocumentEntity_;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.core.service.ItemService;
@@ -33,8 +31,6 @@ import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
-import kz.jarkyn.backend.global.model.CurrencyEntity_;
-import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,24 +86,18 @@ public class SupplyService {
     public PageResponse<SupplyListResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<SupplyEntity> attributes = CriteriaAttributes.<SupplyEntity>builder()
                 .add("id", (root) -> root.get(SupplyEntity_.id))
-                .add("type.id", (root) -> root.get(PaymentOutEntity_.type).get(EnumTypeEntity_.id))
-                .add("type.name", (root) -> root.get(PaymentOutEntity_.type).get(EnumTypeEntity_.name))
-                .add("type.code", (root) -> root.get(PaymentOutEntity_.type).get(EnumTypeEntity_.code))
+                .addEnumType("type", (root) -> root.get(PaymentOutEntity_.type))
                 .add("name", (root) -> root.get(SupplyEntity_.name))
-                .add("organization.id", (root) -> root.get(SupplyEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root) -> root.get(SupplyEntity_.organization).get(OrganizationEntity_.name))
+                .addReference("organization", (root) -> root.get(SupplyEntity_.organization))
                 .add("moment", (root) -> root.get(SupplyEntity_.moment))
-                .add("currency.id", (root) -> root.get(SupplyEntity_.currency).get(CurrencyEntity_.id))
-                .add("currency.name", (root) -> root.get(SupplyEntity_.currency).get(CurrencyEntity_.name))
+                .addEnumType("currency", (root) -> root.get(SupplyEntity_.currency))
                 .add("exchangeRate", (root) -> root.get(SupplyEntity_.exchangeRate))
                 .add("amount", (root) -> root.get(SupplyEntity_.amount))
                 .add("deleted", (root) -> root.get(SupplyEntity_.deleted))
                 .add("commited", (root) -> root.get(SupplyEntity_.commited))
                 .add("comment", (root) -> root.get(SupplyEntity_.comment))
-                .add("warehouse.id", (root) -> root.get(SupplyEntity_.warehouse).get(WarehouseEntity_.id))
-                .add("warehouse.name", (root) -> root.get(SupplyEntity_.warehouse).get(WarehouseEntity_.name))
-                .add("counterparty.id", (root) -> root.get(SupplyEntity_.counterparty).get(PartyEntity_.id))
-                .add("counterparty.name", (root) -> root.get(SupplyEntity_.counterparty).get(PartyEntity_.name))
+                .addReference("warehouse", (root) -> root.get(SupplyEntity_.warehouse))
+                .addReference("counterparty", (root) -> root.get(SupplyEntity_.counterparty))
                 .add("paidAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
                     Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
@@ -170,5 +160,15 @@ public class SupplyService {
         auditService.saveChanges(supply);
         itemService.deleteTurnover(supply);
         cashFlowService.delete(supply);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        List<PaidDocumentResponse> paidDocuments = paidDocumentService.findResponseByDocument(supply);
+        if (!paidDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
+        if (supply.getCommited()) ExceptionUtils.throwCommitedDeleteException();
+        supply.setDeleted(Boolean.TRUE);
+        auditService.saveChanges(supply);
     }
 }

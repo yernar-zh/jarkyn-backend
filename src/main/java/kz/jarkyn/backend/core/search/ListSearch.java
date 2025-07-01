@@ -115,6 +115,10 @@ public class ListSearch<R> implements Search<R> {
                             case GREATER -> ((Comparable) rowValue).compareTo(filterValue) > 0;
                             case CONTAINS -> ((String) rowValue).contains((String) filterValue);
                             case NOT_CONTAINS -> !((String) rowValue).contains((String) filterValue);
+                            case IN -> List.of(((String) filterValue).split(QueryParams.IN_SEPARATOR))
+                                    .contains((String) rowValue);
+                            case NOT_IN -> !List.of(((String) filterValue).split(QueryParams.IN_SEPARATOR))
+                                    .contains((String) rowValue);
                             case EXISTS -> throw new IllegalStateException();
                         }).reduce((b1, b2) -> b1 || b2).orElse(Boolean.TRUE);
             }).reduce((b1, b2) -> b1 && b2).orElse(Boolean.TRUE);

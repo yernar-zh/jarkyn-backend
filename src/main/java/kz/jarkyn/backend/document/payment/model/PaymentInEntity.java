@@ -10,18 +10,7 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 @Table(name = "payment_in")
 @PrimaryKeyJoinColumn(name = AbstractEntity_.ID)
 public class PaymentInEntity extends DocumentEntity {
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private AccountEntity account;
     private String receiptNumber;
-
-    public AccountEntity getAccount() {
-        return account;
-    }
-
-    public void setAccount(AccountEntity account) {
-        this.account = account;
-    }
 
     public String getReceiptNumber() {
         return receiptNumber;

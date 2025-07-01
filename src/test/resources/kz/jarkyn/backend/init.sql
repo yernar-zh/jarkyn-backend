@@ -115,14 +115,14 @@ VALUES ('0098b2bc-da73-4451-bdb5-35f42f756f10', '17c1285b-6514-45d5-88a2-3b9f673
        ('986378a0-271f-4293-96db-218f608599cd', '17c1285b-6514-45d5-88a2-3b9f673dc5e3',
         'bf6f2ba4-f994-44c1-839f-36a75f07242e', 100, 4, 1);
 -- Supply supplier payment
-INSERT INTO document (id, type_id, organization_id, warehouse_id, counterparty_id, name, moment,
+INSERT INTO document (id, type_id, organization_id, account_id, counterparty_id, name, moment,
                       currency_id, exchange_rate, amount, comment, deleted, commited)
 VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', '9b755b4e-61fa-457d-855d-6b231d3bfed2', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
-        null, '94fadc9a-83bb-4639-be07-f825ab9eb40e',
+        'c8190dcc-1cbe-4df6-a582-0f85e9850335', '94fadc9a-83bb-4639-be07-f825ab9eb40e',
         'PO-00001', '2024-12-07 22:47',
         'e6a3c207-a358-47bf-ac18-2d09973f3807', 68, 710, '', false, false);
-INSERT INTO payment_out (id, account_id, item_of_expenditure_id)
-VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', 'c8190dcc-1cbe-4df6-a582-0f85e9850335',
+INSERT INTO payment_out (id, item_of_expenditure_id)
+VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0',
         'ac03d34e-2274-4f35-8939-46f17ddc05ed');
 INSERT INTO paid_document (id, payment_id, document_id, amount)
 VALUES ('538c3271-7398-4fab-ad05-0a886188de11', '5c799431-3bc3-400f-b9a3-209f27b935a0',
