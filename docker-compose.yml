@@ -9,6 +9,7 @@ services:
       POSTGRES_PASSWORD: 123qwe123
     ports:
       - "5432:5432"
+
   localstack:
     image: localstack/localstack
     ports:
@@ -20,3 +21,6 @@ services:
       - localstack-network
     restart: always
 
+networks:
+  localstack-network:
+    driver: bridge
