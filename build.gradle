@@ -44,6 +44,8 @@ dependencies {
     // Image processioning
     implementation 'net.coobird:thumbnailator:0.4.20'
 
+    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+
     //Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.opentable.components:otj-pg-embedded:1.1.0'

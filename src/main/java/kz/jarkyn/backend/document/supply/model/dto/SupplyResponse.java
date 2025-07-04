@@ -11,8 +11,6 @@ import java.util.List;
 
 @Value.Immutable
 public interface SupplyResponse extends DocumentResponse {
-    ReferenceResponse getWarehouse();
-    ReferenceResponse getCounterparty();
     List<ItemResponse> getItems();
     List<PaidDocumentResponse> getPaidDocuments();
 }

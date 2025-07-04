@@ -32,7 +32,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         this.roleService = roleService;
     }
 
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
