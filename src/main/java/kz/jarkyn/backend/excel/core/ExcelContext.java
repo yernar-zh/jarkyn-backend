@@ -19,13 +19,12 @@ public final class ExcelContext {
     public CellStyle getCellStyle(ExcelCellStyle excelCellStyle) {
         Font font = getFont(excelCellStyle);
         short dataFormat = getDataFormat(excelCellStyle);
-        List<Object> key = List.of(excelCellStyle.getHorizontalAlignment(), excelCellStyle.getVerticalAlignment(),
+        List<Object> key = List.of(excelCellStyle.getHorizontalAlignment(), excelCellStyle,
                 excelCellStyle.getBorderTop(), excelCellStyle.getBorderBottom(), excelCellStyle.getBorderLeft(),
                 excelCellStyle.getBorderRight(), excelCellStyle.isWrapText(), font, dataFormat);
         return cellStyles.computeIfAbsent(key, _ -> {
             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(excelCellStyle.getHorizontalAlignment());
-            cellStyle.setVerticalAlignment(excelCellStyle.getVerticalAlignment());
             cellStyle.setBorderTop(excelCellStyle.getBorderTop());
             cellStyle.setBorderBottom(excelCellStyle.getBorderBottom());
             cellStyle.setBorderLeft(excelCellStyle.getBorderLeft());

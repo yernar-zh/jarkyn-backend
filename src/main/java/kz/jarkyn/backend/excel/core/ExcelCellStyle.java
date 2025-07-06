@@ -4,151 +4,89 @@ import org.apache.poi.ss.usermodel.*;
 
 
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 public final class ExcelCellStyle {
-    private final HorizontalAlignment horizontalAlignment;
-    private final VerticalAlignment verticalAlignment;
-    private final BorderStyle borderTop;
-    private final BorderStyle borderBottom;
-    private final BorderStyle borderLeft;
-    private final BorderStyle borderRight;
-    private final boolean wrapText;
+    private HorizontalAlignment horizontalAlignment;
+    private BorderStyle borderTop;
+    private BorderStyle borderBottom;
+    private BorderStyle borderLeft;
+    private BorderStyle borderRight;
+    private boolean wrapText;
 
-    private final boolean bold;
-    private final boolean italic;
-    private final int fontHeight;
-    private final String fontName;
-    private final boolean strikeout;
+    private boolean bold;
+    private boolean italic;
+    private int fontHeight;
+    private String fontName;
+    private boolean strikeout;
 
-    private final String dataFormat;
+    private String dataFormat;
 
     public ExcelCellStyle() {
-        this(
-                HorizontalAlignment.GENERAL,
-                VerticalAlignment.BOTTOM,
-                BorderStyle.NONE,
-                BorderStyle.NONE,
-                BorderStyle.NONE,
-                BorderStyle.NONE,
-                false,
-                false,
-                false,
-                11,
-                "Arial",
-                false,
-                null
-        );
+        this.horizontalAlignment = HorizontalAlignment.GENERAL;
+        this.borderTop = BorderStyle.NONE;
+        this.borderBottom = BorderStyle.NONE;
+        this.borderLeft = BorderStyle.NONE;
+        this.borderRight = BorderStyle.NONE;
+        this.wrapText = false;
+        this.bold = false;
+        this.italic = false;
+        this.fontHeight = 11;
+        this.fontName = "Arial";
+        this.strikeout = false;
+        this.dataFormat = null;
     }
 
-    public ExcelCellStyle(
-            HorizontalAlignment horizontalAlignment,
-            VerticalAlignment verticalAlignment,
-            BorderStyle borderTop,
-            BorderStyle borderBottom,
-            BorderStyle borderLeft,
-            BorderStyle borderRight,
-            boolean wrapText,
-            boolean bold,
-            boolean italic,
-            int fontHeight,
-            String fontName,
-            boolean strikeout,
-            String dataFormat
-    ) {
-        this.horizontalAlignment = horizontalAlignment;
-        this.verticalAlignment = verticalAlignment;
-        this.borderTop = borderTop;
-        this.borderBottom = borderBottom;
-        this.borderLeft = borderLeft;
-        this.borderRight = borderRight;
-        this.wrapText = wrapText;
-        this.bold = bold;
-        this.italic = italic;
+    public ExcelCellStyle horCenter() {
+        this.horizontalAlignment = HorizontalAlignment.CENTER;
+        return this;
+    }
+
+    public ExcelCellStyle borderBottom() {
+        this.borderBottom = BorderStyle.THIN;
+        return this;
+    }
+
+    public ExcelCellStyle borderAll() {
+        this.borderTop = BorderStyle.THIN;
+        this.borderLeft = BorderStyle.THIN;
+        this.borderBottom = BorderStyle.THIN;
+        this.borderRight = BorderStyle.THIN;
+        return this;
+    }
+
+    public ExcelCellStyle bold() {
+        this.bold = true;
+        return this;
+    }
+
+    public ExcelCellStyle italic() {
+        this.italic = true;
+        return this;
+    }
+
+    public ExcelCellStyle fontHeight(int fontHeight) {
         this.fontHeight = fontHeight;
-        this.fontName = fontName;
-        this.strikeout = strikeout;
-        this.dataFormat = dataFormat;
+        return this;
     }
 
-    public ExcelCellStyle withHorizontalAlignment(HorizontalAlignment alignment) {
-        return new ExcelCellStyle(alignment, verticalAlignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withVerticalAlignment(VerticalAlignment alignment) {
-        return new ExcelCellStyle(horizontalAlignment, alignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withBorderTop(BorderStyle style) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, style, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withBorderBottom(BorderStyle style) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, style, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withBorderLeft(BorderStyle style) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, style, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withBorderRight(BorderStyle style) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, borderLeft, style,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withBorderAll(BorderStyle style) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, style, style, style, style,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-
-    public ExcelCellStyle withWrapText(boolean wrapText) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withBold(boolean bold) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withItalic(boolean italic) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withFontHeight(int fontHeight) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withFontName(String fontName) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withStrikeout(boolean strikeout) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
-    }
-
-    public ExcelCellStyle withDataFormat(String dataFormat) {
-        return new ExcelCellStyle(horizontalAlignment, verticalAlignment, borderTop, borderBottom, borderLeft, borderRight,
-                wrapText, bold, italic, fontHeight, fontName, strikeout, dataFormat);
+    public ExcelCellStyle numberFormat(boolean fraction, String currencyCode) {
+        if (currencyCode == null) {
+            this.dataFormat = "# ##0" + (fraction ? ".00" : "");
+            return this;
+        }
+        String symbol = switch (currencyCode) {
+            case "USD" -> " \"$\"";
+            case "CNY" -> " \"¥\"";
+            case "KZT" -> " \"₸\"";
+            default -> throw new IllegalStateException("Unexpected value: " + currencyCode);
+        };
+        this.dataFormat = "# ##0" + (fraction ? ".00" : "") + symbol;
+        return this;
     }
 
 
     public HorizontalAlignment getHorizontalAlignment() {
         return horizontalAlignment;
-    }
-
-    public VerticalAlignment getVerticalAlignment() {
-        return verticalAlignment;
     }
 
     public BorderStyle getBorderTop() {
@@ -194,6 +132,4 @@ public final class ExcelCellStyle {
     public String getDataFormat() {
         return dataFormat;
     }
-
-
 }

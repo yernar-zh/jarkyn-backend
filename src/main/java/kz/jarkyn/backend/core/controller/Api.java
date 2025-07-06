@@ -59,7 +59,7 @@ public interface Api {
         String PATH = Api.PATH + "/currency";
     }
 
-    interface Excel {
-        String PATH = Api.PATH + "/excel";
+    interface Export {
+        String PATH = Api.PATH + "/export";
     }
 }

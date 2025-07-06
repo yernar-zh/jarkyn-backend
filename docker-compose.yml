@@ -2,7 +2,7 @@ services:
   postgres:
     image: postgres:17
     container_name: postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: jarkyn
       POSTGRES_USER: admin
@@ -12,14 +12,22 @@ services:
 
   localstack:
     image: localstack/localstack
+    container_name: localstack
+    restart: unless-stopped
     ports:
-      - "4566:4566"  # LocalStack services port
-      - "4510-4559:4510-4559"  # Optional: LocalStack service internal ports
+      - "4566:4566"
+      - "4510-4559:4510-4559"
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
     networks:
       - localstack-network
-    restart: always
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: gotenberg
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
 
 networks:
   localstack-network:
