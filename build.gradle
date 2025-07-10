@@ -44,7 +44,11 @@ dependencies {
     // Image processioning
     implementation 'net.coobird:thumbnailator:0.4.20'
 
-    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+//    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+    implementation 'org.jxls:jxls-poi:2.14.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 
     //Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

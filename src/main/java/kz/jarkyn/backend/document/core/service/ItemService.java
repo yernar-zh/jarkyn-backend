@@ -1,7 +1,6 @@
 package kz.jarkyn.backend.document.core.service;
 
 
-import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.ItemEntity;
 import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
@@ -9,7 +8,6 @@ import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.core.mapper.ItemMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
-import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.mode.dto.StockResponse;
 import kz.jarkyn.backend.operation.service.TurnoverService;

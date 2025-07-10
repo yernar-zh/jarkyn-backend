@@ -3,7 +3,6 @@ package kz.jarkyn.backend.document.supply.controller;
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.document.payment.model.dto.PaymentOutResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
@@ -11,7 +10,6 @@ import kz.jarkyn.backend.document.supply.service.SupplyService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -22,7 +20,6 @@ public class SupplyController {
     public SupplyController(SupplyService supplyService) {
         this.supplyService = supplyService;
     }
-
 
     @GetMapping("{id}")
     public SupplyResponse detail(@PathVariable UUID id) {

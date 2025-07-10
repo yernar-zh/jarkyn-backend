@@ -14,6 +14,6 @@ import java.util.UUID;
 public interface ItemRequest extends IdDto {
     @Nullable UUID getId();
     IdDto getGood();
-    Integer getPrice();
-    BigDecimal getQuantity();
+    BigDecimal getPrice();
+    Integer getQuantity();
 }

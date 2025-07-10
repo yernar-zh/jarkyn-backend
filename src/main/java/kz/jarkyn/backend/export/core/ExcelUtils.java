@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.excel.core;
+package kz.jarkyn.backend.export.core;
 
 import java.time.Instant;
 import java.time.ZoneId;
