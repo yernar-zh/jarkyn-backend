@@ -18,7 +18,7 @@ public interface CashFlowRepository extends JpaRepository<CashFlowEntity, UUID> 
             FROM CashFlowEntity cfl
             WHERE cfl.account = :account
             AND cfl.moment < :moment
-            ORDER BY cfl.moment DESC
+            ORDER BY cfl.moment DESC, cfl.lastModifiedAt DESC
             LIMIT 1
             """)
     Optional<CashFlowEntity> findLastByAccountAndMoment(

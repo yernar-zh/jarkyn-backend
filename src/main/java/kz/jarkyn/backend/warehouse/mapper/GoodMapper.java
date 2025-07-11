@@ -11,7 +11,7 @@ import kz.jarkyn.backend.warehouse.model.GoodEntity;
 import kz.jarkyn.backend.warehouse.model.AttributeEntity;
 import kz.jarkyn.backend.warehouse.model.SellingPriceEntity;
 import kz.jarkyn.backend.warehouse.model.dto.GoodRequest;
-import kz.jarkyn.backend.operation.mode.dto.StockResponse;
+import kz.jarkyn.backend.warehouse.model.dto.StockResponse2;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,7 +23,7 @@ import java.util.List;
 public interface GoodMapper extends RequestMapper<GoodEntity, GoodRequest> {
     GoodResponse toResponse(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,
-            List<StockResponse> stock);
+            List<StockResponse2> stock);
     GoodListResponse toListResponse(
             GoodEntity entity, String path, String groupIds, String attributeIds,
             BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);

@@ -86,48 +86,7 @@ public class SaleService {
 
     @Transactional(readOnly = true)
     public PageResponse<SaleListResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaAttributes<SaleEntity> attributes = CriteriaAttributes.<SaleEntity>builder()
-                .add("id", (root) -> root.get(SaleEntity_.id))
-                .add("name", (root) -> root.get(SaleEntity_.name))
-                .add("organization.id", (root) -> root.get(SaleEntity_.organization).get(OrganizationEntity_.id))
-                .add("organization.name", (root) -> root.get(SaleEntity_.organization).get(OrganizationEntity_.name))
-                .add("moment", (root) -> root.get(SaleEntity_.moment))
-                .add("currency.id", (root) -> root.get(SaleEntity_.currency).get(CurrencyEntity_.id))
-                .add("currency.name", (root) -> root.get(SaleEntity_.currency).get(CurrencyEntity_.name))
-                .add("exchangeRate", (root) -> root.get(SaleEntity_.exchangeRate))
-                .add("amount", (root) -> root.get(SaleEntity_.amount))
-                .add("deleted", (root) -> root.get(SaleEntity_.deleted))
-                .add("commited", (root) -> root.get(SaleEntity_.commited))
-                .add("comment", (root) -> root.get(SaleEntity_.comment))
-                .add("warehouse.id", (root) -> root.get(SaleEntity_.warehouse).get(WarehouseEntity_.id))
-                .add("warehouse.name", (root) -> root.get(SaleEntity_.warehouse).get(WarehouseEntity_.name))
-                .add("counterparty.id", (root) -> root.get(SaleEntity_.counterparty).get(PartyEntity_.id))
-                .add("counterparty.name", (root) -> root.get(SaleEntity_.counterparty).get(PartyEntity_.name))
-                .add("shipmentMoment", (root) -> root.get(SaleEntity_.shipmentMoment))
-                .add("state", (root) -> root.get(SaleEntity_.state))
-                .add("paidAmount", (root, query, cb, map) -> {
-                    Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
-                    Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
-                    subQuery.select(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)));
-                    subQuery.where(cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.document), root));
-                    return subQuery;
-                })
-                .add("notPaidAmount", (root, query, cb, map) -> cb.diff(
-                        (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("paidAmount")))
-                .add("costPrice", (root, query, cb, map) -> {
-                    Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
-                    Root<TurnoverEntity> subRoot = subQuery.from(TurnoverEntity.class);
-                    subQuery.select(cb.sum(subRoot.get(TurnoverEntity_.costPrice)));
-                    subQuery.where(cb.equal(subRoot.get(TurnoverEntity_.document), root));
-                    return subQuery;
-                })
-                .add("profit", (root, query, cb, map) -> cb.diff(
-                        (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("costPrice")))
-                .build();
-        Search<SaleListResponse> search = searchFactory.createCriteriaSearch(
-                SaleListResponse.class, List.of("name", "counterparty.name"),
-                SaleEntity.class, attributes);
-        return search.getResult(queryParams);
+        return null;
     }
 
     @Transactional

@@ -11,21 +11,19 @@ import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.warehouse.mapper.SellingPriceMapper;
 import kz.jarkyn.backend.warehouse.model.*;
-import kz.jarkyn.backend.warehouse.model.dto.GoodRequest;
-import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
+import kz.jarkyn.backend.warehouse.model.dto.*;
 import kz.jarkyn.backend.core.model.dto.IdDto;
-import kz.jarkyn.backend.warehouse.model.dto.GoodListResponse;
-import kz.jarkyn.backend.warehouse.model.dto.SellingPriceRequest;
 import kz.jarkyn.backend.warehouse.repository.*;
 import kz.jarkyn.backend.warehouse.mapper.GoodMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
-import kz.jarkyn.backend.operation.mode.dto.StockResponse;
 import kz.jarkyn.backend.operation.service.TurnoverService;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,6 +38,7 @@ public class GoodService {
     private final SellingPriceMapper sellingPriceMapper;
     private final SearchFactory searchFactory;
     private final TurnoverService turnoverService;
+    private final WarehouseRepository warehouseRepository;
 
     public GoodService(
             GoodRepository goodRepository,
@@ -49,7 +48,8 @@ public class GoodService {
             GoodMapper goodMapper,
             SellingPriceMapper sellingPriceMapper,
             SearchFactory searchFactory,
-            TurnoverService turnoverService) {
+            TurnoverService turnoverService,
+            WarehouseRepository warehouseRepository) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
@@ -58,6 +58,7 @@ public class GoodService {
         this.sellingPriceMapper = sellingPriceMapper;
         this.searchFactory = searchFactory;
         this.turnoverService = turnoverService;
+        this.warehouseRepository = warehouseRepository;
     }
 
     @Transactional(readOnly = true)
@@ -67,12 +68,21 @@ public class GoodService {
         attributes.sort(Comparator.comparing(AttributeEntity::getName));
         List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
         sellingPrices.sort(Comparator.comparing(SellingPriceEntity::getQuantity));
-        List<StockResponse> stocks = turnoverService.findStock(null, List.of(good));
+        List<WarehouseEntity> warehouses = warehouseRepository.findByArchived(Boolean.FALSE);
+        List<StockResponse2> stocks = turnoverService.findRemindAtMoment(
+                warehouses.stream().map(warehouse -> Pair.of(warehouse, good)).toList(),
+                Instant.now()).stream().map(pairIntegerPair -> (StockResponse2) null).toList();
         return goodMapper.toResponse(good, attributes, sellingPrices, stocks);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<GoodListResponse> findApiByFilter(QueryParams queryParams, WarehouseEntity warehouse) {
+    public PageResponse<GoodListResponse> findApiByFilter(
+            QueryParams queryParams,
+            List<UUID> filterWarehouseIds, Instant filterMoment
+    ) {
+        List<WarehouseEntity> warehouses = filterWarehouseIds.isEmpty()
+                ? warehouseRepository.findByArchived(false)
+                : warehouseRepository.findAllById(filterWarehouseIds);
         Search<GoodListResponse> search = searchFactory.createListSearch(
                 GoodListResponse.class, List.of("name", "groups.name"), () ->
                         goodRepository.findAll().stream().map(good -> {
@@ -87,14 +97,11 @@ public class GoodService {
                             BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
                                     .stream().map(SellingPriceEntity::getValue)
                                     .max(BigDecimal::compareTo).orElseThrow();
-                            List<StockResponse> stock = turnoverService.findStock(warehouse, List.of(good));
-                            Integer remind = stock.stream()
-                                    .map(StockResponse::getRemain)
-                                    .reduce(Integer::sum).orElseThrow();
-                            BigDecimal averageCostPrice = stock.stream()
-                                    .map(StockResponse::getCostPrice)
-                                    .reduce(BigDecimal::add).orElseThrow()
-                                    .divide(BigDecimal.valueOf(stock.size()), 2, RoundingMode.HALF_UP);
+                            Integer remind = turnoverService.findRemindAtMoment(
+                                            warehouses.stream().map(warehouse -> Pair.of(warehouse, good)).toList(),
+                                            Optional.ofNullable(filterMoment).orElseGet(Instant::now))
+                                    .getFirst().getSecond();
+                            BigDecimal averageCostPrice = BigDecimal.ZERO;
                             return goodMapper.toListResponse(good, path, groupIds, attributes, sellingPrice, remind, averageCostPrice);
                         }).toList());
         return search.getResult(queryParams);

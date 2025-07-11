@@ -26,11 +26,11 @@ public class CashFlowService {
 
     @Transactional(readOnly = true)
     public BigDecimal findCurrentBalance(AccountEntity account) {
-        return findLastBalanceByAccountAndMoment(account, Instant.now());
+        return findBalanceByAccountAtMoment(account, Instant.now());
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal findLastBalanceByAccountAndMoment(AccountEntity account, Instant moment) {
+    public BigDecimal findBalanceByAccountAtMoment(AccountEntity account, Instant moment) {
         Optional<CashFlowEntity> cashFlowOpt = cashFlowRepository.findLastByAccountAndMoment(account, moment);
         return cashFlowOpt.map(cashFlow -> cashFlow.getBalance().add(cashFlow.getAmount()))
                 .orElse(BigDecimal.ZERO);
@@ -43,7 +43,7 @@ public class CashFlowService {
         cashFlow.setAccount(account);
         cashFlow.setMoment(document.getMoment());
         cashFlow.setAmount(amount);
-        cashFlow.setBalance(findLastBalanceByAccountAndMoment(account, document.getMoment()));
+        cashFlow.setBalance(BigDecimal.ZERO);
         cashFlowRepository.save(cashFlow);
         fixBalances(cashFlow.getAccount(), cashFlow.getMoment());
     }
@@ -57,18 +57,17 @@ public class CashFlowService {
         }
     }
 
-    @SuppressWarnings("SpringTransactionalMethodCallsInspection")
-    private void fixBalances(AccountEntity account, Instant moment) {
-        List<CashFlowEntity> cashFlowEntities = cashFlowRepository
+    @Transactional
+    protected void fixBalances(AccountEntity account, Instant moment) {
+        List<CashFlowEntity> cashFlows = cashFlowRepository
                 .findByAccountAndMomentGreaterThanEqual(account, moment).stream()
                 .sorted(Comparator.comparing(CashFlowEntity::getMoment)
-                        .thenComparing(Comparator.comparing(CashFlowEntity::getLastModifiedAt).reversed()))
+                        .thenComparing(turnoverEntity -> turnoverEntity.getDocument().getLastModifiedAt()))
                 .toList();
-        if (cashFlowEntities.isEmpty()) return;
-        BigDecimal balance = findLastBalanceByAccountAndMoment(account, moment);
-        for (CashFlowEntity cashFlowEntity : cashFlowEntities) {
-            cashFlowEntity.setBalance(balance);
-            balance = balance.add(cashFlowEntity.getAmount());
+        BigDecimal balance = findBalanceByAccountAtMoment(account, moment);
+        for (CashFlowEntity cashFlow : cashFlows) {
+            cashFlow.setBalance(balance);
+            balance = balance.add(cashFlow.getAmount());
         }
     }
 }

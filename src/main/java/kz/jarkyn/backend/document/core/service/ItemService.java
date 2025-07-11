@@ -8,9 +8,9 @@ import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.core.mapper.ItemMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
-import kz.jarkyn.backend.operation.mode.TurnoverEntity;
-import kz.jarkyn.backend.operation.mode.dto.StockResponse;
 import kz.jarkyn.backend.operation.service.TurnoverService;
+import kz.jarkyn.backend.warehouse.model.GoodEntity;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,18 +41,12 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemResponse> findApiByDocument(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
-        Map<UUID, TurnoverEntity> turnovers = turnoverService.findByDocument(document).stream()
-                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity()));
-        Map<UUID, StockResponse> stocks = turnoverService
-                .findStock(document.getWarehouse(), items.stream().map(ItemEntity::getGood).toList()).stream()
-                .collect(Collectors.toMap(turnover -> turnover.getGood().getId(), Function.identity(),
-                        (existing, _) -> existing));
-        return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition)).map(item -> {
-            TurnoverEntity turnover = turnovers.get(item.getGood().getId());
-            if (turnover != null) return itemMapper.toResponse(item, turnover.getRemain(), turnover.getCostPrice());
-            StockResponse stock = stocks.get(item.getGood().getId());
-            return itemMapper.toResponse(item, stock.getRemain(), stock.getCostPrice());
-        }).toList();
+        Map<GoodEntity, Integer> reminds = turnoverService.findRemindAtMoment(
+                        items.stream().map(itemEntity -> Pair.of(document.getWarehouse(), itemEntity.getGood())).toList(),
+                        document.getMoment())
+                .stream().collect(Collectors.toMap(pair -> pair.getFirst().getSecond(), Pair::getSecond));
+        return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition))
+                .map(item -> itemMapper.toResponse(item, reminds.get(item.getGood()), BigDecimal.ZERO)).toList();
     }
 
     @Transactional
@@ -75,13 +69,10 @@ public class ItemService {
     @Transactional
     public void createPositiveTurnover(DocumentEntity document, BigDecimal documentCostPrice) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
-        BigDecimal totalItemAmount = items.stream()
-                .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        for (ItemEntity item : items) {
-            BigDecimal costPrice = documentCostPrice.multiply(item.getPrice())
-                    .divide(totalItemAmount, 2, RoundingMode.HALF_UP);
-            turnoverService.create(item.getDocument(), item.getGood(), item.getQuantity(), costPrice);
+        Map<GoodEntity, List<ItemEntity>> map = items.stream().collect(Collectors.groupingBy(ItemEntity::getGood));
+        for (Map.Entry<GoodEntity, List<ItemEntity>> entry : map.entrySet()) {
+            Integer quantity = entry.getValue().stream().map(ItemEntity::getQuantity).reduce(0, Integer::sum);
+            turnoverService.create(document, entry.getKey(), quantity);
         }
     }
 
@@ -89,7 +80,7 @@ public class ItemService {
     public void createNegativeTurnover(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         for (ItemEntity item : items) {
-            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), null);
+            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity());
         }
     }
 

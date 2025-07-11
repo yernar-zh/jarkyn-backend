@@ -1,5 +1,5 @@
 
-package kz.jarkyn.backend.operation.mode.dto;
+package kz.jarkyn.backend.warehouse.model.dto;
 
 import kz.jarkyn.backend.core.model.dto.ReferenceResponse;
 import org.immutables.value.Value;
@@ -7,9 +7,8 @@ import org.immutables.value.Value;
 import java.math.BigDecimal;
 
 @Value.Immutable
-public interface StockResponse {
+public interface StockResponse2 {
     ReferenceResponse getWarehouse();
-    ReferenceResponse getGood();
     Integer getRemain();
     BigDecimal getCostPrice();
 }

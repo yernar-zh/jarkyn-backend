@@ -29,7 +29,6 @@ public class TurnoverEntity extends AbstractEntity {
     private Instant moment;
     private Integer quantity;
     private Integer remain;
-    private BigDecimal costPrice;
 
     public DocumentEntity getDocument() {
         return document;
@@ -77,13 +76,5 @@ public class TurnoverEntity extends AbstractEntity {
 
     public void setRemain(Integer remain) {
         this.remain = remain;
-    }
-
-    public BigDecimal getCostPrice() {
-        return costPrice;
-    }
-
-    public void setCostPrice(BigDecimal costPrice) {
-        this.costPrice = costPrice;
     }
 }

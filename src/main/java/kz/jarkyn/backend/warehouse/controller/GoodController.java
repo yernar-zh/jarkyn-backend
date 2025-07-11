@@ -11,24 +11,22 @@ import kz.jarkyn.backend.warehouse.model.dto.GoodRequest;
 import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
 import kz.jarkyn.backend.core.model.dto.ValueDto;
 import kz.jarkyn.backend.warehouse.service.GoodService;
+import kz.jarkyn.backend.warehouse.service.WarehouseService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 @RestController
 @RequestMapping(Api.Good.PATH)
 public class GoodController {
     private final GoodService goodService;
-    private final EntityMapper entityMapper;
 
     public GoodController(
             GoodService goodService,
             EntityMapper entityMapper) {
         this.goodService = goodService;
-        this.entityMapper = entityMapper;
     }
 
     @GetMapping("{id}")
@@ -37,13 +35,14 @@ public class GoodController {
     }
 
     @GetMapping
-    public PageResponse<GoodListResponse> list(
-            @RequestParam MultiValueMap<String, String> allParams,
-            @RequestParam(required = false) UUID warehouseId) {
-        return goodService.findApiByFilter(
-                QueryParams.of(allParams),
-                entityMapper.toEntity(warehouseId, WarehouseEntity.class));
+    public PageResponse<GoodListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
+        List<UUID> warehouseIds = Optional.ofNullable(allParams.remove("$warehouse.id"))
+                .orElse(List.of()).stream().map(UUID::fromString).toList();
+        Instant moment = Optional.ofNullable(allParams.remove("$moment"))
+                .orElse(List.of()).stream().map(Instant::parse).findFirst().orElse(null);
+        return goodService.findApiByFilter(QueryParams.of(allParams), warehouseIds, moment);
     }
+
     @PostMapping
     public GoodResponse create(@RequestBody GoodRequest request) {
         return goodService.createApi(request);
