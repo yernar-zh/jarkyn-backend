@@ -69,10 +69,18 @@ public class ItemService {
     @Transactional
     public void createPositiveTurnover(DocumentEntity document, BigDecimal documentCostPrice) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
+        BigDecimal totalItemAmount = items.stream()
+                .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         Map<GoodEntity, List<ItemEntity>> map = items.stream().collect(Collectors.groupingBy(ItemEntity::getGood));
         for (Map.Entry<GoodEntity, List<ItemEntity>> entry : map.entrySet()) {
             Integer quantity = entry.getValue().stream().map(ItemEntity::getQuantity).reduce(0, Integer::sum);
-            turnoverService.create(document, entry.getKey(), quantity);
+            BigDecimal price = entry.getValue().stream()
+                    .map(itemEntity -> itemEntity.getPrice().multiply(BigDecimal.valueOf(quantity)))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .divide(BigDecimal.valueOf(quantity), 2, RoundingMode.HALF_UP);
+            BigDecimal costPricePerUnit = documentCostPrice.multiply(price).divide(totalItemAmount, 2, RoundingMode.HALF_UP);
+            turnoverService.create(document, entry.getKey(), quantity, costPricePerUnit);
         }
     }
 
@@ -80,7 +88,7 @@ public class ItemService {
     public void createNegativeTurnover(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         for (ItemEntity item : items) {
-            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity());
+            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), BigDecimal.ZERO);
         }
     }
 

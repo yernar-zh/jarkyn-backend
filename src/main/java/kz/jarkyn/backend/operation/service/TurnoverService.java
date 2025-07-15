@@ -11,9 +11,12 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
@@ -51,17 +54,33 @@ public class TurnoverService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<Pair<WarehouseEntity, Pair<Integer, BigDecimal>>> findRemindAndCostAtMoment(
+            List<WarehouseEntity> warehouses, GoodEntity good, Instant moment
+    ) {
+        return findRemindAtMoment(warehouses.stream().map(warehouse -> Pair.of(warehouse, good)).toList(), moment)
+                .stream().map(pair -> {
+                    // TODO
+                    BigDecimal costPrisePerUnit = turnoverRepository.findFirstInflowByGoodAtMoment(
+                                    pair.getFirst().getFirst(), good, moment)
+                            .map(TurnoverEntity::getCostPricePerUnit).orElse(BigDecimal.ZERO);
+                    return Pair.of(pair.getFirst().getFirst(), Pair.of(pair.getSecond(), costPrisePerUnit));
+                }).toList();
+    }
+
+
     @Transactional
-    public void create(DocumentEntity document, GoodEntity good, Integer quantity) {
+    public void create(DocumentEntity document, GoodEntity good, Integer quantity, BigDecimal costPricePerUnit) {
         TurnoverEntity turnover = new TurnoverEntity();
         turnover.setDocument(document);
         turnover.setGood(good);
         turnover.setQuantity(quantity);
         turnover.setWarehouse(document.getWarehouse());
         turnover.setMoment(document.getMoment());
+        turnover.setCostPricePerUnit(costPricePerUnit);
         turnover.setRemain(0);
         turnoverRepository.save(turnover);
-        fixBalances(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
+        fix(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
     }
 
     @Transactional
@@ -69,21 +88,75 @@ public class TurnoverService {
         List<TurnoverEntity> turnovers = turnoverRepository.findByDocument(document);
         turnoverRepository.deleteAll(turnovers);
         for (TurnoverEntity turnover : turnovers) {
-            fixBalances(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
+            fix(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
         }
     }
 
     @Transactional
-    protected void fixBalances(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
+    protected void fix(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
+        // Fix remind
         List<TurnoverEntity> turnovers = turnoverRepository
                 .findByWarehouseAndGoodAndMomentGreaterThanEqual(warehouse, good, moment).stream()
                 .sorted(Comparator.comparing(TurnoverEntity::getMoment)
-                        .thenComparing(turnoverEntity -> turnoverEntity.getDocument().getLastModifiedAt()))
+                        .thenComparing(turnover -> turnover.getDocument().getLastModifiedAt()))
                 .toList();
         Integer remain = findRemindAtMoment(List.of(Pair.of(warehouse, good)), moment).getFirst().getSecond();
         for (TurnoverEntity turnover : turnovers) {
             turnover.setRemain(remain);
             remain += turnover.getQuantity();
         }
+
+        // Fix costPrice
+        TurnoverEntity lastOutflow = turnoverRepository.findLastOutflowByGoodAndMoment(warehouse, good, moment).orElse(null);
+        if (lastOutflow == null) return;
+        List<TurnoverEntity> outflows = turnoverRepository.findByWarehouseAndGoodAndMomentGreaterThanEqual(
+                        lastOutflow.getWarehouse(), lastOutflow.getGood(), lastOutflow.getMoment())
+                .stream().filter(turnoverEntity -> turnoverEntity.getQuantity() < 0)
+                .sorted(Comparator.comparing(TurnoverEntity::getMoment).thenComparing(turnover -> turnover.getDocument().getLastModifiedAt()))
+                .toList();
+        TurnoverEntity lastInflow = lastOutflow.getLastInflow();
+        List<TurnoverEntity> inflows;
+        int inflowUsedQuantity = 0;
+        int inflowIndex = 0;
+        if (lastInflow == null) {
+            inflows = List.of();
+        } else {
+            inflows = turnoverRepository.findByWarehouseAndGoodAndMomentGreaterThanEqual(
+                            lastOutflow.getWarehouse(), lastOutflow.getGood(), lastOutflow.getMoment())
+                    .stream().filter(turnoverEntity -> turnoverEntity.getQuantity() > 0)
+                    .sorted(Comparator.comparing(TurnoverEntity::getMoment).thenComparing(turnover -> turnover.getDocument().getLastModifiedAt()))
+                    .toList();
+            inflowUsedQuantity = lastInflow.getLastInflowUsedQuantity();
+        }
+        for (TurnoverEntity outflow : outflows) {
+            int remainingOutflowQuantity = -outflow.getQuantity();
+            BigDecimal totalCostPrice = BigDecimal.ZERO;
+            while (remainingOutflowQuantity > 0 && inflowIndex < inflows.size()) {
+                TurnoverEntity inflow = inflows.get(inflowIndex);
+                int available = inflow.getQuantity() - inflowUsedQuantity;
+                if (available <= 0) {
+                    throw new IllegalStateException("Inflow overused: inflowUsedQuantity=" + inflowUsedQuantity
+                                                    + " > inflow.getQuantity()=" + inflow.getQuantity()
+                                                    + " (inflowId=" + inflow.getId() + ", good=" + inflow.getGood().getName() + ")");
+                }
+                int used = Math.min(available, remainingOutflowQuantity);
+                BigDecimal costPrice = inflow.getCostPricePerUnit().multiply(BigDecimal.valueOf(used));
+                totalCostPrice = totalCostPrice.add(costPrice);
+                inflowUsedQuantity += used;
+                remainingOutflowQuantity -= used;
+                if (inflowUsedQuantity == inflow.getQuantity()) {
+                    inflowIndex++;
+                    inflowUsedQuantity = 0;
+                }
+            }
+            BigDecimal costPerUnit = totalCostPrice.divide(BigDecimal.valueOf(-outflow.getQuantity()), RoundingMode.HALF_UP);
+            outflow.setCostPricePerUnit(costPerUnit);
+            outflow.setLastInflow(inflows.get(inflowIndex));
+            outflow.setLastInflowUsedQuantity(inflowUsedQuantity);
+        }
+    }
+
+    public static class StockDto {
+
     }
 }

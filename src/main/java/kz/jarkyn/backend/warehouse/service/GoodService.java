@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,9 +68,8 @@ public class GoodService {
         List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
         sellingPrices.sort(Comparator.comparing(SellingPriceEntity::getQuantity));
         List<WarehouseEntity> warehouses = warehouseRepository.findByArchived(Boolean.FALSE);
-        List<StockResponse2> stocks = turnoverService.findRemindAtMoment(
-                warehouses.stream().map(warehouse -> Pair.of(warehouse, good)).toList(),
-                Instant.now()).stream().map(pairIntegerPair -> (StockResponse2) null).toList();
+        List<Pair<WarehouseEntity, Pair<Integer, BigDecimal>>> stocks = turnoverService
+                .findRemindAndCostAtMoment(warehouses, good, Instant.now());
         return goodMapper.toResponse(good, attributes, sellingPrices, stocks);
     }
 

@@ -7,7 +7,7 @@ import org.immutables.value.Value;
 import java.math.BigDecimal;
 
 @Value.Immutable
-public interface StockResponse2 {
+public interface StockResponse {
     ReferenceResponse getWarehouse();
     Integer getRemain();
     BigDecimal getCostPrice();

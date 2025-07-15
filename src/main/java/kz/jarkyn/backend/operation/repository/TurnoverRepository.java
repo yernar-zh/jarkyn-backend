@@ -4,6 +4,7 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.warehouse.model.GoodEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TurnoverRepository extends JpaRepository<TurnoverEntity, UUID> {
@@ -35,4 +37,35 @@ public interface TurnoverRepository extends JpaRepository<TurnoverEntity, UUID> 
 
     List<TurnoverEntity> findByWarehouseAndGoodAndMomentGreaterThanEqual(
             WarehouseEntity warehouse, GoodEntity good, Instant moment);
+
+    @Query("""
+            SELECT trv
+            FROM TurnoverEntity trv
+            WHERE trv.warehouse = :warehouse
+            AND trv.good = :good
+            AND trv.moment < :moment
+            AND trv.quantity < 0
+            ORDER BY trv.moment DESC, trv.lastModifiedAt DESC
+            LIMIT 1
+            """)
+    Optional<TurnoverEntity> findLastOutflowByGoodAndMoment(
+            @Param("warehouse") WarehouseEntity warehouse,
+            @Param("good") GoodEntity good,
+            @Param("moment") Instant moment);
+
+
+    @Query("""
+            SELECT trv
+            FROM TurnoverEntity trv
+            WHERE trv.warehouse = :warehouse
+            AND trv.good = :good
+            AND trv.moment < :moment
+            AND trv.quantity > 0
+            ORDER BY trv.moment, trv.lastModifiedAt
+            LIMIT 1
+            """)
+    Optional<TurnoverEntity> findFirstInflowByGoodAtMoment(
+            @Param("warehouse") WarehouseEntity warehouse,
+            @Param("good") GoodEntity good,
+            @Param("moment") Instant moment);
 }

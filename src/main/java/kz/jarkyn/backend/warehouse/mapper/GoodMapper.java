@@ -2,34 +2,38 @@
 package kz.jarkyn.backend.warehouse.mapper;
 
 import kz.jarkyn.backend.core.mapper.RequestMapper;
+import kz.jarkyn.backend.warehouse.model.*;
 import kz.jarkyn.backend.warehouse.model.dto.GoodListResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.mapper.BaseMapperConfig;
-import kz.jarkyn.backend.warehouse.model.GoodAttributeEntity;
-import kz.jarkyn.backend.warehouse.model.GoodEntity;
-import kz.jarkyn.backend.warehouse.model.AttributeEntity;
-import kz.jarkyn.backend.warehouse.model.SellingPriceEntity;
 import kz.jarkyn.backend.warehouse.model.dto.GoodRequest;
-import kz.jarkyn.backend.warehouse.model.dto.StockResponse2;
+import kz.jarkyn.backend.warehouse.model.dto.StockResponse;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.data.util.Pair;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper(config = BaseMapperConfig.class)
-public interface GoodMapper extends RequestMapper<GoodEntity, GoodRequest> {
-    GoodResponse toResponse(
+public abstract class GoodMapper implements RequestMapper<GoodEntity, GoodRequest> {
+    public abstract GoodResponse toResponse(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,
-            List<StockResponse2> stock);
-    GoodListResponse toListResponse(
+            List<Pair<WarehouseEntity, Pair<Integer, BigDecimal>>> stock);
+    public abstract GoodListResponse toListResponse(
             GoodEntity entity, String path, String groupIds, String attributeIds,
             BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "good", source = "good")
     @Mapping(target = "attribute", source = "attribute")
-    GoodAttributeEntity toEntity(GoodEntity good, IdDto attribute);
+    public abstract GoodAttributeEntity toEntity(GoodEntity good, IdDto attribute);
+
+    @Mapping(target = "warehouse", source = "first")
+    @Mapping(target = "remain", source = "second.first")
+    @Mapping(target = "costPrice", source = "second.second")
+    protected abstract StockResponse toResponse(Pair<WarehouseEntity, Pair<Integer, BigDecimal>> pair);
+
 }

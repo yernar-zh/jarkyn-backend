@@ -1,10 +1,7 @@
 package kz.jarkyn.backend.operation.mode;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
@@ -28,7 +25,14 @@ public class TurnoverEntity extends AbstractEntity {
     private WarehouseEntity warehouse;
     private Instant moment;
     private Integer quantity;
+    @Column(name = "costPrice_per_unit")
+    private BigDecimal costPricePerUnit;
     private Integer remain;
+    @ManyToOne
+    @JoinColumn(name = "last_inflow_id")
+    private TurnoverEntity lastInflow;
+    @Column(name = "last_inflow_used_quantity")
+    private Integer lastInflowUsedQuantity;
 
     public DocumentEntity getDocument() {
         return document;
@@ -76,5 +80,29 @@ public class TurnoverEntity extends AbstractEntity {
 
     public void setRemain(Integer remain) {
         this.remain = remain;
+    }
+
+    public BigDecimal getCostPricePerUnit() {
+        return costPricePerUnit;
+    }
+
+    public void setCostPricePerUnit(BigDecimal costPricePerUnit) {
+        this.costPricePerUnit = costPricePerUnit;
+    }
+
+    public TurnoverEntity getLastInflow() {
+        return lastInflow;
+    }
+
+    public void setLastInflow(TurnoverEntity lastInflow) {
+        this.lastInflow = lastInflow;
+    }
+
+    public Integer getLastInflowUsedQuantity() {
+        return lastInflowUsedQuantity;
+    }
+
+    public void setLastInflowUsedQuantity(Integer lastInflowUsedQuantity) {
+        this.lastInflowUsedQuantity = lastInflowUsedQuantity;
     }
 }

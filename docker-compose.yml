@@ -10,17 +10,17 @@ services:
     ports:
       - "5432:5432"
 
-  localstack:
-    image: localstack/localstack
-    container_name: localstack
-    restart: unless-stopped
-    ports:
-      - "4566:4566"
-      - "4510-4559:4510-4559"
+  minio:
+    image: minio/minio
+    container_name: minio
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
-    networks:
-      - localstack-network
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+
 
   gotenberg:
     image: gotenberg/gotenberg:8

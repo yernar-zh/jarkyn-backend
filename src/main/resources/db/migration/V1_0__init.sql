@@ -256,16 +256,18 @@ CREATE TABLE supply
 
 CREATE TABLE turnover
 (
-    id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    document_id      UUID,
-    good_id          UUID,
-    warehouse_id     UUID,
-    moment           TIMESTAMP WITHOUT TIME ZONE,
-    quantity         INTEGER,
-    remain           INTEGER,
-    cost_price       DECIMAL,
+    id                        UUID NOT NULL,
+    created_at                TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at          TIMESTAMP WITHOUT TIME ZONE,
+    document_id               UUID,
+    good_id                   UUID,
+    warehouse_id              UUID,
+    moment                    TIMESTAMP WITHOUT TIME ZONE,
+    quantity                  INTEGER,
+    cost_price_per_unit       DECIMAL,
+    remain                    INTEGER,
+    last_inflow_id            UUID,
+    last_inflow_used_quantity INTEGER,
     CONSTRAINT pk_turnover PRIMARY KEY (id)
 );
 
@@ -385,6 +387,9 @@ ALTER TABLE turnover
 
 ALTER TABLE turnover
     ADD CONSTRAINT FK_TURNOVER_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
+
+ALTER TABLE turnover
+    ADD CONSTRAINT FK_TURNOVER_ON_LAST_INFLOW FOREIGN KEY (last_inflow_id) REFERENCES turnover (id);
 
 ALTER TABLE turnover
     ADD CONSTRAINT FK_TURNOVER_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
