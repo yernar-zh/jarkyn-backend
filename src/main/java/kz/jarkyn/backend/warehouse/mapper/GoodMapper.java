@@ -2,6 +2,7 @@
 package kz.jarkyn.backend.warehouse.mapper;
 
 import kz.jarkyn.backend.core.mapper.RequestMapper;
+import kz.jarkyn.backend.operation.service.TurnoverService;
 import kz.jarkyn.backend.warehouse.model.*;
 import kz.jarkyn.backend.warehouse.model.dto.GoodListResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
@@ -21,7 +22,7 @@ import java.util.List;
 public abstract class GoodMapper implements RequestMapper<GoodEntity, GoodRequest> {
     public abstract GoodResponse toResponse(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,
-            List<Pair<WarehouseEntity, Pair<Integer, BigDecimal>>> stock);
+            List<TurnoverService.StockDto> stocks);
     public abstract GoodListResponse toListResponse(
             GoodEntity entity, String path, String groupIds, String attributeIds,
             BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);
@@ -30,10 +31,4 @@ public abstract class GoodMapper implements RequestMapper<GoodEntity, GoodReques
     @Mapping(target = "good", source = "good")
     @Mapping(target = "attribute", source = "attribute")
     public abstract GoodAttributeEntity toEntity(GoodEntity good, IdDto attribute);
-
-    @Mapping(target = "warehouse", source = "first")
-    @Mapping(target = "remain", source = "second.first")
-    @Mapping(target = "costPrice", source = "second.second")
-    protected abstract StockResponse toResponse(Pair<WarehouseEntity, Pair<Integer, BigDecimal>> pair);
-
 }

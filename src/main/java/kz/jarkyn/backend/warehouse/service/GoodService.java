@@ -68,8 +68,9 @@ public class GoodService {
         List<SellingPriceEntity> sellingPrices = sellingPriceRepository.findByGood(good);
         sellingPrices.sort(Comparator.comparing(SellingPriceEntity::getQuantity));
         List<WarehouseEntity> warehouses = warehouseRepository.findByArchived(Boolean.FALSE);
-        List<Pair<WarehouseEntity, Pair<Integer, BigDecimal>>> stocks = turnoverService
-                .findRemindAndCostAtMoment(warehouses, good, Instant.now());
+        List<Pair<WarehouseEntity, GoodEntity>> goodPair = warehouses.stream()
+                .map(warehouse -> Pair.of(warehouse, good)).toList();
+        List<TurnoverService.StockDto> stocks = turnoverService.findStockAtMoment(goodPair, Instant.now());
         return goodMapper.toResponse(good, attributes, sellingPrices, stocks);
     }
 
@@ -95,12 +96,15 @@ public class GoodService {
                             BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
                                     .stream().map(SellingPriceEntity::getValue)
                                     .max(BigDecimal::compareTo).orElseThrow();
-                            Integer remind = turnoverService.findRemindAtMoment(
-                                            warehouses.stream().map(warehouse -> Pair.of(warehouse, good)).toList(),
-                                            Optional.ofNullable(filterMoment).orElseGet(Instant::now))
-                                    .getFirst().getSecond();
-                            BigDecimal averageCostPrice = BigDecimal.ZERO;
-                            return goodMapper.toListResponse(good, path, groupIds, attributes, sellingPrice, remind, averageCostPrice);
+                            List<Pair<WarehouseEntity, GoodEntity>> goodPair = warehouses.stream()
+                                    .map(warehouse -> Pair.of(warehouse, good)).toList();
+                            List<TurnoverService.StockDto> stocks = turnoverService.findStockAtMoment(
+                                    goodPair, Optional.ofNullable(filterMoment).orElseGet(Instant::now));
+                            Integer remind = stocks.stream().map(TurnoverService.StockDto::getRemain)
+                                    .reduce(0, Integer::sum);
+                            BigDecimal costPrice = stocks.stream().map(TurnoverService.StockDto::getCostPrice)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                            return goodMapper.toListResponse(good, path, groupIds, attributes, sellingPrice, remind, costPrice);
                         }).toList());
         return search.getResult(queryParams);
     }

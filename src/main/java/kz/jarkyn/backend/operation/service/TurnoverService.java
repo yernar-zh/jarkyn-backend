@@ -18,7 +18,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 
 @Service
@@ -37,35 +36,19 @@ public class TurnoverService {
     }
 
     @Transactional(readOnly = true)
-    public List<Pair<Pair<WarehouseEntity, GoodEntity>, Integer>> findRemindAtMoment(
+    public List<StockDto> findStockAtMoment(
             List<Pair<WarehouseEntity, GoodEntity>> goodsPair, Instant moment
     ) {
-        Map<Pair<WarehouseEntity, GoodEntity>, TurnoverEntity> map = goodsPair.stream()
+        return goodsPair.stream()
                 .collect(groupingBy(Pair::getFirst, mapping(Pair::getSecond, Collectors.toList())))
                 .entrySet().stream()
-                .map(entry -> turnoverRepository.findLastByGoodAndMoment(entry.getKey(), entry.getValue(), moment))
-                .flatMap(Collection::stream)
-                .collect(toMap(turnover -> Pair.of(turnover.getWarehouse(), turnover.getGood()), identity(),
-                        (t1, t2) -> t1.getLastModifiedAt().isAfter(t2.getLastModifiedAt()) ? t1 : t2));
-        return goodsPair.stream().distinct().map(pair -> Pair.of(pair,
-                        Optional.ofNullable(map.get(pair))
-                                .map(turnover -> turnover.getRemain() + turnover.getQuantity())
-                                .orElse(0)))
+                .flatMap(entry -> {
+                    Map<GoodEntity, Integer> remainMap = findRemindAtMoment(entry.getKey(), entry.getValue(), moment);
+                    Map<GoodEntity, BigDecimal> costPriceMap = findCostPriceAtMoment(entry.getKey(), entry.getValue(), moment);
+                    return entry.getValue().stream().map(good ->
+                            new StockDto(entry.getKey(), good, remainMap.get(good), costPriceMap.get(good)));
+                })
                 .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<Pair<WarehouseEntity, Pair<Integer, BigDecimal>>> findRemindAndCostAtMoment(
-            List<WarehouseEntity> warehouses, GoodEntity good, Instant moment
-    ) {
-        return findRemindAtMoment(warehouses.stream().map(warehouse -> Pair.of(warehouse, good)).toList(), moment)
-                .stream().map(pair -> {
-                    // TODO
-                    BigDecimal costPrisePerUnit = turnoverRepository.findFirstInflowByGoodAtMoment(
-                                    pair.getFirst().getFirst(), good, moment)
-                            .map(TurnoverEntity::getCostPricePerUnit).orElse(BigDecimal.ZERO);
-                    return Pair.of(pair.getFirst().getFirst(), Pair.of(pair.getSecond(), costPrisePerUnit));
-                }).toList();
     }
 
 
@@ -92,15 +75,40 @@ public class TurnoverService {
         }
     }
 
-    @Transactional
-    protected void fix(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
+    private Map<GoodEntity, Integer> findRemindAtMoment(
+            WarehouseEntity warehouse, List<GoodEntity> goods, Instant moment) {
+        Map<GoodEntity, Integer> lastTurnoverMap = turnoverRepository
+                .findLastByMomentLessThan(warehouse, goods, moment).stream()
+                .collect(toMap(TurnoverEntity::getGood, turnover -> turnover.getRemain() + turnover.getQuantity()));
+        Map<GoodEntity, Integer> defaultMap = goods.stream().collect(toMap(good -> good, _ -> 0));
+
+        LinkedHashMap<GoodEntity, Integer> result = new LinkedHashMap<>();
+        Stream.of(lastTurnoverMap, defaultMap).forEach(map -> map.forEach(result::putIfAbsent));
+        return result;
+    }
+
+
+    private Map<GoodEntity, BigDecimal> findCostPriceAtMoment(
+            WarehouseEntity warehouse, List<GoodEntity> goods, Instant moment) {
+        // TODO
+        Map<GoodEntity, BigDecimal> firstInflowMap = turnoverRepository
+                .findFirstInflow(warehouse, goods, moment).stream()
+                .collect(toMap(TurnoverEntity::getGood, TurnoverEntity::getCostPricePerUnit));
+        Map<GoodEntity, BigDecimal> defaultMap = goods.stream().collect(toMap(good -> good, _ -> BigDecimal.ZERO));
+
+        LinkedHashMap<GoodEntity, BigDecimal> result = new LinkedHashMap<>();
+        Stream.of(firstInflowMap, defaultMap).forEach(map -> map.forEach(result::putIfAbsent));
+        return result;
+    }
+
+    private void fix(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
         // Fix remind
         List<TurnoverEntity> turnovers = turnoverRepository
                 .findByWarehouseAndGoodAndMomentGreaterThanEqual(warehouse, good, moment).stream()
                 .sorted(Comparator.comparing(TurnoverEntity::getMoment)
                         .thenComparing(turnover -> turnover.getDocument().getLastModifiedAt()))
                 .toList();
-        Integer remain = findRemindAtMoment(List.of(Pair.of(warehouse, good)), moment).getFirst().getSecond();
+        Integer remain = findRemindAtMoment(warehouse, List.of(good), moment).get(good);
         for (TurnoverEntity turnover : turnovers) {
             turnover.setRemain(remain);
             remain += turnover.getQuantity();
@@ -156,7 +164,34 @@ public class TurnoverService {
         }
     }
 
-    public static class StockDto {
 
+    public static class StockDto {
+        private final WarehouseEntity warehouse;
+        private final GoodEntity good;
+        private final Integer remain;
+        private final BigDecimal costPrice;
+
+        public StockDto(WarehouseEntity warehouse, GoodEntity good, Integer remain, BigDecimal costPrice) {
+            this.warehouse = warehouse;
+            this.good = good;
+            this.remain = remain;
+            this.costPrice = costPrice;
+        }
+
+        public WarehouseEntity getWarehouse() {
+            return warehouse;
+        }
+
+        public GoodEntity getGood() {
+            return good;
+        }
+
+        public Integer getRemain() {
+            return remain;
+        }
+
+        public BigDecimal getCostPrice() {
+            return costPrice;
+        }
     }
 }
