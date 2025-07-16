@@ -2,11 +2,14 @@
 package kz.jarkyn.backend.operation.service;
 
 
+import kz.jarkyn.backend.operation.sorts.TurnoverSorts;
+import kz.jarkyn.backend.operation.specifications.TurnoverSpecifications;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.warehouse.model.GoodEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.repository.TurnoverRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +31,6 @@ public class TurnoverService {
             TurnoverRepository turnoverRepository
     ) {
         this.turnoverRepository = turnoverRepository;
-    }
-
-    @Transactional(readOnly = true)
-    public List<TurnoverEntity> findByDocument(DocumentEntity document) {
-        return turnoverRepository.findByDocument(document);
     }
 
     @Transactional(readOnly = true)
@@ -68,7 +66,8 @@ public class TurnoverService {
 
     @Transactional
     public void delete(DocumentEntity document) {
-        List<TurnoverEntity> turnovers = turnoverRepository.findByDocument(document);
+        List<TurnoverEntity> turnovers = turnoverRepository.findAll(Specification
+                .where(TurnoverSpecifications.document(document)));
         turnoverRepository.deleteAll(turnovers);
         for (TurnoverEntity turnover : turnovers) {
             fix(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
@@ -102,26 +101,34 @@ public class TurnoverService {
     }
 
     private void fix(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
-        // Fix remind
-        List<TurnoverEntity> turnovers = turnoverRepository
-                .findByWarehouseAndGoodAndMomentGreaterThanEqual(warehouse, good, moment).stream()
-                .sorted(Comparator.comparing(TurnoverEntity::getMoment)
-                        .thenComparing(turnover -> turnover.getDocument().getLastModifiedAt()))
-                .toList();
+        fixRemind(warehouse, good, moment);
+        fixCostPrice(warehouse, good, moment);
+    }
+
+    private void fixRemind(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
+        Specification<TurnoverEntity> spec = Specification
+                .where(TurnoverSpecifications.warehouseAndGoodEquals(warehouse, good))
+                .and(TurnoverSpecifications.momentGreaterThanEqual(moment));
+        List<TurnoverEntity> turnovers = turnoverRepository.findAll(spec, TurnoverSorts.byMomentAsc());
         Integer remain = findRemindAtMoment(warehouse, List.of(good), moment).get(good);
         for (TurnoverEntity turnover : turnovers) {
             turnover.setRemain(remain);
             remain += turnover.getQuantity();
         }
+    }
 
-        // Fix costPrice
-        TurnoverEntity lastOutflow = turnoverRepository.findLastOutflowByGoodAndMoment(warehouse, good, moment).orElse(null);
+    private void fixCostPrice(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
+        TurnoverEntity lastOutflow = turnoverRepository.findOne(Specification
+                        .where(TurnoverSpecifications.warehouseAndGoodEquals(warehouse, good))
+                        .and(TurnoverSpecifications.momentLessThan(moment))
+                        .and(TurnoverSpecifications.isOutflow())
+                , TurnoverSorts.byMomentDesc());
         if (lastOutflow == null) return;
-        List<TurnoverEntity> outflows = turnoverRepository.findByWarehouseAndGoodAndMomentGreaterThanEqual(
-                        lastOutflow.getWarehouse(), lastOutflow.getGood(), lastOutflow.getMoment())
-                .stream().filter(turnoverEntity -> turnoverEntity.getQuantity() < 0)
-                .sorted(Comparator.comparing(TurnoverEntity::getMoment).thenComparing(turnover -> turnover.getDocument().getLastModifiedAt()))
-                .toList();
+        List<TurnoverEntity> outflows = turnoverRepository.findAll(Specification
+                        .where(TurnoverSpecifications.warehouseAndGoodEquals(warehouse, good))
+                        .and(TurnoverSpecifications.momentGreaterThanEqual(moment))
+                        .and(TurnoverSpecifications.isOutflow())
+                , TurnoverSorts.byMomentAsc());
         TurnoverEntity lastInflow = lastOutflow.getLastInflow();
         List<TurnoverEntity> inflows;
         int inflowUsedQuantity = 0;
@@ -129,11 +136,11 @@ public class TurnoverService {
         if (lastInflow == null) {
             inflows = List.of();
         } else {
-            inflows = turnoverRepository.findByWarehouseAndGoodAndMomentGreaterThanEqual(
-                            lastOutflow.getWarehouse(), lastOutflow.getGood(), lastOutflow.getMoment())
-                    .stream().filter(turnoverEntity -> turnoverEntity.getQuantity() > 0)
-                    .sorted(Comparator.comparing(TurnoverEntity::getMoment).thenComparing(turnover -> turnover.getDocument().getLastModifiedAt()))
-                    .toList();
+            inflows = turnoverRepository.findAll(Specification
+                            .where(TurnoverSpecifications.warehouseAndGoodEquals(warehouse, good))
+                            .and(TurnoverSpecifications.momentGreaterThanEqual(moment))
+                            .and(TurnoverSpecifications.isIncome())
+                    , TurnoverSorts.byMomentAsc());
             inflowUsedQuantity = lastInflow.getLastInflowUsedQuantity();
         }
         for (TurnoverEntity outflow : outflows) {
