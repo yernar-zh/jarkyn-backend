@@ -62,4 +62,8 @@ public interface Api {
     interface Export {
         String PATH = Api.PATH + "/export";
     }
+
+    interface History {
+        String PATH = Api.PATH + "/history";
+    }
 }

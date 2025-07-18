@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.document.core.service;
 
 
+import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.ItemEntity;
 import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
@@ -29,14 +30,16 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
     private final TurnoverService turnoverService;
+    private final AuditService auditService;
 
     public ItemService(
             ItemRepository itemRepository,
             ItemMapper itemMapper,
-            TurnoverService turnoverService) {
+            TurnoverService turnoverService, AuditService auditService) {
         this.itemRepository = itemRepository;
         this.itemMapper = itemMapper;
         this.turnoverService = turnoverService;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -60,12 +63,17 @@ public class ItemService {
             item.setDocument(document);
             item.setPosition(entry.getReceivedPosition());
             itemRepository.save(item);
+            auditService.saveChanges(item);
         }
         for (EntityDivider<ItemEntity, ItemRequest>.Entry entry : divider.edited()) {
             itemMapper.editEntity(entry.getCurrent(), entry.getReceived());
             entry.getCurrent().setPosition(entry.getReceivedPosition());
+            auditService.saveChanges(entry.getCurrent());
         }
-        itemRepository.deleteAll(divider.skippedCurrent());
+        for (ItemEntity item : divider.skippedCurrent()) {
+            itemRepository.delete(item);
+            auditService.deleteChanges(item);
+        }
     }
 
     @Transactional

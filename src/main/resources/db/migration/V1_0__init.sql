@@ -42,7 +42,7 @@ CREATE TABLE audit
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     user_id          UUID,
-    moment           TIMESTAMP WITHOUT TIME ZONE,
+    entity_name      VARCHAR(255),
     entity_id        UUID,
     entity_parent_id UUID,
     field_name       VARCHAR(255),
