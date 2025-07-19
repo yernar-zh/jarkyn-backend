@@ -12,5 +12,5 @@ public interface ChangeGroupResponse {
     Instant getMoment();
     ReferenceResponse getUser();
     AuditType getType();
-    List<EntityChangeResponse> getEntityChange();
+    List<EntityChangeResponse> getEntityChanges();
 }

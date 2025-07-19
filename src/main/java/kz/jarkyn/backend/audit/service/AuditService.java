@@ -16,15 +16,12 @@ import kz.jarkyn.backend.user.model.UserEntity;
 import kz.jarkyn.backend.user.service.UserService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

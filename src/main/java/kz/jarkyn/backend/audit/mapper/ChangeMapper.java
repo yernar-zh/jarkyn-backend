@@ -20,6 +20,6 @@ public interface ChangeMapper {
             List<FieldChangeResponse> fieldChanges);
     ChangeGroupResponse toGroupResponse(
             Instant moment, UserEntity user, AuditType type,
-            List<EntityChangeResponse> entityChange);
+            List<EntityChangeResponse> entityChanges);
 
 }
