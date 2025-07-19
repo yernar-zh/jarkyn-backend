@@ -17,7 +17,6 @@ import java.time.Instant;
 @Table(name = "document")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class DocumentEntity extends AbstractEntity {
-    @Enumerated(EnumType.STRING)
     @ManyToOne
     @JoinColumn(name = "type_id")
     private DocumentTypeEntity type;

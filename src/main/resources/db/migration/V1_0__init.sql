@@ -38,15 +38,17 @@ CREATE TABLE attribute_group
 
 CREATE TABLE audit
 (
-    id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    user_id          UUID,
-    entity_name      VARCHAR(255),
-    entity_id        UUID,
-    entity_parent_id UUID,
-    field_name       VARCHAR(255),
-    field_value      VARCHAR(255),
+    id                UUID NOT NULL,
+    created_at        TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at  TIMESTAMP WITHOUT TIME ZONE,
+    moment            TIMESTAMP WITHOUT TIME ZONE,
+    user_id           UUID,
+    type              VARCHAR(255),
+    entity_name       VARCHAR(255),
+    entity_id         UUID,
+    related_entity_id UUID,
+    field_name        VARCHAR(255),
+    field_value       VARCHAR(255),
     CONSTRAINT pk_audit PRIMARY KEY (id)
 );
 
@@ -306,6 +308,9 @@ ALTER TABLE account
 
 ALTER TABLE attribute
     ADD CONSTRAINT FK_ATTRIBUTE_ON_GROUP FOREIGN KEY (group_id) REFERENCES attribute_group (id);
+
+ALTER TABLE audit
+    ADD CONSTRAINT FK_AUDIT_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE cash_flow
     ADD CONSTRAINT FK_CASH_FLOW_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);

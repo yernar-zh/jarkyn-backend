@@ -2,31 +2,53 @@ package kz.jarkyn.backend.audit.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.user.model.UserEntity;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "audit")
 public class AuditEntity extends AbstractEntity {
-    @Column(name = "user_id")
-    private UUID userId;
+    private Instant moment;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+    @Enumerated(EnumType.STRING)
+    private AuditType type;
     @Column(name = "entity_name")
     private String entityName;
     @Column(name = "entity_id")
     private UUID entityId;
-    @Column(name = "entity_parent_id")
-    private UUID entityParentId;
+    @Column(name = "related_entity_id")
+    private UUID relatedEntityId;
     @Column(name = "field_name")
     private String fieldName;
     @Column(name = "field_value")
     private String fieldValue;
 
-    public UUID getUserId() {
-        return userId;
+    public Instant getMoment() {
+        return moment;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setMoment(Instant moment) {
+        this.moment = moment;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public AuditType getType() {
+        return type;
+    }
+
+    public void setType(AuditType type) {
+        this.type = type;
     }
 
     public String getEntityName() {
@@ -45,12 +67,12 @@ public class AuditEntity extends AbstractEntity {
         this.entityId = entityId;
     }
 
-    public UUID getEntityParentId() {
-        return entityParentId;
+    public UUID getRelatedEntityId() {
+        return relatedEntityId;
     }
 
-    public void setEntityParentId(UUID entityParentId) {
-        this.entityParentId = entityParentId;
+    public void setRelatedEntityId(UUID relatedEntityId) {
+        this.relatedEntityId = relatedEntityId;
     }
 
     public String getFieldName() {

@@ -63,16 +63,16 @@ public class ItemService {
             item.setDocument(document);
             item.setPosition(entry.getReceivedPosition());
             itemRepository.save(item);
-            auditService.saveChanges(item);
+            auditService.saveChanges(item, item.getDocument());
         }
         for (EntityDivider<ItemEntity, ItemRequest>.Entry entry : divider.edited()) {
             itemMapper.editEntity(entry.getCurrent(), entry.getReceived());
             entry.getCurrent().setPosition(entry.getReceivedPosition());
-            auditService.saveChanges(entry.getCurrent());
+            auditService.saveChanges(entry.getCurrent(), entry.getCurrent().getDocument());
         }
         for (ItemEntity item : divider.skippedCurrent()) {
             itemRepository.delete(item);
-            auditService.deleteChanges(item);
+            auditService.deleteChanges(item, item.getDocument());
         }
     }
 

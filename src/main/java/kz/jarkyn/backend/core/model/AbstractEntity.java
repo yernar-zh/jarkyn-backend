@@ -13,6 +13,7 @@ import java.util.UUID;
 public abstract class AbstractEntity implements Persistable<UUID> {
 
     @Id
+    @IgnoreAudit
     private UUID id;
     @IgnoreAudit
     private Instant createdAt;
