@@ -1,17 +1,24 @@
 package kz.jarkyn.backend.audit.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import kz.jarkyn.backend.audit.mapper.ChangeMapper;
 import kz.jarkyn.backend.audit.model.AuditEntity;
 import kz.jarkyn.backend.audit.model.AuditType;
+import kz.jarkyn.backend.audit.model.dto.ChangeEntityResponse;
 import kz.jarkyn.backend.audit.model.dto.ChangeGroupResponse;
-import kz.jarkyn.backend.audit.model.dto.EntityChangeResponse;
-import kz.jarkyn.backend.audit.model.dto.FieldChangeResponse;
+import kz.jarkyn.backend.audit.model.dto.ChangeFieldResponse;
 import kz.jarkyn.backend.audit.repository.AuditRepository;
+import kz.jarkyn.backend.core.model.ReferenceEntity;
 import kz.jarkyn.backend.core.sorts.EntitySorts;
 import kz.jarkyn.backend.audit.specifications.AuditSpecifications;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 import kz.jarkyn.backend.user.service.UserService;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,19 +37,21 @@ public class AuditService {
     private final AuditRepository auditRepository;
     private final UserService userService;
     private final ChangeMapper changeMapper;
+    private final ObjectMapper objectMapper;
 
-    public AuditService(AuditRepository auditRepository,
-                        UserService userService,
-                        ChangeMapper changeMapper) {
+    public AuditService(
+            AuditRepository auditRepository,
+            UserService userService,
+            ChangeMapper changeMapper,
+            ObjectMapper objectMapper) {
         this.auditRepository = auditRepository;
         this.userService = userService;
         this.changeMapper = changeMapper;
+        this.objectMapper = objectMapper;
     }
 
-
     public List<ChangeGroupResponse> findChanges(UUID entityId) {
-        Map<UUID, Map<String, String>> beforeFiledValuesMap = new HashMap<>();
-        return auditRepository.findAll(
+        List<List<AuditEntity>> changeGroups = auditRepository.findAll(
                         Specification.where(AuditSpecifications.relatedEntityId(entityId)))
                 .stream().collect(Collectors.groupingBy(
                         AuditEntity::getMoment,
@@ -53,43 +62,51 @@ public class AuditService {
                                 ),
                                 map -> List.copyOf(map.values())
                         ))).values().stream()
-                .sorted(Comparator.comparing(changeGroupAudits -> changeGroupAudits.getFirst().getMoment()))
-                .map(changeGroupAudits -> {
-                    AuditEntity firstChangeGroupAudit = changeGroupAudits.getFirst();
-                    List<EntityChangeResponse> entityChanges = changeGroupAudits
-                            .stream().collect(Collectors.groupingBy(AuditEntity::getEntityId))
-                            .values().stream().map(entityChangeAudits -> {
-                                AuditEntity firstEntityChangeAudits = entityChangeAudits.getFirst();
-                                Set<String> existKeys = entityChangeAudits.stream().map(AuditEntity::getFieldName)
-                                        .filter(fieldName -> !fieldName.isEmpty()).collect(Collectors.toSet());
-                                Map<String, String> beforeFiledValues = beforeFiledValuesMap
-                                        .computeIfAbsent(entityChangeAudits.getFirst().getEntityId(), _ -> new HashMap<>());
-                                List<FieldChangeResponse> existChanges = entityChangeAudits.stream()
-                                        .filter(audit -> !audit.getFieldName().isEmpty()).map(audit -> {
-                                            String beforeFiledValue = beforeFiledValues.get(audit.getFieldName());
-                                            beforeFiledValues.put(audit.getFieldName(), audit.getFieldValue());
-                                            return changeMapper.toFieldChangeResponse(audit.getFieldName(), beforeFiledValue, audit.getFieldValue());
-                                        }).toList();
-                                List<FieldChangeResponse> noChanges = beforeFiledValues.entrySet().stream()
-                                        .filter(entry -> !existKeys.contains(entry.getKey()))
-                                        .map(entry -> changeMapper.toFieldChangeResponse(entry.getKey(), entry.getValue(), entry.getValue()))
-                                        .toList();
-                                EntityChangeResponse.Type type = switch (firstEntityChangeAudits.getType()) {
-                                    case CREATED -> EntityChangeResponse.Type.CREATED;
-                                    case EDITED -> EntityChangeResponse.Type.EDITED;
-                                    case DELETED -> EntityChangeResponse.Type.DELETED;
-                                    default -> throw new IllegalStateException();
-                                };
-                                return changeMapper.toEntityChangeResponse(
-                                        type, firstEntityChangeAudits.getEntityName(), firstEntityChangeAudits.getEntityId(),
-                                        Stream.of(existChanges, noChanges).flatMap(Collection::stream).toList());
-                            }).toList();
-                    return changeMapper.toGroupResponse(
-                            firstChangeGroupAudit.getMoment(), firstChangeGroupAudit.getUser(),
-                            firstChangeGroupAudit.getType(),
-                            firstChangeGroupAudit.getType().equals(AuditType.CREATED) ? List.of() : entityChanges
-                    );
-                }).sorted(Comparator.comparing(ChangeGroupResponse::getMoment).reversed()).toList();
+                .sorted(Comparator.comparing(changeGroupAudits -> changeGroupAudits.getFirst().getMoment())).toList();
+
+        Map<UUID, Map<String, String>> beforeFiledValuesMap = new HashMap<>();
+        final Boolean[] created = {true};
+        return changeGroups.stream().map(changeGroupAudits -> {
+            List<ChangeEntityResponse> entityChanges = changeGroupAudits
+                    .stream().collect(Collectors.groupingBy(AuditEntity::getEntityId))
+                    .values().stream().map(entityChangeAudits -> {
+                        AuditEntity firstEntityChangeAudit = entityChangeAudits.getFirst();
+                        Set<String> existKeys = entityChangeAudits.stream().map(AuditEntity::getFieldName)
+                                .filter(fieldName -> !fieldName.isEmpty()).collect(Collectors.toSet());
+                        Map<String, String> beforeFiledValues = beforeFiledValuesMap
+                                .computeIfAbsent(entityChangeAudits.getFirst().getEntityId(), _ -> new HashMap<>());
+                        List<ChangeFieldResponse> existChanges = entityChangeAudits.stream()
+                                .filter(audit -> !audit.getFieldName().isEmpty()).map(audit -> {
+                                    String beforeFiledValue = beforeFiledValues.get(audit.getFieldName());
+                                    beforeFiledValues.put(audit.getFieldName(), audit.getFieldValue());
+                                    return changeMapper.toFieldChangeResponse(audit.getFieldName(),
+                                            toJsonNode(beforeFiledValue),
+                                            toJsonNode(audit.getFieldValue()));
+                                }).toList();
+                        List<ChangeFieldResponse> noChanges = beforeFiledValues.entrySet().stream()
+                                .filter(entry -> !existKeys.contains(entry.getKey()))
+                                .map(entry -> changeMapper.toFieldChangeResponse(entry.getKey(),
+                                        toJsonNode(entry.getValue()),
+                                        toJsonNode(entry.getValue())))
+                                .toList();
+                        return changeMapper.toEntityChangeResponse(
+                                firstEntityChangeAudit.getType(),
+                                firstEntityChangeAudit.getEntityName(), firstEntityChangeAudit.getEntityId(),
+                                Stream.of(existChanges, noChanges).flatMap(Collection::stream).toList());
+                    }).toList();
+            AuditEntity firstChangeGroupAudit = changeGroupAudits.getFirst();
+            if (created[0]) {
+                created[0] = false;
+                return changeMapper.toGroupResponse(
+                        firstChangeGroupAudit.getMoment(), firstChangeGroupAudit.getUser(),
+                        ChangeGroupResponse.Type.CREATED, List.of());
+            } else {
+                return changeMapper.toGroupResponse(
+                        firstChangeGroupAudit.getMoment(), firstChangeGroupAudit.getUser(),
+                        ChangeGroupResponse.Type.EDITED, entityChanges);
+            }
+
+        }).sorted(Comparator.comparing(ChangeGroupResponse::getMoment).reversed()).toList();
     }
 
     public void saveChanges(AbstractEntity entity) {
@@ -107,17 +124,7 @@ public class AuditService {
                     continue;
                 }
                 field.setAccessible(true);
-                Object fieldValueObj = field.get(entity);
-                String fieldValue;
-                if (fieldValueObj == null) {
-                    fieldValue = "";
-                } else if (fieldValueObj instanceof AbstractEntity abstractEntity) {
-                    fieldValue = Objects.requireNonNull(abstractEntity.getId()).toString();
-                } else {
-                    fieldValue = fieldValueObj.toString();
-                }
-                save(entity.getClass().getSimpleName(), entity.getId(), relatedEntity.getId(),
-                        field.getName(), fieldValue);
+                save(entity, relatedEntity.getId(), field.getName(), field.get(entity));
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -126,9 +133,16 @@ public class AuditService {
 
     @Transactional
     public void deleteChanges(AbstractEntity entity, AbstractEntity relatedEntity) {
+        UserEntity user = userService.findCurrent();
+        Instant moment = auditRepository.findAll(Specification
+                        .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
+                        .and(AuditSpecifications.user(user))
+                        .and(AuditSpecifications.createdLessThanOneSecond()))
+                .stream().map(AuditEntity::getMoment)
+                .findAny().orElse(Instant.now());
         AuditEntity newAudit = new AuditEntity();
-        newAudit.setMoment(Instant.now());
-        newAudit.setUser(userService.findCurrent());
+        newAudit.setMoment(moment);
+        newAudit.setUser(user);
         newAudit.setType(AuditType.DELETED);
         newAudit.setEntityName(entity.getClass().getSimpleName());
         newAudit.setEntityId(entity.getId());
@@ -138,12 +152,44 @@ public class AuditService {
         auditRepository.save(newAudit);
     }
 
-    private void save(String entityName, UUID entityId, UUID relatedEntityId, String fieldName, String fieldValue) {
+    private JsonNode toJsonNode(String json) {
+        if (json == null) return null;
+        try {
+            return objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void save(AbstractEntity entity, UUID relatedEntityId, String fieldName, Object fieldValueObj) {
         AuditEntity oldAudit = auditRepository.findOne(Specification
-                        .where(AuditSpecifications.entityId(entityId))
+                        .where(AuditSpecifications.entityId(entity.getId()))
                         .and(AuditSpecifications.relatedEntityId(relatedEntityId))
                         .and(AuditSpecifications.fieldName(fieldName))
                 , EntitySorts.byCreatedDesc());
+
+        JsonNode fieldValueNode;
+        if (fieldValueObj instanceof ReferenceEntity reference) {
+            fieldValueNode = objectMapper.createObjectNode()
+                    .put("id", String.valueOf(reference.getId()))
+                    .put("name", reference.getName())
+                    .put("archived", reference.getArchived());
+        } else if (fieldValueObj instanceof DocumentEntity document) {
+            fieldValueNode = objectMapper.createObjectNode()
+                    .put("id", String.valueOf(document.getId()))
+                    .put("name", document.getName())
+                    .put("deleted", document.getDeleted());
+        } else {
+            fieldValueNode = objectMapper.valueToTree(fieldValueObj);
+        }
+
+        String fieldValue;
+        try {
+            fieldValue = objectMapper.writeValueAsString(fieldValueNode);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         if (oldAudit != null && oldAudit.getFieldValue().equals(fieldValue)) {
             return;
         }
@@ -162,8 +208,8 @@ public class AuditService {
         newAudit.setMoment(moment);
         newAudit.setUser(user);
         newAudit.setType(type);
-        newAudit.setEntityName(entityName);
-        newAudit.setEntityId(entityId);
+        newAudit.setEntityName(entity.getClass().getSimpleName());
+        newAudit.setEntityId(entity.getId());
         newAudit.setRelatedEntityId(relatedEntityId);
         newAudit.setFieldName(fieldName);
         newAudit.setFieldValue(fieldValue);

@@ -1,9 +1,10 @@
 package kz.jarkyn.backend.audit.mapper;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import kz.jarkyn.backend.audit.model.AuditType;
+import kz.jarkyn.backend.audit.model.dto.ChangeEntityResponse;
 import kz.jarkyn.backend.audit.model.dto.ChangeGroupResponse;
-import kz.jarkyn.backend.audit.model.dto.EntityChangeResponse;
-import kz.jarkyn.backend.audit.model.dto.FieldChangeResponse;
+import kz.jarkyn.backend.audit.model.dto.ChangeFieldResponse;
 import kz.jarkyn.backend.core.mapper.BaseMapperConfig;
 import kz.jarkyn.backend.user.model.UserEntity;
 import org.mapstruct.Mapper;
@@ -14,12 +15,12 @@ import java.util.UUID;
 
 @Mapper(config = BaseMapperConfig.class)
 public interface ChangeMapper {
-    FieldChangeResponse toFieldChangeResponse(String fieldName, String before, String after);
-    EntityChangeResponse toEntityChangeResponse(
-            EntityChangeResponse.Type type, String entityName, UUID entityId,
-            List<FieldChangeResponse> fieldChanges);
+    ChangeFieldResponse toFieldChangeResponse(String fieldName, JsonNode before, JsonNode after);
+    ChangeEntityResponse toEntityChangeResponse(
+            AuditType type, String entityName, UUID entityId,
+            List<ChangeFieldResponse> fieldChanges);
     ChangeGroupResponse toGroupResponse(
-            Instant moment, UserEntity user, AuditType type,
-            List<EntityChangeResponse> entityChanges);
+            Instant moment, UserEntity user, ChangeGroupResponse.Type type,
+            List<ChangeEntityResponse> entityChanges);
 
 }

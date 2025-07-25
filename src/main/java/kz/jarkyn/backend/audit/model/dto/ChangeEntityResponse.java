@@ -1,18 +1,15 @@
 package kz.jarkyn.backend.audit.model.dto;
 
+import kz.jarkyn.backend.audit.model.AuditType;
 import org.immutables.value.Value;
 
 import java.util.List;
 import java.util.UUID;
 
 @Value.Immutable
-public interface EntityChangeResponse {
-    Type getType();
+public interface ChangeEntityResponse {
+    AuditType getType();
     String getEntityName();
     UUID getEntityId();
-    List<FieldChangeResponse> getFieldChanges();
-
-    enum Type {
-        CREATED, EDITED, DELETED
-    }
+    List<ChangeFieldResponse> getFieldChanges();
 }

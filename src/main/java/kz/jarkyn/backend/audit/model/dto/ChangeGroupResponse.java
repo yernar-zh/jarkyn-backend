@@ -12,5 +12,9 @@ public interface ChangeGroupResponse {
     Instant getMoment();
     ReferenceResponse getUser();
     AuditType getType();
-    List<EntityChangeResponse> getEntityChanges();
+    List<ChangeEntityResponse> getEntityChanges();
+
+    enum Type {
+        CREATED, EDITED
+    }
 }

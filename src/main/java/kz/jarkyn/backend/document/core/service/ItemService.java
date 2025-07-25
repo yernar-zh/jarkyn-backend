@@ -47,10 +47,13 @@ public class ItemService {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         List<Pair<WarehouseEntity, GoodEntity>> goodsPair = items.stream()
                 .map(itemEntity -> Pair.of(document.getWarehouse(), itemEntity.getGood()))
-                .toList();
-        TurnoverService.StockDto stock = turnoverService.findStockAtMoment(goodsPair, document.getMoment()).getFirst();
+                .distinct().toList();
+        Map<GoodEntity, TurnoverService.StockDto> stocks = turnoverService
+                .findStockAtMoment(goodsPair, document.getMoment())
+                .stream().collect(Collectors.toMap(TurnoverService.StockDto::getGood, Function.identity()));
         return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition))
-                .map(item -> itemMapper.toResponse(item, stock.getRemain(), stock.getCostPrice()))
+                .map(item -> itemMapper.toResponse(item, stocks.get(item.getGood()).getRemain(),
+                        stocks.get(item.getGood()).getCostPrice()))
                 .toList();
     }
 
@@ -98,7 +101,7 @@ public class ItemService {
     public void createNegativeTurnover(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         for (ItemEntity item : items) {
-            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), BigDecimal.ZERO);
+            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), BigDecimal.ZERO); // TODO
         }
     }
 

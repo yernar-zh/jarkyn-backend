@@ -3,14 +3,14 @@ package kz.jarkyn.backend.warehouse.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.core.model.ReferenceEntity;
 import kz.jarkyn.backend.global.model.ImageEntity;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "good")
-public class GoodEntity extends AbstractEntity {
-    private String name;
+public class GoodEntity extends ReferenceEntity {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private GroupEntity group;
@@ -20,15 +20,6 @@ public class GoodEntity extends AbstractEntity {
     private BigDecimal weight;
     @Column(name = "minimum_price")
     private Integer minimumPrice;
-    private Boolean archived;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public GroupEntity getGroup() {
         return group;
@@ -60,13 +51,5 @@ public class GoodEntity extends AbstractEntity {
 
     public void setMinimumPrice(Integer minimumPrice) {
         this.minimumPrice = minimumPrice;
-    }
-
-    public Boolean getArchived() {
-        return archived;
-    }
-
-    public void setArchived(Boolean archived) {
-        this.archived = archived;
     }
 }

@@ -79,7 +79,7 @@ public class TurnoverService {
         Map<GoodEntity, Integer> lastTurnoverMap = turnoverRepository
                 .findLastByMomentLessThan(warehouse, goods, moment).stream()
                 .collect(toMap(TurnoverEntity::getGood, turnover -> turnover.getRemain() + turnover.getQuantity()));
-        Map<GoodEntity, Integer> defaultMap = goods.stream().collect(toMap(good -> good, _ -> 0));
+        Map<GoodEntity, Integer> defaultMap = goods.stream().distinct().collect(toMap(good -> good, _ -> 0));
 
         LinkedHashMap<GoodEntity, Integer> result = new LinkedHashMap<>();
         Stream.of(lastTurnoverMap, defaultMap).forEach(map -> map.forEach(result::putIfAbsent));
@@ -93,7 +93,8 @@ public class TurnoverService {
         Map<GoodEntity, BigDecimal> firstInflowMap = turnoverRepository
                 .findFirstInflow(warehouse, goods, moment).stream()
                 .collect(toMap(TurnoverEntity::getGood, TurnoverEntity::getCostPricePerUnit));
-        Map<GoodEntity, BigDecimal> defaultMap = goods.stream().collect(toMap(good -> good, _ -> BigDecimal.ZERO));
+        Map<GoodEntity, BigDecimal> defaultMap = goods.stream().distinct()
+                .collect(toMap(good -> good, _ -> BigDecimal.ZERO));
 
         LinkedHashMap<GoodEntity, BigDecimal> result = new LinkedHashMap<>();
         Stream.of(firstInflowMap, defaultMap).forEach(map -> map.forEach(result::putIfAbsent));

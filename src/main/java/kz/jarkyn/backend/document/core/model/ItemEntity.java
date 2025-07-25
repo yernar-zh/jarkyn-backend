@@ -22,8 +22,8 @@ public class ItemEntity extends AbstractEntity {
     @JoinColumn(name = "good_id")
     private GoodEntity good;
     private Integer quantity;
-    @IgnoreAudit
     private BigDecimal price;
+    @IgnoreAudit
     private Integer position;
 
     public DocumentEntity getDocument() {
