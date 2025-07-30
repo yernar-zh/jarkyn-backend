@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(Api.History.PATH)
-public class HistoryController {
+@RequestMapping(Api.Change.PATH)
+public class ChangeController {
     private final AuditService auditService;
 
-    public HistoryController(AuditService auditService) {
+    public ChangeController(AuditService auditService) {
         this.auditService = auditService;
     }
 

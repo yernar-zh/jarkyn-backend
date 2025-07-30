@@ -100,13 +100,13 @@ public class AuditService {
                                 .filter(parts -> parts.length > 1)
                                 .map(parts -> parts[0])
                                 .orElse(null);
-                        List<FieldChangeResponse> changeFields = changes.stream().map(triple ->
+                        List<FieldChangeResponse> fieldChanges = changes.stream().map(triple ->
                                 changeMapper.toFieldChangeResponse(
                                         entityName != null ? triple.getFirst().substring(entityName.length()) : triple.getFirst(),
                                         toJsonNode(triple.getSecond()),
                                         toJsonNode(triple.getThird()))
                         ).toList();
-                        return Pair.of(entityName, changeMapper.toEntityChangeResponse(action, changeFields));
+                        return Pair.of(entityName, changeMapper.toEntityChangeResponse(action, fieldChanges));
                     }).toList();
             String action = changeEntityPairs.stream()
                     .filter(pair -> pair.getFirst() == null)
@@ -114,7 +114,7 @@ public class AuditService {
                     .findFirst().orElse(EDITE);
             List<FieldChangeResponse> fieldChanges = changeEntityPairs.stream()
                     .filter(pair -> pair.getFirst() == null)
-                    .map(Pair::getSecond).map(EntityChangeResponse::getChangeFields)
+                    .map(Pair::getSecond).map(EntityChangeResponse::getFieldChanges)
                     .findFirst().orElse(List.of())
                     .stream()
                     .filter(_ -> !action.equals(CREATE))

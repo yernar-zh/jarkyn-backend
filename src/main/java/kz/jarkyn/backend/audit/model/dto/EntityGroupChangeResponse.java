@@ -6,6 +6,6 @@ import java.util.List;
 
 @Value.Immutable
 public interface EntityGroupChangeResponse {
-    String getName();
-    List<EntityChangeResponse> getChangeEntities();
+    String getEntityName();
+    List<EntityChangeResponse> getEntityChanges();
 }

@@ -7,5 +7,5 @@ import java.util.List;
 @Value.Immutable
 public interface EntityChangeResponse {
     String getAction();
-    List<FieldChangeResponse> getChangeFields();
+    List<FieldChangeResponse> getFieldChanges();
 }
