@@ -82,7 +82,7 @@ public class AccountService {
                     account.setGiro("");
                     account.setArchived(false);
                     accountRepository.save(account);
-                    auditService.saveChanges(account);
+                    auditService.saveEntity(account);
                     return account;
                 });
     }
@@ -104,7 +104,7 @@ public class AccountService {
     public UUID createApi(AccountRequest request) {
         AccountEntity account = accountRepository.save(accountMapper.toEntity(request));
         account.setCounterparty(null);
-        auditService.saveChanges(account);
+        auditService.saveEntity(account);
         return account.getId();
     }
 
@@ -116,6 +116,6 @@ public class AccountService {
         }
         ExceptionUtils.requireEqualsApi(account.getCurrency().getId(), request.getCurrency().getId(), "currency");
         accountMapper.editEntity(account, request);
-        auditService.saveChanges(account);
+        auditService.saveEntity(account);
     }
 }

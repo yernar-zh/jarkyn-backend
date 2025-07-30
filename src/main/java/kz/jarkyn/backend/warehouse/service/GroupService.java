@@ -66,7 +66,7 @@ public class GroupService {
         GroupEntity entity = groupMapper.toEntity(request);
         entity.setPosition(1000);
         groupRepository.save(entity);
-        auditService.saveChanges(entity);
+        auditService.saveEntity(entity);
         return findApiById(entity.getId());
     }
 

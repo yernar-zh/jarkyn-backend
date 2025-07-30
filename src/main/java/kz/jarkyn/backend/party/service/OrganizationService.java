@@ -52,7 +52,7 @@ public class OrganizationService {
     @Transactional
     public UUID createApi(OrganizationRequest request) {
         OrganizationEntity organization = organizationRepository.save(organizationMapper.toEntity(request));
-        auditService.saveChanges(organization);
+        auditService.saveEntity(organization);
         return organization.getId();
     }
 
@@ -60,6 +60,6 @@ public class OrganizationService {
     public void editApi(UUID id, OrganizationRequest request) {
         OrganizationEntity organization = organizationRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         organizationMapper.editEntity(organization, request);
-        auditService.saveChanges(organization);
+        auditService.saveEntity(organization);
     }
 }

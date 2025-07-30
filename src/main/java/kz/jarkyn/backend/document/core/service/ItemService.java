@@ -21,7 +21,6 @@ import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -66,16 +65,16 @@ public class ItemService {
             item.setDocument(document);
             item.setPosition(entry.getReceivedPosition());
             itemRepository.save(item);
-            auditService.saveChanges(item, item.getDocument());
+            auditService.saveEntity(item, item.getDocument(), "items");
         }
         for (EntityDivider<ItemEntity, ItemRequest>.Entry entry : divider.edited()) {
             itemMapper.editEntity(entry.getCurrent(), entry.getReceived());
             entry.getCurrent().setPosition(entry.getReceivedPosition());
-            auditService.saveChanges(entry.getCurrent(), entry.getCurrent().getDocument());
+            auditService.saveEntity(entry.getCurrent(), entry.getCurrent().getDocument(), "items");
         }
         for (ItemEntity item : divider.skippedCurrent()) {
             itemRepository.delete(item);
-            auditService.deleteChanges(item, item.getDocument());
+            auditService.delete(item, item.getDocument());
         }
     }
 

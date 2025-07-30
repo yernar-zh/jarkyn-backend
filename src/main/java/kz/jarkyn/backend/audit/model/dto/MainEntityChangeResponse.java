@@ -1,6 +1,5 @@
 package kz.jarkyn.backend.audit.model.dto;
 
-import kz.jarkyn.backend.audit.model.AuditType;
 import kz.jarkyn.backend.core.model.dto.ReferenceResponse;
 import org.immutables.value.Value;
 
@@ -8,13 +7,8 @@ import java.time.Instant;
 import java.util.List;
 
 @Value.Immutable
-public interface ChangeGroupResponse {
+public interface MainEntityChangeResponse extends EntityChangeResponse {
     Instant getMoment();
     ReferenceResponse getUser();
-    AuditType getType();
-    List<ChangeEntityResponse> getEntityChanges();
-
-    enum Type {
-        CREATED, EDITED
-    }
+    List<EntityGroupChangeResponse> getSubEntityGroupChanges();
 }

@@ -14,18 +14,16 @@ public class AuditEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-    @Enumerated(EnumType.STRING)
-    private AuditType type;
     @Column(name = "entity_name")
     private String entityName;
     @Column(name = "entity_id")
     private UUID entityId;
     @Column(name = "related_entity_id")
     private UUID relatedEntityId;
-    @Column(name = "field_name")
-    private String fieldName;
-    @Column(name = "field_value")
-    private String fieldValue;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "value")
+    private String value;
 
     public Instant getMoment() {
         return moment;
@@ -41,14 +39,6 @@ public class AuditEntity extends AbstractEntity {
 
     public void setUser(UserEntity user) {
         this.user = user;
-    }
-
-    public AuditType getType() {
-        return type;
-    }
-
-    public void setType(AuditType type) {
-        this.type = type;
     }
 
     public String getEntityName() {
@@ -75,19 +65,19 @@ public class AuditEntity extends AbstractEntity {
         this.relatedEntityId = relatedEntityId;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String getName() {
+        return name;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getFieldValue() {
-        return fieldValue;
+    public String getValue() {
+        return value;
     }
 
-    public void setFieldValue(String fieldValue) {
-        this.fieldValue = fieldValue;
+    public void setValue(String value) {
+        this.value = value;
     }
 }

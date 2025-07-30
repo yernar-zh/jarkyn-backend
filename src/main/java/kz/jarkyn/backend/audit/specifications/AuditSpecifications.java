@@ -17,8 +17,8 @@ public class AuditSpecifications {
         return (root, query, cb) -> cb.equal(root.get(AuditEntity_.relatedEntityId), relatedEntityId);
     }
 
-    public static Specification<AuditEntity> fieldName(String fieldName) {
-        return (root, query, cb) -> cb.equal(root.get(AuditEntity_.fieldName), fieldName);
+    public static Specification<AuditEntity> name(String fieldName) {
+        return (root, query, cb) -> cb.equal(root.get(AuditEntity_.name), fieldName);
     }
 
     public static Specification<AuditEntity> user(UserEntity user) {

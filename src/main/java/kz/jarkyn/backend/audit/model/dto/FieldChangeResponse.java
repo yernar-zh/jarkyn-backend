@@ -5,7 +5,7 @@ import jakarta.annotation.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface ChangeFieldResponse {
+public interface FieldChangeResponse {
     String getFieldName();
     @Nullable JsonNode getBefore();
     @Nullable JsonNode getAfter();

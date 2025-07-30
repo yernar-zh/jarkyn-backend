@@ -74,7 +74,7 @@ public class CounterpartyService {
     @Transactional
     public UUID create(CounterpartyRequest request) {
         CounterpartyEntity counterparty = counterpartyRepository.save(counterpartyMapper.toEntity(request));
-        auditService.saveChanges(counterparty);
+        auditService.saveEntity(counterparty);
         return counterparty.getId();
     }
 
@@ -82,6 +82,6 @@ public class CounterpartyService {
     public void edit(UUID id, CounterpartyRequest request) {
         CounterpartyEntity counterparty = counterpartyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         counterpartyMapper.editEntity(counterparty, request);
-        auditService.saveChanges(counterparty);
+        auditService.saveEntity(counterparty);
     }
 }

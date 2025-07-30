@@ -2,9 +2,6 @@
 package kz.jarkyn.backend.warehouse.service;
 
 
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
@@ -12,15 +9,6 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.document.core.model.DocumentEntity_;
-import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity;
-import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity_;
-import kz.jarkyn.backend.document.supply.model.SupplyEntity;
-import kz.jarkyn.backend.document.supply.model.SupplyEntity_;
-import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
-import kz.jarkyn.backend.global.model.CurrencyEntity_;
-import kz.jarkyn.backend.party.model.OrganizationEntity_;
-import kz.jarkyn.backend.party.model.PartyEntity_;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseRequest;
@@ -30,7 +18,6 @@ import kz.jarkyn.backend.warehouse.mapper.WarehouseMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -75,7 +62,7 @@ public class WarehouseService {
     @Transactional
     public UUID createApi(WarehouseRequest request) {
         WarehouseEntity warehouse = warehouseRepository.save(warehouseMapper.toEntity(request));
-        auditService.saveChanges(warehouse);
+        auditService.saveEntity(warehouse);
         return warehouse.getId();
     }
 
@@ -83,6 +70,6 @@ public class WarehouseService {
     public void editApi(UUID id, WarehouseRequest request) {
         WarehouseEntity warehouse = warehouseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         warehouseMapper.editEntity(warehouse, request);
-        auditService.saveChanges(warehouse);
+        auditService.saveEntity(warehouse);
     }
 }

@@ -126,7 +126,7 @@ public class SupplyService {
         supply.setDeleted(false);
         supply.setCommited(false);
         supplyRepository.save(supply);
-        auditService.saveChanges(supply);
+        auditService.saveEntity(supply);
         itemService.saveApi(supply, request.getItems());
         return supply.getId();
     }
@@ -136,7 +136,7 @@ public class SupplyService {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         documentService.validateName(supply);
         supplyMapper.editEntity(supply, request);
-        auditService.saveChanges(supply);
+        auditService.saveEntity(supply);
         itemService.saveApi(supply, request.getItems());
     }
 
@@ -145,7 +145,7 @@ public class SupplyService {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         if (supply.getCommited()) return;
         supply.setCommited(Boolean.TRUE);
-        auditService.saveChanges(supply);
+        auditService.saveEntity(supply);
         itemService.createPositiveTurnover(supply, supply.getAmount().multiply(supply.getExchangeRate()));
         AccountEntity supplerAccount = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
@@ -157,7 +157,7 @@ public class SupplyService {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         if (!supply.getCommited()) return;
         supply.setCommited(Boolean.FALSE);
-        auditService.saveChanges(supply);
+        auditService.saveEntity(supply);
         itemService.deleteTurnover(supply);
         cashFlowService.delete(supply);
     }
@@ -169,6 +169,6 @@ public class SupplyService {
         if (!paidDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
         if (supply.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         supply.setDeleted(Boolean.TRUE);
-        auditService.saveChanges(supply);
+        auditService.saveEntity(supply);
     }
 }

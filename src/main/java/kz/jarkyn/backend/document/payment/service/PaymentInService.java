@@ -120,7 +120,7 @@ public class PaymentInService {
         paymentIn.setDeleted(false);
         paymentIn.setCommited(false);
         paymentInRepository.save(paymentIn);
-        auditService.saveChanges(paymentIn);
+        auditService.saveEntity(paymentIn);
         paidDocumentService.saveApi(paymentIn, request.getPaidDocuments());
         return paymentIn.getId();
     }
@@ -130,7 +130,7 @@ public class PaymentInService {
         PaymentInEntity paymentIn = paymentInRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         documentService.validateName(paymentIn);
         paymentInMapper.editEntity(paymentIn, request);
-        auditService.saveChanges(paymentIn);
+        auditService.saveEntity(paymentIn);
         paidDocumentService.saveApi(paymentIn, request.getPaidDocuments());
     }
 
@@ -138,7 +138,7 @@ public class PaymentInService {
     public void commit(UUID id) {
         PaymentInEntity paymentIn = paymentInRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         paymentIn.setCommited(Boolean.TRUE);
-        auditService.saveChanges(paymentIn);
+        auditService.saveEntity(paymentIn);
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 paymentIn.getOrganization(), paymentIn.getCounterparty(), paymentIn.getCurrency());
         cashFlowService.create(paymentIn, account, paymentIn.getAmount());
@@ -149,7 +149,7 @@ public class PaymentInService {
     public void undoCommit(UUID id) {
         PaymentInEntity paymentIn = paymentInRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         paymentIn.setCommited(Boolean.FALSE);
-        auditService.saveChanges(paymentIn);
+        auditService.saveEntity(paymentIn);
         cashFlowService.delete(paymentIn);
     }
 }

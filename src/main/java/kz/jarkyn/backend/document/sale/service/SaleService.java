@@ -2,25 +2,16 @@
 package kz.jarkyn.backend.document.sale.service;
 
 
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.core.search.CriteriaAttributes;
-import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.party.model.AccountEntity;
-import kz.jarkyn.backend.party.model.PartyEntity_;
-import kz.jarkyn.backend.party.model.OrganizationEntity_;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.core.service.ItemService;
-import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity;
-import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity_;
 import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
 import kz.jarkyn.backend.document.payment.service.PaidDocumentService;
 import kz.jarkyn.backend.document.sale.model.SaleEntity;
@@ -30,16 +21,10 @@ import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.sale.repository.SaleRepository;
 import kz.jarkyn.backend.document.sale.mapper.SaleMapper;
-import kz.jarkyn.backend.document.sale.model.SaleEntity_;
-import kz.jarkyn.backend.operation.mode.TurnoverEntity;
-import kz.jarkyn.backend.operation.mode.TurnoverEntity_;
 import kz.jarkyn.backend.operation.service.CashFlowService;
-import kz.jarkyn.backend.global.model.CurrencyEntity_;
-import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -99,7 +84,7 @@ public class SaleService {
         sale.setDeleted(false);
         sale.setCommited(false);
         saleRepository.save(sale);
-        auditService.saveChanges(sale);
+        auditService.saveEntity(sale);
         itemService.saveApi(sale, request.getItems());
         return sale.getId();
     }
@@ -109,7 +94,7 @@ public class SaleService {
         SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         documentService.validateName(sale);
         saleMapper.editEntity(sale, request);
-        auditService.saveChanges(sale);
+        auditService.saveEntity(sale);
         itemService.saveApi(sale, request.getItems());
     }
 
@@ -118,7 +103,7 @@ public class SaleService {
         SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         sale.setState(SaleState.SHIPPED);
         sale.setCommited(Boolean.TRUE);
-        auditService.saveChanges(sale);
+        auditService.saveEntity(sale);
         itemService.createNegativeTurnover(sale);
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 sale.getOrganization(), sale.getCounterparty(), sale.getCurrency());
@@ -129,7 +114,7 @@ public class SaleService {
     public void undoCommit(UUID id) {
         SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         sale.setCommited(Boolean.FALSE);
-        auditService.saveChanges(sale);
+        auditService.saveEntity(sale);
         itemService.deleteTurnover(sale);
         cashFlowService.delete(sale);
     }

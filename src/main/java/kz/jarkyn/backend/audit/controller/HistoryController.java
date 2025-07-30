@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.audit.controller;
 
-import kz.jarkyn.backend.audit.model.dto.ChangeGroupResponse;
+import kz.jarkyn.backend.audit.model.dto.MainEntityChangeResponse;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.controller.Api;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ public class HistoryController {
 
 
     @GetMapping("{entityId}")
-    public List<ChangeGroupResponse> detail(@PathVariable UUID entityId) {
+    public List<MainEntityChangeResponse> detail(@PathVariable UUID entityId) {
         return auditService.findChanges(entityId);
     }
 }

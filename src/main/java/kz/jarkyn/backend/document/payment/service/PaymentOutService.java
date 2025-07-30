@@ -108,7 +108,7 @@ public class PaymentOutService {
         paymentOut.setDeleted(false);
         paymentOut.setCommited(false);
         paymentOutRepository.save(paymentOut);
-        auditService.saveChanges(paymentOut);
+        auditService.saveEntity(paymentOut);
         paidDocumentService.saveApi(paymentOut, request.getPaidDocuments());
         return paymentOut.getId();
     }
@@ -118,7 +118,7 @@ public class PaymentOutService {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         documentService.validateName(paymentOut);
         paymentOutMapper.editEntity(paymentOut, request);
-        auditService.saveChanges(paymentOut);
+        auditService.saveEntity(paymentOut);
         paidDocumentService.saveApi(paymentOut, request.getPaidDocuments());
     }
 
@@ -126,7 +126,7 @@ public class PaymentOutService {
     public void commit(UUID id) {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         paymentOut.setCommited(Boolean.TRUE);
-        auditService.saveChanges(paymentOut);
+        auditService.saveEntity(paymentOut);
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 paymentOut.getOrganization(), paymentOut.getCounterparty(), paymentOut.getCurrency());
         cashFlowService.create(paymentOut, account, paymentOut.getAmount().negate());
@@ -137,7 +137,7 @@ public class PaymentOutService {
     public void undoCommit(UUID id) {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         paymentOut.setCommited(Boolean.FALSE);
-        auditService.saveChanges(paymentOut);
+        auditService.saveEntity(paymentOut);
         cashFlowService.delete(paymentOut);
     }
 
@@ -146,7 +146,7 @@ public class PaymentOutService {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         if (paymentOut.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         paymentOut.setDeleted(Boolean.TRUE);
-        auditService.saveChanges(paymentOut);
+        auditService.saveEntity(paymentOut);
         paidDocumentService.saveApi(paymentOut, List.of());
     }
 }
