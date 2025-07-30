@@ -6,6 +6,6 @@ import java.util.List;
 
 @Value.Immutable
 public interface EntityChangeResponse {
-    String getType();
+    String getAction();
     List<FieldChangeResponse> getChangeFields();
 }

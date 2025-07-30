@@ -15,11 +15,11 @@ import java.util.List;
 @Mapper(config = BaseMapperConfig.class)
 public interface ChangeMapper {
     FieldChangeResponse toFieldChangeResponse(String fieldName, JsonNode before, JsonNode after);
-    EntityChangeResponse toEntityChangeResponse(String type, List<FieldChangeResponse> changeFields);
+    EntityChangeResponse toEntityChangeResponse(String action, List<FieldChangeResponse> changeFields);
     EntityGroupChangeResponse toEntityGroupChangeResponse(
             String name, List<EntityChangeResponse> changeEntities);
     MainEntityChangeResponse toMainEntityChange(
-            Instant moment, UserEntity user, String type,
+            Instant moment, UserEntity user, String action,
             List<FieldChangeResponse> changeFields, List<EntityGroupChangeResponse> subEntityGroupChanges);
 
 }

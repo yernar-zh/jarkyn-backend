@@ -43,10 +43,10 @@ CREATE TABLE audit
     last_modified_at  TIMESTAMP WITHOUT TIME ZONE,
     moment            TIMESTAMP WITHOUT TIME ZONE,
     user_id           UUID,
-    type              VARCHAR(255),
-    entity_name       VARCHAR(255),
-    entity_id         UUID,
     related_entity_id UUID,
+    entity_id         UUID,
+    entity_name       VARCHAR(255),
+    action            VARCHAR(255),
     field_name        VARCHAR(255),
     field_value       VARCHAR(255),
     CONSTRAINT pk_audit PRIMARY KEY (id)
@@ -120,14 +120,14 @@ CREATE TABLE document_type
 CREATE TABLE good
 (
     id               UUID NOT NULL,
+    name             VARCHAR(255),
+    archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    name             VARCHAR(255),
     group_id         UUID,
     image_id         UUID,
     weight           DECIMAL,
     minimum_price    INTEGER,
-    archived         BOOLEAN,
     CONSTRAINT pk_good PRIMARY KEY (id)
 );
 

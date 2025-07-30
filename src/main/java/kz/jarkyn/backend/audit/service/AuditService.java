@@ -33,9 +33,8 @@ import java.util.stream.Stream;
 
 @Service
 public class AuditService {
-    private static final String TYPE_NAME = "$type";
-    private static final String TYPE_CREATED = "CREATED";
-    private static final String TYPE_EDITED = "EDITED";
+    private static final String CREATE = "CREATE";
+    private static final String EDITE = "EDITE";
 
     private final AuditRepository auditRepository;
     private final UserService userService;
@@ -68,30 +67,33 @@ public class AuditService {
                     .stream().map(entityChangeAudits -> {
                         Set<String> existKeys = entityChangeAudits
                                 .stream()
-                                .map(AuditEntity::getName)
-                                .filter(fieldName -> !fieldName.startsWith(TYPE_NAME))
+                                .map(AuditEntity::getFieldName)
+                                .filter(Objects::nonNull)
                                 .collect(Collectors.toSet());
                         Map<String, String> beforeFiledValues = beforeValueMap
                                 .computeIfAbsent(entityChangeAudits.getFirst().getEntityId(), _ -> new HashMap<>());
-                        String type = entityChangeAudits.stream()
-                                .filter(audit -> !audit.getName().equals(TYPE_NAME))
-                                .map(AuditEntity::getValue)
-                                .findFirst().orElse(beforeValueMap.isEmpty() ? TYPE_CREATED : TYPE_EDITED);
-                        List<Triple<String, String, String>> existChanges = entityChangeAudits.stream()
-                                .filter(audit -> existKeys.contains(audit.getName()))
+                        String action = entityChangeAudits.stream()
+                                .map(AuditEntity::getAction)
+                                .findFirst().orElseThrow();
+                        // fieldName, beforeFieldValue, afterFieldValue
+                        List<Triple<String, String, String>> existChanges = entityChangeAudits
+                                .stream()
+                                .filter(audit -> existKeys.contains(audit.getFieldName()))
                                 .map(audit -> {
-                                    String beforeFiledValue = beforeFiledValues.get(audit.getName());
-                                    beforeFiledValues.put(audit.getName(), audit.getValue());
-                                    return Triple.of(audit.getName(), beforeFiledValue, audit.getValue());
+                                    String beforeFiledValue = beforeFiledValues.get(audit.getFieldName());
+                                    beforeFiledValues.put(audit.getFieldName(), audit.getFieldValue());
+                                    return Triple.of(audit.getFieldName(), beforeFiledValue, audit.getFieldValue());
                                 }).toList();
+                        // fieldName, beforeFieldValue, afterFieldValue
                         List<Triple<String, String, String>> noChanges = beforeFiledValues.entrySet().stream()
                                 .filter(entry -> !existKeys.contains(entry.getKey()))
                                 .map(entry -> Triple.of(entry.getKey(), entry.getValue(), entry.getValue()))
                                 .toList();
+                        // fieldName, beforeFieldValue, afterFieldValue
                         List<Triple<String, String, String>> changes = Stream
                                 .of(existChanges, noChanges)
                                 .flatMap(Collection::stream).toList();
-                        String groupName = changes.stream()
+                        String entityName = changes.stream()
                                 .map(Triple::getFirst)
                                 .map(name -> name.split("\\."))
                                 .max(Comparator.comparing(parts -> parts.length))
@@ -100,36 +102,36 @@ public class AuditService {
                                 .orElse(null);
                         List<FieldChangeResponse> changeFields = changes.stream().map(triple ->
                                 changeMapper.toFieldChangeResponse(
-                                        groupName != null ?
-                                                triple.getFirst().substring(groupName.length()) : triple.getFirst(),
+                                        entityName != null ? triple.getFirst().substring(entityName.length()) : triple.getFirst(),
                                         toJsonNode(triple.getSecond()),
                                         toJsonNode(triple.getThird()))
                         ).toList();
-                        return Pair.of(groupName, changeMapper.toEntityChangeResponse(type, changeFields));
+                        return Pair.of(entityName, changeMapper.toEntityChangeResponse(action, changeFields));
                     }).toList();
-            String type = changeEntityPairs.stream()
+            String action = changeEntityPairs.stream()
                     .filter(pair -> pair.getFirst() == null)
-                    .map(pair -> pair.getSecond().getType())
-                    .findFirst().orElse(TYPE_EDITED);
+                    .map(pair -> pair.getSecond().getAction())
+                    .findFirst().orElse(EDITE);
             List<FieldChangeResponse> fieldChanges = changeEntityPairs.stream()
                     .filter(pair -> pair.getFirst() == null)
                     .map(Pair::getSecond).map(EntityChangeResponse::getChangeFields)
                     .findFirst().orElse(List.of())
                     .stream()
-                    .filter(_ -> !type.equals(TYPE_CREATED))
-                    .filter(fieldChange -> !type.equals(TYPE_EDITED) ||
-                                           Objects.equals(fieldChange.getAfter(), fieldChange.getBefore()))
+                    .filter(_ -> !action.equals(CREATE))
+                    .filter(fieldChange -> !action.equals(EDITE) ||
+                                           !Objects.equals(fieldChange.getBefore(), fieldChange.getAfter()))
                     .toList();
             List<EntityGroupChangeResponse> entityGroupChanges = changeEntityPairs.stream()
                     .filter(pair -> pair.getFirst() != null)
                     .collect(Collectors.groupingBy(Pair::getFirst, Collectors.mapping(Pair::getSecond, Collectors.toList())))
                     .entrySet().stream()
                     .map(entry -> changeMapper.toEntityGroupChangeResponse(entry.getKey(), entry.getValue()))
+                    .filter(_ -> !action.equals(CREATE))
                     .toList();
             AuditEntity firstChangeGroupAudit = changeGroupAudits.getFirst();
             return changeMapper.toMainEntityChange(
                     firstChangeGroupAudit.getMoment(), firstChangeGroupAudit.getUser(),
-                    type, fieldChanges, entityGroupChanges);
+                    action, fieldChanges, entityGroupChanges);
         }).sorted(Comparator.comparing(MainEntityChangeResponse::getMoment).reversed()).toList();
     }
 
@@ -158,17 +160,22 @@ public class AuditService {
     }
 
     @Transactional
-    public void delete(AbstractEntity entity, AbstractEntity relatedEntity) {
-        addAction(entity, relatedEntity, "DELETED");
+    public void delete(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
+        addAction(entity, relatedEntity, entityName, "DELETE");
     }
 
     @Transactional
-    public void commit(AbstractEntity entity, AbstractEntity relatedEntity) {
-        addAction(entity, relatedEntity, "DELETED");
+    public void commit(AbstractEntity entity) {
+        addAction(entity, entity, null, "COMMIT");
     }
 
     @Transactional
-    public void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String action) {
+    public void undoCommit(AbstractEntity entity) {
+        addAction(entity, entity, null, "UNDO_COMMIT");
+    }
+
+    @Transactional
+    public void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String entityName, String action) {
         UserEntity user = userService.findCurrent();
         Instant moment = auditRepository.findAll(Specification
                         .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
@@ -182,8 +189,10 @@ public class AuditService {
         newAudit.setEntityName(entity.getClass().getSimpleName());
         newAudit.setEntityId(entity.getId());
         newAudit.setRelatedEntityId(relatedEntity.getId());
-        newAudit.setName(TYPE_CREATED);
-        newAudit.setValue(action);
+        newAudit.setEntityName(entityName);
+        newAudit.setAction(action);
+        newAudit.setFieldName(null);
+        newAudit.setFieldName(null);
         auditRepository.save(newAudit);
     }
 
@@ -200,7 +209,7 @@ public class AuditService {
         AuditEntity oldAudit = auditRepository.findOne(Specification
                         .where(AuditSpecifications.entityId(entity.getId()))
                         .and(AuditSpecifications.relatedEntityId(relatedEntityId))
-                        .and(AuditSpecifications.name(fieldName))
+                        .and(AuditSpecifications.fieldName(fieldName))
                 , EntitySorts.byCreatedDesc());
 
         JsonNode fieldValueNode;
@@ -225,7 +234,7 @@ public class AuditService {
             throw new RuntimeException(e);
         }
 
-        if (oldAudit != null && oldAudit.getValue().equals(fieldValue)) {
+        if (oldAudit != null && oldAudit.getFieldValue().equals(fieldValue)) {
             return;
         }
         UserEntity user = userService.findCurrent();
@@ -241,8 +250,9 @@ public class AuditService {
         newAudit.setEntityName(entity.getClass().getSimpleName());
         newAudit.setEntityId(entity.getId());
         newAudit.setRelatedEntityId(relatedEntityId);
-        newAudit.setName(fieldName);
-        newAudit.setValue(fieldValue);
+        newAudit.setAction(oldAudit == null ? CREATE : EDITE);
+        newAudit.setFieldName(fieldName);
+        newAudit.setFieldValue(fieldValue);
         auditRepository.save(newAudit);
     }
 }
