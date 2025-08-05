@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 @Value.Immutable
 public interface PaymentOutListResponse extends DocumentResponse {
     ReferenceResponse getAccount();
-    @Nullable ReferenceResponse getCounterparty();
+    ReferenceResponse getCounterparty();
     @Nullable String getReceiptNumber();
     EnumTypeResponse getItemOfExpenditure();
-    @Nullable String getPurpose();
-    @Nullable BigDecimal getAttachedAmount();
-    @Nullable BigDecimal getNotAttachedAmount();
+    String getPurpose();
+    BigDecimal getAttachedAmount();
+    BigDecimal getNotAttachedAmount();
 }

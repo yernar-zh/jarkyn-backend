@@ -13,6 +13,8 @@ import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.*;
+import kz.jarkyn.backend.global.model.CoverageEntity;
+import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.service.DocumentService;
@@ -86,6 +88,18 @@ public class PaymentOutService {
                     subQuery.select(cb.coalesce(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)), BigDecimal.ZERO));
                     subQuery.where(cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.payment), root));
                     return subQuery;
+                })
+                .add("attachedCoverage.id", (root, query, cb, map) -> {
+                    Expression<Number> amount = (Expression<Number>) map.get("amount");
+                    Expression<Number> attachedAmount = (Expression<Number>) map.get("attachedAmount");
+                    Expression<String> codeExpr = cb.<String>selectCase()
+                            .when(cb.equal(amount, attachedAmount), CoverageEntity.FULL)
+                            .when(cb.equal(attachedAmount, 0), CoverageEntity.NONE)
+                            .otherwise(CoverageEntity.PARTIAL);
+                    Subquery<UUID> subQuery = query.subquery(UUID.class);
+                    Root<CoverageEntity> coverageRoot = subQuery.from(CoverageEntity.class);
+                    return subQuery.select(coverageRoot.get(CoverageEntity_.id))
+                            .where(cb.equal(coverageRoot.get(CoverageEntity_.code), codeExpr));
                 })
                 .add("notAttachedAmount", (root, query, cb, map) -> cb.diff(
                         (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("attachedAmount")))

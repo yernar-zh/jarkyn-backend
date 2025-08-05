@@ -145,7 +145,7 @@ public class SupplyService {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         if (supply.getCommited()) return;
         supply.setCommited(Boolean.TRUE);
-        auditService.saveEntity(supply);
+        auditService.commit(supply);
         itemService.createPositiveTurnover(supply, supply.getAmount().multiply(supply.getExchangeRate()));
         AccountEntity supplerAccount = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
@@ -157,7 +157,7 @@ public class SupplyService {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         if (!supply.getCommited()) return;
         supply.setCommited(Boolean.FALSE);
-        auditService.saveEntity(supply);
+        auditService.undoCommit(supply);
         itemService.deleteTurnover(supply);
         cashFlowService.delete(supply);
     }

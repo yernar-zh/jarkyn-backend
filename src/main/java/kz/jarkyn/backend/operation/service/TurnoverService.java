@@ -123,7 +123,7 @@ public class TurnoverService {
                         .where(TurnoverSpecifications.warehouseAndGoodEquals(warehouse, good))
                         .and(TurnoverSpecifications.momentLessThan(moment))
                         .and(TurnoverSpecifications.isOutflow())
-                , TurnoverSorts.byMomentDesc());
+                , TurnoverSorts.byMomentDesc()).orElse(null);
         if (lastOutflow == null) return;
         List<TurnoverEntity> outflows = turnoverRepository.findAll(Specification
                         .where(TurnoverSpecifications.warehouseAndGoodEquals(warehouse, good))

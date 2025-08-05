@@ -66,4 +66,8 @@ public interface Api {
     interface Change {
         String PATH = Api.PATH + "/change";
     }
+
+    interface Coverage {
+        String PATH = Api.PATH + "/coverage";
+    }
 }

@@ -18,6 +18,11 @@ public class ChangeController {
     }
 
 
+    @GetMapping("{entityId}/last")
+    public MainEntityChangeResponse last(@PathVariable UUID entityId) {
+        return auditService.findLastChange(entityId);
+    }
+
     @GetMapping("{entityId}")
     public List<MainEntityChangeResponse> detail(@PathVariable UUID entityId) {
         return auditService.findChanges(entityId);

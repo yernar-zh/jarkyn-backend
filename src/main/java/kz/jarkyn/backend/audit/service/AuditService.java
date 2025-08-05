@@ -4,6 +4,7 @@ package kz.jarkyn.backend.audit.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import kz.jarkyn.backend.audit.mapper.ChangeMapper;
 import kz.jarkyn.backend.audit.model.AuditEntity;
@@ -12,6 +13,8 @@ import kz.jarkyn.backend.audit.model.dto.EntityGroupChangeResponse;
 import kz.jarkyn.backend.audit.model.dto.FieldChangeResponse;
 import kz.jarkyn.backend.audit.model.dto.MainEntityChangeResponse;
 import kz.jarkyn.backend.audit.repository.AuditRepository;
+import kz.jarkyn.backend.core.exception.DataValidationException;
+import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.ReferenceEntity;
 import kz.jarkyn.backend.core.model.dto.Pair;
 import kz.jarkyn.backend.core.model.dto.Triple;
@@ -50,6 +53,17 @@ public class AuditService {
         this.userService = userService;
         this.changeMapper = changeMapper;
         this.objectMapper = objectMapper;
+    }
+
+    public MainEntityChangeResponse findLastChange(UUID entityId) {
+        AuditEntity audit = auditRepository.findOne(
+                        Specification.where(AuditSpecifications.relatedEntityId(entityId)),
+                        EntitySorts.byCreatedDesc())
+                .orElseThrow(ExceptionUtils.entityNotFound());
+
+        return changeMapper.toMainEntityChange(
+                audit.getMoment(), audit.getUser(),
+                audit.getAction(), List.of(), List.of());
     }
 
     public List<MainEntityChangeResponse> findChanges(UUID entityId) {
@@ -102,7 +116,7 @@ public class AuditService {
                                 .orElse(null);
                         List<FieldChangeResponse> fieldChanges = changes.stream().map(triple ->
                                 changeMapper.toFieldChangeResponse(
-                                        entityName != null ? triple.getFirst().substring(entityName.length()) : triple.getFirst(),
+                                        entityName != null ? triple.getFirst().substring(entityName.length() + 1) : triple.getFirst(),
                                         toJsonNode(triple.getSecond()),
                                         toJsonNode(triple.getThird()))
                         ).toList();
@@ -117,16 +131,15 @@ public class AuditService {
                     .map(Pair::getSecond).map(EntityChangeResponse::getFieldChanges)
                     .findFirst().orElse(List.of())
                     .stream()
-                    .filter(_ -> !action.equals(CREATE))
-                    .filter(fieldChange -> !action.equals(EDITE) ||
-                                           !Objects.equals(fieldChange.getBefore(), fieldChange.getAfter()))
+                    .filter(_ -> action.equals(EDITE))
+                    .filter(fieldChange -> !Objects.equals(fieldChange.getBefore(), fieldChange.getAfter()))
                     .toList();
             List<EntityGroupChangeResponse> entityGroupChanges = changeEntityPairs.stream()
                     .filter(pair -> pair.getFirst() != null)
                     .collect(Collectors.groupingBy(Pair::getFirst, Collectors.mapping(Pair::getSecond, Collectors.toList())))
                     .entrySet().stream()
                     .map(entry -> changeMapper.toEntityGroupChangeResponse(entry.getKey(), entry.getValue()))
-                    .filter(_ -> !action.equals(CREATE))
+                    .filter(_ -> action.equals(EDITE))
                     .toList();
             AuditEntity firstChangeGroupAudit = changeGroupAudits.getFirst();
             return changeMapper.toMainEntityChange(
@@ -210,7 +223,7 @@ public class AuditService {
                         .where(AuditSpecifications.entityId(entity.getId()))
                         .and(AuditSpecifications.relatedEntityId(relatedEntityId))
                         .and(AuditSpecifications.fieldName(fieldName))
-                , EntitySorts.byCreatedDesc());
+                , EntitySorts.byCreatedDesc()).orElse(null);
 
         JsonNode fieldValueNode;
         if (fieldValueObj instanceof ReferenceEntity reference) {

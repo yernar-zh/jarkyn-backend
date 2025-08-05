@@ -74,6 +74,17 @@ CREATE TABLE counterparty
     CONSTRAINT pk_counterparty PRIMARY KEY (id)
 );
 
+CREATE TABLE coverage
+(
+    id               UUID NOT NULL,
+    code             VARCHAR(255),
+    name             VARCHAR(255),
+    archived         BOOLEAN,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    CONSTRAINT pk_coverage PRIMARY KEY (id)
+);
+
 CREATE TABLE currency
 (
     id               UUID NOT NULL,
