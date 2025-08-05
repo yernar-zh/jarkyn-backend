@@ -15,8 +15,4 @@ public interface CounterpartyListResponse extends ReferenceResponse {
     Integer getDiscount();
     BigDecimal getAccountBalance();
     EnumTypeResponse getAccountCurrency();
-    @Nullable Instant getFirstSaleMoment();
-    @Nullable Instant getLastSaleMoment();
-    Integer getTotalSaleCount();
-    BigDecimal getTotalSaleAmount();
 }

@@ -60,13 +60,7 @@ public class CounterpartyService {
                 () -> counterpartyRepository.findAll().stream().map(customer -> {
                     Pair<BigDecimal, CurrencyEntity> account = accountService.findBalanceByCounterparty(customer)
                             .stream().findFirst().orElseThrow();
-                    Tuple results = counterpartyRepository.findSaleInfo(customer);
-                    return counterpartyMapper.toResponse(customer, account.getFirst(), account.getSecond(),
-                            results.get("firstSaleMoment", Instant.class),
-                            results.get("lastSaleMoment", Instant.class),
-                            results.get("totalSaleCount", Long.class).intValue(),
-                            results.get("totalSaleAmount", BigDecimal.class)
-                    );
+                    return counterpartyMapper.toResponse(customer, account.getFirst(), account.getSecond());
                 }).toList());
         return search.getResult(queryParams);
     }

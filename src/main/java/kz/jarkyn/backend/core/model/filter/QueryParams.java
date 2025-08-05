@@ -99,6 +99,13 @@ public class QueryParams {
         return sorts;
     }
 
+    private int getCharType(char ch) {
+        if (ch >= '0' && ch <= '9') return 0;
+        if (ch >= 'a' && ch <= 'z') return 1;
+        if ((ch >= 'а' && ch <= 'я') || "әғқңөұүіһ".indexOf(ch) >= 0) return 2;
+        return -1;
+    }
+
     public static class Filter {
         private final String name;
         private final List<String> values;

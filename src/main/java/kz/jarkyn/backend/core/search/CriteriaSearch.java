@@ -8,6 +8,7 @@ import kz.jarkyn.backend.core.model.dto.ImmutablePage;
 import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.utils.PrefixSearch;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.util.Pair;
 
@@ -152,8 +153,8 @@ public class CriteriaSearch<R, E> implements Search<R> {
                 .map(expression -> (Expression<String>) expression)
                 .toList();
         List<Predicate> searchPredicates = Stream.of(queryParams.getSearch())
-                .filter(Objects::nonNull).flatMap(s -> Stream.of(s.split("\\s")))
-                .map(String::trim).filter(Strings::isNotBlank)
+                .filter(Objects::nonNull).map(PrefixSearch::split)
+                .flatMap(Collection::stream)
                 .map(pattern -> "%" + pattern.toLowerCase() + "%")
                 .map(pattern -> searchFields.stream()
                         .map(expression -> cb.like(cb.lower(expression), pattern))

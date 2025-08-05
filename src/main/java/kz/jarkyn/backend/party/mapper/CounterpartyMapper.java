@@ -19,7 +19,5 @@ public interface CounterpartyMapper extends RequestResponseMapper<CounterpartyEn
     @Mapping(target = "name", source = "counterparty.name")
     @Mapping(target = "archived", source = "counterparty.archived")
     CounterpartyListResponse toResponse(
-            CounterpartyEntity counterparty, BigDecimal accountBalance, CurrencyEntity accountCurrency,
-            Instant firstSaleMoment, Instant lastSaleMoment,
-            Integer totalSaleCount, BigDecimal totalSaleAmount);
+            CounterpartyEntity counterparty, BigDecimal accountBalance, CurrencyEntity accountCurrency);
 }

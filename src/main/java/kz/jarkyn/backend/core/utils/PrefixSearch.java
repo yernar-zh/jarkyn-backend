@@ -3,18 +3,6 @@ package kz.jarkyn.backend.core.utils;
 import java.util.*;
 
 public class PrefixSearch {
-    private static final String ENG_LETTERS = "abcdefghijklmnopqrstuvwxyz";
-    private static final String KZ_LETTERS = "аәбвгғдеёжзийкқлмнңоөпрстуұүфхһцчшщъыіьэюя";
-    private static final String NUMBERS = "0123456789";
-    private static final Map<Character, Integer> charMap = new HashMap<>() {{
-        String[] alphabets = new String[]{ENG_LETTERS, KZ_LETTERS, NUMBERS};
-        for (int i = 0; i < alphabets.length; i++) {
-            for (char chr : alphabets[i].toCharArray()) {
-                put(chr, i);
-            }
-        }
-    }};
-
     private final TreeSet<String> set;
 
     public PrefixSearch(String... texts) {
@@ -35,19 +23,23 @@ public class PrefixSearch {
         return true;
     }
 
-    private List<String> split(String text) {
+    public static List<String> split(String text) {
         List<String> result = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        int lastAlphabetIndex = -1;
+        StringBuilder current = new StringBuilder();
+        int lastAlphabetType = -1;
         for (char chr : (text.toLowerCase() + " ").toCharArray()) {
-            Integer alphabetIndex = charMap.get(chr);
-            if ((alphabetIndex == null || lastAlphabetIndex != alphabetIndex) && !sb.isEmpty()) {
-                result.add(sb.toString());
-                sb = new StringBuilder();
+            int alphabetType;
+            if (chr >= '0' && chr <= '9') alphabetType = 0;
+            else if (chr >= 'a' && chr <= 'z') alphabetType = 1;
+            else if ((chr >= 'а' && chr <= 'я') || "әғқңөұүіһ".indexOf(chr) >= 0) alphabetType = 2;
+            else alphabetType = -1;
+            if ((lastAlphabetType != alphabetType) && !current.isEmpty()) {
+                result.add(current.toString());
+                current = new StringBuilder();
             }
-            if (alphabetIndex != null) {
-                sb.append(chr);
-                lastAlphabetIndex = alphabetIndex;
+            if (alphabetType != -1) {
+                current.append(chr);
+                lastAlphabetType = alphabetType;
             }
         }
         return result;
