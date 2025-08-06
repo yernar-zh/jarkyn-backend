@@ -58,10 +58,10 @@ public class AuditService {
                         Specification.where(AuditSpecifications.relatedEntityId(entityId)),
                         EntitySorts.byCreatedDesc())
                 .orElseThrow(ExceptionUtils.entityNotFound());
-
+        String action = audit.getEntityId().equals(entityId) ? audit.getAction() : EDITE;
         return changeMapper.toMainEntityChange(
                 audit.getMoment(), audit.getUser(),
-                audit.getAction(), List.of(), List.of());
+                action, List.of(), List.of());
     }
 
     public List<MainEntityChangeResponse> findChanges(UUID entityId) {
@@ -171,6 +171,11 @@ public class AuditService {
     }
 
     @Transactional
+    public void delete(AbstractEntity entity) {
+        delete(entity, entity, null);
+    }
+
+    @Transactional
     public void delete(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
         addAction(entity, relatedEntity, entityName, "DELETE");
     }
@@ -197,13 +202,11 @@ public class AuditService {
         AuditEntity newAudit = new AuditEntity();
         newAudit.setMoment(moment);
         newAudit.setUser(user);
-        newAudit.setEntityName(entity.getClass().getSimpleName());
         newAudit.setEntityId(entity.getId());
         newAudit.setRelatedEntityId(relatedEntity.getId());
-        newAudit.setEntityName(entityName);
         newAudit.setAction(action);
         newAudit.setFieldName(null);
-        newAudit.setFieldName(null);
+        newAudit.setFieldValue(null);
         auditRepository.save(newAudit);
     }
 
@@ -217,53 +220,55 @@ public class AuditService {
     }
 
     private void save(AbstractEntity entity, UUID relatedEntityId, String fieldName, Object fieldValueObj) {
-        AuditEntity oldAudit = auditRepository.findOne(Specification
-                        .where(AuditSpecifications.entityId(entity.getId()))
-                        .and(AuditSpecifications.relatedEntityId(relatedEntityId))
-                        .and(AuditSpecifications.fieldName(fieldName))
-                , EntitySorts.byCreatedDesc()).orElse(null);
-
-        JsonNode fieldValueNode;
-        if (fieldValueObj instanceof ReferenceEntity reference) {
-            fieldValueNode = objectMapper.createObjectNode()
-                    .put("id", String.valueOf(reference.getId()))
-                    .put("name", reference.getName())
-                    .put("archived", reference.getArchived());
-        } else if (fieldValueObj instanceof DocumentEntity document) {
-            fieldValueNode = objectMapper.createObjectNode()
-                    .put("id", String.valueOf(document.getId()))
-                    .put("name", document.getName())
-                    .put("deleted", document.getDeleted());
-        } else {
-            fieldValueNode = objectMapper.valueToTree(fieldValueObj);
-        }
-
-        String fieldValue;
         try {
-            fieldValue = objectMapper.writeValueAsString(fieldValueNode);
+            AuditEntity oldAudit = auditRepository.findOne(Specification
+                            .where(AuditSpecifications.entityId(entity.getId()))
+                            .and(AuditSpecifications.relatedEntityId(relatedEntityId))
+                            .and(AuditSpecifications.fieldName(fieldName))
+                    , EntitySorts.byCreatedDesc()).orElse(null);
+
+            JsonNode fieldValue;
+            if ((fieldValueObj instanceof AbstractEntity)) {
+                if (fieldValueObj instanceof ReferenceEntity reference) {
+                    fieldValue = objectMapper.createObjectNode()
+                            .put("id", String.valueOf(reference.getId()))
+                            .put("name", reference.getName())
+                            .put("archived", reference.getArchived());
+                } else if (fieldValueObj instanceof DocumentEntity document) {
+                    fieldValue = objectMapper.createObjectNode()
+                            .put("id", String.valueOf(document.getId()))
+                            .put("name", document.getName())
+                            .put("deleted", document.getDeleted());
+                } else {
+                    throw new RuntimeException("Unsupported field type: " + fieldValueObj.getClass());
+                }
+                if (oldAudit != null && Objects.equals(
+                        objectMapper.readTree(oldAudit.getFieldValue()).get("id"),
+                        fieldValue.get("id")))
+                    return;
+            } else {
+                fieldValue = objectMapper.valueToTree(fieldValueObj);
+                if (oldAudit != null && Objects.equals(oldAudit.getFieldValue(),
+                        objectMapper.writeValueAsString(fieldValue))) return;
+            }
+            UserEntity user = userService.findCurrent();
+            Instant moment = auditRepository.findAll(Specification
+                            .where(AuditSpecifications.relatedEntityId(relatedEntityId))
+                            .and(AuditSpecifications.user(user))
+                            .and(AuditSpecifications.createdLessThanOneSecond()))
+                    .stream().map(AuditEntity::getMoment)
+                    .findAny().orElse(Instant.now());
+            AuditEntity newAudit = new AuditEntity();
+            newAudit.setMoment(moment);
+            newAudit.setUser(user);
+            newAudit.setEntityId(entity.getId());
+            newAudit.setRelatedEntityId(relatedEntityId);
+            newAudit.setAction(oldAudit == null ? CREATE : EDITE);
+            newAudit.setFieldName(fieldName);
+            newAudit.setFieldValue(objectMapper.writeValueAsString(fieldValue));
+            auditRepository.save(newAudit);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
-        if (oldAudit != null && oldAudit.getFieldValue().equals(fieldValue)) {
-            return;
-        }
-        UserEntity user = userService.findCurrent();
-        Instant moment = auditRepository.findAll(Specification
-                        .where(AuditSpecifications.relatedEntityId(relatedEntityId))
-                        .and(AuditSpecifications.user(user))
-                        .and(AuditSpecifications.createdLessThanOneSecond()))
-                .stream().map(AuditEntity::getMoment)
-                .findAny().orElse(Instant.now());
-        AuditEntity newAudit = new AuditEntity();
-        newAudit.setMoment(moment);
-        newAudit.setUser(user);
-        newAudit.setEntityName(entity.getClass().getSimpleName());
-        newAudit.setEntityId(entity.getId());
-        newAudit.setRelatedEntityId(relatedEntityId);
-        newAudit.setAction(oldAudit == null ? CREATE : EDITE);
-        newAudit.setFieldName(fieldName);
-        newAudit.setFieldValue(fieldValue);
-        auditRepository.save(newAudit);
     }
 }

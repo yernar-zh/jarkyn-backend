@@ -18,8 +18,6 @@ public class AuditEntity extends AbstractEntity {
     private UUID relatedEntityId;
     @Column(name = "entity_id")
     private UUID entityId;
-    @Column(name = "entity_name")
-    private String entityName;
     @Column(name = "action")
     private String action;
     @Column(name = "field_name")
@@ -57,14 +55,6 @@ public class AuditEntity extends AbstractEntity {
 
     public void setEntityId(UUID entityId) {
         this.entityId = entityId;
-    }
-
-    public String getEntityName() {
-        return entityName;
-    }
-
-    public void setEntityName(String entityName) {
-        this.entityName = entityName;
     }
 
     public String getAction() {

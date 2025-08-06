@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.document.payment.service;
 
 
+import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.service.DocumentService;
@@ -21,12 +22,14 @@ import java.util.List;
 public class PaidDocumentService {
     private final PaidDocumentRepository paidDocumentRepository;
     private final PaidDocumentMapper paidDocumentMapper;
+    private final AuditService auditService;
 
     public PaidDocumentService(
             PaidDocumentRepository paidDocumentRepository,
-            PaidDocumentMapper paidDocumentMapper, DocumentService documentService) {
+            PaidDocumentMapper paidDocumentMapper, DocumentService documentService, AuditService auditService) {
         this.paidDocumentRepository = paidDocumentRepository;
         this.paidDocumentMapper = paidDocumentMapper;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -64,10 +67,15 @@ public class PaidDocumentService {
             PaidDocumentEntity paidDocument = paidDocumentMapper.toEntity(entry.getReceived());
             paidDocument.setPayment(payment);
             paidDocumentRepository.save(paidDocument);
+            auditService.saveEntity(paidDocument, paidDocument.getPayment(), "paidDocuments");
         }
         for (EntityDivider<PaidDocumentEntity, PaidDocumentRequest>.Entry entry : divider.edited()) {
             paidDocumentMapper.editEntity(entry.getCurrent(), entry.getReceived());
+            auditService.saveEntity(entry.getCurrent(), entry.getCurrent().getPayment(), "paidDocuments");
         }
-        paidDocumentRepository.deleteAll(divider.skippedCurrent());
+        for (PaidDocumentEntity paidDocument : divider.skippedCurrent()) {
+            paidDocumentRepository.delete(paidDocument);
+            auditService.delete(paidDocument, paidDocument.getPayment(), "paidDocuments");
+        }
     }
 }

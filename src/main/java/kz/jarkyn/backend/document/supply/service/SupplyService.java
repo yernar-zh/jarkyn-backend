@@ -185,6 +185,6 @@ public class SupplyService {
         if (!paidDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
         if (supply.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         supply.setDeleted(Boolean.TRUE);
-        auditService.saveEntity(supply);
+        auditService.delete(supply);
     }
 }

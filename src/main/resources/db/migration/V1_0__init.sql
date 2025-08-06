@@ -45,7 +45,6 @@ CREATE TABLE audit
     user_id           UUID,
     related_entity_id UUID,
     entity_id         UUID,
-    entity_name       VARCHAR(255),
     action            VARCHAR(255),
     field_name        VARCHAR(255),
     field_value       VARCHAR(255),

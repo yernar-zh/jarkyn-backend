@@ -4,12 +4,14 @@ package kz.jarkyn.backend.document.payment.model;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import org.immutables.value.internal.$processor$.meta.$GsonMirrors;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "paid_document")
 public class PaidDocumentEntity extends AbstractEntity {
+    @$GsonMirrors.Ignore
     @ManyToOne
     @JoinColumn(name = "payment_id")
     private DocumentEntity payment;

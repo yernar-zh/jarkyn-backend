@@ -140,7 +140,7 @@ public class PaymentOutService {
     public void commit(UUID id) {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         paymentOut.setCommited(Boolean.TRUE);
-        auditService.saveEntity(paymentOut);
+        auditService.commit(paymentOut);
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 paymentOut.getOrganization(), paymentOut.getCounterparty(), paymentOut.getCurrency());
         cashFlowService.create(paymentOut, account, paymentOut.getAmount().negate());
@@ -151,7 +151,7 @@ public class PaymentOutService {
     public void undoCommit(UUID id) {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         paymentOut.setCommited(Boolean.FALSE);
-        auditService.saveEntity(paymentOut);
+        auditService.undoCommit(paymentOut);
         cashFlowService.delete(paymentOut);
     }
 
@@ -160,7 +160,7 @@ public class PaymentOutService {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         if (paymentOut.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         paymentOut.setDeleted(Boolean.TRUE);
-        auditService.saveEntity(paymentOut);
+        auditService.delete(paymentOut);
         paidDocumentService.saveApi(paymentOut, List.of());
     }
 }
