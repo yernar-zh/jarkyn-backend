@@ -12,8 +12,11 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.core.sorts.EntitySorts;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.PaymentOutEntity_;
+import kz.jarkyn.backend.global.model.CoverageEntity;
+import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
@@ -32,6 +35,7 @@ import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -105,11 +109,23 @@ public class SupplyService {
                     subQuery.where(cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.document), root));
                     return subQuery;
                 })
+                .add("paidCoverage.id", (root, query, cb, map) -> {
+                    Expression<Number> amount = (Expression<Number>) map.get("amount");
+                    Expression<Number> paidAmount = (Expression<Number>) map.get("paidAmount");
+                    Expression<String> coverageCode = cb.<String>selectCase()
+                            .when(cb.equal(amount, paidAmount), CoverageEntity.FULL)
+                            .when(cb.equal(paidAmount, 0), CoverageEntity.NONE)
+                            .otherwise(CoverageEntity.PARTIAL);
+                    Subquery<UUID> subQuery = query.subquery(UUID.class);
+                    Root<CoverageEntity> coverageRoot = subQuery.from(CoverageEntity.class);
+                    return subQuery.select(coverageRoot.get(CoverageEntity_.id))
+                            .where(cb.equal(coverageRoot.get(CoverageEntity_.code), coverageCode));
+                })
                 .add("notPaidAmount", (root, query, cb, map) -> cb.diff(
                         (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("paidAmount")))
                 .build();
         Search<SupplyListResponse> search = searchFactory.createCriteriaSearch(
-                SupplyListResponse.class, List.of("name", "counterparty.name"),
+                SupplyListResponse.class, List.of("name", "counterparty.name"), QueryParams.Sort.MOMENT_DESC,
                 SupplyEntity.class, attributes);
         return search.getResult(queryParams);
     }

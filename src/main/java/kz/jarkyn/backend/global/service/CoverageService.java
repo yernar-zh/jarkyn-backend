@@ -16,7 +16,6 @@ import kz.jarkyn.backend.global.repository.CoverageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -50,7 +49,7 @@ public class CoverageService {
                 .add("archived", (root) -> root.get(CoverageEntity_.archived))
                 .build();
         Search<EnumTypeResponse> search = searchFactory.createCriteriaSearch(
-                EnumTypeResponse.class, List.of("name"),
+                EnumTypeResponse.class, QueryParams.NAME_SEARCH, QueryParams.Sort.NAME_ASC,
                 CoverageEntity.class, attributes);
         return search.getResult(queryParams);
     }

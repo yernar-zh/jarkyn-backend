@@ -15,7 +15,6 @@ import kz.jarkyn.backend.global.repository.ItemOfExpenditureRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,7 +46,7 @@ public class ItemOfExpenditureService {
                 .add("archived", (root) -> root.get(ItemOfExpenditureEntity_.archived))
                 .build();
         Search<EnumTypeResponse> search = searchFactory.createCriteriaSearch(
-                EnumTypeResponse.class, List.of("name"),
+                EnumTypeResponse.class, QueryParams.NAME_SEARCH, QueryParams.Sort.NAME_ASC,
                 ItemOfExpenditureEntity.class, attributes);
         return search.getResult(queryParams);
     }

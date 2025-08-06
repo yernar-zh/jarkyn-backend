@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.document.core.model;
 
 
+import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.party.model.AccountEntity;
@@ -37,10 +38,13 @@ public class DocumentEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "currency_id")
     private CurrencyEntity currency;
+    @JoinColumn(name = "exchange_rate")
     private BigDecimal exchangeRate;
     private BigDecimal amount;
     private String comment;
+    @IgnoreAudit
     private Boolean deleted;
+    @IgnoreAudit
     private Boolean commited;
 
     public DocumentTypeEntity getType() {

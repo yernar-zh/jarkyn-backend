@@ -18,7 +18,6 @@ import kz.jarkyn.backend.warehouse.mapper.WarehouseMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -54,7 +53,7 @@ public class WarehouseService {
                 .add("archived", (root) -> root.get(WarehouseEntity_.archived))
                 .build();
         Search<WarehouseResponse> search = searchFactory.createCriteriaSearch(
-                WarehouseResponse.class, List.of("name"),
+                WarehouseResponse.class, QueryParams.NAME_SEARCH, QueryParams.Sort.NAME_ASC,
                 WarehouseEntity.class, attributes);
         return search.getResult(queryParams);
     }

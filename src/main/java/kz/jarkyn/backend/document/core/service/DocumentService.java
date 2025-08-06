@@ -2,11 +2,17 @@
 package kz.jarkyn.backend.document.core.service;
 
 
+import kz.jarkyn.backend.audit.model.AuditEntity;
+import kz.jarkyn.backend.audit.specifications.AuditSpecifications;
+import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
+import kz.jarkyn.backend.core.sorts.EntitySorts;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity_;
 import kz.jarkyn.backend.document.core.model.DocumentTypeEntity;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
+import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,41 +35,31 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public String findNextName(DocumentTypeEntity type) {
-        String namePrefix = getNamePrefix(type);
-        String lastName = documentRepository.getLastNameByNamePrefix(namePrefix);
-        if (lastName == null) {
-            return namePrefix + "-00001";
-        }
-        Matcher matcher = Pattern.compile(namePrefix + "-(\\d{5})").matcher(lastName);
+        String lastName = documentRepository.findOne(
+                        Specification.where(DocumentSpecifications.type(type)),
+                        EntitySorts.byNameDesc())
+                .map(DocumentEntity::getName)
+                .orElse("000000");
+        Matcher matcher = Pattern.compile("(\\d{6})").matcher(lastName);
         if (!matcher.find()) {
             throw new RuntimeException("unsupported name : " + lastName);
         }
         int lastNameId = Integer.parseInt(matcher.group(1));
-        return String.format("%s-%05d", namePrefix, lastNameId + 1);
+        return String.format("%06d", lastNameId + 1);
     }
 
     public void validateName(DocumentEntity document) {
         if (document.getName() == null) {
             throw new RuntimeException("document name is null");
         }
-        String namePrefix = getNamePrefix(document.getType());
         String name = document.getName();
-        Matcher matcher = Pattern.compile(namePrefix + "-(\\d{5})").matcher(name);
+        Matcher matcher = Pattern.compile("(\\d{6})").matcher(name);
         if (!matcher.find()) {
             throw new RuntimeException("unsupported name : " + name);
         }
     }
 
-    private String getNamePrefix(DocumentTypeEntity type) {
-        return switch (DocumentTypeService.DocumentTypeCode.valueOf(type.getCode())) {
-            case SALE -> "SL";
-            case SUPPLY -> "SP";
-            case PAYMENT_IN -> "PI";
-            case PAYMENT_OUT -> "PO";
-        };
-    }
-
-    public <T extends DocumentEntity> CriteriaAttributes.Builder<T> generateCriteriaAttributesBuilderFor(Class<T> type) {
+    public <T extends DocumentEntity> CriteriaAttributes.Builder<T> generateCriteriaAttributesBuilderFor() {
         return CriteriaAttributes.<T>builder()
                 .add("id", (root) -> root.get(DocumentEntity_.id))
                 .addEnumType("type", (root) -> root.get(DocumentEntity_.type))

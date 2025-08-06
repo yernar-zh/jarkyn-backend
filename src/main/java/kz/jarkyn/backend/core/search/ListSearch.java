@@ -11,14 +11,17 @@ import org.apache.logging.log4j.util.Strings;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ListSearch<R> implements Search<R> {
     private final List<Row> rows;
     private final Class<R> responseClass;
+    private final QueryParams.Sort defaultSort;
 
-    public ListSearch(Class<R> responseClass, List<String> searchFields, List<R> list) {
+    public ListSearch(Class<R> responseClass, List<String> searchFields, List<R> list, QueryParams.Sort defaultSort) {
         rows = list.stream().map(data -> {
             Map<String, Object> fields = new HashMap<>();
             getRowValues(fields, null, responseClass, data);
@@ -28,6 +31,7 @@ public class ListSearch<R> implements Search<R> {
             return new Row(data, new PrefixSearch(searchTexts), fields);
         }).toList();
         this.responseClass = responseClass;
+        this.defaultSort = defaultSort;
     }
 
     private void getRowValues(Map<String, Object> fields, String fieldName, Class<?> valueClass, Object value) {
@@ -126,19 +130,20 @@ public class ListSearch<R> implements Search<R> {
     }
 
     private Comparator<Row> sort(QueryParams queryParams) {
-        return queryParams.getSorts().stream().map(sort -> {
-            Comparator<Row> comparator = Comparator.comparing(row -> {
-                Object rowValue = row.getValues().get(sort.getName());
-                if (rowValue == null) {
-                    return null;
-                }
-                return (Comparable) rowValue;
-            });
-            return switch (sort.getType()) {
-                case ASC -> comparator;
-                case DESC -> comparator.reversed();
-            };
-        }).reduce(Comparator::thenComparing).orElse(Comparator.comparing(_ -> true));
+        return Stream.of(queryParams.getSorts().stream(), Stream.of(defaultSort)).flatMap(Function.identity())
+                .map(sort -> {
+                    Comparator<Row> comparator = Comparator.comparing(row -> {
+                        Object rowValue = row.getValues().get(sort.getName());
+                        if (rowValue == null) {
+                            return null;
+                        }
+                        return (Comparable) rowValue;
+                    });
+                    return switch (sort.getType()) {
+                        case ASC -> comparator;
+                        case DESC -> comparator.reversed();
+                    };
+                }).reduce(Comparator::thenComparing).orElse(Comparator.comparing(_ -> true));
     }
 
     private class Row {

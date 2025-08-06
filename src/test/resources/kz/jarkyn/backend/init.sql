@@ -105,7 +105,7 @@ INSERT INTO document (id, type_id, organization_id, warehouse_id, counterparty_i
                       currency_id, exchange_rate, amount, comment, deleted, commited)
 VALUES ('17c1285b-6514-45d5-88a2-3b9f673dc5e3', '3873fc3e-58da-4ecc-81a8-70728d8d3297', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
         '523961a7-696d-4779-8bb0-fd327feaecf3', '94fadc9a-83bb-4639-be07-f825ab9eb40e',
-        'SP-00001', '2024-12-07 21:47',
+        '000001', '2024-12-07 21:47',
         'e6a3c207-a358-47bf-ac18-2d09973f3807', 68, 710, '', false, false);
 INSERT INTO supply (id)
 VALUES ('17c1285b-6514-45d5-88a2-3b9f673dc5e3');
@@ -119,7 +119,7 @@ INSERT INTO document (id, type_id, organization_id, account_id, counterparty_id,
                       currency_id, exchange_rate, amount, comment, deleted, commited)
 VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0', '9b755b4e-61fa-457d-855d-6b231d3bfed2', 'c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515',
         'c8190dcc-1cbe-4df6-a582-0f85e9850335', '94fadc9a-83bb-4639-be07-f825ab9eb40e',
-        'PO-00001', '2024-12-07 22:47',
+        '000001', '2024-12-07 22:47',
         'e6a3c207-a358-47bf-ac18-2d09973f3807', 68, 710, '', false, false);
 INSERT INTO payment_out (id, item_of_expenditure_id)
 VALUES ('5c799431-3bc3-400f-b9a3-209f27b935a0',

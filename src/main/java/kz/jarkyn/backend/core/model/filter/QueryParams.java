@@ -8,6 +8,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.*;
 
 public class QueryParams {
+    public static List<String> NAME_SEARCH = List.of("name");
     public static final String IN_SEPARATOR = "<%sep%>";
     private static final List<Pair<String, Filter.Type>> FILTER_SUFFIX = new ArrayList<>() {{
         add(Pair.of("[lte]", Filter.Type.LESS_OR_EQ));
@@ -99,13 +100,6 @@ public class QueryParams {
         return sorts;
     }
 
-    private int getCharType(char ch) {
-        if (ch >= '0' && ch <= '9') return 0;
-        if (ch >= 'a' && ch <= 'z') return 1;
-        if ((ch >= 'а' && ch <= 'я') || "әғқңөұүіһ".indexOf(ch) >= 0) return 2;
-        return -1;
-    }
-
     public static class Filter {
         private final String name;
         private final List<String> values;
@@ -140,6 +134,9 @@ public class QueryParams {
     }
 
     public static class Sort {
+        public static Sort NAME_ASC = new Sort("name", Type.ASC);
+        public static Sort MOMENT_DESC = new Sort("moment", Sort.Type.DESC);
+
         private final String name;
         private final Type type;
 

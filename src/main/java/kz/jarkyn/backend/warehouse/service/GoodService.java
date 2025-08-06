@@ -83,29 +83,30 @@ public class GoodService {
                 ? warehouseRepository.findByArchived(false)
                 : warehouseRepository.findAllById(filterWarehouseIds);
         Search<GoodListResponse> search = searchFactory.createListSearch(
-                GoodListResponse.class, List.of("name", "groups.name"), () ->
-                        goodRepository.findAll().stream().map(good -> {
-                            String path = getParentGroups(good.getGroup()).stream().map(GroupEntity::getName)
-                                                  .collect(Collectors.joining("/")) + "/" + good.getName();
-                            String groupIds = getParentGroups(good.getGroup()).stream().map(GroupEntity::getId)
-                                    .filter(Objects::nonNull).map(UUID::toString).collect(Collectors.joining("/"));
-                            String attributes = attributeRepository.findByGood(good).stream()
-                                    .map(AbstractEntity::getId)
-                                    .filter(Objects::nonNull).map(UUID::toString)
-                                    .collect(Collectors.joining(","));
-                            BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
-                                    .stream().map(SellingPriceEntity::getValue)
-                                    .max(BigDecimal::compareTo).orElseThrow();
-                            List<Pair<WarehouseEntity, GoodEntity>> goodPair = warehouses.stream()
-                                    .map(warehouse -> Pair.of(warehouse, good)).toList();
-                            List<TurnoverService.StockDto> stocks = turnoverService.findStockAtMoment(
-                                    goodPair, Optional.ofNullable(filterMoment).orElseGet(Instant::now));
-                            Integer remind = stocks.stream().map(TurnoverService.StockDto::getRemain)
-                                    .reduce(0, Integer::sum);
-                            BigDecimal costPrice = stocks.stream().map(TurnoverService.StockDto::getCostPrice)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-                            return goodMapper.toListResponse(good, path, groupIds, attributes, sellingPrice, remind, costPrice);
-                        }).toList());
+                GoodListResponse.class, List.of("name", "groups.name"),
+                new QueryParams.Sort("path", QueryParams.Sort.Type.ASC),
+                () -> goodRepository.findAll().stream().map(good -> {
+                    String path = getParentGroups(good.getGroup()).stream().map(GroupEntity::getName)
+                                          .collect(Collectors.joining("/")) + "/" + good.getName();
+                    String groupIds = getParentGroups(good.getGroup()).stream().map(GroupEntity::getId)
+                            .filter(Objects::nonNull).map(UUID::toString).collect(Collectors.joining("/"));
+                    String attributes = attributeRepository.findByGood(good).stream()
+                            .map(AbstractEntity::getId)
+                            .filter(Objects::nonNull).map(UUID::toString)
+                            .collect(Collectors.joining(","));
+                    BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
+                            .stream().map(SellingPriceEntity::getValue)
+                            .max(BigDecimal::compareTo).orElseThrow();
+                    List<Pair<WarehouseEntity, GoodEntity>> goodPair = warehouses.stream()
+                            .map(warehouse -> Pair.of(warehouse, good)).toList();
+                    List<TurnoverService.StockDto> stocks = turnoverService.findStockAtMoment(
+                            goodPair, Optional.ofNullable(filterMoment).orElseGet(Instant::now));
+                    Integer remind = stocks.stream().map(TurnoverService.StockDto::getRemain)
+                            .reduce(0, Integer::sum);
+                    BigDecimal costPrice = stocks.stream().map(TurnoverService.StockDto::getCostPrice)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    return goodMapper.toListResponse(good, path, groupIds, attributes, sellingPrice, remind, costPrice);
+                }).toList());
         return search.getResult(queryParams);
     }
 

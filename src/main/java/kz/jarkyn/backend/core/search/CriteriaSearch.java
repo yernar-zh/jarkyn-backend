@@ -9,10 +9,11 @@ import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.utils.PrefixSearch;
-import org.apache.logging.log4j.util.Strings;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,19 +23,22 @@ public class CriteriaSearch<R, E> implements Search<R> {
     private final Class<E> entityClass;
     private final Map<String, CriteriaAttributes.CriteriaAttribute<E>> attributes;
     private final List<String> searchByAttributeNames;
+    private final QueryParams.Sort defaultSort;
 
     public CriteriaSearch(
             EntityManager entityManager,
             Class<R> responseClass,
             Class<E> entityClass,
             Map<String, CriteriaAttributes.CriteriaAttribute<E>> attributes,
-            List<String> searchByAttributeNames
+            List<String> searchByAttributeNames,
+            QueryParams.Sort defaultSort
     ) {
         this.em = entityManager;
         this.responseClass = responseClass;
         this.entityClass = entityClass;
         this.attributes = attributes;
         this.searchByAttributeNames = searchByAttributeNames;
+        this.defaultSort = defaultSort;
     }
 
     @Override
@@ -166,12 +170,14 @@ public class CriteriaSearch<R, E> implements Search<R> {
 
     private List<Order> getOrders(
             Map<String, Expression<?>> expressions, QueryParams queryParams, CriteriaBuilder cb) {
-        return queryParams.getSorts().stream().map(sort -> {
-            Expression<?> expression = expressions.get(sort.getName());
-            return switch (sort.getType()) {
-                case ASC -> cb.asc(expression);
-                case DESC -> cb.desc(expression);
-            };
-        }).toList();
+        return Stream.of(queryParams.getSorts().stream(), Stream.of(defaultSort))
+                .flatMap(Function.identity())
+                .map(sort -> {
+                    Expression<?> expression = expressions.get(sort.getName());
+                    return switch (sort.getType()) {
+                        case ASC -> cb.asc(expression);
+                        case DESC -> cb.desc(expression);
+                    };
+                }).toList();
     }
 }

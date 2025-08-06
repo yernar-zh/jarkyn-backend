@@ -77,7 +77,7 @@ public class PaymentOutService {
     @Transactional(readOnly = true)
     public PageResponse<PaymentOutListResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<PaymentOutEntity> attributes = documentService
-                .generateCriteriaAttributesBuilderFor(PaymentOutEntity.class)
+                .<PaymentOutEntity>generateCriteriaAttributesBuilderFor()
                 .addReference("account", (root) -> root.get(PaymentOutEntity_.account))
                 .add("receiptNumber", (root) -> root.get(PaymentOutEntity_.receiptNumber))
                 .addEnumType("itemOfExpenditure", (root) -> root.get(PaymentOutEntity_.itemOfExpenditure))
@@ -92,20 +92,20 @@ public class PaymentOutService {
                 .add("attachedCoverage.id", (root, query, cb, map) -> {
                     Expression<Number> amount = (Expression<Number>) map.get("amount");
                     Expression<Number> attachedAmount = (Expression<Number>) map.get("attachedAmount");
-                    Expression<String> codeExpr = cb.<String>selectCase()
+                    Expression<String> coverageCode = cb.<String>selectCase()
                             .when(cb.equal(amount, attachedAmount), CoverageEntity.FULL)
                             .when(cb.equal(attachedAmount, 0), CoverageEntity.NONE)
                             .otherwise(CoverageEntity.PARTIAL);
                     Subquery<UUID> subQuery = query.subquery(UUID.class);
                     Root<CoverageEntity> coverageRoot = subQuery.from(CoverageEntity.class);
                     return subQuery.select(coverageRoot.get(CoverageEntity_.id))
-                            .where(cb.equal(coverageRoot.get(CoverageEntity_.code), codeExpr));
+                            .where(cb.equal(coverageRoot.get(CoverageEntity_.code), coverageCode));
                 })
                 .add("notAttachedAmount", (root, query, cb, map) -> cb.diff(
                         (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("attachedAmount")))
                 .build();
         Search<PaymentOutListResponse> search = searchFactory.createCriteriaSearch(
-                PaymentOutListResponse.class, List.of("name", "counterparty.name"),
+                PaymentOutListResponse.class, List.of("name", "counterparty.name"), QueryParams.Sort.MOMENT_DESC,
                 PaymentOutEntity.class, attributes);
         return search.getResult(queryParams);
     }

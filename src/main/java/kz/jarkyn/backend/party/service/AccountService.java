@@ -60,7 +60,7 @@ public class AccountService {
     @Transactional(readOnly = true)
     public PageResponse<AccountResponse> findApiByFilter(QueryParams queryParams) {
         Search<AccountResponse> search = searchFactory.createListSearch(
-                AccountResponse.class, List.of("name", "giro"),
+                AccountResponse.class, List.of("name", "giro"), QueryParams.Sort.NAME_ASC,
                 () -> accountRepository.findAll().stream()
                         .filter(account -> account.getCounterparty() == null)
                         .map(account -> accountMapper.toResponse(account, cashFlowService.findCurrentBalance(account)))

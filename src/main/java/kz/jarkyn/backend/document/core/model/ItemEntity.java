@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "item")
 public class ItemEntity extends AbstractEntity {
-    @IgnoreAudit
     @ManyToOne
     @JoinColumn(name = "document_id")
     private DocumentEntity document;

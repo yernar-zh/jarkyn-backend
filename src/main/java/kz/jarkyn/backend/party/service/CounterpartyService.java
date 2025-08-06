@@ -2,7 +2,6 @@
 package kz.jarkyn.backend.party.service;
 
 
-import jakarta.persistence.Tuple;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,7 +54,7 @@ public class CounterpartyService {
     @Transactional(readOnly = true)
     public PageResponse<CounterpartyListResponse> findApiByFilter(QueryParams queryParams) {
         Search<CounterpartyListResponse> search = searchFactory.createListSearch(
-                CounterpartyListResponse.class, List.of("name", "phoneNumber"),
+                CounterpartyListResponse.class, List.of("name", "phoneNumber"), QueryParams.Sort.NAME_ASC,
                 () -> counterpartyRepository.findAll().stream().map(customer -> {
                     Pair<BigDecimal, CurrencyEntity> account = accountService.findBalanceByCounterparty(customer)
                             .stream().findFirst().orElseThrow();

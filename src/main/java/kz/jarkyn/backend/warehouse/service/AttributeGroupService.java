@@ -48,11 +48,11 @@ public class AttributeGroupService {
     @Transactional(readOnly = true)
     public PageResponse<AttributeGroupResponse> findApiByFilter(QueryParams queryParams) {
         Search<AttributeGroupResponse> search = searchFactory.createListSearch(
-                AttributeGroupResponse.class, List.of("name"), () ->
-                        attributeGroupRepository.findAll().stream().map(attributeGroup -> {
-                            List<AttributeEntity> attributes = attributeService.findByGroup(attributeGroup);
-                            return attributeGroupMapper.toResponse(attributeGroup, attributes);
-                        }).toList());
+                AttributeGroupResponse.class, QueryParams.NAME_SEARCH, QueryParams.Sort.NAME_ASC,
+                () -> attributeGroupRepository.findAll().stream().map(attributeGroup -> {
+                    List<AttributeEntity> attributes = attributeService.findByGroup(attributeGroup);
+                    return attributeGroupMapper.toResponse(attributeGroup, attributes);
+                }).toList());
         return search.getResult(queryParams);
     }
 

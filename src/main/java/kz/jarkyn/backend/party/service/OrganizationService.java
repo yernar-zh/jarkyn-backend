@@ -45,7 +45,8 @@ public class OrganizationService {
     @Transactional(readOnly = true)
     public PageResponse<OrganizationResponse> findApiByFilter(QueryParams queryParams) {
         Search<OrganizationResponse> search = searchFactory.createListSearch(
-                OrganizationResponse.class, List.of(), () -> organizationMapper.toResponse(organizationRepository.findAll()));
+                OrganizationResponse.class, List.of(), QueryParams.Sort.NAME_ASC,
+                () -> organizationMapper.toResponse(organizationRepository.findAll()));
         return search.getResult(queryParams);
     }
 

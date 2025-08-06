@@ -104,10 +104,7 @@ public class PaymentInService {
                 .add("notAttached", (root, query, cb, map) -> cb.diff(
                         (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("attached")))
                 .build();
-        Search<PaymentInListResponse> search = searchFactory.createCriteriaSearch(
-                PaymentInListResponse.class, List.of("name", "counterparty.name"),
-                PaymentInEntity.class, attributes);
-        return search.getResult(queryParams);
+        return null;
     }
 
     @Transactional
