@@ -70,4 +70,8 @@ public interface Api {
     interface Coverage {
         String PATH = Api.PATH + "/coverage";
     }
+
+    interface Lookup {
+        String PATH = Api.PATH + "/lookup";
+    }
 }
