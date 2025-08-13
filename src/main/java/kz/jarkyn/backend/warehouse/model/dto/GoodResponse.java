@@ -16,5 +16,5 @@ public interface GoodResponse extends ReferenceResponse {
     Integer getMinimumPrice();
     List<ReferenceResponse> getAttributes();
     List<SellingPriceResponse> getSellingPrices();
-    List<StockResponse> getStock();
+    List<StockResponse> getStocks();
 }

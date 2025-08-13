@@ -10,7 +10,6 @@ import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
 import kz.jarkyn.backend.party.service.CounterpartyService;
 import kz.jarkyn.backend.party.service.OrganizationService;
 import kz.jarkyn.backend.warehouse.model.dto.GroupDetailResponse;
-import kz.jarkyn.backend.warehouse.model.dto.GroupResponse;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.warehouse.service.GroupService;
 import kz.jarkyn.backend.warehouse.service.WarehouseService;
