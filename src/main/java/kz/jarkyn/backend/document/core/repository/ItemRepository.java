@@ -1,5 +1,6 @@
 package kz.jarkyn.backend.document.core.repository;
 
+import kz.jarkyn.backend.core.repository.AppRepository;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.ItemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ItemRepository extends JpaRepository<ItemEntity, UUID> {
-    List<ItemEntity> findByDocument(@Param("document") DocumentEntity document);
+public interface ItemRepository extends AppRepository<ItemEntity> {
+    List<ItemEntity> findByDocument(DocumentEntity document);
 }

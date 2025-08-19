@@ -9,6 +9,10 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.core.model.ItemEntity;
+import kz.jarkyn.backend.document.core.repository.ItemRepository;
+import kz.jarkyn.backend.document.core.service.ItemService;
+import kz.jarkyn.backend.document.core.specifications.ItemSpecifications;
 import kz.jarkyn.backend.warehouse.mapper.SellingPriceMapper;
 import kz.jarkyn.backend.warehouse.model.*;
 import kz.jarkyn.backend.warehouse.model.dto.*;
@@ -17,6 +21,9 @@ import kz.jarkyn.backend.warehouse.repository.*;
 import kz.jarkyn.backend.warehouse.mapper.GoodMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.operation.service.TurnoverService;
+import kz.jarkyn.backend.warehouse.specifications.GoodAttributeSpecifications;
+import kz.jarkyn.backend.warehouse.specifications.SellingPriceSpecifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +45,7 @@ public class GoodService {
     private final SearchFactory searchFactory;
     private final TurnoverService turnoverService;
     private final WarehouseRepository warehouseRepository;
+    private final ItemRepository itemRepository;
 
     public GoodService(
             GoodRepository goodRepository,
@@ -48,7 +56,8 @@ public class GoodService {
             SellingPriceMapper sellingPriceMapper,
             SearchFactory searchFactory,
             TurnoverService turnoverService,
-            WarehouseRepository warehouseRepository) {
+            WarehouseRepository warehouseRepository,
+            ItemRepository itemRepository) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
@@ -58,6 +67,7 @@ public class GoodService {
         this.searchFactory = searchFactory;
         this.turnoverService = turnoverService;
         this.warehouseRepository = warehouseRepository;
+        this.itemRepository = itemRepository;
     }
 
     @Transactional(readOnly = true)
@@ -173,6 +183,18 @@ public class GoodService {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         good.setArchived(false);
         return findApiById(id);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        List<ItemEntity> items = itemRepository.findAll(Specification.where(ItemSpecifications.good(good)));
+        if (!items.isEmpty()) ExceptionUtils.throwRelationDeleteException();
+        sellingPriceRepository.deleteAll(sellingPriceRepository.findAll(Specification
+                .where(SellingPriceSpecifications.good(good))));
+        goodAttributeRepository.deleteAll(goodAttributeRepository.findAll(Specification
+                .where(GoodAttributeSpecifications.good(good))));
+        goodRepository.delete(good);
     }
 
     private List<GroupEntity> getParentGroups(GroupEntity group) {

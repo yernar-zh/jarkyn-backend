@@ -1,7 +1,7 @@
 package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
-import kz.jarkyn.backend.core.mapper.EntityMapper;
+import kz.jarkyn.backend.core.model.dto.MessageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.warehouse.model.dto.GoodListResponse;
@@ -19,9 +19,7 @@ import java.util.*;
 public class GoodController {
     private final GoodService goodService;
 
-    public GoodController(
-            GoodService goodService,
-            EntityMapper entityMapper) {
+    public GoodController(GoodService goodService) {
         this.goodService = goodService;
     }
 
@@ -57,5 +55,11 @@ public class GoodController {
     @PutMapping("{id}/unarchive")
     public GoodResponse unarchive(@PathVariable UUID id) {
         return goodService.unarchive(id);
+    }
+
+    @DeleteMapping("{id}")
+    public MessageResponse delete(@PathVariable UUID id) {
+        goodService.delete(id);
+        return MessageResponse.DELETED;
     }
 }
