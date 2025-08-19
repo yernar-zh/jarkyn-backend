@@ -1,17 +1,13 @@
 package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
-import kz.jarkyn.backend.core.mapper.BaseMapperConfig;
 import kz.jarkyn.backend.core.mapper.EntityMapper;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 import kz.jarkyn.backend.warehouse.model.dto.GoodListResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GoodRequest;
 import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
-import kz.jarkyn.backend.core.model.dto.ValueDto;
 import kz.jarkyn.backend.warehouse.service.GoodService;
-import kz.jarkyn.backend.warehouse.service.WarehouseService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,7 +50,12 @@ public class GoodController {
     }
 
     @PutMapping("{id}/archive")
-    public GoodResponse archive(@PathVariable UUID id, @RequestBody ValueDto<Boolean> valueApi) {
-        return goodService.archive(id, valueApi.getValue());
+    public GoodResponse archive(@PathVariable UUID id) {
+        return goodService.archive(id);
+    }
+
+    @PutMapping("{id}/unarchive")
+    public GoodResponse unarchive(@PathVariable UUID id) {
+        return goodService.unarchive(id);
     }
 }

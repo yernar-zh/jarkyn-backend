@@ -162,9 +162,16 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodResponse archive(UUID id, Boolean value) {
+    public GoodResponse archive(UUID id) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        good.setArchived(value);
+        good.setArchived(true);
+        return findApiById(id);
+    }
+
+    @Transactional
+    public GoodResponse unarchive(UUID id) {
+        GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        good.setArchived(false);
         return findApiById(id);
     }
 
