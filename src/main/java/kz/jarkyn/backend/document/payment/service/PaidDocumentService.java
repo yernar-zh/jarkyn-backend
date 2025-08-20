@@ -75,7 +75,7 @@ public class PaidDocumentService {
         }
         for (PaidDocumentEntity paidDocument : divider.skippedCurrent()) {
             paidDocumentRepository.delete(paidDocument);
-            auditService.delete(paidDocument, paidDocument.getPayment(), "paidDocuments");
+            auditService.delete(paidDocument, paidDocument.getPayment());
         }
     }
 }

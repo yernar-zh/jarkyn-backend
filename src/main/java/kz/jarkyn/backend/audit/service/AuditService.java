@@ -172,26 +172,36 @@ public class AuditService {
 
     @Transactional
     public void delete(AbstractEntity entity) {
-        delete(entity, entity, null);
+        delete(entity, entity);
     }
 
     @Transactional
-    public void delete(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
-        addAction(entity, relatedEntity, entityName, "DELETE");
+    public void delete(AbstractEntity entity, AbstractEntity relatedEntity) {
+        addAction(entity, relatedEntity, "DELETE");
     }
 
     @Transactional
     public void commit(AbstractEntity entity) {
-        addAction(entity, entity, null, "COMMIT");
+        addAction(entity, entity, "COMMIT");
     }
 
     @Transactional
     public void undoCommit(AbstractEntity entity) {
-        addAction(entity, entity, null, "UNDO_COMMIT");
+        addAction(entity, entity, "UNDO_COMMIT");
     }
 
     @Transactional
-    public void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String entityName, String action) {
+    public void archive(AbstractEntity entity) {
+        addAction(entity, entity, "ARCHIVE");
+    }
+
+    @Transactional
+    public void unarchive(AbstractEntity entity) {
+        addAction(entity, entity, "UNARCHIVE");
+    }
+
+    @Transactional
+    public void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String action) {
         UserEntity user = userService.findCurrent();
         Instant moment = auditRepository.findAll(Specification
                         .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))

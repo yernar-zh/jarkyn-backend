@@ -74,7 +74,7 @@ public class ItemService {
         }
         for (ItemEntity item : divider.skippedCurrent()) {
             itemRepository.delete(item);
-            auditService.delete(item, item.getDocument(), "items");
+            auditService.delete(item, item.getDocument());
         }
     }
 
