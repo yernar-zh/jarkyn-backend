@@ -2,6 +2,7 @@
 package kz.jarkyn.backend.warehouse.service;
 
 
+import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.AbstractEntity;
@@ -46,6 +47,7 @@ public class GoodService {
     private final TurnoverService turnoverService;
     private final WarehouseRepository warehouseRepository;
     private final ItemRepository itemRepository;
+    private final AuditService auditService;
 
     public GoodService(
             GoodRepository goodRepository,
@@ -57,7 +59,7 @@ public class GoodService {
             SearchFactory searchFactory,
             TurnoverService turnoverService,
             WarehouseRepository warehouseRepository,
-            ItemRepository itemRepository) {
+            ItemRepository itemRepository, AuditService auditService) {
         this.goodRepository = goodRepository;
         this.goodAttributeRepository = goodAttributeRepository;
         this.attributeRepository = attributeRepository;
@@ -68,6 +70,7 @@ public class GoodService {
         this.turnoverService = turnoverService;
         this.warehouseRepository = warehouseRepository;
         this.itemRepository = itemRepository;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -124,16 +127,19 @@ public class GoodService {
     public GoodResponse createApi(GoodRequest request) {
         GoodEntity good = goodRepository.save(goodMapper.toEntity(request));
         good.setArchived(false);
-        for (IdDto api : request.getAttributes()) {
-            GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, api);
-            goodAttributeRepository.save(goodAttributeEntity);
+        for (IdDto dto : request.getAttributes()) {
+            GoodAttributeEntity goodAttribute = goodMapper.toEntity(good, dto);
+            goodAttributeRepository.save(goodAttribute);
+            auditService.saveEntity(goodAttribute, good, "attributes");
         }
-        for (SellingPriceRequest sellingPrice : request.getSellingPrices()) {
-            SellingPriceEntity sellingPriceEntity = sellingPriceMapper.toEntity(sellingPrice);
-            sellingPriceEntity.setGood(good);
-            sellingPriceRepository.save(sellingPriceEntity);
+        for (SellingPriceRequest sellingPriceRequest : request.getSellingPrices()) {
+            SellingPriceEntity sellingPrice = sellingPriceMapper.toEntity(sellingPriceRequest);
+            sellingPrice.setGood(good);
+            sellingPriceRepository.save(sellingPrice);
+            auditService.saveEntity(sellingPrice, good, "sellingPrices");
         }
         validate(good);
+        auditService.saveEntity(good);
         return findApiById(good.getId());
     }
 
@@ -146,13 +152,15 @@ public class GoodService {
                 attributeRepository.findByGood(good), request.getAttributes()
         );
         for (EntityDivider<AttributeEntity, IdDto>.Entry entry : attributeDivider.newReceived()) {
-            GoodAttributeEntity goodAttributeEntity = goodMapper.toEntity(good, entry.getReceived());
-            goodAttributeRepository.save(goodAttributeEntity);
+            GoodAttributeEntity goodAttribute = goodMapper.toEntity(good, entry.getReceived());
+            goodAttributeRepository.save(goodAttribute);
+            auditService.saveEntity(goodAttribute, good, "attributes");
         }
         for (AttributeEntity attribute : attributeDivider.skippedCurrent()) {
             GoodAttributeEntity goodAttribute = goodAttributeRepository
                     .findByGoodAndAttribute(good, attribute).orElseThrow();
             goodAttributeRepository.delete(goodAttribute);
+            auditService.delete(goodAttribute, good);
         }
 
         EntityDivider<SellingPriceEntity, SellingPriceRequest> sellingPriceDivider = new EntityDivider<>(
@@ -162,12 +170,18 @@ public class GoodService {
             SellingPriceEntity sellingPrice = sellingPriceMapper.toEntity(entry.getReceived());
             sellingPrice.setGood(good);
             sellingPriceRepository.save(sellingPrice);
+            auditService.saveEntity(sellingPrice, good, "sellingPrices");
         }
         for (EntityDivider<SellingPriceEntity, SellingPriceRequest>.Entry entry : sellingPriceDivider.edited()) {
             sellingPriceMapper.editEntity(entry.getCurrent(), entry.getReceived());
+            auditService.saveEntity(entry.getCurrent(), good, "sellingPrices");
         }
-        sellingPriceRepository.deleteAll(sellingPriceDivider.skippedCurrent());
+        for (SellingPriceEntity sellingPrice : sellingPriceDivider.skippedCurrent()) {
+            sellingPriceRepository.delete(sellingPrice);
+            auditService.delete(sellingPrice, good);
+        }
         validate(good);
+        auditService.saveEntity(good);
         return findApiById(id);
     }
 
@@ -175,6 +189,7 @@ public class GoodService {
     public GoodResponse archive(UUID id) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         good.setArchived(true);
+        auditService.archive(good);
         return findApiById(id);
     }
 
@@ -182,6 +197,7 @@ public class GoodService {
     public GoodResponse unarchive(UUID id) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         good.setArchived(false);
+        auditService.unarchive(good);
         return findApiById(id);
     }
 

@@ -6,6 +6,7 @@ import kz.jarkyn.backend.global.model.dto.FileDto;
 import kz.jarkyn.backend.global.model.dto.ImageResponse;
 import kz.jarkyn.backend.global.repository.ImageRepository;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -48,6 +48,9 @@ public class ImageService {
             BufferedImage thumbnailImage = Thumbnails.of(originalImage).size(24, 24).asBufferedImage();
             FileDto thumbnailDto = toFileDto(thumbnailImage, originalFile);
             UUID thumbnailId = fileService.upload(thumbnailDto);
+
+            ContentDisposition disposition = ContentDisposition.parse(file.getContentDisposition());
+            String filename = disposition.getFilename();
 
             ImageEntity image = new ImageEntity();
             image.setOriginalFileId(originalId);

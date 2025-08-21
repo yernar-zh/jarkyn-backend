@@ -2,6 +2,7 @@ package kz.jarkyn.backend.warehouse.model;
 
 
 import jakarta.persistence.*;
+import kz.jarkyn.backend.audit.config.IgnoreAudit;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.ReferenceEntity;
 import kz.jarkyn.backend.global.model.ImageEntity;
@@ -16,6 +17,7 @@ public class GoodEntity extends ReferenceEntity {
     private GroupEntity group;
     @ManyToOne
     @JoinColumn(name = "image_id")
+    @IgnoreAudit
     private ImageEntity image;
     private BigDecimal weight;
     @Column(name = "minimum_price")

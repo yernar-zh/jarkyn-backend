@@ -1,10 +1,12 @@
 package kz.jarkyn.backend.core.model;
 
 import jakarta.persistence.*;
+import kz.jarkyn.backend.audit.config.IgnoreAudit;
 
 @MappedSuperclass
 public abstract class ReferenceEntity extends AbstractEntity {
     private String name;
+    @IgnoreAudit
     private Boolean archived;
 
     public String getName() {
