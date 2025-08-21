@@ -9,15 +9,19 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import kz.jarkyn.backend.document.core.repository.DocumentRepository;
+import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
 import kz.jarkyn.backend.warehouse.model.WarehouseEntity_;
-import kz.jarkyn.backend.warehouse.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
+import kz.jarkyn.backend.warehouse.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.warehouse.repository.WarehouseRepository;
 import kz.jarkyn.backend.warehouse.mapper.WarehouseMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,17 +29,20 @@ public class WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
     private final AuditService auditService;
+    private final DocumentRepository documentRepository;
     private final SearchFactory searchFactory;
 
     public WarehouseService(
             WarehouseRepository warehouseRepository,
             WarehouseMapper warehouseMapper,
             AuditService auditService,
+            DocumentRepository documentRepository,
             SearchFactory searchFactory
     ) {
         this.warehouseRepository = warehouseRepository;
         this.warehouseMapper = warehouseMapper;
         this.auditService = auditService;
+        this.documentRepository = documentRepository;
         this.searchFactory = searchFactory;
     }
 
@@ -70,5 +77,29 @@ public class WarehouseService {
         WarehouseEntity warehouse = warehouseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         warehouseMapper.editEntity(warehouse, request);
         auditService.saveEntity(warehouse);
+    }
+
+    @Transactional
+    public WarehouseResponse archive(UUID id) {
+        WarehouseEntity warehouse = warehouseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        warehouse.setArchived(true);
+        auditService.archive(warehouse);
+        return findApiById(id);
+    }
+
+    @Transactional
+    public WarehouseResponse unarchive(UUID id) {
+        WarehouseEntity warehouse = warehouseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        warehouse.setArchived(false);
+        auditService.unarchive(warehouse);
+        return findApiById(id);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        WarehouseEntity warehouse = warehouseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        Optional<DocumentEntity> document = documentRepository.findAny(DocumentSpecifications.warehouse(warehouse));
+        if (document.isPresent()) ExceptionUtils.throwRelationDeleteException();
+        warehouseRepository.delete(warehouse);
     }
 }

@@ -18,4 +18,9 @@ public interface AppRepository<T> extends
         PageRequest pageRequest = PageRequest.of(0, 1, sort);
         return findAll(spec, pageRequest).stream().findFirst();
     }
+
+    default Optional<T> findAny(Specification<T> spec) {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        return findAll(spec, pageRequest).stream().findFirst();
+    }
 }

@@ -1,8 +1,10 @@
 package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.MessageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.warehouse.service.WarehouseService;
@@ -43,5 +45,21 @@ public class WarehouseController {
     public WarehouseResponse edit(@PathVariable UUID id, @RequestBody WarehouseRequest request) {
         warehouseService.editApi(id, request);
         return warehouseService.findApiById(id);
+    }
+
+    @PutMapping("{id}/archive")
+    public WarehouseResponse archive(@PathVariable UUID id) {
+        return warehouseService.archive(id);
+    }
+
+    @PutMapping("{id}/unarchive")
+    public WarehouseResponse unarchive(@PathVariable UUID id) {
+        return warehouseService.unarchive(id);
+    }
+
+    @DeleteMapping("{id}")
+    public MessageResponse delete(@PathVariable UUID id) {
+        warehouseService.delete(id);
+        return MessageResponse.DELETED;
     }
 }
