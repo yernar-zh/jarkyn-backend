@@ -10,9 +10,13 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import kz.jarkyn.backend.document.core.repository.DocumentRepository;
+import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.model.dto.AccountRequest;
 import kz.jarkyn.backend.party.model.dto.AccountResponse;
+import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
 import kz.jarkyn.backend.party.repository.AccountRepository;
 import kz.jarkyn.backend.party.mapper.AccountMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
@@ -25,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,6 +40,7 @@ public class AccountService {
     private final SearchFactory searchFactory;
     private final CashFlowService cashFlowService;
     private final CurrencyService currencyService;
+    private final DocumentRepository documentRepository;
 
     public AccountService(
             AccountRepository accountRepository,
@@ -42,13 +48,14 @@ public class AccountService {
             AccountMapper accountMapper,
             SearchFactory searchFactory,
             CashFlowService cashFlowService,
-            CurrencyService currencyService) {
+            CurrencyService currencyService, DocumentRepository documentRepository) {
         this.accountRepository = accountRepository;
         this.auditService = auditService;
         this.accountMapper = accountMapper;
         this.searchFactory = searchFactory;
         this.cashFlowService = cashFlowService;
         this.currencyService = currencyService;
+        this.documentRepository = documentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -117,5 +124,29 @@ public class AccountService {
         ExceptionUtils.requireEqualsApi(account.getCurrency().getId(), request.getCurrency().getId(), "currency");
         accountMapper.editEntity(account, request);
         auditService.saveEntity(account);
+    }
+
+    @Transactional
+    public AccountResponse archive(UUID id) {
+        AccountEntity account = accountRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        account.setArchived(true);
+        auditService.archive(account);
+        return findApiById(id);
+    }
+
+    @Transactional
+    public AccountResponse unarchive(UUID id) {
+        AccountEntity account = accountRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        account.setArchived(false);
+        auditService.unarchive(account);
+        return findApiById(id);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        AccountEntity account = accountRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        Optional<DocumentEntity> document = documentRepository.findAny(DocumentSpecifications.account(account));
+        if (document.isPresent()) ExceptionUtils.throwRelationDeleteException();
+        accountRepository.delete(account);
     }
 }

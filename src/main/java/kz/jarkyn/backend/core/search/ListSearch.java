@@ -130,20 +130,16 @@ public class ListSearch<R> implements Search<R> {
     }
 
     private Comparator<Row> sort(QueryParams queryParams) {
-        return Stream.of(queryParams.getSorts().stream(), Stream.of(defaultSort)).flatMap(Function.identity())
+        return Stream.concat(queryParams.getSorts().stream(), Stream.of(defaultSort))
                 .map(sort -> {
-                    Comparator<Row> comparator = Comparator.comparing(row -> {
-                        Object rowValue = row.getValues().get(sort.getName());
-                        if (rowValue == null) {
-                            return null;
-                        }
-                        return (Comparable) rowValue;
-                    });
-                    return switch (sort.getType()) {
-                        case ASC -> comparator;
-                        case DESC -> comparator.reversed();
-                    };
-                }).reduce(Comparator::thenComparing).orElse(Comparator.comparing(_ -> true));
+                    Comparator<Row> comparator = Comparator.comparing(
+                            row -> (Comparable) row.getValues().get(sort.getName()),
+                            Comparator.nullsLast(Comparator.naturalOrder())
+                    );
+                    return sort.getType() == QueryParams.Sort.Type.ASC ? comparator : comparator.reversed();
+                })
+                .reduce(Comparator::thenComparing)
+                .orElse(Comparator.comparing(_ -> 0));
     }
 
     private class Row {

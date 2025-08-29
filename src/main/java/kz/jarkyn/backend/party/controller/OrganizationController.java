@@ -1,11 +1,13 @@
 package kz.jarkyn.backend.party.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.MessageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.party.model.dto.OrganizationRequest;
 import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
 import kz.jarkyn.backend.party.service.OrganizationService;
+import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,5 +45,21 @@ public class OrganizationController {
     public OrganizationResponse edit(@PathVariable UUID id, @RequestBody OrganizationRequest request) {
         organizationService.editApi(id, request);
         return organizationService.findApiById(id);
+    }
+
+    @PutMapping("{id}/archive")
+    public OrganizationResponse archive(@PathVariable UUID id) {
+        return organizationService.archive(id);
+    }
+
+    @PutMapping("{id}/unarchive")
+    public OrganizationResponse unarchive(@PathVariable UUID id) {
+        return organizationService.unarchive(id);
+    }
+
+    @DeleteMapping("{id}")
+    public MessageResponse delete(@PathVariable UUID id) {
+        organizationService.delete(id);
+        return MessageResponse.DELETED;
     }
 }

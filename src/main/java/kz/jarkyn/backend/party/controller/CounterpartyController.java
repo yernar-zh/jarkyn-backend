@@ -1,11 +1,13 @@
 package kz.jarkyn.backend.party.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.MessageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.party.model.dto.CounterpartyListResponse;
 import kz.jarkyn.backend.party.model.dto.CounterpartyRequest;
 import kz.jarkyn.backend.party.model.dto.CounterpartyResponse;
+import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
 import kz.jarkyn.backend.party.service.CounterpartyService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -35,13 +37,30 @@ public class CounterpartyController {
 
     @PostMapping
     public CounterpartyResponse create(@RequestBody CounterpartyRequest request) {
-        UUID id = counterpartyService.create(request);
+        UUID id = counterpartyService.createApi(request);
         return counterpartyService.findApiById(id);
     }
 
     @PutMapping("{id}")
     public CounterpartyResponse edit(@PathVariable UUID id, @RequestBody CounterpartyRequest request) {
-        counterpartyService.edit(id, request);
+        counterpartyService.editApi(id, request);
         return counterpartyService.findApiById(id);
+    }
+
+
+    @PutMapping("{id}/archive")
+    public CounterpartyResponse archive(@PathVariable UUID id) {
+        return counterpartyService.archive(id);
+    }
+
+    @PutMapping("{id}/unarchive")
+    public CounterpartyResponse unarchive(@PathVariable UUID id) {
+        return counterpartyService.unarchive(id);
+    }
+
+    @DeleteMapping("{id}")
+    public MessageResponse delete(@PathVariable UUID id) {
+        counterpartyService.delete(id);
+        return MessageResponse.DELETED;
     }
 }

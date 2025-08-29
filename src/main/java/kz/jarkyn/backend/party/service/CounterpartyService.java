@@ -8,6 +8,9 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import kz.jarkyn.backend.document.core.repository.DocumentRepository;
+import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
 import kz.jarkyn.backend.party.model.CounterpartyEntity;
 import kz.jarkyn.backend.party.model.dto.CounterpartyListResponse;
 import kz.jarkyn.backend.party.model.dto.CounterpartyRequest;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,19 +34,21 @@ public class CounterpartyService {
     private final AuditService auditService;
     private final SearchFactory searchFactory;
     private final AccountService accountService;
+    private final DocumentRepository documentRepository;
 
     public CounterpartyService(
             CounterpartyRepository counterpartyRepository,
             CounterpartyMapper counterpartyMapper,
             AuditService auditService,
             SearchFactory searchFactory,
-            AccountService accountService
-    ) {
+            AccountService accountService,
+            DocumentRepository documentRepository) {
         this.counterpartyRepository = counterpartyRepository;
         this.counterpartyMapper = counterpartyMapper;
         this.auditService = auditService;
         this.searchFactory = searchFactory;
         this.accountService = accountService;
+        this.documentRepository = documentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -64,16 +70,40 @@ public class CounterpartyService {
     }
 
     @Transactional
-    public UUID create(CounterpartyRequest request) {
+    public UUID createApi(CounterpartyRequest request) {
         CounterpartyEntity counterparty = counterpartyRepository.save(counterpartyMapper.toEntity(request));
         auditService.saveEntity(counterparty);
         return counterparty.getId();
     }
 
     @Transactional
-    public void edit(UUID id, CounterpartyRequest request) {
+    public void editApi(UUID id, CounterpartyRequest request) {
         CounterpartyEntity counterparty = counterpartyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         counterpartyMapper.editEntity(counterparty, request);
         auditService.saveEntity(counterparty);
+    }
+
+    @Transactional
+    public CounterpartyResponse archive(UUID id) {
+        CounterpartyEntity counterparty = counterpartyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        counterparty.setArchived(true);
+        auditService.archive(counterparty);
+        return findApiById(id);
+    }
+
+    @Transactional
+    public CounterpartyResponse unarchive(UUID id) {
+        CounterpartyEntity counterparty = counterpartyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        counterparty.setArchived(false);
+        auditService.unarchive(counterparty);
+        return findApiById(id);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        CounterpartyEntity counterparty = counterpartyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        Optional<DocumentEntity> document = documentRepository.findAny(DocumentSpecifications.counterparty(counterparty));
+        if (document.isPresent()) ExceptionUtils.throwRelationDeleteException();
+        counterpartyRepository.delete(counterparty);
     }
 }
