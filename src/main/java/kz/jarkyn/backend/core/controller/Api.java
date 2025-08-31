@@ -74,4 +74,12 @@ public interface Api {
     interface Lookup {
         String PATH = Api.PATH + "/lookup";
     }
+
+    interface Role {
+        String PATH = Api.PATH + "/role";
+    }
+
+    interface User {
+        String PATH = Api.PATH + "/user";
+    }
 }

@@ -241,6 +241,17 @@ CREATE TABLE payment_out
     CONSTRAINT pk_payment_out PRIMARY KEY (id)
 );
 
+CREATE TABLE role
+(
+    id               UUID NOT NULL,
+    code             VARCHAR(255),
+    name             VARCHAR(255),
+    archived         BOOLEAN,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    CONSTRAINT pk_role PRIMARY KEY (id)
+);
+
 CREATE TABLE sale
 (
     id              UUID NOT NULL,
@@ -283,6 +294,16 @@ CREATE TABLE turnover
     CONSTRAINT pk_turnover PRIMARY KEY (id)
 );
 
+CREATE TABLE user_token
+(
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    user_id          UUID,
+    token            VARCHAR(255),
+    CONSTRAINT pk_user_token PRIMARY KEY (id)
+);
+
 CREATE TABLE users
 (
     id               UUID NOT NULL,
@@ -290,10 +311,9 @@ CREATE TABLE users
     archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    counterparty_id  UUID,
     phone_number     VARCHAR(255),
-    auth_token       VARCHAR(255),
-    role             VARCHAR(255),
+    password         VARCHAR(255),
+    role_id          UUID,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -410,4 +430,7 @@ ALTER TABLE turnover
     ADD CONSTRAINT FK_TURNOVER_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
 
 ALTER TABLE users
-    ADD CONSTRAINT FK_USERS_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES party (id);
+    ADD CONSTRAINT FK_USERS_ON_ROLE FOREIGN KEY (role_id) REFERENCES role (id);
+
+ALTER TABLE user_token
+    ADD CONSTRAINT FK_USER_TOKEN_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

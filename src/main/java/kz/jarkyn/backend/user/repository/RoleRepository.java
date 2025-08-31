@@ -1,9 +1,9 @@
 package kz.jarkyn.backend.user.repository;
 
 import kz.jarkyn.backend.core.repository.AppRepository;
-import kz.jarkyn.backend.user.model.UserEntity;
+import kz.jarkyn.backend.user.model.RoleEntity;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends AppRepository<UserEntity> {
+public interface RoleRepository extends AppRepository<RoleEntity> {
 }

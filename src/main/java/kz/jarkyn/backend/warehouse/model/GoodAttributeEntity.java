@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import kz.jarkyn.backend.audit.config.IgnoreAudit;
+import kz.jarkyn.backend.audit.config.AuditIgnore;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 
 @Entity
@@ -12,7 +12,7 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 public class GoodAttributeEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "good_id")
-    @IgnoreAudit
+    @AuditIgnore
     private GoodEntity good;
     @ManyToOne
     @JoinColumn(name = "attribute_id")

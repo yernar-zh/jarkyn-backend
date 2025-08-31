@@ -7,5 +7,4 @@ import org.immutables.value.Value;
 @JsonDeserialize(builder = ImmutableReferenceResponse.Builder.class)
 public interface ReferenceRequest {
     String getName();
-    Boolean getArchived();
 }

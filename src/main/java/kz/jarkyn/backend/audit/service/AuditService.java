@@ -4,7 +4,7 @@ package kz.jarkyn.backend.audit.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kz.jarkyn.backend.audit.config.IgnoreAudit;
+import kz.jarkyn.backend.audit.config.AuditIgnore;
 import kz.jarkyn.backend.audit.mapper.ChangeMapper;
 import kz.jarkyn.backend.audit.model.AuditEntity;
 import kz.jarkyn.backend.audit.model.dto.EntityChangeResponse;
@@ -21,8 +21,9 @@ import kz.jarkyn.backend.audit.specifications.AuditSpecifications;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
-import kz.jarkyn.backend.user.service.UserService;
+import kz.jarkyn.backend.user.repository.UserRepository;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,19 +39,18 @@ public class AuditService {
     private static final String EDITE = "EDITE";
 
     private final AuditRepository auditRepository;
-    private final UserService userService;
     private final ChangeMapper changeMapper;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     public AuditService(
             AuditRepository auditRepository,
-            UserService userService,
             ChangeMapper changeMapper,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper, UserRepository userRepository) {
         this.auditRepository = auditRepository;
-        this.userService = userService;
         this.changeMapper = changeMapper;
         this.objectMapper = objectMapper;
+        this.userRepository = userRepository;
     }
 
     public MainEntityChangeResponse findLastChange(UUID entityId) {
@@ -157,7 +157,7 @@ public class AuditService {
         }
         try {
             for (Field field : fields) {
-                if (field.isAnnotationPresent(IgnoreAudit.class)) {
+                if (field.isAnnotationPresent(AuditIgnore.class)) {
                     continue;
                 }
                 field.setAccessible(true);
@@ -202,7 +202,7 @@ public class AuditService {
 
     @Transactional
     public void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String action) {
-        UserEntity user = userService.findCurrent();
+        UserEntity user = findCurrentUser();
         Instant moment = auditRepository.findAll(Specification
                         .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
                         .and(AuditSpecifications.user(user))
@@ -219,6 +219,12 @@ public class AuditService {
         newAudit.setFieldValue(null);
         auditRepository.save(newAudit);
     }
+
+    private UserEntity findCurrentUser() {
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.findById(userId).orElseThrow();
+    }
+
 
     private JsonNode toJsonNode(String json) {
         if (json == null) return null;
@@ -261,7 +267,7 @@ public class AuditService {
                 if (oldAudit != null && Objects.equals(oldAudit.getFieldValue(),
                         objectMapper.writeValueAsString(fieldValue))) return;
             }
-            UserEntity user = userService.findCurrent();
+            UserEntity user = findCurrentUser();
             Instant moment = auditRepository.findAll(Specification
                             .where(AuditSpecifications.relatedEntityId(relatedEntityId))
                             .and(AuditSpecifications.user(user))

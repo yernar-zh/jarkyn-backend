@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import kz.jarkyn.backend.audit.config.IgnoreAudit;
+import kz.jarkyn.backend.audit.config.AuditIgnore;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.warehouse.model.GoodEntity;
 
@@ -22,7 +22,7 @@ public class ItemEntity extends AbstractEntity {
     private GoodEntity good;
     private Integer quantity;
     private BigDecimal price;
-    @IgnoreAudit
+    @AuditIgnore
     private Integer position;
 
     public DocumentEntity getDocument() {

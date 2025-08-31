@@ -1,7 +1,7 @@
 package kz.jarkyn.backend.document.core.model;
 
 
-import kz.jarkyn.backend.audit.config.IgnoreAudit;
+import kz.jarkyn.backend.audit.config.AuditIgnore;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import jakarta.persistence.*;
 import kz.jarkyn.backend.party.model.AccountEntity;
@@ -42,9 +42,9 @@ public class DocumentEntity extends AbstractEntity {
     private BigDecimal exchangeRate;
     private BigDecimal amount;
     private String comment;
-    @IgnoreAudit
+    @AuditIgnore
     private Boolean deleted;
-    @IgnoreAudit
+    @AuditIgnore
     private Boolean commited;
 
     public DocumentTypeEntity getType() {

@@ -1,17 +1,13 @@
-INSERT INTO public.party (id, name, archived, created_at, last_modified_at)
-VALUES ('c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515', 'ИП Жырқын', false, now(), now());
+INSERT INTO public.role (id, name, code, archived, created_at, last_modified_at)
+VALUES ('82435749-721a-49ee-8402-579d507b21ff', 'Система', 'SYSTEM', false, now(), now()),
+       ('c54cf84d-230d-48bf-87fa-172c0cc7e4d5', 'Владелец', 'OWNER', false, now(), now()),
+       ('123b4cb7-d57d-48fd-8596-143bf994826e', 'Администратор', 'ADMINISTRATOR', false, now(), now()),
+       ('60969353-3986-4d85-bfa1-04f91d375b19', 'Кладовщик ', 'STOREKEEPER', false, now(), now());
 
-INSERT INTO public.organization (id)
-VALUES ('c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515');
+INSERT INTO public.users (id, name, phone_number, role_id, password, archived, created_at, last_modified_at)
+VALUES ('d8427d9f-4836-449f-8a6d-90d5d718c83f', 'Система', '+7 700 000 0000',
+        '82435749-721a-49ee-8402-579d507b21ff', '', false, now(), now());
 
-INSERT INTO public.users (id, counterparty_id, phone_number, name, auth_token, role, archived,
-                          created_at, last_modified_at)
-VALUES ('376d6b4e-746b-4ee6-9e6c-8c8223643a7a', null,
-        null, 'Система', null, 'SYSTEM', false,
-        now(), now()),
-       ('f57382c9-35a1-4b64-b3f0-f172489dc90a', null,
-        '+77752166661', 'Ернар', null, 'ADMIN', false,
-        now(), now());
 
 INSERT INTO public.currency (id, name, code, archived, created_at, last_modified_at)
 VALUES ('559109ea-f824-476d-8fa4-9990e53880ff', 'Тенге', 'KZT', false, now(), now()),

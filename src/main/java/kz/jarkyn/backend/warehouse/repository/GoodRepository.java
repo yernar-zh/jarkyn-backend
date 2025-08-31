@@ -1,5 +1,6 @@
 package kz.jarkyn.backend.warehouse.repository;
 
+import kz.jarkyn.backend.core.repository.AppRepository;
 import kz.jarkyn.backend.warehouse.model.AttributeEntity;
 import kz.jarkyn.backend.warehouse.model.GoodEntity;
 import kz.jarkyn.backend.warehouse.model.GroupEntity;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface GoodRepository extends JpaRepository<GoodEntity, UUID> {
+public interface GoodRepository extends AppRepository<GoodEntity> {
     List<GoodEntity> findByGroup(GroupEntity group);
 
     @Query("""
