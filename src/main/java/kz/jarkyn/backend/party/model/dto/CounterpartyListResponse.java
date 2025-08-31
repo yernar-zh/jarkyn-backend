@@ -11,8 +11,8 @@ import java.time.Instant;
 @Value.Immutable
 public interface CounterpartyListResponse extends ReferenceResponse {
     @Nullable String getPhoneNumber();
-    String getShippingAddress();
     Integer getDiscount();
+    String getShippingAddress();
     BigDecimal getAccountBalance();
     EnumTypeResponse getAccountCurrency();
 }

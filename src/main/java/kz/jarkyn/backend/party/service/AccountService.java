@@ -10,19 +10,22 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.party.model.dto.AccountShortResponse;
+import kz.jarkyn.backend.party.spesification.AccountSpecifications;
+import kz.jarkyn.backend.party.spesification.OrganizationSpecifications;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.model.dto.AccountRequest;
 import kz.jarkyn.backend.party.model.dto.AccountResponse;
-import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
 import kz.jarkyn.backend.party.repository.AccountRepository;
 import kz.jarkyn.backend.party.mapper.AccountMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
 import kz.jarkyn.backend.global.service.CurrencyService;
-import org.springframework.data.util.Pair;
+import kz.jarkyn.backend.party.repository.OrganizationRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AccountService {
@@ -41,6 +47,7 @@ public class AccountService {
     private final CashFlowService cashFlowService;
     private final CurrencyService currencyService;
     private final DocumentRepository documentRepository;
+    private final OrganizationRepository organizationRepository;
 
     public AccountService(
             AccountRepository accountRepository,
@@ -48,7 +55,7 @@ public class AccountService {
             AccountMapper accountMapper,
             SearchFactory searchFactory,
             CashFlowService cashFlowService,
-            CurrencyService currencyService, DocumentRepository documentRepository) {
+            CurrencyService currencyService, DocumentRepository documentRepository, OrganizationRepository organizationRepository) {
         this.accountRepository = accountRepository;
         this.auditService = auditService;
         this.accountMapper = accountMapper;
@@ -56,6 +63,7 @@ public class AccountService {
         this.cashFlowService = cashFlowService;
         this.currencyService = currencyService;
         this.documentRepository = documentRepository;
+        this.organizationRepository = organizationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -95,16 +103,21 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public List<Pair<BigDecimal, CurrencyEntity>> findBalanceByCounterparty(PartyEntity counterparty) {
-        List<Pair<BigDecimal, CurrencyEntity>> result = accountRepository.findByCounterparty(counterparty).stream()
+    public List<AccountShortResponse> findBalanceByCounterparty(CounterpartyEntity counterparty) {
+        Stream<AccountShortResponse> accounts = accountRepository
+                .findAll(Specification.where(AccountSpecifications.counterparty(counterparty))).stream()
                 .sorted(Comparator.comparing(AbstractEntity::getLastModifiedAt).reversed())
-                .map(account -> Pair.of(cashFlowService.findCurrentBalance(account), account.getCurrency()))
-                .filter(pair -> pair.getFirst().compareTo(BigDecimal.ZERO) != 0)
-                .toList();
-        if (!result.isEmpty()) {
-            return result;
-        }
-        return List.of(Pair.of(BigDecimal.ZERO, currencyService.findKZT()));
+                .map(account -> accountMapper.toResponse(account.getOrganization(),
+                        cashFlowService.findCurrentBalance(account), account.getCurrency()))
+                .filter(balance -> balance.getBalance().compareTo(BigDecimal.ZERO) != 0);
+        Stream<AccountShortResponse> defaultAccounts = organizationRepository
+                .findAll(Specification.where(OrganizationSpecifications.nonArchived())).stream()
+                .map(organization -> accountMapper.toResponse(organization, BigDecimal.ZERO, currencyService.findKZT()));
+        return Stream.concat(accounts, defaultAccounts)
+                .collect(Collectors.toMap(
+                        AccountShortResponse::getOrganization, Function.identity(),
+                        (a, b) -> a.getBalance().compareTo(b.getBalance()) >= 0 ? a : b
+                )).values().stream().toList();
     }
 
     @Transactional

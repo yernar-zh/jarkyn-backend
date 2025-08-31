@@ -12,17 +12,12 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
 import kz.jarkyn.backend.party.model.CounterpartyEntity;
-import kz.jarkyn.backend.party.model.dto.CounterpartyListResponse;
-import kz.jarkyn.backend.party.model.dto.CounterpartyRequest;
-import kz.jarkyn.backend.party.model.dto.CounterpartyResponse;
+import kz.jarkyn.backend.party.model.dto.*;
 import kz.jarkyn.backend.party.repository.CounterpartyRepository;
 import kz.jarkyn.backend.party.mapper.CounterpartyMapper;
-import kz.jarkyn.backend.global.model.CurrencyEntity;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,18 +48,20 @@ public class CounterpartyService {
 
     @Transactional(readOnly = true)
     public CounterpartyResponse findApiById(UUID id) {
-        CounterpartyEntity counterparty = counterpartyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        return counterpartyMapper.toResponse(counterparty);
+        CounterpartyEntity counterparty = counterpartyRepository.findById(id)
+                .orElseThrow(ExceptionUtils.entityNotFound());
+        List<AccountShortResponse> accounts = accountService.findBalanceByCounterparty(counterparty);
+        return counterpartyMapper.toResponse(counterparty, accounts);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<CounterpartyListResponse> findApiByFilter(QueryParams queryParams) {
         Search<CounterpartyListResponse> search = searchFactory.createListSearch(
                 CounterpartyListResponse.class, List.of("name", "phoneNumber"), QueryParams.Sort.NAME_ASC,
-                () -> counterpartyRepository.findAll().stream().map(customer -> {
-                    Pair<BigDecimal, CurrencyEntity> account = accountService.findBalanceByCounterparty(customer)
+                () -> counterpartyRepository.findAll().stream().map(counterparty -> {
+                    AccountShortResponse account = accountService.findBalanceByCounterparty(counterparty)
                             .stream().findFirst().orElseThrow();
-                    return counterpartyMapper.toResponse(customer, account.getFirst(), account.getSecond());
+                    return counterpartyMapper.toResponse(counterparty, account.getBalance(), account.getCurrency());
                 }).toList());
         return search.getResult(queryParams);
     }
