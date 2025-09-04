@@ -20,6 +20,7 @@ import kz.jarkyn.backend.core.sorts.EntitySorts;
 import kz.jarkyn.backend.audit.specifications.AuditSpecifications;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
+import kz.jarkyn.backend.user.model.SessionEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 import kz.jarkyn.backend.user.repository.UserRepository;
 import kz.jarkyn.backend.user.service.AuthService;
@@ -41,17 +42,16 @@ public class AuditService {
     private final AuditRepository auditRepository;
     private final ChangeMapper changeMapper;
     private final ObjectMapper objectMapper;
-    private final UserRepository userRepository;
     private final AuthService authService;
 
     public AuditService(
             AuditRepository auditRepository,
             ChangeMapper changeMapper,
-            ObjectMapper objectMapper, UserRepository userRepository, AuthService authService) {
+            ObjectMapper objectMapper,
+            AuthService authService) {
         this.auditRepository = auditRepository;
         this.changeMapper = changeMapper;
         this.objectMapper = objectMapper;
-        this.userRepository = userRepository;
         this.authService = authService;
     }
 
@@ -62,7 +62,7 @@ public class AuditService {
                 .orElseThrow(ExceptionUtils.entityNotFound());
         String action = audit.getEntityId().equals(entityId) ? audit.getAction() : EDITE;
         return changeMapper.toMainEntityChange(
-                audit.getMoment(), audit.getUser(),
+                audit.getMoment(), audit.getSession().getUser(),
                 action, List.of(), List.of());
     }
 
@@ -143,7 +143,7 @@ public class AuditService {
                     .toList();
             AuditEntity firstChangeGroupAudit = changeGroupAudits.getFirst();
             return changeMapper.toMainEntityChange(
-                    firstChangeGroupAudit.getMoment(), firstChangeGroupAudit.getUser(),
+                    firstChangeGroupAudit.getMoment(), firstChangeGroupAudit.getSession().getUser(),
                     action, fieldChanges, entityGroupChanges);
         }).sorted(Comparator.comparing(MainEntityChangeResponse::getMoment).reversed()).toList();
     }
@@ -204,16 +204,16 @@ public class AuditService {
 
     @Transactional
     public void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String action) {
-        UserEntity user = authService.getCurrentUser();
+        SessionEntity session = authService.getCurrentSession();
         Instant moment = auditRepository.findAll(Specification
                         .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
-                        .and(AuditSpecifications.user(user))
+                        .and(AuditSpecifications.session(session))
                         .and(AuditSpecifications.createdLessThanOneSecond()))
                 .stream().map(AuditEntity::getMoment)
                 .findAny().orElse(Instant.now());
         AuditEntity newAudit = new AuditEntity();
         newAudit.setMoment(moment);
-        newAudit.setUser(user);
+        newAudit.setSession(session);
         newAudit.setEntityId(entity.getId());
         newAudit.setRelatedEntityId(relatedEntity.getId());
         newAudit.setAction(action);
@@ -264,16 +264,16 @@ public class AuditService {
                 if (oldAudit != null && Objects.equals(oldAudit.getFieldValue(),
                         objectMapper.writeValueAsString(fieldValue))) return;
             }
-            UserEntity user = authService.getCurrentUser();
+            SessionEntity session = authService.getCurrentSession();
             Instant moment = auditRepository.findAll(Specification
                             .where(AuditSpecifications.relatedEntityId(relatedEntityId))
-                            .and(AuditSpecifications.user(user))
+                            .and(AuditSpecifications.session(session))
                             .and(AuditSpecifications.createdLessThanOneSecond()))
                     .stream().map(AuditEntity::getMoment)
                     .findAny().orElse(Instant.now());
             AuditEntity newAudit = new AuditEntity();
             newAudit.setMoment(moment);
-            newAudit.setUser(user);
+            newAudit.setSession(session);
             newAudit.setEntityId(entity.getId());
             newAudit.setRelatedEntityId(relatedEntityId);
             newAudit.setAction(oldAudit == null ? CREATE : EDITE);

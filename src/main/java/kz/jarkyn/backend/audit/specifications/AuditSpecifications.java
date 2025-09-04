@@ -2,6 +2,7 @@ package kz.jarkyn.backend.audit.specifications;
 
 import kz.jarkyn.backend.audit.model.AuditEntity;
 import kz.jarkyn.backend.audit.model.AuditEntity_;
+import kz.jarkyn.backend.user.model.SessionEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -21,8 +22,8 @@ public class AuditSpecifications {
         return (root, query, cb) -> cb.equal(root.get(AuditEntity_.fieldName), fieldName);
     }
 
-    public static Specification<AuditEntity> user(UserEntity user) {
-        return (root, query, cb) -> cb.equal(root.get(AuditEntity_.user), user);
+    public static Specification<AuditEntity> session(SessionEntity session) {
+        return (root, query, cb) -> cb.equal(root.get(AuditEntity_.session), session);
     }
 
     public static Specification<AuditEntity> createdLessThanOneSecond() {

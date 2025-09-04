@@ -2,6 +2,7 @@ package kz.jarkyn.backend.audit.model;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
+import kz.jarkyn.backend.user.model.SessionEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 
 import java.time.Instant;
@@ -13,7 +14,7 @@ public class AuditEntity extends AbstractEntity {
     private Instant moment;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private SessionEntity session;
     @Column(name = "related_entity_id")
     private UUID relatedEntityId;
     @Column(name = "entity_id")
@@ -33,12 +34,12 @@ public class AuditEntity extends AbstractEntity {
         this.moment = moment;
     }
 
-    public UserEntity getUser() {
-        return user;
+    public SessionEntity getSession() {
+        return session;
     }
 
-    public void setUser(UserEntity user) {
-        this.user = user;
+    public void setSession(SessionEntity session) {
+        this.session = session;
     }
 
     public UUID getRelatedEntityId() {

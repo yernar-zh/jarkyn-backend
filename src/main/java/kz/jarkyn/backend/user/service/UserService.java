@@ -11,6 +11,7 @@ import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.user.mapper.UserMapper;
+import kz.jarkyn.backend.user.model.SessionEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 import kz.jarkyn.backend.user.model.UserEntity_;
 import kz.jarkyn.backend.user.model.dto.UserRequest;
@@ -18,6 +19,7 @@ import kz.jarkyn.backend.user.model.dto.UserResponse;
 import kz.jarkyn.backend.user.repository.RoleRepository;
 import kz.jarkyn.backend.user.repository.UserRepository;
 import kz.jarkyn.backend.user.repository.SessionRepository;
+import kz.jarkyn.backend.user.spesification.SessionSpecifications;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,7 @@ public class UserService {
     private final SearchFactory searchFactory;
     private final AuditRepository auditRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SessionRepository sessionRepository;
 
     public UserService(
             UserRepository userRepository,
@@ -39,15 +42,16 @@ public class UserService {
             AuditService auditService,
             SearchFactory searchFactory,
             AuditRepository auditRepository,
-            SessionRepository userTokenRepository,
-            RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            SessionRepository sessionRepository
+    ) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.auditService = auditService;
         this.searchFactory = searchFactory;
         this.auditRepository = auditRepository;
         this.passwordEncoder = passwordEncoder;
+        this.sessionRepository = sessionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -106,9 +110,11 @@ public class UserService {
     @Transactional
     public void delete(UUID id) {
         UserEntity user = userRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        boolean existsAudit = auditRepository.exists(AuditSpecifications.user(user));
-        if (existsAudit) ExceptionUtils.throwRelationDeleteException();
-        // TODO remove all tokens
+        for (SessionEntity session : sessionRepository.findAll(SessionSpecifications.user(user))) {
+            boolean existsAudit = auditRepository.exists(AuditSpecifications.session(session));
+            if (existsAudit) ExceptionUtils.throwRelationDeleteException();
+            sessionRepository.delete(session);
+        }
         userRepository.delete(user);
     }
 }

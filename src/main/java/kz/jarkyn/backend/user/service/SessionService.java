@@ -12,7 +12,6 @@ import java.util.UUID;
 @Service
 public class SessionService {
     private final SessionRepository sessionRepository;
-
     public SessionService(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
     }
