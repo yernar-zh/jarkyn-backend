@@ -110,7 +110,7 @@ public class AuthService {
     public LoginResponse login(String phoneNumber, String password, String ip, String userAgent) {
         UserEntity user = userRepository.findOne(UserSpecifications.phoneNumber(phoneNumber))
                 .orElseThrow(() -> new BadCredentialsException("Bad Credentials"));
-        if (user.getArchived() || passwordEncoder.matches(password, user.getPasswordHash()))
+        if (user.getArchived() || !passwordEncoder.matches(password, user.getPasswordHash()))
             throw new BadCredentialsException("Bad creds");
 
         byte[] b = new byte[32];
@@ -158,7 +158,6 @@ public class AuthService {
         }
     }
 
-
     private AccessTokenResponse generateAccessToken(SessionEntity session) {
         Instant now = Instant.now();
         String accessToken = Jwts.builder()
@@ -174,6 +173,6 @@ public class AuthService {
     private boolean validate(SessionEntity session) {
         Instant now = Instant.now();
         if (session.getExpiresAt().compareTo(now) < 0) return false;
-        return session.getRevokedAt() == null || session.getRevokedAt().compareTo(now) >= 0;
+        return session.getRevokedAt() == null;
     }
 }

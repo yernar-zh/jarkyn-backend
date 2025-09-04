@@ -1,63 +1,72 @@
 package kz.jarkyn.backend.user.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import kz.jarkyn.backend.core.controller.Api;
-import kz.jarkyn.backend.core.model.dto.MessageResponse;
-import kz.jarkyn.backend.core.model.dto.PageResponse;
-import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.user.model.dto.UserRequest;
-import kz.jarkyn.backend.user.model.dto.UserResponse;
-import kz.jarkyn.backend.user.service.UserService;
-import org.springframework.util.MultiValueMap;
+import kz.jarkyn.backend.user.model.dto.AccessTokenResponse;
+import kz.jarkyn.backend.user.model.dto.LoginRequest;
+import kz.jarkyn.backend.user.model.dto.LoginResponse;
+import kz.jarkyn.backend.user.service.AuthService;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.time.Duration;
 
 @RestController
-@RequestMapping(Api.Auth.PATH)
+@RequestMapping(Api.Role.PATH)
 public class AuthController {
-    private final UserService userService;
+    private final AuthService authService;
 
-    public AuthController(
-            UserService userService
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AccessTokenResponse> login(
+            @RequestBody LoginRequest request,
+            HttpServletResponse response,
+            @RequestHeader(value = "User-Agent", required = false) String userAgent,
+            @RequestHeader(value = "X-Forwarded-For", required = false) String ip
     ) {
-        this.userService = userService;
+        LoginResponse loginResponse = authService.login(
+                request.getPhoneNumber(),
+                request.getPassword(),
+                ip,
+                userAgent
+        );
+
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", loginResponse.getRefreshToken())
+                .httpOnly(true)
+                .path("/api/auth/refresh")
+                .maxAge(Duration.ofDays(365))
+                .sameSite("Strict").build();
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        return ResponseEntity.ok(loginResponse.getAccessToken());
     }
 
-    @GetMapping("{id}")
-    public UserResponse detail(@PathVariable UUID id) {
-        return userService.findApiById(id);
+    @PostMapping("/refresh")
+    public ResponseEntity<AccessTokenResponse> refresh(
+            @CookieValue("refreshToken") String refreshToken
+    ) {
+        AccessTokenResponse accessToken = authService.refresh(refreshToken);
+        return ResponseEntity.ok(accessToken);
     }
 
-    @GetMapping
-    public PageResponse<UserResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return userService.findApiByFilter(QueryParams.of(allParams));
-    }
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        authService.logout();
 
-    @PostMapping
-    public UserResponse create(@RequestBody UserRequest request) {
-        UUID id = userService.createApi(request);
-        return userService.findApiById(id);
-    }
+        // очистить cookie
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/api/auth/refresh")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+        response.addHeader("Set-Cookie", deleteCookie.toString());
 
-    @PutMapping("{id}")
-    public UserResponse edit(@PathVariable UUID id, @RequestBody UserRequest request) {
-        userService.editApi(id, request);
-        return userService.findApiById(id);
-    }
-
-    @PutMapping("{id}/archive")
-    public UserResponse archive(@PathVariable UUID id) {
-        return userService.archive(id);
-    }
-
-    @PutMapping("{id}/unarchive")
-    public UserResponse unarchive(@PathVariable UUID id) {
-        return userService.unarchive(id);
-    }
-
-    @DeleteMapping("{id}")
-    public MessageResponse delete(@PathVariable UUID id) {
-        userService.delete(id);
-        return MessageResponse.DELETED;
+        return ResponseEntity.noContent().build();
     }
 }
