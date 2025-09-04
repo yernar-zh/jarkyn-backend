@@ -22,8 +22,8 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 import kz.jarkyn.backend.user.repository.UserRepository;
+import kz.jarkyn.backend.user.service.AuthService;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,15 +42,17 @@ public class AuditService {
     private final ChangeMapper changeMapper;
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
+    private final AuthService authService;
 
     public AuditService(
             AuditRepository auditRepository,
             ChangeMapper changeMapper,
-            ObjectMapper objectMapper, UserRepository userRepository) {
+            ObjectMapper objectMapper, UserRepository userRepository, AuthService authService) {
         this.auditRepository = auditRepository;
         this.changeMapper = changeMapper;
         this.objectMapper = objectMapper;
         this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     public MainEntityChangeResponse findLastChange(UUID entityId) {
@@ -202,7 +204,7 @@ public class AuditService {
 
     @Transactional
     public void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String action) {
-        UserEntity user = findCurrentUser();
+        UserEntity user = authService.getCurrentUser();
         Instant moment = auditRepository.findAll(Specification
                         .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
                         .and(AuditSpecifications.user(user))
@@ -218,11 +220,6 @@ public class AuditService {
         newAudit.setFieldName(null);
         newAudit.setFieldValue(null);
         auditRepository.save(newAudit);
-    }
-
-    private UserEntity findCurrentUser() {
-        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findById(userId).orElseThrow();
     }
 
 
@@ -267,7 +264,7 @@ public class AuditService {
                 if (oldAudit != null && Objects.equals(oldAudit.getFieldValue(),
                         objectMapper.writeValueAsString(fieldValue))) return;
             }
-            UserEntity user = findCurrentUser();
+            UserEntity user = authService.getCurrentUser();
             Instant moment = auditRepository.findAll(Specification
                             .where(AuditSpecifications.relatedEntityId(relatedEntityId))
                             .and(AuditSpecifications.user(user))

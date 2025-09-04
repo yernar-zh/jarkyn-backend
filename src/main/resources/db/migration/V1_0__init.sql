@@ -271,6 +271,21 @@ CREATE TABLE selling_price
     CONSTRAINT pk_selling_price PRIMARY KEY (id)
 );
 
+CREATE TABLE session
+(
+    id                 UUID NOT NULL,
+    created_at         TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at   TIMESTAMP WITHOUT TIME ZONE,
+    user_id            UUID,
+    refresh_token_hash VARCHAR(255),
+    ip                 VARCHAR(255),
+    user_agent         VARCHAR(255),
+    expires_at         TIMESTAMP WITHOUT TIME ZONE,
+    revoked_at         TIMESTAMP WITHOUT TIME ZONE,
+    version            INTEGER,
+    CONSTRAINT pk_session PRIMARY KEY (id)
+);
+
 CREATE TABLE supply
 (
     id UUID NOT NULL,
@@ -294,25 +309,15 @@ CREATE TABLE turnover
     CONSTRAINT pk_turnover PRIMARY KEY (id)
 );
 
-CREATE TABLE user_token
-(
-    id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    user_id          UUID,
-    token            VARCHAR(255),
-    CONSTRAINT pk_user_token PRIMARY KEY (id)
-);
-
 CREATE TABLE users
 (
-    id               UUID NOT NULL,
+    id               UUID         NOT NULL,
     name             VARCHAR(255),
     archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     phone_number     VARCHAR(255),
-    password         VARCHAR(255),
+    password_hash    VARCHAR(255) NOT NULL,
     role_id          UUID,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
@@ -414,6 +419,9 @@ ALTER TABLE sale
 ALTER TABLE selling_price
     ADD CONSTRAINT FK_SELLING_PRICE_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);
 
+ALTER TABLE session
+    ADD CONSTRAINT FK_SESSION_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
 ALTER TABLE supply
     ADD CONSTRAINT FK_SUPPLY_ON_ID FOREIGN KEY (id) REFERENCES document (id);
 
@@ -431,6 +439,3 @@ ALTER TABLE turnover
 
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_ROLE FOREIGN KEY (role_id) REFERENCES role (id);
-
-ALTER TABLE user_token
-    ADD CONSTRAINT FK_USER_TOKEN_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

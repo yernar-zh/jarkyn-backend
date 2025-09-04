@@ -11,20 +11,13 @@ import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.user.mapper.UserMapper;
-import kz.jarkyn.backend.user.model.RoleEntity;
 import kz.jarkyn.backend.user.model.UserEntity;
 import kz.jarkyn.backend.user.model.UserEntity_;
-import kz.jarkyn.backend.user.model.UserTokenEntity;
 import kz.jarkyn.backend.user.model.dto.UserRequest;
 import kz.jarkyn.backend.user.model.dto.UserResponse;
 import kz.jarkyn.backend.user.repository.RoleRepository;
 import kz.jarkyn.backend.user.repository.UserRepository;
-import kz.jarkyn.backend.user.repository.UserTokenRepository;
-import kz.jarkyn.backend.user.spesification.RoleSpecifications;
-import kz.jarkyn.backend.user.spesification.UserSpecifications;
-import kz.jarkyn.backend.user.spesification.UserTokenSpecifications;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
+import kz.jarkyn.backend.user.repository.SessionRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +31,6 @@ public class UserService {
     private final AuditService auditService;
     private final SearchFactory searchFactory;
     private final AuditRepository auditRepository;
-    private final UserTokenRepository userTokenRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(
@@ -48,7 +39,7 @@ public class UserService {
             AuditService auditService,
             SearchFactory searchFactory,
             AuditRepository auditRepository,
-            UserTokenRepository userTokenRepository,
+            SessionRepository userTokenRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -56,8 +47,6 @@ public class UserService {
         this.auditService = auditService;
         this.searchFactory = searchFactory;
         this.auditRepository = auditRepository;
-        this.userTokenRepository = userTokenRepository;
-        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -81,27 +70,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity findByAuthToken(String authToken) {
-        return userTokenRepository.findOne(Specification.where(UserTokenSpecifications.token(authToken)))
-                .map(UserTokenEntity::getUser).orElse(null);
-    }
-
-    @Transactional(readOnly = true)
-    public UserEntity findCurrent() {
-        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findById(userId).orElseThrow();
-    }
-
-    @Transactional(readOnly = true)
-    public UserEntity findSystem() {
-        RoleEntity role = roleRepository.findOne(RoleSpecifications.system()).orElseThrow();
-        return userRepository.findOne(UserSpecifications.role(role)).orElseThrow();
-    }
-
-    @Transactional
     public UUID createApi(UserRequest request) {
         UserEntity user = userMapper.toEntity(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setArchived(false);
         userRepository.save(user);
         auditService.saveEntity(user);

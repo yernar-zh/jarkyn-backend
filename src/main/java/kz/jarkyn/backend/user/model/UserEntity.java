@@ -12,8 +12,8 @@ public class UserEntity extends ReferenceEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
     @AuditIgnore
-    @Column(name = "password")
-    private String password;
+    @Column(nullable = false)
+    private String passwordHash;
     @ManyToOne
     @JoinColumn(name = "role_id")
     private RoleEntity role;
@@ -26,12 +26,12 @@ public class UserEntity extends ReferenceEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public RoleEntity getRole() {

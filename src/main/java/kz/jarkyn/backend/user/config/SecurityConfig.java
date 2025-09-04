@@ -24,7 +24,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            TokenAuthenticationFilter tokenAuthFilter
+            JwtAuthenticationFilter tokenAuthFilter
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)

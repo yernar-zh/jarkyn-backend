@@ -12,6 +12,12 @@ spring:
       ddl-auto: validate
     show-sql: true
 
+security:
+  jwt:
+    secret: oV8u8rMyJkhN5f9wM4rF1dpWjwzQ7fCNxsaYPVvgl0xmHiEQk6N8OZ5KSvrPNPMl
+    access-ttl-minutes: 900   # 15 минут
+    refresh-ttl-minutes: 525600 # 1 год
+
 cloud:
   s3:
     key: minioadmin

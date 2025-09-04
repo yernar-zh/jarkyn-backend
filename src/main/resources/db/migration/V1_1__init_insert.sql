@@ -4,10 +4,14 @@ VALUES ('82435749-721a-49ee-8402-579d507b21ff', 'Система', 'SYSTEM', fals
        ('123b4cb7-d57d-48fd-8596-143bf994826e', 'Администратор', 'ADMINISTRATOR', false, now(), now()),
        ('60969353-3986-4d85-bfa1-04f91d375b19', 'Кладовщик ', 'STOREKEEPER', false, now(), now());
 
-INSERT INTO public.users (id, name, phone_number, role_id, password, archived, created_at, last_modified_at)
+INSERT INTO public.users (id, name, phone_number, role_id, password_hash, archived, created_at, last_modified_at)
 VALUES ('d8427d9f-4836-449f-8a6d-90d5d718c83f', 'Система', '+7 700 000 0000',
         '82435749-721a-49ee-8402-579d507b21ff', '', false, now(), now());
 
+INSERT INTO public.session(id, user_id, refresh_token_hash, ip, user_agent, expires_at, revoked_at, version, created_at,
+                           last_modified_at)
+VALUES ('a1e286f1-f820-4cf9-a9cc-4f43687681fe', 'd8427d9f-4836-449f-8a6d-90d5d718c83f', '',
+        '', '', now(), now(), 0, now(), now());
 
 INSERT INTO public.currency (id, name, code, archived, created_at, last_modified_at)
 VALUES ('559109ea-f824-476d-8fa4-9990e53880ff', 'Тенге', 'KZT', false, now(), now()),

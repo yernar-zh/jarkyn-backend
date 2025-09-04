@@ -82,4 +82,8 @@ public interface Api {
     interface User {
         String PATH = Api.PATH + "/user";
     }
+
+    interface Auth {
+        String PATH = Api.PATH + "/auth";
+    }
 }
