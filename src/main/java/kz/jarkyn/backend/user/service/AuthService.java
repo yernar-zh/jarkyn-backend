@@ -4,6 +4,8 @@ package kz.jarkyn.backend.user.service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import kz.jarkyn.backend.core.exception.DataValidationException;
+import kz.jarkyn.backend.export.core.ExcelUtils;
 import kz.jarkyn.backend.user.mapper.SessionMapper;
 import kz.jarkyn.backend.user.model.RoleEntity;
 import kz.jarkyn.backend.user.model.SessionEntity;
@@ -73,8 +75,9 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public SessionEntity getCurrentSession() {
-        UUID sessionId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return sessionRepository.findById(sessionId).orElseThrow();
+        Object sessionId = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (sessionId.equals("anonymousUser")) return null;
+        return sessionRepository.findById((UUID) sessionId).orElseThrow();
     }
 
     @Transactional(readOnly = true)
@@ -109,9 +112,9 @@ public class AuthService {
     @Transactional
     public LoginResponse login(String phoneNumber, String password, String ip, String userAgent) {
         UserEntity user = userRepository.findOne(UserSpecifications.phoneNumber(phoneNumber))
-                .orElseThrow(() -> new BadCredentialsException("Bad Credentials"));
+                .orElseThrow(() -> new DataValidationException("Номер телефона или пароль указаны неверно"));
         if (user.getArchived() || !passwordEncoder.matches(password, user.getPasswordHash()))
-            throw new BadCredentialsException("Bad creds");
+            throw new DataValidationException("Номер телефона или пароль указаны неверно");
 
         byte[] b = new byte[32];
         secureRandom.nextBytes(b);
@@ -133,6 +136,9 @@ public class AuthService {
 
     @Transactional
     public AccessTokenResponse refresh(String refreshToken) {
+        if (refreshToken == null) {
+            throw new BadCredentialsException("Bad creds");
+        }
         String refreshTokenHash = DigestUtils.sha256Hex(refreshToken);
         SessionEntity session = sessionRepository
                 .findOne(SessionSpecifications.refreshTokenHash(refreshTokenHash))
@@ -146,6 +152,7 @@ public class AuthService {
     @Transactional
     public void logout() {
         SessionEntity current = getCurrentSession();
+        if (current == null) return;
         current.setRevokedAt(Instant.now());
     }
 

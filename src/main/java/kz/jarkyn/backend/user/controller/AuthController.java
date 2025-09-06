@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 
 @RestController
-@RequestMapping(Api.Role.PATH)
+@RequestMapping(Api.Auth.PATH)
 public class AuthController {
     private final AuthService authService;
 
@@ -47,7 +47,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AccessTokenResponse> refresh(
-            @CookieValue("refreshToken") String refreshToken
+            @CookieValue(value = "refreshToken", required = false) String refreshToken
     ) {
         AccessTokenResponse accessToken = authService.refresh(refreshToken);
         return ResponseEntity.ok(accessToken);
@@ -60,7 +60,6 @@ public class AuthController {
         // очистить cookie
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(true)
                 .path("/api/auth/refresh")
                 .maxAge(0)
                 .sameSite("Strict")

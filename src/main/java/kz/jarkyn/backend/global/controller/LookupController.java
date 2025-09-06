@@ -4,6 +4,7 @@ import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.EnumTypeResponse;
 import kz.jarkyn.backend.global.mapper.LookupMapper;
 import kz.jarkyn.backend.global.model.dto.DefaultLookupResponse;
+import kz.jarkyn.backend.global.model.dto.ImmutableDefaultLookupResponse;
 import kz.jarkyn.backend.global.service.CurrencyService;
 import kz.jarkyn.backend.party.model.dto.CounterpartyResponse;
 import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
@@ -44,16 +45,17 @@ public class LookupController {
 
     @GetMapping("default")
     public DefaultLookupResponse getDefault() {
-        OrganizationResponse organization = organizationService
-                .findApiById(UUID.fromString("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"));
-        WarehouseResponse warehouse = warehouseService
-                .findApiById(UUID.fromString("523961a7-696d-4779-8bb0-fd327feaecf3"));
-        CounterpartyResponse supplyCounterparty = counterpartyService
-                .findApiById(UUID.fromString("94fadc9a-83bb-4639-be07-f825ab9eb40e"));
-        EnumTypeResponse supplyCurrency = currencyService
-                .findApiById(UUID.fromString("e6a3c207-a358-47bf-ac18-2d09973f3807"));
-        GroupDetailResponse group = groupService
-                .findApiById(UUID.fromString("656e38bc-bbc7-4e25-8b94-a2018783324c"));
-        return lookupMapper.toDefaultResponse(organization, warehouse, supplyCounterparty, supplyCurrency, group);
+//        OrganizationResponse organization = organizationService
+//                .findApiById(UUID.fromString("c6e5e4f9-93c0-40ea-91fa-e8a9bfffc515"));
+//        WarehouseResponse warehouse = warehouseService
+//                .findApiById(UUID.fromString("523961a7-696d-4779-8bb0-fd327feaecf3"));
+//        CounterpartyResponse supplyCounterparty = counterpartyService
+//                .findApiById(UUID.fromString("94fadc9a-83bb-4639-be07-f825ab9eb40e"));
+//        EnumTypeResponse supplyCurrency = currencyService
+//                .findApiById(UUID.fromString("e6a3c207-a358-47bf-ac18-2d09973f3807"));
+//        GroupDetailResponse group = groupService
+//                .findApiById(UUID.fromString("656e38bc-bbc7-4e25-8b94-a2018783324c"));
+//        return lookupMapper.toDefaultResponse(organization, warehouse, supplyCounterparty, supplyCurrency, group);
+        return ImmutableDefaultLookupResponse.of(null, null, null, null, null);
     }
 }

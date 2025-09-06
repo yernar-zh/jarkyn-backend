@@ -11,6 +11,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -27,6 +29,10 @@ public class ApiResponseEntityExceptionHandler {
     public final ResponseEntity<ExceptionResponse> handleException(
             Exception ex, WebRequest request) {
         switch (ex) {
+            case AuthenticationException authenticationException -> {
+                logger.error("401", ex);
+                throw authenticationException;
+            }
             case HttpMessageNotReadableException httpMessageNotReadableException -> {
                 return handBindException(httpMessageNotReadableException);
             }

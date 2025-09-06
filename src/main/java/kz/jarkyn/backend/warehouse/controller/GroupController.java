@@ -22,7 +22,7 @@ public class GroupController {
     }
 
     @GetMapping("tree")
-    public GroupResponse tree() {
+    public List<GroupResponse> tree() {
         return groupService.findApiTree();
     }
 

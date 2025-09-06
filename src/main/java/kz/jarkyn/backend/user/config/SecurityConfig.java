@@ -1,5 +1,6 @@
 package kz.jarkyn.backend.user.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -29,13 +30,18 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(config -> config
-                        .requestMatchers("/api/auth/login", "/api/auth/sendSms",
-                                "/api/file/download/**", "/api/excel/**")
+                        .requestMatchers("/api/auth/**", "/api/file/download/**", "/api/excel/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(config ->
                         config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, e) ->
+                                res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                        .accessDeniedHandler((req, res, e) ->
+                                res.sendError(HttpServletResponse.SC_FORBIDDEN))
+                )
                 .addFilterBefore(tokenAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

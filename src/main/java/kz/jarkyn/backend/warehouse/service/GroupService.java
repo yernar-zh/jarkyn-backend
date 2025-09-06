@@ -48,7 +48,7 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public GroupResponse findApiTree() {
+    public List<GroupResponse> findApiTree() {
         List<GroupEntity> entities = groupRepository.findAll().stream()
                 .sorted(Comparator.comparing(GroupEntity::getPosition)).toList();
         Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream()
@@ -56,9 +56,9 @@ public class GroupService {
                 .collect(Collectors.groupingBy(GroupEntity::getParent,
                         Collectors.collectingAndThen(Collectors.toList(), list ->
                                 list.stream().sorted(Comparator.comparing(GroupEntity::getPosition)).toList())));
-        return entities.stream().filter(group -> group.getParent() == null).findFirst()
+        return entities.stream().filter(group -> group.getParent() == null)
                 .map(head -> groupMapper.toListApi(head, childrenMap))
-                .orElseThrow();
+                .toList();
     }
 
     @Transactional
