@@ -158,6 +158,9 @@ CREATE TABLE groups
     archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    search_keywords  VARCHAR(255),
+    minimum_markup   INTEGER,
+    selling_markup   INTEGER,
     parent_id        UUID,
     position         INTEGER,
     CONSTRAINT pk_groups PRIMARY KEY (id)

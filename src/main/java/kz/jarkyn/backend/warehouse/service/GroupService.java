@@ -6,10 +6,15 @@ import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.IdDto;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.Search;
+import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.party.model.dto.AccountResponse;
 import kz.jarkyn.backend.warehouse.model.GroupEntity;
 import kz.jarkyn.backend.warehouse.model.dto.GroupDetailResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GroupRequest;
 import kz.jarkyn.backend.warehouse.model.dto.GroupResponse;
+import kz.jarkyn.backend.warehouse.model.dto.ImmutableGroupResponse;
 import kz.jarkyn.backend.warehouse.repository.GoodRepository;
 import kz.jarkyn.backend.warehouse.repository.GroupRepository;
 import kz.jarkyn.backend.warehouse.mapper.GroupMapper;
@@ -26,17 +31,19 @@ public class GroupService {
     private final GoodRepository goodRepository;
     private final GroupMapper groupMapper;
     private final AuditService auditService;
+    private final SearchFactory searchFactory;
 
     public GroupService(
             GroupRepository groupRepository,
             GoodRepository goodRepository,
             GroupMapper groupMapper,
-            AuditService auditService
-    ) {
+            AuditService auditService,
+            SearchFactory searchFactory) {
         this.groupRepository = groupRepository;
         this.goodRepository = goodRepository;
         this.groupMapper = groupMapper;
         this.auditService = auditService;
+        this.searchFactory = searchFactory;
     }
 
     @Transactional(readOnly = true)
@@ -48,7 +55,7 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupResponse> findApiTree() {
+    public List<GroupResponse> findApiTree(QueryParams queryParams) {
         List<GroupEntity> entities = groupRepository.findAll().stream()
                 .sorted(Comparator.comparing(GroupEntity::getPosition)).toList();
         Map<GroupEntity, List<GroupEntity>> childrenMap = entities.stream()
@@ -56,9 +63,36 @@ public class GroupService {
                 .collect(Collectors.groupingBy(GroupEntity::getParent,
                         Collectors.collectingAndThen(Collectors.toList(), list ->
                                 list.stream().sorted(Comparator.comparing(GroupEntity::getPosition)).toList())));
-        return entities.stream().filter(group -> group.getParent() == null)
-                .map(head -> groupMapper.toListApi(head, childrenMap))
-                .toList();
+        List<GroupResponse> tree = entities.stream().filter(group -> group.getParent() == null)
+                .map(head -> groupMapper.toListApi(head, childrenMap)).toList();
+
+        Search<GroupResponse> search = searchFactory.createListSearch(
+                GroupResponse.class, List.of("name", "searchKeywords"), QueryParams.Sort.NAME_ASC, () -> {
+                    List<GroupResponse> flattens = new ArrayList<>();
+                    makeFlatten(tree, flattens);
+                    return flattens;
+                });
+        Set<UUID> filteredIds = search.getResult(queryParams).getRow()
+                .stream().map(IdDto::getId).collect(Collectors.toSet());
+
+        return filter(tree, filteredIds);
+    }
+
+    private List<GroupResponse> filter(List<GroupResponse> trees, Set<UUID> filteredIds) {
+        List<GroupResponse> result = new ArrayList<>();
+        for (GroupResponse tree : trees) {
+            List<GroupResponse> children = filter(tree.getChildren(), filteredIds);
+            if (children.isEmpty() && !filteredIds.contains(tree.getId())) continue;
+            result.add(ImmutableGroupResponse.builder().from(tree).children(children).build());
+        }
+        return result;
+    }
+
+    private void makeFlatten(List<GroupResponse> trees, List<GroupResponse> flattens) {
+        for (GroupResponse tree : trees) {
+            flattens.add(tree);
+            makeFlatten(tree.getChildren(), flattens);
+        }
     }
 
     @Transactional

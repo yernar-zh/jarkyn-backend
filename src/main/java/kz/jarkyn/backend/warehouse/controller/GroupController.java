@@ -2,11 +2,13 @@ package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.MessageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.warehouse.model.dto.GroupDetailResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GroupRequest;
 import kz.jarkyn.backend.warehouse.model.dto.GroupResponse;
 import kz.jarkyn.backend.warehouse.service.GroupService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +24,8 @@ public class GroupController {
     }
 
     @GetMapping("tree")
-    public List<GroupResponse> tree() {
-        return groupService.findApiTree();
+    public List<GroupResponse> tree(@RequestParam MultiValueMap<String, String> allParams) {
+        return groupService.findApiTree(QueryParams.of(allParams));
     }
 
     @GetMapping("{id}")
