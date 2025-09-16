@@ -96,7 +96,7 @@ public class GoodService {
                 ? warehouseRepository.findByArchived(false)
                 : warehouseRepository.findAllById(filterWarehouseIds);
         Search<GoodListResponse> search = searchFactory.createListSearch(
-                GoodListResponse.class, List.of("name", "groups.name"),
+                GoodListResponse.class, List.of("name", "group.name", "group.searchKeywords"),
                 new QueryParams.Sort("path", QueryParams.Sort.Type.ASC),
                 () -> goodRepository.findAll().stream().map(good -> {
                     String path = getParentGroups(good.getGroup()).stream().map(GroupEntity::getName)

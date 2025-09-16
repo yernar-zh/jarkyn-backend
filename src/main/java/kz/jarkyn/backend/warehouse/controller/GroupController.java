@@ -34,7 +34,6 @@ public class GroupController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('GROUP_CREATE')")
     public GroupDetailResponse create(@RequestBody GroupRequest request) {
         return groupService.createApi(request);
     }

@@ -9,7 +9,6 @@ import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.party.model.dto.AccountResponse;
 import kz.jarkyn.backend.warehouse.model.GroupEntity;
 import kz.jarkyn.backend.warehouse.model.dto.GroupDetailResponse;
 import kz.jarkyn.backend.warehouse.model.dto.GroupRequest;
@@ -110,10 +109,11 @@ public class GroupService {
         groupMapper.editEntity(entity, request);
         for (GroupEntity parent = entity.getParent(); parent != null; parent = parent.getParent()) {
             if (parent.equals(entity)) {
-                throw new DataValidationException("You are trying to move a group into itself");
+                throw new DataValidationException("Вы пытаетесь переместить группу внутрь самой себя");
             }
         }
         groupRepository.save(entity);
+        auditService.saveEntity(entity);
         EntityDivider<GroupEntity, IdDto> divider = new EntityDivider<>(
                 groupRepository.findByParent(entity), request.getChildren());
         if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {

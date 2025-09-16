@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Value.Immutable
 public interface GoodListResponse extends ReferenceResponse {
-    ReferenceResponse getGroup();
+    GroupShortResponse getGroup();
     @Nullable ImageResponse getImage();
     Integer getMinimumPrice();
     BigDecimal getWeight();

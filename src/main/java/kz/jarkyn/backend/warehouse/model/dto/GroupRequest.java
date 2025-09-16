@@ -11,6 +11,9 @@ import java.util.List;
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableGroupRequest.Builder.class)
 public interface GroupRequest extends ReferenceRequest {
+    String getSearchKeywords();
+    @Nullable Integer getMinimumMarkup();
+    @Nullable Integer getSellingMarkup();
     @Nullable IdDto getParent();
     List<IdDto> getChildren();
 }
