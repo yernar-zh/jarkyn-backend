@@ -14,6 +14,7 @@ public interface GoodListResponse extends ReferenceResponse {
     GroupShortResponse getGroup();
     @Nullable ImageResponse getImage();
     Integer getMinimumPrice();
+    String getSearchKeywords();
     BigDecimal getWeight();
     Boolean getArchived();
     String getPath();

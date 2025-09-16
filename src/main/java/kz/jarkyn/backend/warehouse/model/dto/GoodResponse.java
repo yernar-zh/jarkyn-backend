@@ -14,6 +14,7 @@ public interface GoodResponse extends ReferenceResponse {
     @Nullable ImageResponse getImage();
     BigDecimal getWeight();
     Integer getMinimumPrice();
+    String getSearchKeywords();
     List<ReferenceResponse> getAttributes();
     List<SellingPriceResponse> getSellingPrices();
     List<StockResponse> getStocks();

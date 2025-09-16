@@ -138,6 +138,7 @@ CREATE TABLE good
     image_id         UUID,
     weight           DECIMAL,
     minimum_price    INTEGER,
+    search_keywords  VARCHAR(255),
     CONSTRAINT pk_good PRIMARY KEY (id)
 );
 

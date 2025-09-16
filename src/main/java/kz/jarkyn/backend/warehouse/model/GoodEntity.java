@@ -21,6 +21,8 @@ public class GoodEntity extends ReferenceEntity {
     private BigDecimal weight;
     @Column(name = "minimum_price")
     private Integer minimumPrice;
+    @Column(name = "search_keywords")
+    private String searchKeywords;
 
     public GroupEntity getGroup() {
         return group;
@@ -52,5 +54,13 @@ public class GoodEntity extends ReferenceEntity {
 
     public void setMinimumPrice(Integer minimumPrice) {
         this.minimumPrice = minimumPrice;
+    }
+
+    public String getSearchKeywords() {
+        return searchKeywords;
+    }
+
+    public void setSearchKeywords(String searchKeywords) {
+        this.searchKeywords = searchKeywords;
     }
 }

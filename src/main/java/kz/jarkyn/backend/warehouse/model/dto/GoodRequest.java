@@ -16,6 +16,7 @@ public interface GoodRequest extends ReferenceRequest {
     @Nullable IdDto getImage();
     BigDecimal getWeight();
     Integer getMinimumPrice();
+    String getSearchKeywords();
     List<IdDto> getAttributes();
     List<SellingPriceRequest> getSellingPrices();
 }
