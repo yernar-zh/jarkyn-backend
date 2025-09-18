@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class QueryParams {
     public static List<String> NAME_SEARCH = List.of("name");
@@ -43,11 +44,17 @@ public class QueryParams {
         return new QueryParams(allParams);
     }
 
-    public static QueryParams of() {
-        return new QueryParams(new HttpHeaders());
+    public static QueryParams of(Map<String, String> allParams) {
+        Map<String, List<String>> converted = allParams.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(List.of(e.getValue()))));
+        return new QueryParams(converted);
     }
 
-    public QueryParams(MultiValueMap<String, String> allParams) {
+    public static QueryParams of() {
+        return new QueryParams(Map.of());
+    }
+
+    private QueryParams(Map<String, List<String>> allParams) {
         this.search = getFirst(allParams, SEARCH_FIELD, null);
         this.pageFirst = Integer.valueOf(getFirst(allParams, PAGE_FIRST_FIELD, "0"));
         this.pageSize = Integer.valueOf(getFirst(allParams, PAGE_SIZE_FIELD, "20"));
@@ -76,7 +83,7 @@ public class QueryParams {
                 }).toList();
     }
 
-    private String getFirst(MultiValueMap<String, String> allParams, String key, String defaultValue) {
+    private String getFirst(Map<String, List<String>> allParams, String key, String defaultValue) {
         return allParams.getOrDefault(key, List.of()).stream().findFirst().orElse(defaultValue);
     }
 
