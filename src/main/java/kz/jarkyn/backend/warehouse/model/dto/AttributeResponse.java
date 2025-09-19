@@ -5,5 +5,6 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 public interface AttributeResponse extends ReferenceResponse {
+    AttributeGroupResponse getGroup();
     String getSearchKeywords();
 }

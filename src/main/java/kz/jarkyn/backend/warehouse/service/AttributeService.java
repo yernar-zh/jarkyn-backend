@@ -55,6 +55,7 @@ public class AttributeService {
                 .add("id", (root) -> root.get(AttributeEntity_.id))
                 .add("name", (root) -> root.get(AttributeEntity_.name))
                 .add("archived", (root) -> root.get(AttributeEntity_.archived))
+                .add("searchKeywords", (root) -> root.get(AttributeEntity_.searchKeywords))
                 .addReference("group", (root) -> root.get(AttributeEntity_.group))
                 .build();
         Search<AttributeResponse> search = searchFactory.createCriteriaSearch(
@@ -73,7 +74,6 @@ public class AttributeService {
     @Transactional
     public AttributeResponse editApi(UUID id, AttributeRequest request) {
         AttributeEntity attribute = attributeRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        ExceptionUtils.requireEqualsApi(attribute.getGroup().getId(), request.getGroup().getId(), "group");
         attributeMapper.editEntity(attribute, request);
         auditService.saveEntity(attribute);
         return findApiById(attribute.getId());

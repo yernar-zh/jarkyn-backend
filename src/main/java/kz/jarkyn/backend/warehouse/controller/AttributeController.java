@@ -1,10 +1,14 @@
 package kz.jarkyn.backend.warehouse.controller;
 
 import kz.jarkyn.backend.core.controller.Api;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupResponse;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeRequest;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeResponse;
 import kz.jarkyn.backend.core.model.dto.MessageResponse;
 import kz.jarkyn.backend.warehouse.service.AttributeService;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,6 +25,11 @@ public class AttributeController {
     @GetMapping("{id}")
     public AttributeResponse detail(@PathVariable UUID id) {
         return attributeService.findApiById(id);
+    }
+
+    @GetMapping
+    public PageResponse<AttributeResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
+        return attributeService.findApiByFilter(QueryParams.of(allParams));
     }
 
     @PostMapping
