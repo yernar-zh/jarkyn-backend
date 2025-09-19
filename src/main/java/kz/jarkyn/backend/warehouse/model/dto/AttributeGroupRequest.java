@@ -10,5 +10,4 @@ import java.util.List;
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableAttributeGroupRequest.Builder.class)
 public interface AttributeGroupRequest extends ReferenceRequest {
-    List<IdDto> getAttributes();
 }

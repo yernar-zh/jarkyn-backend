@@ -1,11 +1,18 @@
 package kz.jarkyn.backend.warehouse.service;
 
 
+import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
-import kz.jarkyn.backend.warehouse.model.AttributeGroupEntity;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.CriteriaAttributes;
+import kz.jarkyn.backend.core.search.Search;
+import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.supply.model.SupplyEntity_;
+import kz.jarkyn.backend.warehouse.model.*;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeRequest;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeResponse;
-import kz.jarkyn.backend.warehouse.model.AttributeEntity;
+import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.warehouse.repository.AttributeRepository;
 import kz.jarkyn.backend.warehouse.repository.GoodRepository;
 import kz.jarkyn.backend.warehouse.mapper.AttributeMapper;
@@ -21,36 +28,55 @@ public class AttributeService {
     private final AttributeRepository attributeRepository;
     private final GoodRepository goodRepository;
     private final AttributeMapper attributeMapper;
+    private final AuditService auditService;
+    private final SearchFactory searchFactory;
 
     public AttributeService(
             AttributeRepository attributeRepository,
             GoodRepository goodRepository,
-            AttributeMapper attributeMapper
-    ) {
+            AttributeMapper attributeMapper,
+            AuditService auditService, SearchFactory searchFactory) {
         this.attributeRepository = attributeRepository;
         this.goodRepository = goodRepository;
         this.attributeMapper = attributeMapper;
+        this.auditService = auditService;
+        this.searchFactory = searchFactory;
     }
 
     @Transactional(readOnly = true)
     public AttributeResponse findApiById(UUID id) {
-        AttributeEntity entity = attributeRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        return attributeMapper.toResponse(entity);
+        AttributeEntity attribute = attributeRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        return attributeMapper.toResponse(attribute);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AttributeResponse> findApiByFilter(QueryParams queryParams) {
+        CriteriaAttributes<AttributeEntity> attributes = CriteriaAttributes.<AttributeEntity>builder()
+                .add("id", (root) -> root.get(AttributeEntity_.id))
+                .add("name", (root) -> root.get(AttributeEntity_.name))
+                .add("archived", (root) -> root.get(AttributeEntity_.archived))
+                .addReference("group", (root) -> root.get(AttributeEntity_.group))
+                .build();
+        Search<AttributeResponse> search = searchFactory.createCriteriaSearch(
+                AttributeResponse.class, List.of("name", "searchKeywords"), QueryParams.Sort.NAME_ASC,
+                AttributeEntity.class, attributes);
+        return search.getResult(queryParams);
     }
 
     @Transactional
     public AttributeResponse createApi(AttributeRequest request) {
-        AttributeEntity entity = attributeRepository.save(attributeMapper.toEntity(request));
-        entity.setPosition(1000);
-        return findApiById(entity.getId());
+        AttributeEntity attribute = attributeRepository.save(attributeMapper.toEntity(request));
+        auditService.saveEntity(attribute);
+        return findApiById(attribute.getId());
     }
 
     @Transactional
     public AttributeResponse editApi(UUID id, AttributeRequest request) {
-        AttributeEntity entity = attributeRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        ExceptionUtils.requireEqualsApi(entity.getGroup().getId(), request.getGroup().getId(), "group");
-        attributeMapper.editEntity(entity, request);
-        return findApiById(entity.getId());
+        AttributeEntity attribute = attributeRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        ExceptionUtils.requireEqualsApi(attribute.getGroup().getId(), request.getGroup().getId(), "group");
+        attributeMapper.editEntity(attribute, request);
+        auditService.saveEntity(attribute);
+        return findApiById(attribute.getId());
     }
 
     @Transactional
@@ -64,7 +90,7 @@ public class AttributeService {
 
     public List<AttributeEntity> findByGroup(AttributeGroupEntity entity) {
         return attributeRepository.findByGroup(entity).stream()
-                .sorted(Comparator.comparing(AttributeEntity::getPosition))
+                .sorted(Comparator.comparing(AttributeEntity::getName))
                 .toList();
     }
 }

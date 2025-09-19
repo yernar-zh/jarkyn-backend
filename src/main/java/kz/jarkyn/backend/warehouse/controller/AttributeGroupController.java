@@ -34,11 +34,6 @@ public class AttributeGroupController {
         return attributeGroupService.findApiByFilter(QueryParams.of(allParams));
     }
 
-    @PutMapping
-    public PageResponse<AttributeGroupResponse> move(@RequestBody List<IdDto> apiList) {
-        return attributeGroupService.moveApi(apiList);
-    }
-
     @PostMapping
     public AttributeGroupResponse create(@RequestBody AttributeGroupRequest request) {
         return attributeGroupService.createApi(request);

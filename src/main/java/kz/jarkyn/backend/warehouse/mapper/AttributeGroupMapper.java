@@ -12,5 +12,4 @@ import java.util.List;
 
 @Mapper(config = BaseMapperConfig.class)
 public interface AttributeGroupMapper extends RequestResponseMapper<AttributeGroupEntity, AttributeGroupRequest, AttributeGroupResponse> {
-    AttributeGroupResponse toResponse(AttributeGroupEntity entity, List<AttributeEntity> attributes);
 }

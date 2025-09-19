@@ -21,7 +21,7 @@ CREATE TABLE attribute
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     group_id         UUID,
-    position         INTEGER,
+    search_keywords  VARCHAR(255),
     CONSTRAINT pk_attribute PRIMARY KEY (id)
 );
 
@@ -32,7 +32,6 @@ CREATE TABLE attribute_group
     archived         BOOLEAN,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    position         INTEGER,
     CONSTRAINT pk_attribute_group PRIMARY KEY (id)
 );
 

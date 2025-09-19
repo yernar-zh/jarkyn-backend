@@ -1,20 +1,19 @@
 package kz.jarkyn.backend.warehouse.service;
 
 
-import kz.jarkyn.backend.core.exception.ApiValidationException;
+import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.warehouse.mapper.AttributeGroupMapper;
+import kz.jarkyn.backend.warehouse.model.AttributeGroupEntity_;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupRequest;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupResponse;
-import kz.jarkyn.backend.warehouse.model.AttributeEntity;
 import kz.jarkyn.backend.warehouse.model.AttributeGroupEntity;
-import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.warehouse.repository.AttributeGroupRepository;
-import kz.jarkyn.backend.core.utils.EntityDivider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,75 +25,54 @@ public class AttributeGroupService {
     private final AttributeService attributeService;
     private final AttributeGroupMapper attributeGroupMapper;
     private final SearchFactory searchFactory;
+    private final AuditService auditService;
 
     public AttributeGroupService(
             AttributeGroupRepository attributeGroupRepository,
             AttributeService attributeService,
-            AttributeGroupMapper attributeGroupMapper, SearchFactory searchFactory) {
+            AttributeGroupMapper attributeGroupMapper, SearchFactory searchFactory, AuditService auditService) {
         this.attributeGroupRepository = attributeGroupRepository;
         this.attributeService = attributeService;
         this.attributeGroupMapper = attributeGroupMapper;
         this.searchFactory = searchFactory;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
     public AttributeGroupResponse findApiById(UUID id) {
-        AttributeGroupEntity entity = attributeGroupRepository.findById(id)
+        AttributeGroupEntity attribute = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
-        List<AttributeEntity> attributes = attributeService.findByGroup(entity);
-        return attributeGroupMapper.toResponse(entity, attributes);
+        return attributeGroupMapper.toResponse(attribute);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<AttributeGroupResponse> findApiByFilter(QueryParams queryParams) {
-        Search<AttributeGroupResponse> search = searchFactory.createListSearch(
-                AttributeGroupResponse.class, QueryParams.NAME_SEARCH, QueryParams.Sort.NAME_ASC,
-                () -> attributeGroupRepository.findAll().stream().map(attributeGroup -> {
-                    List<AttributeEntity> attributes = attributeService.findByGroup(attributeGroup);
-                    return attributeGroupMapper.toResponse(attributeGroup, attributes);
-                }).toList());
+        CriteriaAttributes<AttributeGroupEntity> attributes = CriteriaAttributes.<AttributeGroupEntity>builder()
+                .add("id", (root) -> root.get(AttributeGroupEntity_.id))
+                .add("name", (root) -> root.get(AttributeGroupEntity_.name))
+                .add("archived", (root) -> root.get(AttributeGroupEntity_.archived))
+                .build();
+        Search<AttributeGroupResponse> search = searchFactory.createCriteriaSearch(
+                AttributeGroupResponse.class, List.of("name"), QueryParams.Sort.NAME_ASC,
+                AttributeGroupEntity.class, attributes);
         return search.getResult(queryParams);
     }
 
     @Transactional
-    public PageResponse<AttributeGroupResponse> moveApi(List<IdDto> apiList) {
-        EntityDivider<AttributeGroupEntity, IdDto> divider = new EntityDivider<>(
-                attributeGroupRepository.findAll(), apiList
-        );
-        if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
-            throw new ApiValidationException("list should contain only and all current groups");
-        }
-        for (EntityDivider<AttributeGroupEntity, IdDto>.Entry entry : divider.edited()) {
-            AttributeGroupEntity entity = entry.getCurrent();
-            entity.setPosition(entry.getReceivedPosition());
-            attributeGroupRepository.save(entity);
-        }
-        return findApiByFilter(QueryParams.of());
-    }
-
-    @Transactional
     public AttributeGroupResponse createApi(AttributeGroupRequest request) {
-        AttributeGroupEntity entity = attributeGroupRepository.save(attributeGroupMapper.toEntity(request));
-        entity.setPosition(1000);
-        return findApiById(entity.getId());
+        AttributeGroupEntity attributeGroup = attributeGroupRepository.save(attributeGroupMapper.toEntity(request));
+        auditService.saveEntity(attributeGroup);
+        return findApiById(attributeGroup.getId());
     }
 
     @Transactional
     public AttributeGroupResponse editApi(UUID id, AttributeGroupRequest request) {
-        AttributeGroupEntity entity = attributeGroupRepository.findById(id)
+        AttributeGroupEntity attributeGroup = attributeGroupRepository.findById(id)
                 .orElseThrow(ExceptionUtils.entityNotFound());
-        attributeGroupMapper.editEntity(entity, request);
-        attributeGroupRepository.save(entity);
-        EntityDivider<AttributeEntity, IdDto> divider = new EntityDivider<>(
-                attributeService.findByGroup(entity), request.getAttributes());
-        if (!divider.newReceived().isEmpty() || !divider.skippedCurrent().isEmpty()) {
-            throw new ApiValidationException("children list have to be same, only change positions");
-        }
-        for (EntityDivider<AttributeEntity, IdDto>.Entry entry : divider.edited()) {
-            AttributeEntity attributeEntity = entry.getCurrent();
-            attributeEntity.setPosition(entry.getReceivedPosition());
-        }
-        return findApiById(entity.getId());
+        attributeGroupMapper.editEntity(attributeGroup, request);
+        auditService.saveEntity(attributeGroup);
+        attributeGroupRepository.save(attributeGroup);
+        return findApiById(attributeGroup.getId());
     }
 
     @Transactional

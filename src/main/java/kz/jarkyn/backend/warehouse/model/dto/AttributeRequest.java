@@ -9,4 +9,5 @@ import org.immutables.value.Value;
 @JsonDeserialize(builder = ImmutableAttributeRequest.Builder.class)
 public interface AttributeRequest extends ReferenceRequest {
     IdDto getGroup();
+    String getSearchKeywords();
 }

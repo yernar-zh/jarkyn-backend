@@ -7,5 +7,4 @@ import java.util.List;
 
 @Value.Immutable
 public interface AttributeGroupResponse extends ReferenceResponse {
-    List<AttributeResponse> getAttributes();
 }
