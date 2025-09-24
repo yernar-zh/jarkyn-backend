@@ -43,7 +43,6 @@ public class PaymentInService {
     private final PaidDocumentService paidDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
-    private final SearchFactory searchFactory;
     private final AccountService accountService;
     private final CashFlowService cashFlowService;
 
@@ -53,7 +52,6 @@ public class PaymentInService {
             PaidDocumentService paidDocumentService,
             DocumentService documentService,
             AuditService auditService,
-            SearchFactory searchFactory,
             AccountService accountService,
             CashFlowService cashFlowService
     ) {
@@ -62,7 +60,6 @@ public class PaymentInService {
         this.paidDocumentService = paidDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
-        this.searchFactory = searchFactory;
         this.accountService = accountService;
         this.cashFlowService = cashFlowService;
     }

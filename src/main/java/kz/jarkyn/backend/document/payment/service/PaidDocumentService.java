@@ -4,7 +4,6 @@ package kz.jarkyn.backend.document.payment.service;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
-import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.payment.mapper.PaidDocumentMapper;
 import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity;
 import kz.jarkyn.backend.document.payment.model.PaymentInEntity;
@@ -26,7 +25,8 @@ public class PaidDocumentService {
 
     public PaidDocumentService(
             PaidDocumentRepository paidDocumentRepository,
-            PaidDocumentMapper paidDocumentMapper, DocumentService documentService, AuditService auditService) {
+            PaidDocumentMapper paidDocumentMapper,
+            AuditService auditService) {
         this.paidDocumentRepository = paidDocumentRepository;
         this.paidDocumentMapper = paidDocumentMapper;
         this.auditService = auditService;

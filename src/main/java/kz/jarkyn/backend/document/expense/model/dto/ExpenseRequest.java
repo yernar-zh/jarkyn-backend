@@ -11,5 +11,5 @@ import java.util.List;
 @Value.Immutable
 @JsonDeserialize(builder = ImmutablePaymentOutRequest.Builder.class)
 public interface ExpenseRequest extends DocumentRequest {
-    List<RelatedExpenseRequest> getPaidDocuments();
+    List<RelatedExpenseRequest> getRelatedExpenses();
 }

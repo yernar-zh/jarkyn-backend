@@ -13,7 +13,7 @@ import java.util.List;
 public interface PaidDocumentRepository extends AppRepository<PaidDocumentEntity> {
     List<PaidDocumentEntity> findByPayment(DocumentEntity payment);
 
-    @Query("SELECT pd FROM RelatedExpenseEntity pd " +
+    @Query("SELECT pd FROM PaidDocumentEntity pd " +
            "WHERE pd.document = :document ")
     List<PaidDocumentEntity> findByDocument(@Param("document") DocumentEntity document);
 }
