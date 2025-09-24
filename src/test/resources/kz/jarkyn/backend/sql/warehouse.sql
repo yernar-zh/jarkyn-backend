@@ -1,0 +1,2 @@
+INSERT INTO public.warehouse (id, name, archived, created_at, last_modified_at) VALUES ('7cfa1b93-b092-4d39-beb3-58eac6a8f800', 'Кенжина', false, '2025-09-19 12:19:23.589798', '2025-09-19 12:19:23.589798');
+INSERT INTO public.warehouse (id, name, archived, created_at, last_modified_at) VALUES ('fa48a071-2be2-4055-a60f-31255dc46757', 'Барыс', false, '2025-09-19 12:19:30.196604', '2025-09-19 12:19:30.196604');

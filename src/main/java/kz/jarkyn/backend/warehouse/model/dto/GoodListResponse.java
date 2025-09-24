@@ -20,6 +20,7 @@ public interface GoodListResponse extends ReferenceResponse {
     String getPath();
     String getGroupIds();
     String getAttributeIds();
+    String getAttributeSearchKeywords();
     BigDecimal getSellingPrice();
     Integer getRemain();
     BigDecimal getCostPrice();

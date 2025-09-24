@@ -1,0 +1,2 @@
+INSERT INTO public.attribute_group (id, name, archived, created_at, last_modified_at) VALUES ('968b81dd-985b-43c8-85e8-7385d305d595', 'Объем двигателя', false, '2025-09-19 10:38:38.255200', '2025-09-19 10:38:38.255200');
+INSERT INTO public.attribute_group (id, name, archived, created_at, last_modified_at) VALUES ('15b11568-aab1-4447-9160-b78e217b8a82', 'Транспорт', false, '2025-09-19 09:20:20.224826', '2025-09-19 11:57:20.924266');
