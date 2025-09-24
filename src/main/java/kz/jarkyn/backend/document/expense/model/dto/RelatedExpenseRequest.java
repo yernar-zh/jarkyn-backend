@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Value.Immutable
 @JsonDeserialize(builder = ImmutablePaidDocumentRequest.Builder.class)
-public interface RelatedExpensesRequest extends IdDto {
+public interface RelatedExpenseRequest extends IdDto {
     @Nullable UUID getId();
     IdDto getDocument();
     BigDecimal getAmount();

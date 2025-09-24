@@ -10,6 +10,6 @@ import java.util.List;
 
 @Value.Immutable
 @JsonDeserialize(builder = ImmutablePaymentOutRequest.Builder.class)
-public interface ExpensesRequest extends DocumentRequest {
-    List<RelatedExpensesRequest> getPaidDocuments();
+public interface ExpenseRequest extends DocumentRequest {
+    List<RelatedExpenseRequest> getPaidDocuments();
 }
