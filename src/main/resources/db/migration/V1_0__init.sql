@@ -126,6 +126,12 @@ CREATE TABLE document_type
     CONSTRAINT pk_document_type PRIMARY KEY (id)
 );
 
+CREATE TABLE expense
+(
+    id UUID NOT NULL,
+    CONSTRAINT pk_expense PRIMARY KEY (id)
+);
+
 CREATE TABLE good
 (
     id               UUID NOT NULL,
@@ -242,6 +248,17 @@ CREATE TABLE payment_out
     item_of_expenditure_id UUID,
     purpose                VARCHAR(255),
     CONSTRAINT pk_payment_out PRIMARY KEY (id)
+);
+
+CREATE TABLE related_expenses
+(
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    expense_id       UUID,
+    document_id      UUID,
+    amount           DECIMAL,
+    CONSTRAINT pk_related_expenses PRIMARY KEY (id)
 );
 
 CREATE TABLE role
@@ -377,6 +394,9 @@ ALTER TABLE document
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
 
+ALTER TABLE expense
+    ADD CONSTRAINT FK_EXPENSE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
+
 ALTER TABLE good_attribute
     ADD CONSTRAINT FK_GOOD_ATTRIBUTE_ON_ATTRIBUTE FOREIGN KEY (attribute_id) REFERENCES attribute (id);
 
@@ -415,6 +435,12 @@ ALTER TABLE payment_out
 
 ALTER TABLE payment_out
     ADD CONSTRAINT FK_PAYMENT_OUT_ON_ITEM_OF_EXPENDITURE FOREIGN KEY (item_of_expenditure_id) REFERENCES item_of_expenditure (id);
+
+ALTER TABLE related_expenses
+    ADD CONSTRAINT FK_RELATED_EXPENSES_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
+
+ALTER TABLE related_expenses
+    ADD CONSTRAINT FK_RELATED_EXPENSES_ON_EXPENSE FOREIGN KEY (expense_id) REFERENCES expense (id);
 
 ALTER TABLE sale
     ADD CONSTRAINT FK_SALE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
