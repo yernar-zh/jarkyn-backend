@@ -14,6 +14,7 @@ import java.time.Instant;
 public interface DocumentRequest {
     String getName();
     IdDto getOrganization();
+    IdDto getCounterparty();
     Instant getMoment();
     IdDto getCurrency();
     BigDecimal getExchangeRate();

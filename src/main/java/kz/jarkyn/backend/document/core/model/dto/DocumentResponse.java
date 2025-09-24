@@ -16,7 +16,7 @@ public interface DocumentResponse {
     EnumTypeResponse getType();
     String getName();
     ReferenceResponse getOrganization();
-    @Nullable ReferenceResponse getCounterparty();
+    ReferenceResponse getCounterparty();
     @Nullable ReferenceResponse getWarehouse();
     @Nullable ReferenceResponse getAccount();
     Instant getMoment();

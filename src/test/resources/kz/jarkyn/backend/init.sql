@@ -1,57 +1,971 @@
---------------------- Group ---------------------
-INSERT INTO groups (ID, name, position, parent_id, archived)
-VALUES ('656e38bc-bbc7-4e25-8b94-a2018783324c',
-        'Все товары', 100, null, false),
-       ('da48c6fa-6739-11ee-0a80-039b000669e2',
-        'Педаль', 100, '656e38bc-bbc7-4e25-8b94-a2018783324c', false),
-       ('cdfcf458-7cca-11ef-0a80-152f001b4886',
-        'Кикстартер', 100, 'da48c6fa-6739-11ee-0a80-039b000669e2', false),
-       ('6120deea-5b87-11ee-0a80-000c0039b0fd',
-        'Педаль переключения передач', 99, 'da48c6fa-6739-11ee-0a80-039b000669e2', false),
-       ('a590bc3a-9498-4f56-bce6-0e604b00590d',
-        'Свеча', 99, '656e38bc-bbc7-4e25-8b94-a2018783324c', false);
+INSERT INTO public.account (id, name, archived, created_at, last_modified_at, organization_id, counterparty_id, bank,
+                            giro, currency_id)
+VALUES ('83252f10-d198-441e-9fbc-d225d4a2a2b2', 'Каспи Ернар Ж', false, '2025-09-19 12:20:26.419246',
+        '2025-09-19 12:20:26.419246', '70167f17-b7b7-4ce2-b2ad-2c8da4976cff', null, 'Каспи ', 'Ернар Ж +7 775 216 6661',
+        '559109ea-f824-476d-8fa4-9990e53880ff');
+INSERT INTO public.account (id, name, archived, created_at, last_modified_at, organization_id, counterparty_id, bank,
+                            giro, currency_id)
+VALUES ('61528e17-1857-45f0-9773-5e99e2fb0bb3', 'Наличными Тенге', false, '2025-09-19 10:30:31.681333',
+        '2025-09-19 12:21:25.613073', '70167f17-b7b7-4ce2-b2ad-2c8da4976cff', null, '', '',
+        '559109ea-f824-476d-8fa4-9990e53880ff');
+INSERT INTO public.account (id, name, archived, created_at, last_modified_at, organization_id, counterparty_id, bank,
+                            giro, currency_id)
+VALUES ('d83f7353-1ffe-40c8-a4d6-d4b32726e155', 'Наличными Юань', false, '2025-09-19 12:21:45.778511',
+        '2025-09-19 12:21:45.778511', '70167f17-b7b7-4ce2-b2ad-2c8da4976cff', null, '', '',
+        'e6a3c207-a358-47bf-ac18-2d09973f3807');
+INSERT INTO public.account (id, name, archived, created_at, last_modified_at, organization_id, counterparty_id, bank,
+                            giro, currency_id)
+VALUES ('b2985ddb-d3cb-4b70-88ae-2250c5d64dcd', 'Наличными Доллар', false, '2025-09-19 12:23:03.367596',
+        '2025-09-19 12:23:03.367596', '70167f17-b7b7-4ce2-b2ad-2c8da4976cff', null, '', '',
+        '24f15639-67da-4df4-aab4-56b85c872c3b');
+INSERT INTO public.attribute (id, name, archived, created_at, last_modified_at, group_id, search_keywords)
+VALUES ('9cc4f1b5-c84d-4de1-b1a4-3c55759b465b', 'Эндуро', false, '2025-09-19 10:17:24.208204',
+        '2025-09-19 10:28:49.425213', '15b11568-aab1-4447-9160-b78e217b8a82', 'enduro');
+INSERT INTO public.attribute (id, name, archived, created_at, last_modified_at, group_id, search_keywords)
+VALUES ('4bded9ea-ed43-416a-b336-d70486d57ee2', '150 куб', false, '2025-09-19 10:36:30.711845',
+        '2025-09-19 10:40:18.563232', '968b81dd-985b-43c8-85e8-7385d305d595', '');
+INSERT INTO public.attribute (id, name, archived, created_at, last_modified_at, group_id, search_keywords)
+VALUES ('7084aa04-4dc3-49d5-8e28-a5fa02fce81e', 'Классика WY', false, '2025-09-19 11:39:25.282847',
+        '2025-09-19 11:45:23.049498', '15b11568-aab1-4447-9160-b78e217b8a82', 'klassika уян');
+INSERT INTO public.attribute (id, name, archived, created_at, last_modified_at, group_id, search_keywords)
+VALUES ('b5381472-fa2f-4455-8b73-3403f97c2fdd', 'Скутер Самурай', false, '2025-09-19 10:17:46.968131',
+        '2025-09-19 11:46:16.133536', '15b11568-aab1-4447-9160-b78e217b8a82', 'skuter samurai');
+INSERT INTO public.attribute (id, name, archived, created_at, last_modified_at, group_id, search_keywords)
+VALUES ('193bb168-8adc-4cbe-bd56-61dfa0ca6238', 'Классика GN', false, '2025-09-19 11:56:47.791254',
+        '2025-09-19 11:56:47.791254', '15b11568-aab1-4447-9160-b78e217b8a82', 'klassika жн');
+INSERT INTO public.attribute (id, name, archived, created_at, last_modified_at, group_id, search_keywords)
+VALUES ('c4bcf529-93c8-42d5-9947-9a0d898dc49f', '200 куб', false, '2025-09-19 11:57:39.293201',
+        '2025-09-19 11:57:39.293201', '968b81dd-985b-43c8-85e8-7385d305d595', '');
+INSERT INTO public.attribute (id, name, archived, created_at, last_modified_at, group_id, search_keywords)
+VALUES ('a173763d-0386-4d22-a7cd-c9baa680f492', '250 куб', false, '2025-09-19 11:57:50.634890',
+        '2025-09-19 11:57:50.634890', '968b81dd-985b-43c8-85e8-7385d305d595', '');
+INSERT INTO public.attribute_group (id, name, archived, created_at, last_modified_at)
+VALUES ('968b81dd-985b-43c8-85e8-7385d305d595', 'Объем двигателя', false, '2025-09-19 10:38:38.255200',
+        '2025-09-19 10:38:38.255200');
+INSERT INTO public.attribute_group (id, name, archived, created_at, last_modified_at)
+VALUES ('15b11568-aab1-4447-9160-b78e217b8a82', 'Транспорт', false, '2025-09-19 09:20:20.224826',
+        '2025-09-19 11:57:20.924266');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('2ea8eea1-eccd-4626-bd25-9f2dfd762023', '2025-09-19 08:16:32.381292', '2025-09-19 08:16:32.381292',
+        '2025-09-19 08:16:32.380121', 'a1e286f1-f820-4cf9-a9cc-4f43687681fe', '2e487fac-517d-43a1-9c43-5f3d3e13cb06',
+        '2e487fac-517d-43a1-9c43-5f3d3e13cb06', 'CREATE', 'phoneNumber', '"+7 775 216 6661"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('e8982f13-dbd5-4781-b711-806e4271e4a8', '2025-09-19 08:16:32.408262', '2025-09-19 08:16:32.408262',
+        '2025-09-19 08:16:32.380121', 'a1e286f1-f820-4cf9-a9cc-4f43687681fe', '2e487fac-517d-43a1-9c43-5f3d3e13cb06',
+        '2e487fac-517d-43a1-9c43-5f3d3e13cb06', 'CREATE', 'role',
+        '{"id":"c54cf84d-230d-48bf-87fa-172c0cc7e4d5","name":null,"archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('99bc741f-c3d5-4c17-9fe3-baa611383b7b', '2025-09-19 08:16:32.419854', '2025-09-19 08:16:32.419854',
+        '2025-09-19 08:16:32.380121', 'a1e286f1-f820-4cf9-a9cc-4f43687681fe', '2e487fac-517d-43a1-9c43-5f3d3e13cb06',
+        '2e487fac-517d-43a1-9c43-5f3d3e13cb06', 'CREATE', 'name', '"Ернар"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d965ec72-891a-4f70-8554-1ba4eaae5548', '2025-09-19 09:20:20.239760', '2025-09-19 09:20:20.239760',
+        '2025-09-19 09:20:20.239237', '7a7aa9b9-e520-462c-bcd7-b02230779bbd', '15b11568-aab1-4447-9160-b78e217b8a82',
+        '15b11568-aab1-4447-9160-b78e217b8a82', 'CREATE', 'name', '"Тип"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('3fef49e4-a947-4cd7-97ab-eb7442b50fa1', '2025-09-19 10:17:24.236512', '2025-09-19 10:17:24.236512',
+        '2025-09-19 10:17:24.234341', '7a7aa9b9-e520-462c-bcd7-b02230779bbd', '9cc4f1b5-c84d-4de1-b1a4-3c55759b465b',
+        '9cc4f1b5-c84d-4de1-b1a4-3c55759b465b', 'CREATE', 'group',
+        '{"id":"15b11568-aab1-4447-9160-b78e217b8a82","name":"Тип","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('58a5cd44-77f3-4001-934c-a6db213fa55a', '2025-09-19 10:17:24.268646', '2025-09-19 10:17:24.268646',
+        '2025-09-19 10:17:24.234341', '7a7aa9b9-e520-462c-bcd7-b02230779bbd', '9cc4f1b5-c84d-4de1-b1a4-3c55759b465b',
+        '9cc4f1b5-c84d-4de1-b1a4-3c55759b465b', 'CREATE', 'searchKeywords', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('db67f66e-1bd5-4af4-ab69-162e88655dae', '2025-09-19 10:17:24.279923', '2025-09-19 10:17:24.279923',
+        '2025-09-19 10:17:24.234341', '7a7aa9b9-e520-462c-bcd7-b02230779bbd', '9cc4f1b5-c84d-4de1-b1a4-3c55759b465b',
+        '9cc4f1b5-c84d-4de1-b1a4-3c55759b465b', 'CREATE', 'name', '"Эндуро"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('936d3dfc-6c5a-457a-b79e-581e48e6f7ad', '2025-09-19 10:17:46.991221', '2025-09-19 10:17:46.991221',
+        '2025-09-19 10:17:46.990163', '7a7aa9b9-e520-462c-bcd7-b02230779bbd', 'b5381472-fa2f-4455-8b73-3403f97c2fdd',
+        'b5381472-fa2f-4455-8b73-3403f97c2fdd', 'CREATE', 'group',
+        '{"id":"15b11568-aab1-4447-9160-b78e217b8a82","name":"Тип","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('46d04f79-29de-49fa-91f0-ccd528a76ef8', '2025-09-19 10:17:47.008776', '2025-09-19 10:17:47.008776',
+        '2025-09-19 10:17:46.990163', '7a7aa9b9-e520-462c-bcd7-b02230779bbd', 'b5381472-fa2f-4455-8b73-3403f97c2fdd',
+        'b5381472-fa2f-4455-8b73-3403f97c2fdd', 'CREATE', 'searchKeywords', '"skuter"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('9845b6c2-f9d5-4c4e-9f7e-08849f05f7ee', '2025-09-19 10:17:47.022012', '2025-09-19 10:17:47.022012',
+        '2025-09-19 10:17:46.990163', '7a7aa9b9-e520-462c-bcd7-b02230779bbd', 'b5381472-fa2f-4455-8b73-3403f97c2fdd',
+        'b5381472-fa2f-4455-8b73-3403f97c2fdd', 'CREATE', 'name', '"Скутер"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('30eef3e8-a62d-4ee9-a078-d0753e9da149', '2025-09-19 10:28:49.423026', '2025-09-19 10:28:49.423026',
+        '2025-09-19 10:28:49.422483', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '9cc4f1b5-c84d-4de1-b1a4-3c55759b465b',
+        '9cc4f1b5-c84d-4de1-b1a4-3c55759b465b', 'EDITE', 'searchKeywords', '"enduro"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d069661b-c9e7-4e6d-bc22-ade0229d1104', '2025-09-19 10:30:01.648145', '2025-09-19 10:30:01.648145',
+        '2025-09-19 10:30:01.647653', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '70167f17-b7b7-4ce2-b2ad-2c8da4976cff',
+        '70167f17-b7b7-4ce2-b2ad-2c8da4976cff', 'CREATE', 'name', '"ИП Жаркын"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('065540b8-c486-46ca-b278-6277c833ac5c', '2025-09-19 10:30:31.693387', '2025-09-19 10:30:31.693387',
+        '2025-09-19 10:30:31.691817', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'CREATE', 'organization',
+        '{"id":"70167f17-b7b7-4ce2-b2ad-2c8da4976cff","name":"ИП Жаркын","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('cfaa62b2-3224-4b60-af6d-279a0041a385', '2025-09-19 10:30:31.707304', '2025-09-19 10:30:31.707304',
+        '2025-09-19 10:30:31.691817', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'CREATE', 'counterparty', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('1ab79031-12b8-4d17-b617-fad3aa9a6e6f', '2025-09-19 10:30:31.718278', '2025-09-19 10:30:31.718278',
+        '2025-09-19 10:30:31.691817', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'CREATE', 'bank', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('32df0e0c-860d-45d5-9b32-1ba56c4d7c3e', '2025-09-19 10:30:31.729506', '2025-09-19 10:30:31.729506',
+        '2025-09-19 10:30:31.691817', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'CREATE', 'giro', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('b8130690-656e-4d90-9202-e1f7d2e8747f', '2025-09-19 10:30:31.740471', '2025-09-19 10:30:31.740471',
+        '2025-09-19 10:30:31.691817', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'CREATE', 'currency',
+        '{"id":"559109ea-f824-476d-8fa4-9990e53880ff","name":"Тенге","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('9ffeb55f-36d8-4450-a0b0-f734dd2028dd', '2025-09-19 10:30:31.751230', '2025-09-19 10:30:31.751230',
+        '2025-09-19 10:30:31.691817', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'CREATE', 'name', '"Наличными"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('0d721c3f-b373-4c84-bee5-effbacf1937f', '2025-09-19 10:30:36.292243', '2025-09-19 10:30:36.292243',
+        '2025-09-19 10:30:36.291702', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'EDITE', 'bank', '"4546789"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('b5fb1fc6-ed44-43a8-872e-b1224ad2b2b6', '2025-09-19 10:32:36.750190', '2025-09-19 10:32:36.750190',
+        '2025-09-19 10:32:36.749676', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'EDITE', 'bank', '"1234"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('e3d0a071-e25f-4e90-9885-8a223f324fc8', '2025-09-19 10:32:36.766120', '2025-09-19 10:32:36.766120',
+        '2025-09-19 10:32:36.749676', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'EDITE', 'giro', '"zxcv"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('3f60259b-dca0-4b30-b7d3-b7101e4f2e88', '2025-09-19 10:36:30.725037', '2025-09-19 10:36:30.725037',
+        '2025-09-19 10:36:30.725037', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '4bded9ea-ed43-416a-b336-d70486d57ee2',
+        '4bded9ea-ed43-416a-b336-d70486d57ee2', 'CREATE', 'group',
+        '{"id":"15b11568-aab1-4447-9160-b78e217b8a82","name":"Тип","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('479eaaeb-1b52-434e-ad8b-accbc97d8840', '2025-09-19 10:36:30.737673', '2025-09-19 10:36:30.737673',
+        '2025-09-19 10:36:30.725037', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '4bded9ea-ed43-416a-b336-d70486d57ee2',
+        '4bded9ea-ed43-416a-b336-d70486d57ee2', 'CREATE', 'searchKeywords', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('f3b23bd7-59d5-4555-9e1b-9aa9f10d3bd5', '2025-09-19 10:36:30.748150', '2025-09-19 10:36:30.748150',
+        '2025-09-19 10:36:30.725037', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '4bded9ea-ed43-416a-b336-d70486d57ee2',
+        '4bded9ea-ed43-416a-b336-d70486d57ee2', 'CREATE', 'name', '"150 куб"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('ef8bd873-362a-422e-81ec-53f41e79c7b1', '2025-09-19 10:38:38.265201', '2025-09-19 10:38:38.265201',
+        '2025-09-19 10:38:38.264694', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '968b81dd-985b-43c8-85e8-7385d305d595',
+        '968b81dd-985b-43c8-85e8-7385d305d595', 'CREATE', 'name', '"Объем двигателя"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('8c30f4f8-2bbb-485b-8632-d3b7f8b8ba62', '2025-09-19 10:40:18.558329', '2025-09-19 10:40:18.558329',
+        '2025-09-19 10:40:18.554995', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '4bded9ea-ed43-416a-b336-d70486d57ee2',
+        '4bded9ea-ed43-416a-b336-d70486d57ee2', 'EDITE', 'group',
+        '{"id":"968b81dd-985b-43c8-85e8-7385d305d595","name":"Объем двигателя","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('adc3d603-8d0c-45d6-88ad-8da113c4ed2f', '2025-09-19 10:47:51.668642', '2025-09-19 10:47:51.668642',
+        '2025-09-19 10:47:51.668642', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '35b31b30-898a-4b4c-b772-0644d42ba108',
+        '35b31b30-898a-4b4c-b772-0644d42ba108', 'CREATE', 'searchKeywords', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('90e0a41b-c350-4d40-adc9-cb2975ff10ad', '2025-09-19 10:47:51.682194', '2025-09-19 10:47:51.682194',
+        '2025-09-19 10:47:51.668642', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '35b31b30-898a-4b4c-b772-0644d42ba108',
+        '35b31b30-898a-4b4c-b772-0644d42ba108', 'CREATE', 'minimumMarkup', '25');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('f5713a61-2c60-4c39-b251-d714430c6d98', '2025-09-19 10:47:51.691526', '2025-09-19 10:47:51.691526',
+        '2025-09-19 10:47:51.668642', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '35b31b30-898a-4b4c-b772-0644d42ba108',
+        '35b31b30-898a-4b4c-b772-0644d42ba108', 'CREATE', 'sellingMarkup', '50');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('9eeba817-c85e-417d-b6f5-acafd77b0d86', '2025-09-19 10:47:51.701526', '2025-09-19 10:47:51.701526',
+        '2025-09-19 10:47:51.668642', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '35b31b30-898a-4b4c-b772-0644d42ba108',
+        '35b31b30-898a-4b4c-b772-0644d42ba108', 'CREATE', 'parent', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('1d619bca-f931-412c-9ffe-487cb8303e55', '2025-09-19 10:47:51.712917', '2025-09-19 10:47:51.712917',
+        '2025-09-19 10:47:51.668642', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '35b31b30-898a-4b4c-b772-0644d42ba108',
+        '35b31b30-898a-4b4c-b772-0644d42ba108', 'CREATE', 'position', '1000');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('625691a8-6f78-44c8-8f8a-a96e6f061e28', '2025-09-19 10:47:51.723615', '2025-09-19 10:47:51.723615',
+        '2025-09-19 10:47:51.668642', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '35b31b30-898a-4b4c-b772-0644d42ba108',
+        '35b31b30-898a-4b4c-b772-0644d42ba108', 'CREATE', 'name', '"Мототехника"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('35387dca-bf47-4494-90df-1bbc7bbe7dcc', '2025-09-19 10:48:06.914915', '2025-09-19 10:48:06.914915',
+        '2025-09-19 10:48:06.914379', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '35b31b30-898a-4b4c-b772-0644d42ba108',
+        '35b31b30-898a-4b4c-b772-0644d42ba108', 'EDITE', 'searchKeywords', '"moto"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('f5a3ea9c-c3fc-49ca-937b-d5a44ebc9713', '2025-09-19 10:49:13.481330', '2025-09-19 10:49:13.481330',
+        '2025-09-19 10:49:13.481330', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '5ca4b6fd-283f-4ab2-a194-87e843402ce0',
+        '5ca4b6fd-283f-4ab2-a194-87e843402ce0', 'CREATE', 'searchKeywords', '"pedal"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('60528124-bf39-4805-906b-14f9e40b0858', '2025-09-19 10:49:13.494770', '2025-09-19 10:49:13.494770',
+        '2025-09-19 10:49:13.481330', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '5ca4b6fd-283f-4ab2-a194-87e843402ce0',
+        '5ca4b6fd-283f-4ab2-a194-87e843402ce0', 'CREATE', 'minimumMarkup', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('01c4f7ed-0028-46b2-baed-cd5a019d1f2b', '2025-09-19 10:49:13.503576', '2025-09-19 10:49:13.503576',
+        '2025-09-19 10:49:13.481330', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '5ca4b6fd-283f-4ab2-a194-87e843402ce0',
+        '5ca4b6fd-283f-4ab2-a194-87e843402ce0', 'CREATE', 'sellingMarkup', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d5388f67-10d5-4768-bff1-128fd9aa799b', '2025-09-19 10:49:13.512921', '2025-09-19 10:49:13.512921',
+        '2025-09-19 10:49:13.481330', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '5ca4b6fd-283f-4ab2-a194-87e843402ce0',
+        '5ca4b6fd-283f-4ab2-a194-87e843402ce0', 'CREATE', 'parent',
+        '{"id":"35b31b30-898a-4b4c-b772-0644d42ba108","name":"Мототехника","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('4fbbc98e-b824-45c2-91af-3a4d917cb67d', '2025-09-19 10:49:13.523375', '2025-09-19 10:49:13.523375',
+        '2025-09-19 10:49:13.481330', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '5ca4b6fd-283f-4ab2-a194-87e843402ce0',
+        '5ca4b6fd-283f-4ab2-a194-87e843402ce0', 'CREATE', 'position', '1000');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('f3215766-10fb-482e-98cc-e2e0da1b7f86', '2025-09-19 10:49:13.533136', '2025-09-19 10:49:13.533136',
+        '2025-09-19 10:49:13.481330', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '5ca4b6fd-283f-4ab2-a194-87e843402ce0',
+        '5ca4b6fd-283f-4ab2-a194-87e843402ce0', 'CREATE', 'name', '"Педаль"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('6b6cc341-5794-4b40-80ef-1522f3f17587', '2025-09-19 11:12:44.003792', '2025-09-19 11:12:44.003792',
+        '2025-09-19 11:12:44.003792', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'CREATE', 'searchKeywords', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('fc501230-b951-48a1-924e-8683d5cd86c9', '2025-09-19 11:12:44.016655', '2025-09-19 11:12:44.016655',
+        '2025-09-19 11:12:44.003792', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'CREATE', 'minimumMarkup', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('a333718e-4173-4e2b-ac01-478fa4fa35ae', '2025-09-19 11:12:44.040228', '2025-09-19 11:12:44.040228',
+        '2025-09-19 11:12:44.003792', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'CREATE', 'sellingMarkup', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d9fd52c6-68b1-4200-8fdc-7da98df2b727', '2025-09-19 11:12:44.049800', '2025-09-19 11:12:44.049800',
+        '2025-09-19 11:12:44.003792', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'CREATE', 'parent',
+        '{"id":"35b31b30-898a-4b4c-b772-0644d42ba108","name":"Мототехника","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('1246f66b-7fb4-47e6-a4e8-448a805696dc', '2025-09-19 11:12:44.058786', '2025-09-19 11:12:44.058786',
+        '2025-09-19 11:12:44.003792', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'CREATE', 'position', '1000');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('31a941fc-6c0b-443a-b1ce-deabd010a8cf', '2025-09-19 11:12:44.067340', '2025-09-19 11:12:44.067340',
+        '2025-09-19 11:12:44.003792', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'CREATE', 'name', '"Аккумулятор"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('374f0f1b-f01b-4e1a-9e10-5db21c6c71c4', '2025-09-19 11:13:40.631617', '2025-09-19 11:13:40.631617',
+        '2025-09-19 11:13:40.631617', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'EDITE', 'sellingMarkup', '30');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('c5770b64-8fdc-47fc-a7f3-9e09a0e48d5b', '2025-09-19 11:13:40.650796', '2025-09-19 11:13:40.650796',
+        '2025-09-19 11:13:40.631617', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'EDITE', 'position', '0');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('9d827d0a-a692-4eeb-bec7-a7e11cc7c51d', '2025-09-19 11:15:32.546765', '2025-09-19 11:15:32.546765',
+        '2025-09-19 11:15:32.546765', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'afa39f9e-27db-4287-84a4-70ac56342a7b',
+        'afa39f9e-27db-4287-84a4-70ac56342a7b', 'EDITE', 'searchKeywords', '"akkumulator"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('658fe740-5349-4caa-af04-600379ef53db', '2025-09-19 11:31:09.313659', '2025-09-19 11:31:09.313659',
+        '2025-09-19 11:31:09.313659', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        '467ce251-4b67-485f-aa2e-73553a12ea1e', 'CREATE', 'sellingPrices.good',
+        '{"id":"a0d9d430-1018-4e53-a6b4-833bd05e098a","name":"Кикстартер S","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('95b49706-0c75-4f1d-aeae-ee7a92934bed', '2025-09-19 11:31:09.331224', '2025-09-19 11:31:09.331224',
+        '2025-09-19 11:31:09.313659', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        '467ce251-4b67-485f-aa2e-73553a12ea1e', 'CREATE', 'sellingPrices.quantity', '1');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('77811c72-cc6c-4a56-9657-f08b8c499174', '2025-09-19 11:31:09.343626', '2025-09-19 11:31:09.343626',
+        '2025-09-19 11:31:09.313659', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        '467ce251-4b67-485f-aa2e-73553a12ea1e', 'CREATE', 'sellingPrices.value', '960');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('769bfbfe-7265-4488-a6f8-76b5f1b7e00d', '2025-09-19 11:31:09.356723', '2025-09-19 11:31:09.356723',
+        '2025-09-19 11:31:09.313659', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        'a0d9d430-1018-4e53-a6b4-833bd05e098a', 'CREATE', 'group',
+        '{"id":"5ca4b6fd-283f-4ab2-a194-87e843402ce0","name":"Педаль","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('582e45c1-f798-43a1-abb1-1bc5e849db5a', '2025-09-19 11:31:09.366384', '2025-09-19 11:31:09.366384',
+        '2025-09-19 11:31:09.313659', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        'a0d9d430-1018-4e53-a6b4-833bd05e098a', 'CREATE', 'weight', '0');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('b29b647a-77ba-47f8-833b-d4f04ad79e99', '2025-09-19 11:31:09.374953', '2025-09-19 11:31:09.374953',
+        '2025-09-19 11:31:09.313659', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        'a0d9d430-1018-4e53-a6b4-833bd05e098a', 'CREATE', 'minimumPrice', '850');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d5957d1b-33de-41ca-b0ee-6e0de1aed4e9', '2025-09-19 11:31:09.383006', '2025-09-19 11:31:09.383006',
+        '2025-09-19 11:31:09.313659', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        'a0d9d430-1018-4e53-a6b4-833bd05e098a', 'CREATE', 'searchKeywords', '"kikstarter с"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('ff99c816-ef60-4679-a1cf-505b3477d248', '2025-09-19 11:31:09.391498', '2025-09-19 11:31:09.391498',
+        '2025-09-19 11:31:09.313659', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        'a0d9d430-1018-4e53-a6b4-833bd05e098a', 'CREATE', 'name', '"Кикстартер S"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('c8aa6911-c6d1-43b9-8c2c-49e8d9b82030', '2025-09-19 11:39:25.292093', '2025-09-19 11:39:25.292093',
+        '2025-09-19 11:39:25.292093', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7084aa04-4dc3-49d5-8e28-a5fa02fce81e',
+        '7084aa04-4dc3-49d5-8e28-a5fa02fce81e', 'CREATE', 'group',
+        '{"id":"15b11568-aab1-4447-9160-b78e217b8a82","name":"Тип","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('38275c38-2c3d-46fd-8441-5ac2699a4040', '2025-09-19 11:39:25.303783', '2025-09-19 11:39:25.303783',
+        '2025-09-19 11:39:25.292093', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7084aa04-4dc3-49d5-8e28-a5fa02fce81e',
+        '7084aa04-4dc3-49d5-8e28-a5fa02fce81e', 'CREATE', 'searchKeywords', '"klassika"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('41623027-1ae4-45ac-9348-5e5a66dbd27c', '2025-09-19 11:39:25.309737', '2025-09-19 11:39:25.309737',
+        '2025-09-19 11:39:25.292093', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7084aa04-4dc3-49d5-8e28-a5fa02fce81e',
+        '7084aa04-4dc3-49d5-8e28-a5fa02fce81e', 'CREATE', 'name', '"Классика"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('c498d5a3-d54d-439b-a076-6dae1b015d74', '2025-09-19 11:45:23.048420', '2025-09-19 11:45:23.048420',
+        '2025-09-19 11:45:23.048420', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7084aa04-4dc3-49d5-8e28-a5fa02fce81e',
+        '7084aa04-4dc3-49d5-8e28-a5fa02fce81e', 'EDITE', 'searchKeywords', '"klassika уян"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('fa98eb39-a0b9-4318-bcd2-672b0e4bb66a', '2025-09-19 11:45:23.059842', '2025-09-19 11:45:23.059842',
+        '2025-09-19 11:45:23.048420', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7084aa04-4dc3-49d5-8e28-a5fa02fce81e',
+        '7084aa04-4dc3-49d5-8e28-a5fa02fce81e', 'EDITE', 'name', '"Классика WY"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('479b1d98-efb1-4d8a-98e4-2d054bbb3134', '2025-09-19 11:46:16.132997', '2025-09-19 11:46:16.132997',
+        '2025-09-19 11:46:16.132410', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'b5381472-fa2f-4455-8b73-3403f97c2fdd',
+        'b5381472-fa2f-4455-8b73-3403f97c2fdd', 'EDITE', 'searchKeywords', '"skuter samurai"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('92e0397a-b15d-4fb7-b2e3-e9828c251249', '2025-09-19 11:46:16.145994', '2025-09-19 11:46:16.145994',
+        '2025-09-19 11:46:16.132410', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'b5381472-fa2f-4455-8b73-3403f97c2fdd',
+        'b5381472-fa2f-4455-8b73-3403f97c2fdd', 'EDITE', 'name', '"Скутер Самурай"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('4823de24-eef7-4928-83ee-c04de8510939', '2025-09-19 11:56:47.799258', '2025-09-19 11:56:47.799258',
+        '2025-09-19 11:56:47.799258', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '193bb168-8adc-4cbe-bd56-61dfa0ca6238',
+        '193bb168-8adc-4cbe-bd56-61dfa0ca6238', 'CREATE', 'group',
+        '{"id":"15b11568-aab1-4447-9160-b78e217b8a82","name":"Тип","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('5177e5ab-00df-4941-8df1-53539a1a385f', '2025-09-19 11:56:47.808469', '2025-09-19 11:56:47.808469',
+        '2025-09-19 11:56:47.799258', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '193bb168-8adc-4cbe-bd56-61dfa0ca6238',
+        '193bb168-8adc-4cbe-bd56-61dfa0ca6238', 'CREATE', 'searchKeywords', '"klassika жн"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('6e121b13-d885-4b07-afd3-96523a8d881a', '2025-09-19 11:56:47.816025', '2025-09-19 11:56:47.816025',
+        '2025-09-19 11:56:47.799258', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '193bb168-8adc-4cbe-bd56-61dfa0ca6238',
+        '193bb168-8adc-4cbe-bd56-61dfa0ca6238', 'CREATE', 'name', '"Классика GN"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('bab1f476-966f-4d1f-ba21-acfafe1998b1', '2025-09-19 11:57:20.923731', '2025-09-19 11:57:20.923731',
+        '2025-09-19 11:57:20.923731', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '15b11568-aab1-4447-9160-b78e217b8a82',
+        '15b11568-aab1-4447-9160-b78e217b8a82', 'EDITE', 'name', '"Транспорт"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('a047b8c8-0586-43f5-ad0f-d57bb063ae29', '2025-09-19 11:57:39.299548', '2025-09-19 11:57:39.299548',
+        '2025-09-19 11:57:39.299548', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'c4bcf529-93c8-42d5-9947-9a0d898dc49f',
+        'c4bcf529-93c8-42d5-9947-9a0d898dc49f', 'CREATE', 'group',
+        '{"id":"968b81dd-985b-43c8-85e8-7385d305d595","name":"Объем двигателя","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('6904cc51-8346-4cdc-a72a-3ca68e26a5df', '2025-09-19 11:57:39.309233', '2025-09-19 11:57:39.309233',
+        '2025-09-19 11:57:39.299548', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'c4bcf529-93c8-42d5-9947-9a0d898dc49f',
+        'c4bcf529-93c8-42d5-9947-9a0d898dc49f', 'CREATE', 'searchKeywords', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('a798638c-7574-4130-9aea-bea5dc9cef28', '2025-09-19 11:57:39.316416', '2025-09-19 11:57:39.316416',
+        '2025-09-19 11:57:39.299548', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'c4bcf529-93c8-42d5-9947-9a0d898dc49f',
+        'c4bcf529-93c8-42d5-9947-9a0d898dc49f', 'CREATE', 'name', '"200 куб"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('3cbea6df-8af0-4b33-a2ed-26452f20f1e5', '2025-09-19 11:57:50.643449', '2025-09-19 11:57:50.643449',
+        '2025-09-19 11:57:50.643449', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a173763d-0386-4d22-a7cd-c9baa680f492',
+        'a173763d-0386-4d22-a7cd-c9baa680f492', 'CREATE', 'group',
+        '{"id":"968b81dd-985b-43c8-85e8-7385d305d595","name":"Объем двигателя","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('2d2d7b05-058b-49f2-aa15-9f2fcb64d5ec', '2025-09-19 11:57:50.652573', '2025-09-19 11:57:50.652573',
+        '2025-09-19 11:57:50.643449', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a173763d-0386-4d22-a7cd-c9baa680f492',
+        'a173763d-0386-4d22-a7cd-c9baa680f492', 'CREATE', 'searchKeywords', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('105fbffb-1b2e-4900-bb04-ca4c8d1c08e3', '2025-09-19 11:57:50.660587', '2025-09-19 11:57:50.660587',
+        '2025-09-19 11:57:50.643449', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a173763d-0386-4d22-a7cd-c9baa680f492',
+        'a173763d-0386-4d22-a7cd-c9baa680f492', 'CREATE', 'name', '"250 куб"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('105ba616-3288-40e8-8e0c-5f37f3900aa8', '2025-09-19 12:00:09.758539', '2025-09-19 12:00:09.758539',
+        '2025-09-19 12:00:09.757994', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        '06d483dc-358d-4347-b98b-60400e572445', 'CREATE', 'attributes.attribute',
+        '{"id":"7084aa04-4dc3-49d5-8e28-a5fa02fce81e","name":"Классика WY","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('10ce8817-1222-43e5-a775-f2c4d40e21bf', '2025-09-19 12:11:02.432570', '2025-09-19 12:11:02.432570',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        '1764ee8e-aeba-45fb-a078-b93a615bb318', 'CREATE', 'attributes.attribute',
+        '{"id":"193bb168-8adc-4cbe-bd56-61dfa0ca6238","name":"Классика GN","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('4c3e35df-bba0-4087-9c86-f2f09a82b847', '2025-09-19 12:11:02.464455', '2025-09-19 12:11:02.464455',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        '0bd0ee3f-5aa2-4897-a6c2-7b4a28f2af85', 'CREATE', 'sellingPrices.good',
+        '{"id":"f3289a44-d343-4953-84e9-cc2c564f277a","name":"Кикстартер L","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('672bc336-538f-49c1-b429-969b2c90c3d2', '2025-09-19 12:11:02.480933', '2025-09-19 12:11:02.480933',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        '0bd0ee3f-5aa2-4897-a6c2-7b4a28f2af85', 'CREATE', 'sellingPrices.quantity', '1');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('abb46f74-2437-47ce-bb36-d70c9f9c5c91', '2025-09-19 12:11:02.493731', '2025-09-19 12:11:02.493731',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        '0bd0ee3f-5aa2-4897-a6c2-7b4a28f2af85', 'CREATE', 'sellingPrices.value', '850');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('c6a232c0-1bb1-4a65-a1de-978d57ae07d9', '2025-09-19 12:11:02.509363', '2025-09-19 12:11:02.509363',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        'f3289a44-d343-4953-84e9-cc2c564f277a', 'CREATE', 'group',
+        '{"id":"5ca4b6fd-283f-4ab2-a194-87e843402ce0","name":"Педаль","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('9cc32321-9416-4653-9e3c-f7067874d7bd', '2025-09-19 12:11:02.521173', '2025-09-19 12:11:02.521173',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        'f3289a44-d343-4953-84e9-cc2c564f277a', 'CREATE', 'weight', '0');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('ef7fc705-7179-4e77-a914-26e2435d72e6', '2025-09-19 12:11:02.532672', '2025-09-19 12:11:02.532672',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        'f3289a44-d343-4953-84e9-cc2c564f277a', 'CREATE', 'minimumPrice', '770');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('80ddd273-947c-4583-b62b-6ab6df7d6d4d', '2025-09-19 12:11:02.543251', '2025-09-19 12:11:02.543251',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        'f3289a44-d343-4953-84e9-cc2c564f277a', 'CREATE', 'searchKeywords', '"kikstarter л"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('7ffea1e7-f0bd-4d89-a006-78ca32177435', '2025-09-19 12:11:02.555809', '2025-09-19 12:11:02.555809',
+        '2025-09-19 12:11:02.429906', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'f3289a44-d343-4953-84e9-cc2c564f277a',
+        'f3289a44-d343-4953-84e9-cc2c564f277a', 'CREATE', 'name', '"Кикстартер L"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('af6d8a8e-89ef-4970-afdd-7526a2291819', '2025-09-19 12:11:58.864580', '2025-09-19 12:11:58.864580',
+        '2025-09-19 12:11:58.864580', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        '3377237d-1e8c-4365-ad9d-58ed70fccd87', 'CREATE', 'attributes.attribute',
+        '{"id":"193bb168-8adc-4cbe-bd56-61dfa0ca6238","name":"Классика GN","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('6a5e79b8-78cb-46b5-9535-e1d735f0ab71', '2025-09-19 12:11:58.882247', '2025-09-19 12:11:58.882247',
+        '2025-09-19 12:11:58.864580', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        '06d483dc-358d-4347-b98b-60400e572445', 'DELETE', null, null);
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('595db01a-85d5-4660-b4e1-2e4b769cf051', '2025-09-19 12:12:17.846551', '2025-09-19 12:12:17.846551',
+        '2025-09-19 12:12:17.846551', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        'e6e5def9-7f3b-4e85-8148-bef0d813056a', 'CREATE', 'attributes.attribute',
+        '{"id":"7084aa04-4dc3-49d5-8e28-a5fa02fce81e","name":"Классика WY","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('75f97970-a269-4f18-826e-ad388024f9ef', '2025-09-19 12:12:17.858836', '2025-09-19 12:12:17.858836',
+        '2025-09-19 12:12:17.846551', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'a0d9d430-1018-4e53-a6b4-833bd05e098a',
+        '3377237d-1e8c-4365-ad9d-58ed70fccd87', 'DELETE', null, null);
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('88b11881-eaf2-47f8-bcbf-437cddc866da', '2025-09-19 12:14:27.551507', '2025-09-19 12:14:27.551507',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        '63706050-3c39-4d0f-80ed-db23573e7ba7', 'CREATE', 'attributes.attribute',
+        '{"id":"7084aa04-4dc3-49d5-8e28-a5fa02fce81e","name":"Классика WY","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('f1dc4375-50ce-4f5e-8c07-4ae18c0a54a3', '2025-09-19 12:14:27.565779', '2025-09-19 12:14:27.565779',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        'd4662acf-a096-468b-ab6e-694ec492946e', 'CREATE', 'sellingPrices.good',
+        '{"id":"6ddbd771-c468-4086-b550-5c79554b382b","name":"Аккумулятор WY 7Ah","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('1ab3ab5c-17ee-4282-94b3-b5511bd1bf29', '2025-09-19 12:14:27.577394', '2025-09-19 12:14:27.577394',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        'd4662acf-a096-468b-ab6e-694ec492946e', 'CREATE', 'sellingPrices.quantity', '1');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('33d27703-72ae-4993-9ed8-61d48d7308cb', '2025-09-19 12:14:27.589755', '2025-09-19 12:14:27.589755',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        'd4662acf-a096-468b-ab6e-694ec492946e', 'CREATE', 'sellingPrices.value', '5330');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('23ed218c-a531-41a8-9c00-a1d39fb84f06', '2025-09-19 12:14:27.602051', '2025-09-19 12:14:27.602051',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        '6ddbd771-c468-4086-b550-5c79554b382b', 'CREATE', 'group',
+        '{"id":"afa39f9e-27db-4287-84a4-70ac56342a7b","name":"Аккумулятор","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('7370952a-b2c7-439f-a853-ea9710ef845e', '2025-09-19 12:14:27.628534', '2025-09-19 12:14:27.628534',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        '6ddbd771-c468-4086-b550-5c79554b382b', 'CREATE', 'weight', '0');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('43dd3a05-e969-4ce1-8969-9c2d46a78c72', '2025-09-19 12:14:27.639373', '2025-09-19 12:14:27.639373',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        '6ddbd771-c468-4086-b550-5c79554b382b', 'CREATE', 'minimumPrice', '5330');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('4c41b9f6-7126-4c67-ac5e-7cabf6bae640', '2025-09-19 12:14:27.647939', '2025-09-19 12:14:27.647939',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        '6ddbd771-c468-4086-b550-5c79554b382b', 'CREATE', 'searchKeywords', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('bc3df502-51be-4832-8fde-845eb55ee9e0', '2025-09-19 12:14:27.656449', '2025-09-19 12:14:27.656449',
+        '2025-09-19 12:14:27.551507', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '6ddbd771-c468-4086-b550-5c79554b382b',
+        '6ddbd771-c468-4086-b550-5c79554b382b', 'CREATE', 'name', '"Аккумулятор WY 7Ah"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d15f7a7d-2e55-473e-b004-7db79ecbb5b4', '2025-09-19 12:19:30.203603', '2025-09-19 12:19:30.203603',
+        '2025-09-19 12:19:30.203603', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'fa48a071-2be2-4055-a60f-31255dc46757',
+        'fa48a071-2be2-4055-a60f-31255dc46757', 'CREATE', 'name', '"Барыс"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('9238623f-7cf1-460b-bfec-6d7e581b1b87', '2025-09-19 12:17:14.196462', '2025-09-19 12:17:14.196462',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        '46019fcb-09b7-430e-8414-2b43037e619b', 'CREATE', 'attributes.attribute',
+        '{"id":"193bb168-8adc-4cbe-bd56-61dfa0ca6238","name":"Классика GN","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('83c5f546-60e6-42e2-95a4-fe5bb9ed7943', '2025-09-19 12:17:14.211559', '2025-09-19 12:17:14.211559',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        '66987583-878f-4aeb-924a-f1134f254e41', 'CREATE', 'sellingPrices.good',
+        '{"id":"d3a6e8e1-8a8c-4940-b800-308df85889c0","name":"Аккумулятор GN 9Ah","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('75806136-0134-4afe-8d04-af4ebb789e3c', '2025-09-19 12:17:14.218647', '2025-09-19 12:17:14.218647',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        '66987583-878f-4aeb-924a-f1134f254e41', 'CREATE', 'sellingPrices.quantity', '1');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d9d80e7e-d601-40cf-9ba4-1e5fab4bbfd8', '2025-09-19 12:17:14.226167', '2025-09-19 12:17:14.226167',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        '66987583-878f-4aeb-924a-f1134f254e41', 'CREATE', 'sellingPrices.value', '5330');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('3dbb9b7f-9457-47f6-8f31-5cc5f36021d0', '2025-09-19 12:17:14.234741', '2025-09-19 12:17:14.234741',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        'd3a6e8e1-8a8c-4940-b800-308df85889c0', 'CREATE', 'group',
+        '{"id":"afa39f9e-27db-4287-84a4-70ac56342a7b","name":"Аккумулятор","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('158c7e76-2481-42cc-bee2-4c8ce906a1e5', '2025-09-19 12:17:14.243822', '2025-09-19 12:17:14.243822',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        'd3a6e8e1-8a8c-4940-b800-308df85889c0', 'CREATE', 'weight', '0');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('a31e70d1-3e3b-4c7a-8e1b-dabe94d2d0d8', '2025-09-19 12:17:14.251342', '2025-09-19 12:17:14.251342',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        'd3a6e8e1-8a8c-4940-b800-308df85889c0', 'CREATE', 'minimumPrice', '5330');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('302230ad-0763-4d1f-b24d-ab04fd04f71d', '2025-09-19 12:17:14.259103', '2025-09-19 12:17:14.259103',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        'd3a6e8e1-8a8c-4940-b800-308df85889c0', 'CREATE', 'searchKeywords', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('68516f0c-9e50-4f86-ad49-b0c4400d2c3f', '2025-09-19 12:17:14.267079', '2025-09-19 12:17:14.267079',
+        '2025-09-19 12:17:14.196462', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd3a6e8e1-8a8c-4940-b800-308df85889c0',
+        'd3a6e8e1-8a8c-4940-b800-308df85889c0', 'CREATE', 'name', '"Аккумулятор GN 9Ah"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('45b3b18a-969b-4d91-b0e3-ac225437c420', '2025-09-19 12:18:30.467056', '2025-09-19 12:18:30.467056',
+        '2025-09-19 12:18:30.466060', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '3492be06-33c6-44b5-9f66-bdcbd1094036',
+        '3492be06-33c6-44b5-9f66-bdcbd1094036', 'CREATE', 'searchKeywords', '"maslo масла май"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('50b845bb-2e3b-41e4-a6e6-06f6e240cd9f', '2025-09-19 12:18:30.476525', '2025-09-19 12:18:30.476525',
+        '2025-09-19 12:18:30.466060', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '3492be06-33c6-44b5-9f66-bdcbd1094036',
+        '3492be06-33c6-44b5-9f66-bdcbd1094036', 'CREATE', 'minimumMarkup', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('7b681849-9b73-4a12-9127-26a9d3bb2e0f', '2025-09-19 12:18:30.484583', '2025-09-19 12:18:30.484583',
+        '2025-09-19 12:18:30.466060', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '3492be06-33c6-44b5-9f66-bdcbd1094036',
+        '3492be06-33c6-44b5-9f66-bdcbd1094036', 'CREATE', 'sellingMarkup', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('a56cc3f4-b13c-411e-81f0-26043dcf76af', '2025-09-19 12:18:30.492088', '2025-09-19 12:18:30.492088',
+        '2025-09-19 12:18:30.466060', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '3492be06-33c6-44b5-9f66-bdcbd1094036',
+        '3492be06-33c6-44b5-9f66-bdcbd1094036', 'CREATE', 'parent',
+        '{"id":"35b31b30-898a-4b4c-b772-0644d42ba108","name":"Мототехника","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('5005d7e5-a593-4561-9991-1ee52f7cf6d2', '2025-09-19 12:18:30.499554', '2025-09-19 12:18:30.499554',
+        '2025-09-19 12:18:30.466060', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '3492be06-33c6-44b5-9f66-bdcbd1094036',
+        '3492be06-33c6-44b5-9f66-bdcbd1094036', 'CREATE', 'position', '1000');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('f19f4e9f-bd6b-4396-9124-578fb0f14314', '2025-09-19 12:18:30.506586', '2025-09-19 12:18:30.506586',
+        '2025-09-19 12:18:30.466060', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '3492be06-33c6-44b5-9f66-bdcbd1094036',
+        '3492be06-33c6-44b5-9f66-bdcbd1094036', 'CREATE', 'name', '"Масло"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('f822ada8-dfca-4d38-bd3f-8a01467f2b7d', '2025-09-19 12:19:23.597829', '2025-09-19 12:19:23.597829',
+        '2025-09-19 12:19:23.597829', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7cfa1b93-b092-4d39-beb3-58eac6a8f800',
+        '7cfa1b93-b092-4d39-beb3-58eac6a8f800', 'CREATE', 'name', '"Кенжина"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('c91b52ba-72e0-4b14-bb87-cb382c9f351a', '2025-09-19 12:20:26.427579', '2025-09-19 12:20:26.427579',
+        '2025-09-19 12:20:26.427579', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '83252f10-d198-441e-9fbc-d225d4a2a2b2',
+        '83252f10-d198-441e-9fbc-d225d4a2a2b2', 'CREATE', 'organization',
+        '{"id":"70167f17-b7b7-4ce2-b2ad-2c8da4976cff","name":"ИП Жаркын","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('4b3e5182-fd39-4831-b8da-e5f6a15ce250', '2025-09-19 12:20:26.437918', '2025-09-19 12:20:26.437918',
+        '2025-09-19 12:20:26.427579', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '83252f10-d198-441e-9fbc-d225d4a2a2b2',
+        '83252f10-d198-441e-9fbc-d225d4a2a2b2', 'CREATE', 'counterparty', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('dc946d12-0e6b-446a-b431-f51cb2ae0db1', '2025-09-19 12:20:26.444826', '2025-09-19 12:20:26.444826',
+        '2025-09-19 12:20:26.427579', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '83252f10-d198-441e-9fbc-d225d4a2a2b2',
+        '83252f10-d198-441e-9fbc-d225d4a2a2b2', 'CREATE', 'bank', '"Каспи "');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('fb9a2cf3-cf26-4453-ae69-f8d548358f61', '2025-09-19 12:20:26.452945', '2025-09-19 12:20:26.452945',
+        '2025-09-19 12:20:26.427579', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '83252f10-d198-441e-9fbc-d225d4a2a2b2',
+        '83252f10-d198-441e-9fbc-d225d4a2a2b2', 'CREATE', 'giro', '"Ернар Ж +7 775 216 6661"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d6f10eca-4a4c-4bd3-a4c5-6e2972dd5a53', '2025-09-19 12:20:26.460509', '2025-09-19 12:20:26.460509',
+        '2025-09-19 12:20:26.427579', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '83252f10-d198-441e-9fbc-d225d4a2a2b2',
+        '83252f10-d198-441e-9fbc-d225d4a2a2b2', 'CREATE', 'currency',
+        '{"id":"559109ea-f824-476d-8fa4-9990e53880ff","name":"Тенге","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('bae196e1-fc79-451a-a0a5-f2918f02c597', '2025-09-19 12:20:26.468642', '2025-09-19 12:20:26.468642',
+        '2025-09-19 12:20:26.427579', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '83252f10-d198-441e-9fbc-d225d4a2a2b2',
+        '83252f10-d198-441e-9fbc-d225d4a2a2b2', 'CREATE', 'name', '"Каспи Ернар Ж"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('49afe132-38f6-4ff3-9d87-ec879248bfb5', '2025-09-19 12:21:25.612546', '2025-09-19 12:21:25.612546',
+        '2025-09-19 12:21:25.611989', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'EDITE', 'bank', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('2058084e-0853-40e3-8d48-c4d3450869df', '2025-09-19 12:21:25.631515', '2025-09-19 12:21:25.631515',
+        '2025-09-19 12:21:25.611989', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'EDITE', 'giro', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('ad6205cb-933e-47a9-9f16-652eb0d16122', '2025-09-19 12:21:25.645636', '2025-09-19 12:21:25.645636',
+        '2025-09-19 12:21:25.611989', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '61528e17-1857-45f0-9773-5e99e2fb0bb3',
+        '61528e17-1857-45f0-9773-5e99e2fb0bb3', 'EDITE', 'name', '"Наличными Тенге"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('4f4d861e-23a7-46de-b3a0-da27d0490ec4', '2025-09-19 12:21:45.785347', '2025-09-19 12:21:45.785347',
+        '2025-09-19 12:21:45.785347', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd83f7353-1ffe-40c8-a4d6-d4b32726e155',
+        'd83f7353-1ffe-40c8-a4d6-d4b32726e155', 'CREATE', 'organization',
+        '{"id":"70167f17-b7b7-4ce2-b2ad-2c8da4976cff","name":"ИП Жаркын","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('b3733afc-4b48-402b-bb90-8d3de95ea252', '2025-09-19 12:21:45.794747', '2025-09-19 12:21:45.794747',
+        '2025-09-19 12:21:45.785347', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd83f7353-1ffe-40c8-a4d6-d4b32726e155',
+        'd83f7353-1ffe-40c8-a4d6-d4b32726e155', 'CREATE', 'counterparty', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('0f5bb079-ed76-47f2-877f-96a068b1f026', '2025-09-19 12:21:45.801777', '2025-09-19 12:21:45.801777',
+        '2025-09-19 12:21:45.785347', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd83f7353-1ffe-40c8-a4d6-d4b32726e155',
+        'd83f7353-1ffe-40c8-a4d6-d4b32726e155', 'CREATE', 'bank', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('080064ba-e81d-40f7-8ae2-02f3309266d1', '2025-09-19 12:21:45.809314', '2025-09-19 12:21:45.809314',
+        '2025-09-19 12:21:45.785347', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd83f7353-1ffe-40c8-a4d6-d4b32726e155',
+        'd83f7353-1ffe-40c8-a4d6-d4b32726e155', 'CREATE', 'giro', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('3019ab39-a366-4143-83b3-fa57b1c9cc75', '2025-09-19 12:21:45.816530', '2025-09-19 12:21:45.816530',
+        '2025-09-19 12:21:45.785347', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd83f7353-1ffe-40c8-a4d6-d4b32726e155',
+        'd83f7353-1ffe-40c8-a4d6-d4b32726e155', 'CREATE', 'currency',
+        '{"id":"e6a3c207-a358-47bf-ac18-2d09973f3807","name":"Юань","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('ef189fc0-a05e-4d1d-9474-cb5bfaf798f0', '2025-09-19 12:21:45.823442', '2025-09-19 12:21:45.823442',
+        '2025-09-19 12:21:45.785347', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'd83f7353-1ffe-40c8-a4d6-d4b32726e155',
+        'd83f7353-1ffe-40c8-a4d6-d4b32726e155', 'CREATE', 'name', '"Наличными Юань"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('831af6a0-1e00-4346-8712-8a6b9678eb65', '2025-09-19 12:23:03.374584', '2025-09-19 12:23:03.374584',
+        '2025-09-19 12:23:03.374584', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd',
+        'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd', 'CREATE', 'organization',
+        '{"id":"70167f17-b7b7-4ce2-b2ad-2c8da4976cff","name":"ИП Жаркын","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('1c2dd0c9-0171-433b-a78e-af1698e621fe', '2025-09-19 12:23:03.383883', '2025-09-19 12:23:03.383883',
+        '2025-09-19 12:23:03.374584', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd',
+        'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd', 'CREATE', 'counterparty', 'null');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('9c4ea38d-b943-4e37-8014-aee092c7a4b1', '2025-09-19 12:23:03.392979', '2025-09-19 12:23:03.392979',
+        '2025-09-19 12:23:03.374584', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd',
+        'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd', 'CREATE', 'bank', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('04ddc9a0-0689-41bf-820a-90ed5eb719de', '2025-09-19 12:23:03.400283', '2025-09-19 12:23:03.400283',
+        '2025-09-19 12:23:03.374584', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd',
+        'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd', 'CREATE', 'giro', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('744057c3-e53f-424e-8740-9173c558bbcb', '2025-09-19 12:23:03.407271', '2025-09-19 12:23:03.407271',
+        '2025-09-19 12:23:03.374584', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd',
+        'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd', 'CREATE', 'currency',
+        '{"id":"24f15639-67da-4df4-aab4-56b85c872c3b","name":"Доллар","archived":false}');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('98aef0ed-31e2-41d9-9db7-e2d7c5ee495d', '2025-09-19 12:23:03.415411', '2025-09-19 12:23:03.415411',
+        '2025-09-19 12:23:03.374584', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', 'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd',
+        'b2985ddb-d3cb-4b70-88ae-2250c5d64dcd', 'CREATE', 'name', '"Наличными Доллар"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('c9b14820-f109-4757-8990-9a965c6ee1a6', '2025-09-24 08:00:17.099607', '2025-09-24 08:00:17.099607',
+        '2025-09-24 08:00:17.099061', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '530ef41c-4eec-4cff-898e-3fc0ec509f01',
+        '530ef41c-4eec-4cff-898e-3fc0ec509f01', 'CREATE', 'phoneNumber', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('99940244-c1e5-4c81-a38e-ea3ac58c66ca', '2025-09-24 08:00:17.137692', '2025-09-24 08:00:17.137692',
+        '2025-09-24 08:00:17.099061', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '530ef41c-4eec-4cff-898e-3fc0ec509f01',
+        '530ef41c-4eec-4cff-898e-3fc0ec509f01', 'CREATE', 'shippingAddress', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('bcf709d2-e413-4782-81ce-435c857c950b', '2025-09-24 08:00:17.150739', '2025-09-24 08:00:17.150739',
+        '2025-09-24 08:00:17.099061', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '530ef41c-4eec-4cff-898e-3fc0ec509f01',
+        '530ef41c-4eec-4cff-898e-3fc0ec509f01', 'CREATE', 'discount', '0');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('31f0b5dd-12ef-4b60-97f9-9ce1bc218176', '2025-09-24 08:00:17.162380', '2025-09-24 08:00:17.162380',
+        '2025-09-24 08:00:17.099061', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '530ef41c-4eec-4cff-898e-3fc0ec509f01',
+        '530ef41c-4eec-4cff-898e-3fc0ec509f01', 'CREATE', 'name', '"Урымжы Кытай"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('9c9c7ea0-979b-4e61-8bd1-0886b1f8a328', '2025-09-24 08:01:35.920417', '2025-09-24 08:01:35.920417',
+        '2025-09-24 08:01:35.919913', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7b22e58d-1583-4a29-9694-c772659c8c09',
+        '7b22e58d-1583-4a29-9694-c772659c8c09', 'CREATE', 'phoneNumber', '"+7 702 670 5556"');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d8bee629-7810-4376-89de-b1b2489ec1e6', '2025-09-24 08:01:35.935959', '2025-09-24 08:01:35.935959',
+        '2025-09-24 08:01:35.919913', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7b22e58d-1583-4a29-9694-c772659c8c09',
+        '7b22e58d-1583-4a29-9694-c772659c8c09', 'CREATE', 'shippingAddress', '""');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('d96649b4-0afb-4d6e-a407-5578eb6cc251', '2025-09-24 08:01:35.946193', '2025-09-24 08:01:35.946193',
+        '2025-09-24 08:01:35.919913', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7b22e58d-1583-4a29-9694-c772659c8c09',
+        '7b22e58d-1583-4a29-9694-c772659c8c09', 'CREATE', 'discount', '0');
+INSERT INTO public.audit (id, created_at, last_modified_at, moment, user_id, related_entity_id, entity_id, action,
+                          field_name, field_value)
+VALUES ('1ba5acaa-236d-4816-8420-b2618c167c7b', '2025-09-24 08:01:35.956579', '2025-09-24 08:01:35.956579',
+        '2025-09-24 08:01:35.919913', 'b4de022b-174a-4ba2-9035-b290c9a9ccdb', '7b22e58d-1583-4a29-9694-c772659c8c09',
+        '7b22e58d-1583-4a29-9694-c772659c8c09', 'CREATE', 'name', '"Оркен Алматы"');
+
+INSERT INTO public.counterparty (id, phone_number, shipping_address, discount)
+VALUES ('530ef41c-4eec-4cff-898e-3fc0ec509f01', '', '', 0);
+INSERT INTO public.counterparty (id, phone_number, shipping_address, discount)
+VALUES ('7b22e58d-1583-4a29-9694-c772659c8c09', '+7 702 670 5556', '', 0);
+INSERT INTO public.coverage (id, code, name, archived, created_at, last_modified_at)
+VALUES ('6f5d4f59-f10e-42f6-8995-6a67d47e4e3d', 'FULL', 'Полное', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.coverage (id, code, name, archived, created_at, last_modified_at)
+VALUES ('c8f52b6a-8a43-4398-9d33-68b2d9b719a4', 'PARTIAL', 'Частичное', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.coverage (id, code, name, archived, created_at, last_modified_at)
+VALUES ('a8b1cf92-2894-41b4-94f5-0b9ad8e1d531', 'NONE', 'Отсутствует', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.currency (id, code, name, archived, created_at, last_modified_at)
+VALUES ('559109ea-f824-476d-8fa4-9990e53880ff', 'KZT', 'Тенге', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.currency (id, code, name, archived, created_at, last_modified_at)
+VALUES ('e6a3c207-a358-47bf-ac18-2d09973f3807', 'CNY', 'Юань', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.currency (id, code, name, archived, created_at, last_modified_at)
+VALUES ('24f15639-67da-4df4-aab4-56b85c872c3b', 'USD', 'Доллар', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+
+INSERT INTO public.document_type (id, code, name, archived, created_at, last_modified_at)
+VALUES ('c837fc94-4cd4-4918-a38c-9bd9dd9c3271', 'SALE', 'Продажа', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.document_type (id, code, name, archived, created_at, last_modified_at)
+VALUES ('3873fc3e-58da-4ecc-81a8-70728d8d3297', 'SUPPLY', 'Приемка', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.document_type (id, code, name, archived, created_at, last_modified_at)
+VALUES ('b112027c-bf9b-45e4-bcff-74f74b27cff0', 'PAYMENT_IN', 'Входящий платеж', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.document_type (id, code, name, archived, created_at, last_modified_at)
+VALUES ('9b755b4e-61fa-457d-855d-6b231d3bfed2', 'PAYMENT_OUT', 'Исходящий платеж', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.flyway_schema_history (installed_rank, version, description, type, script, checksum, installed_by,
+                                          installed_on, execution_time, success)
+VALUES (1, '1.0', 'init', 'SQL', 'V1_0__init.sql', 1963669332, 'admin', '2025-09-19 13:16:26.274535', 175, true);
+INSERT INTO public.flyway_schema_history (installed_rank, version, description, type, script, checksum, installed_by,
+                                          installed_on, execution_time, success)
+VALUES (2, '1.1', 'init insert', 'SQL', 'V1_1__init_insert.sql', -457082738, 'admin', '2025-09-19 13:16:26.505531', 21,
+        true);
+INSERT INTO public.good (id, name, archived, created_at, last_modified_at, group_id, image_id, weight, minimum_price,
+                         search_keywords)
+VALUES ('a0d9d430-1018-4e53-a6b4-833bd05e098a', 'Кикстартер S', false, '2025-09-19 11:31:09.303482',
+        '2025-09-19 11:31:09.303482', '5ca4b6fd-283f-4ab2-a194-87e843402ce0', null, 0, 850, 'kikstarter с');
+INSERT INTO public.good (id, name, archived, created_at, last_modified_at, group_id, image_id, weight, minimum_price,
+                         search_keywords)
+VALUES ('f3289a44-d343-4953-84e9-cc2c564f277a', 'Кикстартер L', false, '2025-09-19 12:11:02.399838',
+        '2025-09-19 12:11:02.399838', '5ca4b6fd-283f-4ab2-a194-87e843402ce0', null, 0, 770, 'kikstarter л');
+INSERT INTO public.good (id, name, archived, created_at, last_modified_at, group_id, image_id, weight, minimum_price,
+                         search_keywords)
+VALUES ('6ddbd771-c468-4086-b550-5c79554b382b', 'Аккумулятор WY 7Ah', false, '2025-09-19 12:14:27.541258',
+        '2025-09-19 12:14:27.541258', 'afa39f9e-27db-4287-84a4-70ac56342a7b', null, 0, 5330, '');
+INSERT INTO public.good (id, name, archived, created_at, last_modified_at, group_id, image_id, weight, minimum_price,
+                         search_keywords)
+VALUES ('d3a6e8e1-8a8c-4940-b800-308df85889c0', 'Аккумулятор GN 9Ah', false, '2025-09-19 12:17:14.186396',
+        '2025-09-19 12:17:14.186396', 'afa39f9e-27db-4287-84a4-70ac56342a7b', null, 0, 5330, '');
+INSERT INTO public.good_attribute (id, created_at, last_modified_at, good_id, attribute_id)
+VALUES ('1764ee8e-aeba-45fb-a078-b93a615bb318', '2025-09-19 12:11:02.409633', '2025-09-19 12:11:02.409633',
+        'f3289a44-d343-4953-84e9-cc2c564f277a', '193bb168-8adc-4cbe-bd56-61dfa0ca6238');
+INSERT INTO public.good_attribute (id, created_at, last_modified_at, good_id, attribute_id)
+VALUES ('e6e5def9-7f3b-4e85-8148-bef0d813056a', '2025-09-19 12:12:17.837779', '2025-09-19 12:12:17.837779',
+        'a0d9d430-1018-4e53-a6b4-833bd05e098a', '7084aa04-4dc3-49d5-8e28-a5fa02fce81e');
+INSERT INTO public.good_attribute (id, created_at, last_modified_at, good_id, attribute_id)
+VALUES ('63706050-3c39-4d0f-80ed-db23573e7ba7', '2025-09-19 12:14:27.543405', '2025-09-19 12:14:27.543405',
+        '6ddbd771-c468-4086-b550-5c79554b382b', '7084aa04-4dc3-49d5-8e28-a5fa02fce81e');
+INSERT INTO public.good_attribute (id, created_at, last_modified_at, good_id, attribute_id)
+VALUES ('46019fcb-09b7-430e-8414-2b43037e619b', '2025-09-19 12:17:14.188601', '2025-09-19 12:17:14.188601',
+        'd3a6e8e1-8a8c-4940-b800-308df85889c0', '193bb168-8adc-4cbe-bd56-61dfa0ca6238');
+INSERT INTO public.groups (id, name, archived, created_at, last_modified_at, search_keywords, minimum_markup,
+                           selling_markup, parent_id, position)
+VALUES ('35b31b30-898a-4b4c-b772-0644d42ba108', 'Мототехника', false, '2025-09-19 10:47:51.657569',
+        '2025-09-19 10:48:06.915985', 'moto', 25, 50, null, 1000);
+INSERT INTO public.groups (id, name, archived, created_at, last_modified_at, search_keywords, minimum_markup,
+                           selling_markup, parent_id, position)
+VALUES ('5ca4b6fd-283f-4ab2-a194-87e843402ce0', 'Педаль', false, '2025-09-19 10:49:13.471571',
+        '2025-09-19 11:13:12.549307', 'pedal', null, null, '35b31b30-898a-4b4c-b772-0644d42ba108', 1);
+INSERT INTO public.groups (id, name, archived, created_at, last_modified_at, search_keywords, minimum_markup,
+                           selling_markup, parent_id, position)
+VALUES ('afa39f9e-27db-4287-84a4-70ac56342a7b', 'Аккумулятор', false, '2025-09-19 11:12:43.985050',
+        '2025-09-19 11:15:32.547315', 'akkumulator', null, 30, '35b31b30-898a-4b4c-b772-0644d42ba108', 0);
+INSERT INTO public.groups (id, name, archived, created_at, last_modified_at, search_keywords, minimum_markup,
+                           selling_markup, parent_id, position)
+VALUES ('3492be06-33c6-44b5-9f66-bdcbd1094036', 'Масло', false, '2025-09-19 12:18:30.457906',
+        '2025-09-19 12:18:30.457906', 'maslo масла май', null, null, '35b31b30-898a-4b4c-b772-0644d42ba108', 1000);
 
 
------------------- Attribute --------------------
-INSERT INTO attribute_group (id, name, position, archived)
-VALUES ('c5a95fbd-121e-4f57-a84b-600a9919228a',
-        'Транспорт', 100, false);
-INSERT INTO attribute (id, name, position, group_id, archived)
-VALUES ('e95420b5-3344-44ce-8d39-699f516ed715',
-        'Мотоцикл GN', 100, 'c5a95fbd-121e-4f57-a84b-600a9919228a', false),
-       ('355785a2-0dd8-49f8-987f-06e3c48bf9a8',
-        'Мотоцикл WY', 99, 'c5a95fbd-121e-4f57-a84b-600a9919228a', false),
-       ('797e7bc8-fca0-4d2b-b1ce-6975f54b48eb',
-        'Alpha', 101, 'c5a95fbd-121e-4f57-a84b-600a9919228a', false);
+INSERT INTO public.item_of_expenditure (id, code, name, archived, created_at, last_modified_at)
+VALUES ('ac03d34e-2274-4f35-8939-46f17ddc05ed', 'SUPPLY', 'Закупка товаров', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.item_of_expenditure (id, code, name, archived, created_at, last_modified_at)
+VALUES ('f18c785e-9bd9-4446-81f8-c3b64c474cf4', 'REFUND', 'Возврат', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.item_of_expenditure (id, code, name, archived, created_at, last_modified_at)
+VALUES ('3a50a533-63a7-49e8-b1f1-f130b7b16822', 'OPEX', 'Операционные расходы', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.item_of_expenditure (id, code, name, archived, created_at, last_modified_at)
+VALUES ('4bcf1be9-a45b-4585-ab94-39d7452b7e85', 'DIVIDEND', 'Дивиденд', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.item_of_expenditure (id, code, name, archived, created_at, last_modified_at)
+VALUES ('f8ce8a87-947c-4818-b404-9de519f5125e', 'SALARY', 'Зарплата', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.item_of_expenditure (id, code, name, archived, created_at, last_modified_at)
+VALUES ('25fa0cb2-a4d2-4035-9e8c-0c3b639caa4c', 'HOUSEHOLD', 'Хозяйственные расходы', false,
+        '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
+INSERT INTO public.organization (id)
+VALUES ('70167f17-b7b7-4ce2-b2ad-2c8da4976cff');
 
-INSERT INTO attribute_group (id, name, position, archived)
-VALUES ('5d82a954-5b87-11ee-0a80-000c0039afd5',
-        'Цвет', 101, false);
+INSERT INTO public.party (id, name, archived, created_at, last_modified_at)
+VALUES ('70167f17-b7b7-4ce2-b2ad-2c8da4976cff', 'ИП Жаркын', false, '2025-09-19 10:30:01.636575',
+        '2025-09-19 10:30:01.636575');
+INSERT INTO public.party (id, name, archived, created_at, last_modified_at)
+VALUES ('530ef41c-4eec-4cff-898e-3fc0ec509f01', 'Урымжы Кытай', false, '2025-09-24 08:00:17.061845',
+        '2025-09-24 08:00:17.061845');
+INSERT INTO public.party (id, name, archived, created_at, last_modified_at)
+VALUES ('7b22e58d-1583-4a29-9694-c772659c8c09', 'Оркен Алматы', false, '2025-09-24 08:01:35.907576',
+        '2025-09-24 08:01:35.907576');
 
---------------------- Good ----------------------
--- Кикстартер L
-INSERT INTO good (id, name, group_id, weight, minimum_price, image_id, archived)
-VALUES ('7f316872-1da3-44c8-9293-0fddda859435',
-        'Кикстартер L', 'cdfcf458-7cca-11ef-0a80-152f001b4886',
-        254, 800, NULL, FALSE);
-INSERT INTO good_attribute (id, good_id, attribute_id)
-VALUES ('adc7414d-3985-4a16-8790-d5543f624d7a', '7f316872-1da3-44c8-9293-0fddda859435',
-        'e95420b5-3344-44ce-8d39-699f516ed715');
-INSERT INTO selling_price (id, good_id, quantity, val)
-VALUES ('fbe70a5c-a0d1-414c-9507-7352739b1243', '7f316872-1da3-44c8-9293-0fddda859435',
-        1, 880),
-       ('de14fc67-d461-4094-a79f-ed32e2e50518', '7f316872-1da3-44c8-9293-0fddda859435',
-        20, 850);
--- Педаль переключения передач WY (короткий)
-INSERT INTO good (id, name, group_id, weight, minimum_price, image_id, archived)
-VALUES ('bf6f2ba4-f994-44c1-839f-36a75f07242e',
-        'Педаль переключения передач WY (короткий)', '6120deea-5b87-11ee-0a80-000c0039b0fd',
-        120, 500, NULL, FALSE);
-INSERT INTO good_attribute (id, good_id, attribute_id)
-VALUES ('37593a71-7d16-4409-ad41-e74b294d5855', 'bf6f2ba4-f994-44c1-839f-36a75f07242e',
-        '355785a2-0dd8-49f8-987f-06e3c48bf9a8');
-INSERT INTO selling_price (id, good_id, quantity, val)
-VALUES ('4d4bc769-df3f-4e25-9f23-d01083bdb056', 'bf6f2ba4-f994-44c1-839f-36a75f07242e',
-        1, 600),
-       ('7b87a987-36a1-4fa9-8f65-04de71bea721', 'bf6f2ba4-f994-44c1-839f-36a75f07242e',
-        50, 550);
+
+INSERT INTO public.role (id, code, name, archived, created_at, last_modified_at)
+VALUES ('82435749-721a-49ee-8402-579d507b21ff', 'SYSTEM', 'Система', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.role (id, code, name, archived, created_at, last_modified_at)
+VALUES ('c54cf84d-230d-48bf-87fa-172c0cc7e4d5', 'OWNER', 'Владелец', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.role (id, code, name, archived, created_at, last_modified_at)
+VALUES ('123b4cb7-d57d-48fd-8596-143bf994826e', 'ADMINISTRATOR', 'Администратор', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+INSERT INTO public.role (id, code, name, archived, created_at, last_modified_at)
+VALUES ('60969353-3986-4d85-bfa1-04f91d375b19', 'STOREKEEPER', 'Кладовщик ', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669');
+
+INSERT INTO public.selling_price (id, created_at, last_modified_at, good_id, quantity, val)
+VALUES ('467ce251-4b67-485f-aa2e-73553a12ea1e', '2025-09-19 11:31:09.304018', '2025-09-19 11:31:09.304018',
+        'a0d9d430-1018-4e53-a6b4-833bd05e098a', 1, 960);
+INSERT INTO public.selling_price (id, created_at, last_modified_at, good_id, quantity, val)
+VALUES ('0bd0ee3f-5aa2-4897-a6c2-7b4a28f2af85', '2025-09-19 12:11:02.432570', '2025-09-19 12:11:02.432570',
+        'f3289a44-d343-4953-84e9-cc2c564f277a', 1, 850);
+INSERT INTO public.selling_price (id, created_at, last_modified_at, good_id, quantity, val)
+VALUES ('d4662acf-a096-468b-ab6e-694ec492946e', '2025-09-19 12:14:27.551507', '2025-09-19 12:14:27.551507',
+        '6ddbd771-c468-4086-b550-5c79554b382b', 1, 5330);
+INSERT INTO public.selling_price (id, created_at, last_modified_at, good_id, quantity, val)
+VALUES ('66987583-878f-4aeb-924a-f1134f254e41', '2025-09-19 12:17:14.197470', '2025-09-19 12:17:14.197470',
+        'd3a6e8e1-8a8c-4940-b800-308df85889c0', 1, 5330);
+INSERT INTO public.session (id, created_at, last_modified_at, user_id, refresh_token_hash, ip, user_agent, expires_at,
+                            revoked_at, version)
+VALUES ('a1e286f1-f820-4cf9-a9cc-4f43687681fe', '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669',
+        'd8427d9f-4836-449f-8a6d-90d5d718c83f', '', '', '', '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669',
+        0);
+INSERT INTO public.session (id, created_at, last_modified_at, user_id, refresh_token_hash, ip, user_agent, expires_at,
+                            revoked_at, version)
+VALUES ('7a7aa9b9-e520-462c-bcd7-b02230779bbd', '2025-09-19 09:20:04.165735', '2025-09-19 09:20:04.165735',
+        '2e487fac-517d-43a1-9c43-5f3d3e13cb06', '4e2a374f14b07975ac7560480e1018d08432638d18109daa65171a89f4dcba03',
+        null,
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+        '2026-09-19 09:20:04.164697', null, 0);
+INSERT INTO public.session (id, created_at, last_modified_at, user_id, refresh_token_hash, ip, user_agent, expires_at,
+                            revoked_at, version)
+VALUES ('b4de022b-174a-4ba2-9035-b290c9a9ccdb', '2025-09-19 10:27:34.352472', '2025-09-19 10:27:34.352472',
+        '2e487fac-517d-43a1-9c43-5f3d3e13cb06', 'd2ade3ed2c42482c72a6c0af64506bfdb64231d10870437c279ffec40f3c06be',
+        null,
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+        '2026-09-19 10:27:34.352472', null, 0);
+
+
+INSERT INTO public.users (id, name, archived, created_at, last_modified_at, phone_number, password_hash, role_id)
+VALUES ('d8427d9f-4836-449f-8a6d-90d5d718c83f', 'Система', false, '2025-09-19 13:16:26.518669',
+        '2025-09-19 13:16:26.518669', '+7 700 000 0000', '', '82435749-721a-49ee-8402-579d507b21ff');
+INSERT INTO public.users (id, name, archived, created_at, last_modified_at, phone_number, password_hash, role_id)
+VALUES ('2e487fac-517d-43a1-9c43-5f3d3e13cb06', 'Ернар', false, '2025-09-19 08:16:32.322448',
+        '2025-09-19 08:16:32.322448', '+7 775 216 6661', '$2a$10$GC0.WGYMFtURRxlEkfz/cO1ju5HdNRoqomE3L84Jgz7iEFLAqQAD2',
+        'c54cf84d-230d-48bf-87fa-172c0cc7e4d5');
+INSERT INTO public.warehouse (id, name, archived, created_at, last_modified_at)
+VALUES ('7cfa1b93-b092-4d39-beb3-58eac6a8f800', 'Кенжина', false, '2025-09-19 12:19:23.589798',
+        '2025-09-19 12:19:23.589798');
+INSERT INTO public.warehouse (id, name, archived, created_at, last_modified_at)
+VALUES ('fa48a071-2be2-4055-a60f-31255dc46757', 'Барыс', false, '2025-09-19 12:19:30.196604',
+        '2025-09-19 12:19:30.196604');

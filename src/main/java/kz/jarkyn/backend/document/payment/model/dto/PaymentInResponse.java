@@ -10,8 +10,6 @@ import java.util.List;
 
 @Value.Immutable
 public interface PaymentInResponse extends DocumentResponse {
-    ReferenceResponse getAccount();
-    @Nullable ReferenceResponse getCounterparty();
     @Nullable String getReceiptNumber();
     List<PaidDocumentResponse> getPaidDocuments();
 }

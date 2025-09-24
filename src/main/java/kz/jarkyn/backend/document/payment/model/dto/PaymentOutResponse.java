@@ -11,8 +11,6 @@ import java.util.List;
 
 @Value.Immutable
 public interface PaymentOutResponse extends DocumentResponse {
-    ReferenceResponse getAccount();
-    @Nullable ReferenceResponse getCounterparty();
     @Nullable String getReceiptNumber();
     EnumTypeResponse getItemOfExpenditure();
     @Nullable String getPurpose();

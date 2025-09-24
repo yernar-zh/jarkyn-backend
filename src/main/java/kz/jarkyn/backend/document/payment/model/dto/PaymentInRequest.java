@@ -13,7 +13,6 @@ import java.util.List;
 @JsonDeserialize(builder = ImmutablePaymentInRequest.Builder.class)
 public interface PaymentInRequest extends DocumentRequest {
     IdDto getAccount();
-    @Nullable IdDto getCounterparty();
     @Nullable String getReceiptNumber();
     List<PaidDocumentRequest> getPaidDocuments();
 }

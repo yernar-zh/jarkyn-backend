@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 @Value.Immutable
 public interface PaymentInListResponse extends DocumentResponse {
     ReferenceResponse getAccount();
-    @Nullable ReferenceResponse getCounterparty();
     @Nullable String getReceiptNumber();
     @Nullable BigDecimal getAttached();
     @Nullable BigDecimal getNotAttached();
