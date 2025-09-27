@@ -1,19 +1,18 @@
 
-package kz.jarkyn.backend.document.change.model.dto;
+package kz.jarkyn.backend.document.bind.model.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.IdDto;
-import kz.jarkyn.backend.document.payment.model.dto.ImmutablePaidDocumentRequest;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Value.Immutable
-@JsonDeserialize(builder = ImmutablePaidDocumentRequest.Builder.class)
-public interface ChargeDocumentRequest extends IdDto {
+@JsonDeserialize(builder = ImmutableBindDocumentRequest.Builder.class)
+public interface BindDocumentRequest extends IdDto {
     @Nullable UUID getId();
-    IdDto getDocument();
+    IdDto getRelatedDocument();
     BigDecimal getAmount();
 }

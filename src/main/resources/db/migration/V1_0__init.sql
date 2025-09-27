@@ -50,6 +50,17 @@ CREATE TABLE audit
     CONSTRAINT pk_audit PRIMARY KEY (id)
 );
 
+CREATE TABLE bind_document
+(
+    id                  UUID NOT NULL,
+    created_at          TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at    TIMESTAMP WITHOUT TIME ZONE,
+    primary_document_id UUID,
+    related_document_id UUID,
+    amount              DECIMAL,
+    CONSTRAINT pk_bind_document PRIMARY KEY (id)
+);
+
 CREATE TABLE cash_flow
 (
     id               UUID NOT NULL,
@@ -213,17 +224,6 @@ CREATE TABLE organization
     CONSTRAINT pk_organization PRIMARY KEY (id)
 );
 
-CREATE TABLE paid_document
-(
-    id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    payment_id       UUID,
-    document_id      UUID,
-    amount           DECIMAL,
-    CONSTRAINT pk_paid_document PRIMARY KEY (id)
-);
-
 CREATE TABLE party
 (
     id               UUID NOT NULL,
@@ -232,13 +232,6 @@ CREATE TABLE party
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_party PRIMARY KEY (id)
-);
-
-CREATE TABLE payment_in
-(
-    id             UUID NOT NULL,
-    receipt_number VARCHAR(255),
-    CONSTRAINT pk_payment_in PRIMARY KEY (id)
 );
 
 CREATE TABLE payment_out
@@ -270,14 +263,6 @@ CREATE TABLE role
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_role PRIMARY KEY (id)
-);
-
-CREATE TABLE sale
-(
-    id              UUID NOT NULL,
-    shipment_moment TIMESTAMP WITHOUT TIME ZONE,
-    state           VARCHAR(255),
-    CONSTRAINT pk_sale PRIMARY KEY (id)
 );
 
 CREATE TABLE selling_price
@@ -367,6 +352,12 @@ ALTER TABLE attribute
 ALTER TABLE audit
     ADD CONSTRAINT FK_AUDIT_ON_USER FOREIGN KEY (user_id) REFERENCES session (id);
 
+ALTER TABLE bind_document
+    ADD CONSTRAINT FK_BIND_DOCUMENT_ON_PRIMARY_DOCUMENT FOREIGN KEY (primary_document_id) REFERENCES document (id);
+
+ALTER TABLE bind_document
+    ADD CONSTRAINT FK_BIND_DOCUMENT_ON_RELATED_DOCUMENT FOREIGN KEY (related_document_id) REFERENCES document (id);
+
 ALTER TABLE cash_flow
     ADD CONSTRAINT FK_CASH_FLOW_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
 
@@ -421,15 +412,6 @@ ALTER TABLE item
 ALTER TABLE organization
     ADD CONSTRAINT FK_ORGANIZATION_ON_ID FOREIGN KEY (id) REFERENCES party (id);
 
-ALTER TABLE paid_document
-    ADD CONSTRAINT FK_PAID_DOCUMENT_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
-
-ALTER TABLE paid_document
-    ADD CONSTRAINT FK_PAID_DOCUMENT_ON_PAYMENT FOREIGN KEY (payment_id) REFERENCES document (id);
-
-ALTER TABLE payment_in
-    ADD CONSTRAINT FK_PAYMENT_IN_ON_ID FOREIGN KEY (id) REFERENCES document (id);
-
 ALTER TABLE payment_out
     ADD CONSTRAINT FK_PAYMENT_OUT_ON_ID FOREIGN KEY (id) REFERENCES document (id);
 
@@ -441,9 +423,6 @@ ALTER TABLE related_expenses
 
 ALTER TABLE related_expenses
     ADD CONSTRAINT FK_RELATED_EXPENSES_ON_EXPENSE FOREIGN KEY (expense_id) REFERENCES expense (id);
-
-ALTER TABLE sale
-    ADD CONSTRAINT FK_SALE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
 
 ALTER TABLE selling_price
     ADD CONSTRAINT FK_SELLING_PRICE_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);

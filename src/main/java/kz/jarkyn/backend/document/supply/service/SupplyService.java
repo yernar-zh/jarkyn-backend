@@ -12,9 +12,10 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.core.sorts.EntitySorts;
+import kz.jarkyn.backend.document.bind.model.BindDocumentEntity_;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.PaymentOutEntity_;
+import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
 import kz.jarkyn.backend.global.model.CoverageEntity;
 import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.party.model.*;
@@ -22,10 +23,8 @@ import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.core.service.ItemService;
-import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity;
-import kz.jarkyn.backend.document.payment.model.PaidDocumentEntity_;
-import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
-import kz.jarkyn.backend.document.payment.service.PaidDocumentService;
+import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
+import kz.jarkyn.backend.document.bind.service.BindDocumentService;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity_;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
@@ -35,7 +34,6 @@ import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +46,7 @@ public class SupplyService {
     private final SupplyRepository supplyRepository;
     private final SupplyMapper supplyMapper;
     private final ItemService itemService;
-    private final PaidDocumentService paidDocumentService;
+    private final BindDocumentService bindDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
     private final SearchFactory searchFactory;
@@ -60,7 +58,7 @@ public class SupplyService {
             SupplyRepository supplyRepository,
             SupplyMapper supplyMapper,
             ItemService itemService,
-            PaidDocumentService paidDocumentService,
+            BindDocumentService bindDocumentService,
             DocumentService documentService,
             AuditService auditService,
             SearchFactory searchFactory,
@@ -69,7 +67,7 @@ public class SupplyService {
         this.supplyRepository = supplyRepository;
         this.supplyMapper = supplyMapper;
         this.itemService = itemService;
-        this.paidDocumentService = paidDocumentService;
+        this.bindDocumentService = bindDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
         this.searchFactory = searchFactory;
@@ -82,8 +80,8 @@ public class SupplyService {
     public SupplyResponse findApiById(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<ItemResponse> items = itemService.findApiByDocument(supply);
-        List<PaidDocumentResponse> paidDocuments = paidDocumentService.findResponseByDocument(supply);
-        return supplyMapper.toResponse(supply, items, paidDocuments);
+        List<BindDocumentResponse> bindDocuments = bindDocumentService.findResponseByRelatedDocument(supply);
+        return supplyMapper.toResponse(supply, items, bindDocuments);
     }
 
     @Transactional(readOnly = true)
@@ -104,9 +102,9 @@ public class SupplyService {
                 .addReference("counterparty", (root) -> root.get(SupplyEntity_.counterparty))
                 .add("paidAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
-                    Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
-                    subQuery.select(cb.coalesce(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)), BigDecimal.ZERO));
-                    subQuery.where(cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.document), root));
+                    Root<BindDocumentEntity> bindDocumentRoot = subQuery.from(BindDocumentEntity.class);
+                    subQuery.select(cb.coalesce(cb.sum(bindDocumentRoot.get(BindDocumentEntity_.amount)), BigDecimal.ZERO));
+                    subQuery.where(cb.equal(bindDocumentRoot.get(BindDocumentEntity_.relatedDocument), root));
                     return subQuery;
                 })
                 .add("paidCoverage.id", (root, query, cb, map) -> {
@@ -181,8 +179,8 @@ public class SupplyService {
     @Transactional
     public void delete(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        List<PaidDocumentResponse> paidDocuments = paidDocumentService.findResponseByDocument(supply);
-        if (!paidDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
+        List<BindDocumentResponse> bindDocuments = bindDocumentService.findResponseByRelatedDocument(supply);
+        if (!bindDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
         if (supply.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         supply.setDeleted(Boolean.TRUE);
         auditService.delete(supply);

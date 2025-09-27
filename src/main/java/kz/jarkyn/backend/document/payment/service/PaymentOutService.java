@@ -11,15 +11,18 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
+import kz.jarkyn.backend.document.bind.model.BindDocumentEntity_;
+import kz.jarkyn.backend.document.bind.service.BindDocumentService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.*;
+import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
 import kz.jarkyn.backend.global.model.CoverageEntity;
 import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.payment.mapper.PaymentOutMapper;
-import kz.jarkyn.backend.document.payment.model.dto.PaidDocumentResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutListResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutResponse;
 import kz.jarkyn.backend.document.payment.model.dto.PaymentOutRequest;
@@ -37,7 +40,7 @@ import java.util.UUID;
 public class PaymentOutService {
     private final PaymentOutRepository paymentOutRepository;
     private final PaymentOutMapper paymentOutMapper;
-    private final PaidDocumentService paidDocumentService;
+    private final BindDocumentService bindDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
     private final SearchFactory searchFactory;
@@ -48,7 +51,7 @@ public class PaymentOutService {
     public PaymentOutService(
             PaymentOutRepository paymentOutRepository,
             PaymentOutMapper paymentOutMapper,
-            PaidDocumentService paidDocumentService,
+            BindDocumentService bindDocumentService,
             DocumentService documentService,
             AuditService auditService,
             SearchFactory searchFactory,
@@ -58,7 +61,7 @@ public class PaymentOutService {
     ) {
         this.paymentOutRepository = paymentOutRepository;
         this.paymentOutMapper = paymentOutMapper;
-        this.paidDocumentService = paidDocumentService;
+        this.bindDocumentService = bindDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
         this.searchFactory = searchFactory;
@@ -70,8 +73,8 @@ public class PaymentOutService {
     @Transactional(readOnly = true)
     public PaymentOutResponse findApiById(UUID id) {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        List<PaidDocumentResponse> paidDocuments = paidDocumentService.findResponseByPayment(paymentOut);
-        return paymentOutMapper.toResponse(paymentOut, paidDocuments);
+        List<BindDocumentResponse> bindDocuments = bindDocumentService.findResponseByPrimaryDocument(paymentOut);
+        return paymentOutMapper.toResponse(paymentOut, bindDocuments);
     }
 
     @Transactional(readOnly = true)
@@ -84,9 +87,9 @@ public class PaymentOutService {
                 .add("purpose", (root) -> root.get(PaymentOutEntity_.purpose))
                 .add("attachedAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
-                    Root<PaidDocumentEntity> paidDocumentRoot = subQuery.from(PaidDocumentEntity.class);
-                    subQuery.select(cb.coalesce(cb.sum(paidDocumentRoot.get(PaidDocumentEntity_.amount)), BigDecimal.ZERO));
-                    subQuery.where(cb.equal(paidDocumentRoot.get(PaidDocumentEntity_.payment), root));
+                    Root<BindDocumentEntity> bindDocumentRoot = subQuery.from(BindDocumentEntity.class);
+                    subQuery.select(cb.coalesce(cb.sum(bindDocumentRoot.get(BindDocumentEntity_.amount)), BigDecimal.ZERO));
+                    subQuery.where(cb.equal(bindDocumentRoot.get(BindDocumentEntity_.primaryDocument), root));
                     return subQuery;
                 })
                 .add("attachedCoverage.id", (root, query, cb, map) -> {
@@ -123,7 +126,7 @@ public class PaymentOutService {
         paymentOut.setCommited(false);
         paymentOutRepository.save(paymentOut);
         auditService.saveEntity(paymentOut);
-        paidDocumentService.saveApi(paymentOut, request.getPaidDocuments());
+        bindDocumentService.save(paymentOut, request.getBindDocuments());
         return paymentOut.getId();
     }
 
@@ -133,7 +136,7 @@ public class PaymentOutService {
         documentService.validateName(paymentOut);
         paymentOutMapper.editEntity(paymentOut, request);
         auditService.saveEntity(paymentOut);
-        paidDocumentService.saveApi(paymentOut, request.getPaidDocuments());
+        bindDocumentService.save(paymentOut, request.getBindDocuments());
     }
 
     @Transactional
@@ -161,6 +164,6 @@ public class PaymentOutService {
         if (paymentOut.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         paymentOut.setDeleted(Boolean.TRUE);
         auditService.delete(paymentOut);
-        paidDocumentService.saveApi(paymentOut, List.of());
+        bindDocumentService.save(paymentOut, List.of());
     }
 }
