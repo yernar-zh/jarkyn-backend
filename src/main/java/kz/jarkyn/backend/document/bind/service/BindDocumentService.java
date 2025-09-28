@@ -10,6 +10,8 @@ import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentRequest;
 import kz.jarkyn.backend.document.bind.repository.BindDocumentRepository;
+import kz.jarkyn.backend.document.core.model.DocumentTypeEntity;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,19 +35,37 @@ public class BindDocumentService {
 
     @Transactional(readOnly = true)
     public List<BindDocumentResponse> findResponseByPrimaryDocument(DocumentEntity primaryDocument) {
-        return bindDocumentRepository.findAll(BindDocumentSpecifications.primaryDocument(primaryDocument)).stream().map(entity -> {
-            BigDecimal paidAmount = bindDocumentRepository.findAll(BindDocumentSpecifications.relatedDocument(entity.getRelatedDocument())).stream()
-                    .map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            return bindDocumentMapper.toResponse(entity, entity.getRelatedDocument().getAmount().subtract(paidAmount));
+        List<BindDocumentEntity> bindDocuments = bindDocumentRepository
+                .findAll(BindDocumentSpecifications.primaryDocument(primaryDocument));
+        BigDecimal primaryNotBindAmount = bindDocuments
+                .stream().map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add)
+                .negate().add(primaryDocument.getAmount());
+        return bindDocuments.stream().map(bindDocument -> {
+            DocumentEntity relatedDocument = bindDocument.getRelatedDocument();
+            BigDecimal relatedNotBindAmount = bindDocumentRepository
+                    .findAll(BindDocumentSpecifications.relatedDocument(relatedDocument))
+                    .stream().map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .negate().add(relatedDocument.getAmount());
+            return bindDocumentMapper.toResponse(bindDocument, primaryNotBindAmount, relatedNotBindAmount);
         }).toList();
     }
 
     @Transactional(readOnly = true)
-    public List<BindDocumentResponse> findResponseByRelatedDocument(DocumentEntity relatedDocument) { // TODO add primary class type
-        return bindDocumentRepository.findAll(BindDocumentSpecifications.relatedDocument(relatedDocument)).stream().map(entity -> {
-            BigDecimal paidAmount = bindDocumentRepository.findAll(BindDocumentSpecifications.primaryDocument(entity.getPrimaryDocument())).stream()
-                    .map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            return bindDocumentMapper.toResponse(entity, entity.getPrimaryDocument().getAmount().subtract(paidAmount));
+    public List<BindDocumentResponse> findResponseByRelatedDocument(
+            DocumentEntity relatedDocument, DocumentTypeEntity primaryDocumentType) {
+        List<BindDocumentEntity> bindDocuments = bindDocumentRepository.findAll(Specification.allOf(
+                BindDocumentSpecifications.relatedDocument(relatedDocument),
+                BindDocumentSpecifications.primaryDocumentType(primaryDocumentType)));
+        BigDecimal relatedNotBindAmount = bindDocuments
+                .stream().map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add)
+                .negate().add(relatedDocument.getAmount());
+        return bindDocuments.stream().map(bindDocument -> {
+            DocumentEntity primaryDocument = bindDocument.getPrimaryDocument();
+            BigDecimal primaryNotBindAmount = bindDocumentRepository
+                    .findAll(BindDocumentSpecifications.primaryDocument(primaryDocument))
+                    .stream().map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .negate().add(primaryDocument.getAmount());
+            return bindDocumentMapper.toResponse(bindDocument, primaryNotBindAmount, relatedNotBindAmount);
         }).toList();
     }
 

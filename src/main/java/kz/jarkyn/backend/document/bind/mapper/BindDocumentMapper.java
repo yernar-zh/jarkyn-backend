@@ -11,5 +11,8 @@ import java.math.BigDecimal;
 
 @Mapper(config = BaseMapperConfig.class)
 public interface BindDocumentMapper extends RequestMapper<BindDocumentEntity, BindDocumentRequest> {
-    BindDocumentResponse toResponse(BindDocumentEntity entity, BigDecimal notPaidAmount);
+    BindDocumentResponse toResponse(
+            BindDocumentEntity entity,
+            BigDecimal primaryNotBindAmount,
+            BigDecimal relatedNotBindAmount);
 }

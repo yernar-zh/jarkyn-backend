@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 public interface BindDocumentResponse extends IdDto {
     DocumentResponse getPrimaryDocument();
     DocumentResponse getRelatedDocument();
-    BigDecimal getNotPaidAmount();
+    BigDecimal getPrimaryNotBindAmount();
+    BigDecimal getRelatedNotBindAmount();
     BigDecimal getAmount();
 }

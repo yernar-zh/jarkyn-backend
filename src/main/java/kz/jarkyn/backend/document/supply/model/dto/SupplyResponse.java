@@ -13,4 +13,3 @@ public interface SupplyResponse extends DocumentResponse {
     List<ItemResponse> getItems();
     List<BindDocumentResponse> getBindDocuments();
 }
-asd
