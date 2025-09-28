@@ -22,6 +22,8 @@ public class BindDocumentEntity extends AbstractEntity {
 
     private BigDecimal amount;
 
+    private Integer position;
+
     public DocumentEntity getPrimaryDocument() {
         return primaryDocument;
     }
@@ -44,5 +46,13 @@ public class BindDocumentEntity extends AbstractEntity {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }

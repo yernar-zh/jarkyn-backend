@@ -20,6 +20,20 @@ public class DocumentTypeService {
         return findByCode(DocumentTypeCode.PAYMENT_OUT);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isPaymentOut(DocumentTypeEntity documentType) {
+        return documentType.getCode().equals(DocumentTypeCode.PAYMENT_OUT.name());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isPaymentIn(DocumentTypeEntity documentType) {
+        return documentType.getCode().equals(DocumentTypeCode.PAYMENT_IN.name());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isPayment(DocumentTypeEntity documentType) {
+        return isPaymentIn(documentType) || isPaymentOut(documentType);
+    }
 
     @Transactional(readOnly = true)
     public DocumentTypeEntity findByCode(DocumentTypeCode code) {

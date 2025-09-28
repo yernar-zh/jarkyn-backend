@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
@@ -13,6 +14,7 @@ import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
 import kz.jarkyn.backend.document.bind.model.BindDocumentEntity_;
+import kz.jarkyn.backend.document.bind.model.dto.BindDocumentRequest;
 import kz.jarkyn.backend.document.bind.service.BindDocumentService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.*;
@@ -116,7 +118,7 @@ public class PaymentOutService {
     @Transactional
     public UUID createApi(PaymentOutRequest request) {
         PaymentOutEntity paymentOut = paymentOutMapper.toEntity(request);
-        paymentOut.setType(documentTypeService.findByCode(DocumentTypeService.DocumentTypeCode.PAYMENT_OUT));
+        paymentOut.setType(documentTypeService.findPaymentOut());
         if (Strings.isBlank(paymentOut.getName())) {
             paymentOut.setName(documentService.findNextName(paymentOut.getType()));
         } else {

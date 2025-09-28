@@ -58,6 +58,7 @@ CREATE TABLE bind_document
     primary_document_id UUID,
     related_document_id UUID,
     amount              DECIMAL,
+    position            INTEGER,
     CONSTRAINT pk_bind_document PRIMARY KEY (id)
 );
 
