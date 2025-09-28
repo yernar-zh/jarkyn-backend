@@ -14,5 +14,5 @@ import java.util.List;
 @Mapper(config = BaseMapperConfig.class)
 public interface SupplyMapper extends RequestMapper<SupplyEntity, SupplyRequest> {
     SupplyResponse toResponse(
-            SupplyEntity entity, List<ItemResponse> items, List<BindDocumentResponse> bindDocuments);
+            SupplyEntity entity, List<ItemResponse> items, List<BindDocumentResponse> paidDocuments);
 }

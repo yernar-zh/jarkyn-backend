@@ -11,5 +11,5 @@ import java.util.List;
 @Value.Immutable
 public interface SupplyResponse extends DocumentResponse {
     List<ItemResponse> getItems();
-    List<BindDocumentResponse> getBindDocuments();
+    List<BindDocumentResponse> getPaidDocuments();
 }

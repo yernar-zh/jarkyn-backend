@@ -80,9 +80,9 @@ public class SupplyService {
     public SupplyResponse findApiById(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<ItemResponse> items = itemService.findApiByDocument(supply);
-        List<BindDocumentResponse> bindDocuments = bindDocumentService
+        List<BindDocumentResponse> paidDocuments = bindDocumentService
                 .findResponseByRelatedDocument(supply, documentTypeService.findPaymentOut());
-        return supplyMapper.toResponse(supply, items, bindDocuments);
+        return supplyMapper.toResponse(supply, items, paidDocuments);
     }
 
     @Transactional(readOnly = true)
@@ -180,9 +180,9 @@ public class SupplyService {
     @Transactional
     public void delete(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        List<BindDocumentResponse> bindDocuments = bindDocumentService
+        List<BindDocumentResponse> paidDocuments = bindDocumentService
                 .findResponseByRelatedDocument(supply, documentTypeService.findPaymentOut());
-        if (!bindDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
+        if (!paidDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
         if (supply.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         supply.setDeleted(Boolean.TRUE);
         auditService.delete(supply);
