@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.document.payment.service;
+package kz.jarkyn.backend.document.expense.service;
 
 
 import jakarta.persistence.criteria.Expression;
@@ -13,21 +13,22 @@ import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
 import kz.jarkyn.backend.document.bind.model.BindDocumentEntity_;
-import kz.jarkyn.backend.document.bind.service.BindDocumentService;
-import kz.jarkyn.backend.document.core.service.DocumentTypeService;
-import kz.jarkyn.backend.document.payment.model.*;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
+import kz.jarkyn.backend.document.bind.service.BindDocumentService;
+import kz.jarkyn.backend.document.core.service.DocumentService;
+import kz.jarkyn.backend.document.core.service.DocumentTypeService;
+import kz.jarkyn.backend.document.expense.mapper.ExpenseMapper;
+import kz.jarkyn.backend.document.expense.model.ExpenseEntity;
+import kz.jarkyn.backend.document.expense.model.dto.ExpenseResponse;
+import kz.jarkyn.backend.document.expense.model.dto.ExpenseListResponse;
+import kz.jarkyn.backend.document.expense.model.dto.ExpenseRequest;
+import kz.jarkyn.backend.document.expense.repository.ExpenseRepository;
+import kz.jarkyn.backend.document.expense.model.ExpenseEntity_;
 import kz.jarkyn.backend.global.model.CoverageEntity;
 import kz.jarkyn.backend.global.model.CoverageEntity_;
-import kz.jarkyn.backend.party.model.*;
-import kz.jarkyn.backend.party.service.AccountService;
-import kz.jarkyn.backend.document.core.service.DocumentService;
-import kz.jarkyn.backend.document.payment.mapper.PaymentOutMapper;
-import kz.jarkyn.backend.document.payment.model.dto.PaymentOutListResponse;
-import kz.jarkyn.backend.document.payment.model.dto.PaymentOutResponse;
-import kz.jarkyn.backend.document.payment.model.dto.PaymentOutRequest;
-import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
 import kz.jarkyn.backend.operation.service.CashFlowService;
+import kz.jarkyn.backend.party.model.AccountEntity;
+import kz.jarkyn.backend.party.service.AccountService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +38,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class PaymentOutService {
-    private final PaymentOutRepository paymentOutRepository;
-    private final PaymentOutMapper paymentOutMapper;
+public class ExpenseService {
+    private final ExpenseRepository expenseRepository;
+    private final ExpenseMapper expenseMapper;
     private final BindDocumentService bindDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
@@ -48,9 +49,9 @@ public class PaymentOutService {
     private final CashFlowService cashFlowService;
     private final DocumentTypeService documentTypeService;
 
-    public PaymentOutService(
-            PaymentOutRepository paymentOutRepository,
-            PaymentOutMapper paymentOutMapper,
+    public ExpenseService(
+            ExpenseRepository expenseRepository,
+            ExpenseMapper expenseMapper,
             BindDocumentService bindDocumentService,
             DocumentService documentService,
             AuditService auditService,
@@ -59,8 +60,8 @@ public class PaymentOutService {
             CashFlowService cashFlowService,
             DocumentTypeService documentTypeService
     ) {
-        this.paymentOutRepository = paymentOutRepository;
-        this.paymentOutMapper = paymentOutMapper;
+        this.expenseRepository = expenseRepository;
+        this.expenseMapper = expenseMapper;
         this.bindDocumentService = bindDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
@@ -71,18 +72,20 @@ public class PaymentOutService {
     }
 
     @Transactional(readOnly = true)
-    public PaymentOutResponse findApiById(UUID id) {
-        PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        List<BindDocumentResponse> bindDocuments = bindDocumentService.findResponseByPrimaryDocument(paymentOut);
-        return paymentOutMapper.toResponse(paymentOut, bindDocuments);
+    public ExpenseResponse findApiById(UUID id) {
+        ExpenseEntity expense = expenseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        List<BindDocumentResponse> bindDocuments = bindDocumentService.findResponseByPrimaryDocument(expense);
+        return expenseMapper.toResponse(expense, bindDocuments);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<PaymentOutListResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaAttributes<PaymentOutEntity> attributes = documentService
-                .<PaymentOutEntity>generateCriteriaAttributesBuilderFor()
-                .addReference("account", (root) -> root.get(PaymentOutEntity_.account))
-                .add("receiptNumber", (root) -> root.get(PaymentOutEntity_.receiptNumber))
+    public PageResponse<ExpenseListResponse> findApiByFilter(QueryParams queryParams) {
+        CriteriaAttributes<ExpenseEntity> attributes = documentService
+                .<ExpenseEntity>generateCriteriaAttributesBuilderFor()
+                .addReference("account", (root) -> root.get(ExpenseEntity_.account))
+                .add("receiptNumber", (root) -> root.get(ExpenseEntity_.receiptNumber))
+                .addEnumType("itemOfExpenditure", (root) -> root.get(ExpenseEntity_.itemOfExpenditure))
+                .add("purpose", (root) -> root.get(ExpenseEntity_.purpose))
                 .add("attachedAmount", (root, query, cb, map) -> {
                     Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
                     Root<BindDocumentEntity> bindDocumentRoot = subQuery.from(BindDocumentEntity.class);
@@ -105,63 +108,63 @@ public class PaymentOutService {
                 .add("notAttachedAmount", (root, query, cb, map) -> cb.diff(
                         (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("attachedAmount")))
                 .build();
-        Search<PaymentOutListResponse> search = searchFactory.createCriteriaSearch(
-                PaymentOutListResponse.class, List.of("name", "counterparty.name"), QueryParams.Sort.MOMENT_DESC,
-                PaymentOutEntity.class, attributes);
+        Search<ExpenseListResponse> search = searchFactory.createCriteriaSearch(
+                ExpenseListResponse.class, List.of("name", "counterparty.name"), QueryParams.Sort.MOMENT_DESC,
+                ExpenseEntity.class, attributes);
         return search.getResult(queryParams);
     }
 
     @Transactional
-    public UUID createApi(PaymentOutRequest request) {
-        PaymentOutEntity paymentOut = paymentOutMapper.toEntity(request);
-        paymentOut.setType(documentTypeService.findPaymentOut());
-        if (Strings.isBlank(paymentOut.getName())) {
-            paymentOut.setName(documentService.findNextName(paymentOut.getType()));
+    public UUID createApi(ExpenseRequest request) {
+        ExpenseEntity expense = expenseMapper.toEntity(request);
+        expense.setType(documentTypeService.findExpense());
+        if (Strings.isBlank(expense.getName())) {
+            expense.setName(documentService.findNextName(expense.getType()));
         } else {
-            documentService.validateName(paymentOut);
+            documentService.validateName(expense);
         }
-        paymentOut.setDeleted(false);
-        paymentOut.setCommited(false);
-        paymentOutRepository.save(paymentOut);
-        auditService.saveEntity(paymentOut);
-        bindDocumentService.save(paymentOut, request.getBindDocuments());
-        return paymentOut.getId();
+        expense.setDeleted(false);
+        expense.setCommited(false);
+        expenseRepository.save(expense);
+        auditService.saveEntity(expense);
+        bindDocumentService.save(expense, request.getBindDocuments());
+        return expense.getId();
     }
 
     @Transactional
-    public void editApi(UUID id, PaymentOutRequest request) {
-        PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        documentService.validateName(paymentOut);
-        paymentOutMapper.editEntity(paymentOut, request);
-        auditService.saveEntity(paymentOut);
-        bindDocumentService.save(paymentOut, request.getBindDocuments());
+    public void editApi(UUID id, ExpenseRequest request) {
+        ExpenseEntity expense = expenseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        documentService.validateName(expense);
+        expenseMapper.editEntity(expense, request);
+        auditService.saveEntity(expense);
+        bindDocumentService.save(expense, request.getBindDocuments());
     }
 
     @Transactional
     public void commit(UUID id) {
-        PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        paymentOut.setCommited(Boolean.TRUE);
-        auditService.commit(paymentOut);
+        ExpenseEntity expense = expenseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        expense.setCommited(Boolean.TRUE);
+        auditService.commit(expense);
         AccountEntity account = accountService.findOrCreateForCounterparty(
-                paymentOut.getOrganization(), paymentOut.getCounterparty(), paymentOut.getCurrency());
-        cashFlowService.create(paymentOut, account, paymentOut.getAmount().negate());
-        cashFlowService.create(paymentOut, paymentOut.getAccount(), paymentOut.getAmount().negate());
+                expense.getOrganization(), expense.getCounterparty(), expense.getCurrency());
+        cashFlowService.create(expense, account, expense.getAmount().negate());
+        cashFlowService.create(expense, expense.getAccount(), expense.getAmount().negate());
     }
 
     @Transactional
     public void undoCommit(UUID id) {
-        PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        paymentOut.setCommited(Boolean.FALSE);
-        auditService.undoCommit(paymentOut);
-        cashFlowService.delete(paymentOut);
+        ExpenseEntity expense = expenseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        expense.setCommited(Boolean.FALSE);
+        auditService.undoCommit(expense);
+        cashFlowService.delete(expense);
     }
 
     @Transactional
     public void delete(UUID id) {
-        PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (paymentOut.getCommited()) ExceptionUtils.throwCommitedDeleteException();
-        paymentOut.setDeleted(Boolean.TRUE);
-        auditService.delete(paymentOut);
-        bindDocumentService.save(paymentOut, List.of());
+        ExpenseEntity expense = expenseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (expense.getCommited()) ExceptionUtils.throwCommitedDeleteException();
+        expense.setDeleted(Boolean.TRUE);
+        auditService.delete(expense);
+        bindDocumentService.save(expense, List.of());
     }
 }

@@ -140,7 +140,10 @@ CREATE TABLE document_type
 
 CREATE TABLE expense
 (
-    id UUID NOT NULL,
+    id                     UUID NOT NULL,
+    receipt_number         VARCHAR(255),
+    item_of_expenditure_id UUID,
+    purpose                VARCHAR(255),
     CONSTRAINT pk_expense PRIMARY KEY (id)
 );
 
@@ -237,22 +240,9 @@ CREATE TABLE party
 
 CREATE TABLE payment_out
 (
-    id                     UUID NOT NULL,
-    receipt_number         VARCHAR(255),
-    item_of_expenditure_id UUID,
-    purpose                VARCHAR(255),
+    id             UUID NOT NULL,
+    receipt_number VARCHAR(255),
     CONSTRAINT pk_payment_out PRIMARY KEY (id)
-);
-
-CREATE TABLE related_expenses
-(
-    id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    expense_id       UUID,
-    document_id      UUID,
-    amount           DECIMAL,
-    CONSTRAINT pk_related_expenses PRIMARY KEY (id)
 );
 
 CREATE TABLE role
@@ -389,6 +379,9 @@ ALTER TABLE document
 ALTER TABLE expense
     ADD CONSTRAINT FK_EXPENSE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
 
+ALTER TABLE expense
+    ADD CONSTRAINT FK_EXPENSE_ON_ITEM_OF_EXPENDITURE FOREIGN KEY (item_of_expenditure_id) REFERENCES item_of_expenditure (id);
+
 ALTER TABLE good_attribute
     ADD CONSTRAINT FK_GOOD_ATTRIBUTE_ON_ATTRIBUTE FOREIGN KEY (attribute_id) REFERENCES attribute (id);
 
@@ -415,15 +408,6 @@ ALTER TABLE organization
 
 ALTER TABLE payment_out
     ADD CONSTRAINT FK_PAYMENT_OUT_ON_ID FOREIGN KEY (id) REFERENCES document (id);
-
-ALTER TABLE payment_out
-    ADD CONSTRAINT FK_PAYMENT_OUT_ON_ITEM_OF_EXPENDITURE FOREIGN KEY (item_of_expenditure_id) REFERENCES item_of_expenditure (id);
-
-ALTER TABLE related_expenses
-    ADD CONSTRAINT FK_RELATED_EXPENSES_ON_DOCUMENT FOREIGN KEY (document_id) REFERENCES document (id);
-
-ALTER TABLE related_expenses
-    ADD CONSTRAINT FK_RELATED_EXPENSES_ON_EXPENSE FOREIGN KEY (expense_id) REFERENCES expense (id);
 
 ALTER TABLE selling_price
     ADD CONSTRAINT FK_SELLING_PRICE_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);

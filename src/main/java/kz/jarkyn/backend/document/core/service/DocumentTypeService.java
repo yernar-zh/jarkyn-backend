@@ -21,6 +21,11 @@ public class DocumentTypeService {
     }
 
     @Transactional(readOnly = true)
+    public DocumentTypeEntity findExpense() {
+        return findByCode(DocumentTypeCode.PAYMENT_OUT);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isPaymentOut(DocumentTypeEntity documentType) {
         return documentType.getCode().equals(DocumentTypeCode.PAYMENT_OUT.name());
     }
@@ -41,6 +46,6 @@ public class DocumentTypeService {
     }
 
     public enum DocumentTypeCode {
-        SALE, SUPPLY, PAYMENT_IN, PAYMENT_OUT
+        SALE, SUPPLY, PAYMENT_IN, PAYMENT_OUT, EXPENSE;
     }
 }
