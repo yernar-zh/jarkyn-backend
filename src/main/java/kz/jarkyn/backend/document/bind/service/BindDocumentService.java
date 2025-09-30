@@ -3,8 +3,6 @@ package kz.jarkyn.backend.document.bind.service;
 
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.DataValidationException;
-import kz.jarkyn.backend.core.exception.ExceptionUtils;
-import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.document.bind.specifications.BindDocumentSpecifications;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
