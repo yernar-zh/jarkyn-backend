@@ -253,7 +253,10 @@ public class AuditService {
                             .put("name", document.getName())
                             .put("deleted", document.getDeleted())
                             .set("type", objectMapper.createObjectNode()
-                                    .put("id", String.valueOf(document.getType().getId())));
+                                    .put("id", String.valueOf(document.getType().getId()))
+                                    .put("name", document.getType().getName())
+                                    .put("code", document.getType().getCode())
+                                    .put("archived", document.getType().getArchived()));
                 } else {
                     throw new RuntimeException("Unsupported field type: " + fieldValueObj.getClass());
                 }

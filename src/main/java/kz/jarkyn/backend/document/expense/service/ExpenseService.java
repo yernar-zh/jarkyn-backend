@@ -27,8 +27,6 @@ import kz.jarkyn.backend.document.expense.model.ExpenseEntity_;
 import kz.jarkyn.backend.global.model.CoverageEntity;
 import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.operation.service.CashFlowService;
-import kz.jarkyn.backend.party.model.AccountEntity;
-import kz.jarkyn.backend.party.service.AccountService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +43,6 @@ public class ExpenseService {
     private final DocumentService documentService;
     private final AuditService auditService;
     private final SearchFactory searchFactory;
-    private final AccountService accountService;
     private final CashFlowService cashFlowService;
     private final DocumentTypeService documentTypeService;
 
@@ -56,7 +53,6 @@ public class ExpenseService {
             DocumentService documentService,
             AuditService auditService,
             SearchFactory searchFactory,
-            AccountService accountService,
             CashFlowService cashFlowService,
             DocumentTypeService documentTypeService
     ) {
@@ -66,7 +62,6 @@ public class ExpenseService {
         this.documentService = documentService;
         this.auditService = auditService;
         this.searchFactory = searchFactory;
-        this.accountService = accountService;
         this.cashFlowService = cashFlowService;
         this.documentTypeService = documentTypeService;
     }
@@ -82,7 +77,6 @@ public class ExpenseService {
     public PageResponse<ExpenseListResponse> findApiByFilter(QueryParams queryParams) {
         CriteriaAttributes<ExpenseEntity> attributes = documentService
                 .<ExpenseEntity>generateCriteriaAttributesBuilderFor()
-                .addReference("account", (root) -> root.get(ExpenseEntity_.account))
                 .add("receiptNumber", (root) -> root.get(ExpenseEntity_.receiptNumber))
                 .addEnumType("itemOfExpenditure", (root) -> root.get(ExpenseEntity_.itemOfExpenditure))
                 .add("purpose", (root) -> root.get(ExpenseEntity_.purpose))
@@ -145,10 +139,7 @@ public class ExpenseService {
         ExpenseEntity expense = expenseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         expense.setCommited(Boolean.TRUE);
         auditService.commit(expense);
-        AccountEntity account = accountService.findOrCreateForCounterparty(
-                expense.getOrganization(), expense.getCounterparty(), expense.getCurrency());
-        cashFlowService.create(expense, account, expense.getAmount().negate());
-        cashFlowService.create(expense, expense.getAccount(), expense.getAmount().negate());
+        cashFlowService.create(expense, expense.getAccount(), expense.getAmount());
     }
 
     @Transactional

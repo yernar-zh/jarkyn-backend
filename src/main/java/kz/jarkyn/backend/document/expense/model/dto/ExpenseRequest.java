@@ -14,7 +14,6 @@ import java.util.List;
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableExpenseRequest.Builder.class)
 public interface ExpenseRequest extends DocumentRequest {
-    IdDto getAccount();
     @Nullable String getReceiptNumber();
     IdDto getItemOfExpenditure();
     @Nullable String getPurpose();
