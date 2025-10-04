@@ -53,4 +53,26 @@ public class CoverageService {
                 CoverageEntity.class, attributes);
         return search.getResult(queryParams);
     }
+
+    @Transactional(readOnly = true)
+    public CoverageEntity findFull() {
+        return coverageRepository.findByCode(Code.FULL.name())
+                .orElseThrow(ExceptionUtils.entityNotFound());
+    }
+
+    @Transactional(readOnly = true)
+    public CoverageEntity findPartial() {
+        return coverageRepository.findByCode(Code.PARTIAL.name())
+                .orElseThrow(ExceptionUtils.entityNotFound());
+    }
+
+    @Transactional(readOnly = true)
+    public CoverageEntity findNone() {
+        return coverageRepository.findByCode(Code.NONE.name())
+                .orElseThrow(ExceptionUtils.entityNotFound());
+    }
+
+    private enum Code {
+        FULL, PARTIAL, NONE
+    }
 }

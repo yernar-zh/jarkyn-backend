@@ -1,3 +1,20 @@
 spring:
   application:
     name: jarkyn-backend
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: 123qwe123
+
+opensearch:
+  scheme: https
+  host: localhost
+  port: 9200
+  username: admin
+  password: AS@47845assds
+
+rabbitmq:
+  queue:
+    supply-search: supply-search-queue

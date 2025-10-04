@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
+import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
@@ -34,6 +35,7 @@ import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.document.supply.mapper.SupplyMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +55,7 @@ public class SupplyService {
     private final CashFlowService cashFlowService;
     private final AccountService accountService;
     private final DocumentTypeService documentTypeService;
+    private final RabbitTemplate rabbitTemplate;
 
     public SupplyService(
             SupplyRepository supplyRepository,
@@ -63,7 +66,9 @@ public class SupplyService {
             AuditService auditService,
             SearchFactory searchFactory,
             CashFlowService cashFlowService,
-            AccountService accountService, DocumentTypeService documentTypeService) {
+            AccountService accountService,
+            DocumentTypeService documentTypeService,
+            RabbitTemplate rabbitTemplate) {
         this.supplyRepository = supplyRepository;
         this.supplyMapper = supplyMapper;
         this.itemService = itemService;
@@ -74,6 +79,7 @@ public class SupplyService {
         this.cashFlowService = cashFlowService;
         this.accountService = accountService;
         this.documentTypeService = documentTypeService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -143,6 +149,7 @@ public class SupplyService {
         supplyRepository.save(supply);
         auditService.saveEntity(supply);
         itemService.saveApi(supply, request.getItems());
+        rabbitTemplate.convertAndSend(RabbitRoutingKeys.SUPPLY_INDEX, supply.getId());
         return supply.getId();
     }
 
@@ -152,6 +159,7 @@ public class SupplyService {
         documentService.validateName(supply);
         supplyMapper.editEntity(supply, request);
         auditService.saveEntity(supply);
+        rabbitTemplate.convertAndSend("main-exchange", RabbitRoutingKeys.SUPPLY_INDEX, supply.getId());
         itemService.saveApi(supply, request.getItems());
     }
 

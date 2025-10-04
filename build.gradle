@@ -21,6 +21,8 @@ repositories {
 dependencies {
     // Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
 
     // Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -47,24 +49,17 @@ dependencies {
     // Image processioning
     implementation 'net.coobird:thumbnailator:0.4.20'
 
-//    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+    //Excel
     implementation 'org.jxls:jxls-poi:2.14.0'
 
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.apache.commons:commons-lang3:3.18.0'
+    // Message Broker
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
     //Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.opentable.components:otj-pg-embedded:1.1.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
-
-//flyway {
-//    url = 'jdbc:h2:file:./local/h2;AUTO_SERVER=TRUE'
-//    user = 'admin'
-//    password = '123qwe123'
-//    schemas = ['public']
-//}
 
 compileJava {
     options.compilerArgs += [
