@@ -159,7 +159,7 @@ public class SupplyService {
         documentService.validateName(supply);
         supplyMapper.editEntity(supply, request);
         auditService.saveEntity(supply);
-        rabbitTemplate.convertAndSend("main-exchange", RabbitRoutingKeys.SUPPLY_INDEX, supply.getId());
+        rabbitTemplate.convertAndSend(RabbitRoutingKeys.SUPPLY_INDEX, supply.getId());
         itemService.saveApi(supply, request.getItems());
     }
 

@@ -127,6 +127,30 @@ CREATE TABLE document
     CONSTRAINT pk_document PRIMARY KEY (id)
 );
 
+CREATE TABLE document_search
+(
+    id               UUID NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
+    type_id          UUID,
+    organization_id  UUID,
+    warehouse_id     UUID,
+    account_id       UUID,
+    counterparty_id  UUID,
+    name             VARCHAR(255),
+    moment           TIMESTAMP WITHOUT TIME ZONE,
+    currency_id      UUID,
+    exchange_rate    DECIMAL,
+    amount           DECIMAL,
+    comment          VARCHAR(255),
+    deleted          BOOLEAN,
+    commited         BOOLEAN,
+    paid_amount      DECIMAL,
+    not_paid_amount  DECIMAL,
+    paid_coverage_id UUID,
+    CONSTRAINT pk_document_search PRIMARY KEY (id)
+);
+
 CREATE TABLE document_type
 (
     id               UUID NOT NULL,
@@ -375,6 +399,27 @@ ALTER TABLE document
 
 ALTER TABLE document
     ADD CONSTRAINT FK_DOCUMENT_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
+
+ALTER TABLE document_search
+    ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
+
+ALTER TABLE document_search
+    ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
+
+ALTER TABLE document_search
+    ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_CURRENCY FOREIGN KEY (currency_id) REFERENCES currency (id);
+
+ALTER TABLE document_search
+    ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organization (id);
+
+ALTER TABLE document_search
+    ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_PAIDCOVERAGE FOREIGN KEY (paid_coverage_id) REFERENCES coverage (id);
+
+ALTER TABLE document_search
+    ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_TYPE FOREIGN KEY (type_id) REFERENCES document_type (id);
+
+ALTER TABLE document_search
+    ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_WAREHOUSE FOREIGN KEY (warehouse_id) REFERENCES warehouse (id);
 
 ALTER TABLE expense
     ADD CONSTRAINT FK_EXPENSE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
