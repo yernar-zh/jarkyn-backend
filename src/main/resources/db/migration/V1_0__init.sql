@@ -148,6 +148,9 @@ CREATE TABLE document_search
     paid_amount      DECIMAL,
     not_paid_amount  DECIMAL,
     paid_coverage_id UUID,
+    search           VARCHAR(255),
+    discount         DECIMAL,
+    surcharge        DECIMAL,
     CONSTRAINT pk_document_search PRIMARY KEY (id)
 );
 

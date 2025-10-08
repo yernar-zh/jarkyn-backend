@@ -2,9 +2,6 @@
 package kz.jarkyn.backend.document.supply.service;
 
 
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
@@ -13,21 +10,17 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.document.bind.model.BindDocumentEntity_;
+import kz.jarkyn.backend.document.core.model.DocumentSearchEntity;
+import kz.jarkyn.backend.document.core.model.DocumentSearchEntity_;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
-import kz.jarkyn.backend.document.payment.model.PaymentOutEntity_;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
-import kz.jarkyn.backend.global.model.CoverageEntity;
-import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.core.service.ItemService;
-import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
 import kz.jarkyn.backend.document.bind.service.BindDocumentService;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
-import kz.jarkyn.backend.document.supply.model.SupplyEntity_;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
@@ -39,7 +32,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,45 +85,30 @@ public class SupplyService {
 
     @Transactional(readOnly = true)
     public PageResponse<SupplyListResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaAttributes<SupplyEntity> attributes = CriteriaAttributes.<SupplyEntity>builder()
-                .add("id", (root) -> root.get(SupplyEntity_.id))
-                .addEnumType("type", (root) -> root.get(PaymentOutEntity_.type))
-                .add("name", (root) -> root.get(SupplyEntity_.name))
-                .addReference("organization", (root) -> root.get(SupplyEntity_.organization))
-                .add("moment", (root) -> root.get(SupplyEntity_.moment))
-                .addEnumType("currency", (root) -> root.get(SupplyEntity_.currency))
-                .add("exchangeRate", (root) -> root.get(SupplyEntity_.exchangeRate))
-                .add("amount", (root) -> root.get(SupplyEntity_.amount))
-                .add("deleted", (root) -> root.get(SupplyEntity_.deleted))
-                .add("commited", (root) -> root.get(SupplyEntity_.commited))
-                .add("comment", (root) -> root.get(SupplyEntity_.comment))
-                .addReference("warehouse", (root) -> root.get(SupplyEntity_.warehouse))
-                .addReference("counterparty", (root) -> root.get(SupplyEntity_.counterparty))
-                .add("paidAmount", (root, query, cb, map) -> {
-                    Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
-                    Root<BindDocumentEntity> bindDocumentRoot = subQuery.from(BindDocumentEntity.class);
-                    subQuery.select(cb.coalesce(cb.sum(bindDocumentRoot.get(BindDocumentEntity_.amount)), BigDecimal.ZERO));
-                    subQuery.where(cb.equal(bindDocumentRoot.get(BindDocumentEntity_.relatedDocument), root));
-                    return subQuery;
-                })
-                .add("paidCoverage.id", (root, query, cb, map) -> {
-                    Expression<Number> amount = (Expression<Number>) map.get("amount");
-                    Expression<Number> paidAmount = (Expression<Number>) map.get("paidAmount");
-                    Expression<String> coverageCode = cb.<String>selectCase()
-                            .when(cb.equal(amount, paidAmount), CoverageEntity.FULL)
-                            .when(cb.equal(paidAmount, 0), CoverageEntity.NONE)
-                            .otherwise(CoverageEntity.PARTIAL);
-                    Subquery<UUID> subQuery = query.subquery(UUID.class);
-                    Root<CoverageEntity> coverageRoot = subQuery.from(CoverageEntity.class);
-                    return subQuery.select(coverageRoot.get(CoverageEntity_.id))
-                            .where(cb.equal(coverageRoot.get(CoverageEntity_.code), coverageCode));
-                })
-                .add("notPaidAmount", (root, query, cb, map) -> cb.diff(
-                        (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("paidAmount")))
+        CriteriaAttributes<DocumentSearchEntity> attributes = CriteriaAttributes.<DocumentSearchEntity>builder()
+                .add("id", (root) -> root.get(DocumentSearchEntity_.id))
+                .addEnumType("type", (root) -> root.get(DocumentSearchEntity_.type))
+                .add("name", (root) -> root.get(DocumentSearchEntity_.name))
+                .addReference("organization", (root) -> root.get(DocumentSearchEntity_.organization))
+                .addReference("warehouse", (root) -> root.get(DocumentSearchEntity_.warehouse))
+                .addReference("counterparty", (root) -> root.get(DocumentSearchEntity_.counterparty))
+                .add("moment", (root) -> root.get(DocumentSearchEntity_.moment))
+                .addEnumType("currency", (root) -> root.get(DocumentSearchEntity_.currency))
+                .add("exchangeRate", (root) -> root.get(DocumentSearchEntity_.exchangeRate))
+                .add("amount", (root) -> root.get(DocumentSearchEntity_.amount))
+                .add("deleted", (root) -> root.get(DocumentSearchEntity_.deleted))
+                .add("commited", (root) -> root.get(DocumentSearchEntity_.commited))
+                .add("comment", (root) -> root.get(DocumentSearchEntity_.comment))
+                .add("paidAmount", (root) -> root.get(DocumentSearchEntity_.paidAmount))
+                .add("notPaidAmount", (root) -> root.get(DocumentSearchEntity_.notPaidAmount))
+                .addEnumType("paidCoverage", (root) -> root.get(DocumentSearchEntity_.paidCoverage))
+                .add("discount", (root) -> root.get(DocumentSearchEntity_.discount))
+                .add("surcharge", (root) -> root.get(DocumentSearchEntity_.surcharge))
+                .add("search", (root) -> root.get(DocumentSearchEntity_.search))
                 .build();
         Search<SupplyListResponse> search = searchFactory.createCriteriaSearch(
                 SupplyListResponse.class, List.of("name", "counterparty.name"), QueryParams.Sort.MOMENT_DESC,
-                SupplyEntity.class, attributes);
+                DocumentSearchEntity.class, attributes);
         return search.getResult(queryParams);
     }
 
