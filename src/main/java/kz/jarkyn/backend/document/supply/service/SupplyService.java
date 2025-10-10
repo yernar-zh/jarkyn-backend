@@ -3,15 +3,13 @@ package kz.jarkyn.backend.document.supply.service;
 
 
 import kz.jarkyn.backend.audit.service.AuditService;
+import kz.jarkyn.backend.core.config.AppRabbitTemplate;
 import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.core.search.CriteriaAttributes;
-import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.document.core.model.DocumentSearchEntity;
-import kz.jarkyn.backend.document.core.model.DocumentSearchEntity_;
+import kz.jarkyn.backend.document.core.service.DocumentSearchService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
 import kz.jarkyn.backend.party.model.*;
@@ -31,6 +29,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,11 +43,11 @@ public class SupplyService {
     private final BindDocumentService bindDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
-    private final SearchFactory searchFactory;
     private final CashFlowService cashFlowService;
     private final AccountService accountService;
     private final DocumentTypeService documentTypeService;
-    private final RabbitTemplate rabbitTemplate;
+    private final DocumentSearchService documentSearchService;
+    private final AppRabbitTemplate appRabbitTemplate;
 
     public SupplyService(
             SupplyRepository supplyRepository,
@@ -56,22 +56,21 @@ public class SupplyService {
             BindDocumentService bindDocumentService,
             DocumentService documentService,
             AuditService auditService,
-            SearchFactory searchFactory,
             CashFlowService cashFlowService,
             AccountService accountService,
             DocumentTypeService documentTypeService,
-            RabbitTemplate rabbitTemplate) {
+            DocumentSearchService documentSearchService, AppRabbitTemplate appRabbitTemplate) {
         this.supplyRepository = supplyRepository;
         this.supplyMapper = supplyMapper;
         this.itemService = itemService;
         this.bindDocumentService = bindDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
-        this.searchFactory = searchFactory;
         this.cashFlowService = cashFlowService;
         this.accountService = accountService;
         this.documentTypeService = documentTypeService;
-        this.rabbitTemplate = rabbitTemplate;
+        this.documentSearchService = documentSearchService;
+        this.appRabbitTemplate = appRabbitTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -85,31 +84,7 @@ public class SupplyService {
 
     @Transactional(readOnly = true)
     public PageResponse<SupplyListResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaAttributes<DocumentSearchEntity> attributes = CriteriaAttributes.<DocumentSearchEntity>builder()
-                .add("id", (root) -> root.get(DocumentSearchEntity_.id))
-                .addEnumType("type", (root) -> root.get(DocumentSearchEntity_.type))
-                .add("name", (root) -> root.get(DocumentSearchEntity_.name))
-                .addReference("organization", (root) -> root.get(DocumentSearchEntity_.organization))
-                .addReference("warehouse", (root) -> root.get(DocumentSearchEntity_.warehouse))
-                .addReference("counterparty", (root) -> root.get(DocumentSearchEntity_.counterparty))
-                .add("moment", (root) -> root.get(DocumentSearchEntity_.moment))
-                .addEnumType("currency", (root) -> root.get(DocumentSearchEntity_.currency))
-                .add("exchangeRate", (root) -> root.get(DocumentSearchEntity_.exchangeRate))
-                .add("amount", (root) -> root.get(DocumentSearchEntity_.amount))
-                .add("deleted", (root) -> root.get(DocumentSearchEntity_.deleted))
-                .add("commited", (root) -> root.get(DocumentSearchEntity_.commited))
-                .add("comment", (root) -> root.get(DocumentSearchEntity_.comment))
-                .add("paidAmount", (root) -> root.get(DocumentSearchEntity_.paidAmount))
-                .add("notPaidAmount", (root) -> root.get(DocumentSearchEntity_.notPaidAmount))
-                .addEnumType("paidCoverage", (root) -> root.get(DocumentSearchEntity_.paidCoverage))
-                .add("discount", (root) -> root.get(DocumentSearchEntity_.discount))
-                .add("surcharge", (root) -> root.get(DocumentSearchEntity_.surcharge))
-                .add("search", (root) -> root.get(DocumentSearchEntity_.search))
-                .build();
-        Search<SupplyListResponse> search = searchFactory.createCriteriaSearch(
-                SupplyListResponse.class, List.of("name", "counterparty.name"), QueryParams.Sort.MOMENT_DESC,
-                DocumentSearchEntity.class, attributes);
-        return search.getResult(queryParams);
+        return documentSearchService.findApiByFilter(SupplyListResponse.class, queryParams, documentTypeService.findSupply());
     }
 
     @Transactional
@@ -125,8 +100,8 @@ public class SupplyService {
         supply.setCommited(false);
         supplyRepository.save(supply);
         auditService.saveEntity(supply);
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.SUPPLY_SEARCH, supply.getId());
         itemService.saveApi(supply, request.getItems());
-        rabbitTemplate.convertAndSend(RabbitRoutingKeys.SUPPLY_INDEX, supply.getId());
         return supply.getId();
     }
 
@@ -136,7 +111,7 @@ public class SupplyService {
         documentService.validateName(supply);
         supplyMapper.editEntity(supply, request);
         auditService.saveEntity(supply);
-        rabbitTemplate.convertAndSend(RabbitRoutingKeys.SUPPLY_INDEX, supply.getId());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.SUPPLY_SEARCH, supply.getId());
         itemService.saveApi(supply, request.getItems());
     }
 

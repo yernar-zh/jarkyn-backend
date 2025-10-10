@@ -36,7 +36,7 @@ public class RabbitConfig {
         return BindingBuilder
                 .bind(supplyIndexQueue)
                 .to(exchange)
-                .with(RabbitRoutingKeys.SUPPLY_INDEX);
+                .with(RabbitRoutingKeys.SUPPLY_SEARCH);
     }
 
     @Bean

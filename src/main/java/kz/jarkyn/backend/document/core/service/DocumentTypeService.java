@@ -26,6 +26,11 @@ public class DocumentTypeService {
     }
 
     @Transactional(readOnly = true)
+    public DocumentTypeEntity findSupply() {
+        return findByCode(DocumentTypeCode.SUPPLY);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isPaymentOut(DocumentTypeEntity documentType) {
         return documentType.getCode().equals(DocumentTypeCode.PAYMENT_OUT.name());
     }

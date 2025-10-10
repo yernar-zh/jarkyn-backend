@@ -21,11 +21,21 @@ public class SearchFactory {
         this.entityManager = entityManager;
     }
 
-    public <R, S, E> CriteriaSearch<R, E> createCriteriaSearch(
+    public <R, E> CriteriaSearch<R, E> createCriteriaSearch(
             Class<R> responseClass, List<String> searchFields, QueryParams.Sort defaultSort,
             Class<E> entityClass, CriteriaAttributes<E> criteriaAttributes) {
         return new CriteriaSearch<>(entityManager,
-                responseClass, entityClass, criteriaAttributes.getAttributes(), searchFields, defaultSort);
+                responseClass, entityClass, criteriaAttributes.getAttributes(), List.of(),
+                searchFields, defaultSort);
+
+    }
+
+    public <R, E> CriteriaSearch<R, E> createCriteriaSearch(
+            Class<R> responseClass, List<String> searchFields, QueryParams.Sort defaultSort,
+            Class<E> entityClass, CriteriaAttributes<E> criteriaAttributes, CriteriaFilters<E> filters) {
+        return new CriteriaSearch<>(entityManager,
+                responseClass, entityClass, criteriaAttributes.getAttributes(), filters.getFilters(),
+                searchFields, defaultSort);
 
     }
 

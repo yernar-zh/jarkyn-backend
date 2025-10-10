@@ -9,7 +9,6 @@ import kz.jarkyn.backend.core.model.dto.ImmutablePageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.utils.PrefixSearch;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 
 import java.util.*;
@@ -22,6 +21,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
     private final Class<R> responseClass;
     private final Class<E> entityClass;
     private final Map<String, CriteriaAttributes.CriteriaAttribute<E>> attributes;
+    private final List<CriteriaFilters.CriteriaFilter<E>> filters;
     private final List<String> searchByAttributeNames;
     private final QueryParams.Sort defaultSort;
 
@@ -30,6 +30,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
             Class<R> responseClass,
             Class<E> entityClass,
             Map<String, CriteriaAttributes.CriteriaAttribute<E>> attributes,
+            List<CriteriaFilters.CriteriaFilter<E>> filters,
             List<String> searchByAttributeNames,
             QueryParams.Sort defaultSort
     ) {
@@ -37,6 +38,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
         this.responseClass = responseClass;
         this.entityClass = entityClass;
         this.attributes = attributes;
+        this.filters = filters;
         this.searchByAttributeNames = searchByAttributeNames;
         this.defaultSort = defaultSort;
     }
@@ -62,7 +64,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
                 .map(entry -> entry.getValue().alias(entry.getKey()))
                 .collect(Collectors.toList());
         query.multiselect(selections);
-        List<Predicate> wherePredicates = getWherePredicates(expressions, queryParams, cb);
+        List<Predicate> wherePredicates = getWherePredicates(expressions, queryParams, root, query, cb, expressions);
         if (!wherePredicates.isEmpty()) {
             query.where(wherePredicates.toArray(new Predicate[0]));
         }
@@ -101,7 +103,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
                     return cb.sum((Expression<Number>) entry.getValue()).alias(entry.getKey());
                 });
         query.multiselect(Stream.concat(Stream.of(cb.count(cb.conjunction()).alias("totalCount")), selections).toList());
-        List<Predicate> wherePredicates = getWherePredicates(expressions, queryParams, cb);
+        List<Predicate> wherePredicates = getWherePredicates(expressions, queryParams, root, query, cb, expressions);
         if (!wherePredicates.isEmpty()) {
             query.where(wherePredicates.toArray(new Predicate[0]));
         }
@@ -117,7 +119,8 @@ public class CriteriaSearch<R, E> implements Search<R> {
 
 
     private List<Predicate> getWherePredicates(
-            Map<String, Expression<?>> expressions, QueryParams queryParams, CriteriaBuilder cb) {
+            Map<String, Expression<?>> expressions, QueryParams queryParams,
+            Root<E> root, CriteriaQuery<Tuple> query, CriteriaBuilder cb, Map<String, Expression<?>> map) {
         List<Predicate> filterPredicates = queryParams.getFilters().stream().map(filter -> {
             Expression<?> expression = expressions.get(filter.getName());
             if (expression == null) {
@@ -164,8 +167,10 @@ public class CriteriaSearch<R, E> implements Search<R> {
                         .map(expression -> cb.like(cb.lower(expression), pattern))
                         .reduce(cb::or).orElse(cb.conjunction()))
                 .toList();
+        List<Predicate> queryPredicates = filters.stream().map(filter -> filter.get(root, query, cb, expressions)).toList();
 
-        return Stream.concat(filterPredicates.stream(), searchPredicates.stream()).toList();
+        return Stream.of(filterPredicates.stream(), searchPredicates.stream(), queryPredicates.stream())
+                .flatMap(Function.identity()).toList();
     }
 
     private List<Order> getOrders(

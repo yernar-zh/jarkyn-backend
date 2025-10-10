@@ -101,7 +101,7 @@ public class GoodService {
                 new QueryParams.Sort("path", QueryParams.Sort.Type.ASC),
                 () -> goodRepository.findAll().stream().map(good -> {
                     String path = getParentGroups(good.getGroup()).stream().map(GroupEntity::getName)
-                                          .collect(Collectors.joining("/")) + "/" + good.getName();
+                            .collect(Collectors.joining("/")) + "/" + good.getName();
                     String groupIds = getParentGroups(good.getGroup()).stream().map(GroupEntity::getId)
                             .filter(Objects::nonNull).map(UUID::toString).collect(Collectors.joining("/"));
                     List<AttributeEntity> attributes = attributeRepository.findByGood(good);

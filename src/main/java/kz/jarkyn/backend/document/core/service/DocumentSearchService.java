@@ -1,27 +1,32 @@
 package kz.jarkyn.backend.document.core.service;
 
 
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
+import kz.jarkyn.backend.core.model.dto.PageResponse;
+import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.CriteriaAttributes;
+import kz.jarkyn.backend.core.search.CriteriaFilters;
+import kz.jarkyn.backend.core.search.Search;
+import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.core.utils.PrefixSearch;
 import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
 import kz.jarkyn.backend.document.bind.repository.BindDocumentRepository;
 import kz.jarkyn.backend.document.bind.specifications.BindDocumentSpecifications;
-import kz.jarkyn.backend.document.core.model.DocumentEntity;
-import kz.jarkyn.backend.document.core.model.DocumentSearchEntity;
+import kz.jarkyn.backend.document.core.model.*;
 import kz.jarkyn.backend.document.core.repository.DocumentSearchRepository;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.global.service.CoverageService;
+import kz.jarkyn.backend.warehouse.model.GoodEntity_;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -32,18 +37,72 @@ public class DocumentSearchService {
     private final DocumentTypeService documentTypeService;
     private final CoverageService coverageService;
     private final ItemRepository itemRepository;
+    private final SearchFactory searchFactory;
 
     public DocumentSearchService(SupplyRepository supplyRepository,
                                  DocumentSearchRepository documentSearchRepository,
                                  BindDocumentRepository bindDocumentRepository,
                                  DocumentTypeService documentTypeService,
-                                 CoverageService coverageService, ItemRepository itemRepository) {
+                                 CoverageService coverageService, ItemRepository itemRepository, SearchFactory searchFactory) {
         this.supplyRepository = supplyRepository;
         this.documentSearchRepository = documentSearchRepository;
         this.bindDocumentRepository = bindDocumentRepository;
         this.documentTypeService = documentTypeService;
         this.coverageService = coverageService;
         this.itemRepository = itemRepository;
+        this.searchFactory = searchFactory;
+    }
+
+    public <T> PageResponse<T> findApiByFilter(
+            Class<T> responseClass, QueryParams queryParams, DocumentTypeEntity documentType) {
+        CriteriaAttributes.Builder<DocumentSearchEntity> attributesBuilder = CriteriaAttributes
+                .<DocumentSearchEntity>builder()
+                .add("id", (root) -> root.get(DocumentSearchEntity_.id))
+                .addEnumType("type", (root) -> root.get(DocumentSearchEntity_.type))
+                .add("name", (root) -> root.get(DocumentSearchEntity_.name))
+                .addReference("organization", (root) -> root.get(DocumentSearchEntity_.organization))
+                .addReference("warehouse", (root) -> root.get(DocumentSearchEntity_.warehouse))
+                .addReference("counterparty", (root) -> root.get(DocumentSearchEntity_.counterparty))
+                .add("moment", (root) -> root.get(DocumentSearchEntity_.moment))
+                .addEnumType("currency", (root) -> root.get(DocumentSearchEntity_.currency))
+                .add("exchangeRate", (root) -> root.get(DocumentSearchEntity_.exchangeRate))
+                .add("amount", (root) -> root.get(DocumentSearchEntity_.amount))
+                .add("deleted", (root) -> root.get(DocumentSearchEntity_.deleted))
+                .add("commited", (root) -> root.get(DocumentSearchEntity_.commited))
+                .add("comment", (root) -> root.get(DocumentSearchEntity_.comment))
+                .add("paidAmount", (root) -> root.get(DocumentSearchEntity_.paidAmount))
+                .add("notPaidAmount", (root) -> root.get(DocumentSearchEntity_.notPaidAmount))
+                .addEnumType("paidCoverage", (root) -> root.get(DocumentSearchEntity_.paidCoverage))
+                .add("discount", (root) -> root.get(DocumentSearchEntity_.discount))
+                .add("surcharge", (root) -> root.get(DocumentSearchEntity_.surcharge))
+                .add("search", (root) -> root.get(DocumentSearchEntity_.search));
+
+        List<UUID> itemsGoodId = queryParams.getFilters()
+                .stream().filter(filter -> filter.getName().equals("items.good.id"))
+                .filter(filter -> filter.getType().equals(QueryParams.Filter.Type.IN))
+                .map(QueryParams.Filter::getValues)
+                .findFirst().stream().flatMap(Collection::stream)
+                .map(UUID::fromString).toList();
+
+        CriteriaFilters.Builder<DocumentSearchEntity> filterBuilder = CriteriaFilters.builder();
+        if (!itemsGoodId.isEmpty()) {
+            filterBuilder.add((root, query, cb, map) -> {
+                Subquery<UUID> subQuery = query.subquery(UUID.class);
+                Root<ItemEntity> itemRoot = subQuery.from(ItemEntity.class);
+                subQuery.select(itemRoot.get(ItemEntity_.id));
+                subQuery.where(itemRoot.get(ItemEntity_.good).get(GoodEntity_.id).in(itemsGoodId));
+                return cb.exists(subQuery);
+            });
+        }
+        if (documentType != null) {
+            filterBuilder.add((root, query, cb, map) ->
+                    cb.equal(root.get(DocumentSearchEntity_.type), documentType));
+        }
+
+        Search<T> search = searchFactory.createCriteriaSearch(
+                responseClass, List.of("search"), QueryParams.Sort.MOMENT_DESC,
+                DocumentSearchEntity.class, attributesBuilder.build());
+        return search.getResult(queryParams);
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.supply-search}")
