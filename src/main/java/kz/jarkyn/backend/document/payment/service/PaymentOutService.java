@@ -1,24 +1,18 @@
 package kz.jarkyn.backend.document.payment.service;
 
 
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
+import kz.jarkyn.backend.core.config.AppRabbitTemplate;
+import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.core.search.CriteriaAttributes;
-import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
-import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
-import kz.jarkyn.backend.document.bind.model.BindDocumentEntity_;
 import kz.jarkyn.backend.document.bind.service.BindDocumentService;
+import kz.jarkyn.backend.document.core.service.DocumentSearchService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.*;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
-import kz.jarkyn.backend.global.model.CoverageEntity;
-import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.service.DocumentService;
@@ -32,7 +26,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,10 +36,11 @@ public class PaymentOutService {
     private final BindDocumentService bindDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
-    private final SearchFactory searchFactory;
     private final AccountService accountService;
     private final CashFlowService cashFlowService;
     private final DocumentTypeService documentTypeService;
+    private final DocumentSearchService documentSearchService;
+    private final AppRabbitTemplate appRabbitTemplate;
 
     public PaymentOutService(
             PaymentOutRepository paymentOutRepository,
@@ -54,20 +48,20 @@ public class PaymentOutService {
             BindDocumentService bindDocumentService,
             DocumentService documentService,
             AuditService auditService,
-            SearchFactory searchFactory,
             AccountService accountService,
             CashFlowService cashFlowService,
-            DocumentTypeService documentTypeService
-    ) {
+            DocumentTypeService documentTypeService,
+            DocumentSearchService documentSearchService, AppRabbitTemplate appRabbitTemplate) {
         this.paymentOutRepository = paymentOutRepository;
         this.paymentOutMapper = paymentOutMapper;
         this.bindDocumentService = bindDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
-        this.searchFactory = searchFactory;
         this.accountService = accountService;
         this.cashFlowService = cashFlowService;
         this.documentTypeService = documentTypeService;
+        this.documentSearchService = documentSearchService;
+        this.appRabbitTemplate = appRabbitTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -79,36 +73,7 @@ public class PaymentOutService {
 
     @Transactional(readOnly = true)
     public PageResponse<PaymentOutListResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaAttributes<PaymentOutEntity> attributes = documentService
-                .<PaymentOutEntity>generateCriteriaAttributesBuilderFor()
-                .addReference("account", (root) -> root.get(PaymentOutEntity_.account))
-                .add("receiptNumber", (root) -> root.get(PaymentOutEntity_.receiptNumber))
-                .add("attachedAmount", (root, query, cb, map) -> {
-                    Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
-                    Root<BindDocumentEntity> bindDocumentRoot = subQuery.from(BindDocumentEntity.class);
-                    subQuery.select(cb.coalesce(cb.sum(bindDocumentRoot.get(BindDocumentEntity_.amount)), BigDecimal.ZERO));
-                    subQuery.where(cb.equal(bindDocumentRoot.get(BindDocumentEntity_.primaryDocument), root));
-                    return subQuery;
-                })
-                .add("attachedCoverage.id", (root, query, cb, map) -> {
-                    Expression<Number> amount = (Expression<Number>) map.get("amount");
-                    Expression<Number> attachedAmount = (Expression<Number>) map.get("attachedAmount");
-                    Expression<String> coverageCode = cb.<String>selectCase()
-                            .when(cb.equal(amount, attachedAmount), CoverageEntity.FULL)
-                            .when(cb.equal(attachedAmount, 0), CoverageEntity.NONE)
-                            .otherwise(CoverageEntity.PARTIAL);
-                    Subquery<UUID> subQuery = query.subquery(UUID.class);
-                    Root<CoverageEntity> coverageRoot = subQuery.from(CoverageEntity.class);
-                    return subQuery.select(coverageRoot.get(CoverageEntity_.id))
-                            .where(cb.equal(coverageRoot.get(CoverageEntity_.code), coverageCode));
-                })
-                .add("notAttachedAmount", (root, query, cb, map) -> cb.diff(
-                        (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("attachedAmount")))
-                .build();
-        Search<PaymentOutListResponse> search = searchFactory.createCriteriaSearch(
-                PaymentOutListResponse.class, List.of("name", "counterparty.name"), QueryParams.Sort.MOMENT_DESC,
-                PaymentOutEntity.class, attributes);
-        return search.getResult(queryParams);
+        return documentSearchService.findApiByFilter(PaymentOutListResponse.class, queryParams, documentTypeService.findPaymentOut());
     }
 
     @Transactional
@@ -125,6 +90,7 @@ public class PaymentOutService {
         paymentOutRepository.save(paymentOut);
         auditService.saveEntity(paymentOut);
         bindDocumentService.save(paymentOut, request.getBindDocuments());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
         return paymentOut.getId();
     }
 
@@ -135,6 +101,7 @@ public class PaymentOutService {
         paymentOutMapper.editEntity(paymentOut, request);
         auditService.saveEntity(paymentOut);
         bindDocumentService.save(paymentOut, request.getBindDocuments());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
     }
 
     @Transactional
@@ -146,6 +113,7 @@ public class PaymentOutService {
                 paymentOut.getOrganization(), paymentOut.getCounterparty(), paymentOut.getCurrency());
         cashFlowService.create(paymentOut, account, paymentOut.getAmount().negate());
         cashFlowService.create(paymentOut, paymentOut.getAccount(), paymentOut.getAmount().negate());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
     }
 
     @Transactional
@@ -154,6 +122,7 @@ public class PaymentOutService {
         paymentOut.setCommited(Boolean.FALSE);
         auditService.undoCommit(paymentOut);
         cashFlowService.delete(paymentOut);
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
     }
 
     @Transactional
@@ -163,5 +132,6 @@ public class PaymentOutService {
         paymentOut.setDeleted(Boolean.TRUE);
         auditService.delete(paymentOut);
         bindDocumentService.save(paymentOut, List.of());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
     }
 }

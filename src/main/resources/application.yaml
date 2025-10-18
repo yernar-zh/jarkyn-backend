@@ -17,4 +17,4 @@ opensearch:
 
 rabbitmq:
   queue:
-    supply-search: supply-search-queue
+    document-search: document-search-queue

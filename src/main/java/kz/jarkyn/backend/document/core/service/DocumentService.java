@@ -2,9 +2,6 @@
 package kz.jarkyn.backend.document.core.service;
 
 
-import kz.jarkyn.backend.audit.model.AuditEntity;
-import kz.jarkyn.backend.audit.specifications.AuditSpecifications;
-import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.sorts.EntitySorts;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
@@ -59,6 +56,7 @@ public class DocumentService {
         }
     }
 
+    @Deprecated
     public <T extends DocumentEntity> CriteriaAttributes.Builder<T> generateCriteriaAttributesBuilderFor() {
         return CriteriaAttributes.<T>builder()
                 .add("id", (root) -> root.get(DocumentEntity_.id))

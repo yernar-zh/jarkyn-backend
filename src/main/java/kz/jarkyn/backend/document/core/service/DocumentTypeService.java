@@ -46,6 +46,11 @@ public class DocumentTypeService {
     }
 
     @Transactional(readOnly = true)
+    public boolean isSupply(DocumentTypeEntity documentType) {
+        return documentType.getCode().equals(DocumentTypeCode.SUPPLY.name());
+    }
+
+    @Transactional(readOnly = true)
     public DocumentTypeEntity findByCode(DocumentTypeCode code) {
         return documentTypeRepository.findByCode(code.name()).orElseThrow();
     }

@@ -96,8 +96,8 @@ public class SupplyService {
         supply.setCommited(false);
         supplyRepository.save(supply);
         auditService.saveEntity(supply);
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.SUPPLY_SEARCH, supply.getId());
         itemService.saveApi(supply, request.getItems());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
         return supply.getId();
     }
 
@@ -107,8 +107,8 @@ public class SupplyService {
         documentService.validateName(supply);
         supplyMapper.editEntity(supply, request);
         auditService.saveEntity(supply);
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.SUPPLY_SEARCH, supply.getId());
         itemService.saveApi(supply, request.getItems());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
     }
 
     @Transactional
@@ -121,6 +121,7 @@ public class SupplyService {
         AccountEntity supplerAccount = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
         cashFlowService.create(supply, supplerAccount, supply.getAmount());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
     }
 
     @Transactional
@@ -131,6 +132,7 @@ public class SupplyService {
         auditService.undoCommit(supply);
         itemService.deleteTurnover(supply);
         cashFlowService.delete(supply);
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
     }
 
     @Transactional
@@ -142,5 +144,6 @@ public class SupplyService {
         if (supply.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         supply.setDeleted(Boolean.TRUE);
         auditService.delete(supply);
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
     }
 }

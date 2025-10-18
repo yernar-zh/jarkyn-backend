@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    @Value("${rabbitmq.queue.supply-search}")
+    @Value("${rabbitmq.queue.document-search}")
     private String supplyIndexQueueName;
 
     @Bean
@@ -36,7 +36,7 @@ public class RabbitConfig {
         return BindingBuilder
                 .bind(supplyIndexQueue)
                 .to(exchange)
-                .with(RabbitRoutingKeys.SUPPLY_SEARCH);
+                .with(RabbitRoutingKeys.DOCUMENT_SEARCH);
     }
 
     @Bean

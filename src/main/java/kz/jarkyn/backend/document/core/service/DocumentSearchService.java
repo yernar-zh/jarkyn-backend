@@ -3,6 +3,7 @@ package kz.jarkyn.backend.document.core.service;
 
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import jakarta.transaction.Transactional;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
@@ -14,8 +15,10 @@ import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
 import kz.jarkyn.backend.document.bind.repository.BindDocumentRepository;
 import kz.jarkyn.backend.document.bind.specifications.BindDocumentSpecifications;
 import kz.jarkyn.backend.document.core.model.*;
+import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.core.repository.DocumentSearchRepository;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
+import kz.jarkyn.backend.document.payment.model.PaymentOutEntity;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.global.service.CoverageService;
@@ -38,12 +41,13 @@ public class DocumentSearchService {
     private final CoverageService coverageService;
     private final ItemRepository itemRepository;
     private final SearchFactory searchFactory;
+    private final DocumentRepository documentRepository;
 
     public DocumentSearchService(SupplyRepository supplyRepository,
                                  DocumentSearchRepository documentSearchRepository,
                                  BindDocumentRepository bindDocumentRepository,
                                  DocumentTypeService documentTypeService,
-                                 CoverageService coverageService, ItemRepository itemRepository, SearchFactory searchFactory) {
+                                 CoverageService coverageService, ItemRepository itemRepository, SearchFactory searchFactory, DocumentRepository documentRepository) {
         this.supplyRepository = supplyRepository;
         this.documentSearchRepository = documentSearchRepository;
         this.bindDocumentRepository = bindDocumentRepository;
@@ -51,6 +55,7 @@ public class DocumentSearchService {
         this.coverageService = coverageService;
         this.itemRepository = itemRepository;
         this.searchFactory = searchFactory;
+        this.documentRepository = documentRepository;
     }
 
     public <T> PageResponse<T> findApiByFilter(
@@ -105,14 +110,23 @@ public class DocumentSearchService {
         return search.getResult(queryParams);
     }
 
-    @RabbitListener(queues = "${rabbitmq.queue.supply-search}")
-    public void supplySearch(UUID supplyId) {
-        Optional<SupplyEntity> supplyOpt = supplyRepository.findById(supplyId);
-        if (supplyOpt.isEmpty()) {
-            return;
+    @RabbitListener(queues = "${rabbitmq.queue.document-search}")
+    @Transactional()
+    public void documentSearch(UUID documentId) {
+        Optional<DocumentEntity> documentOpt = documentRepository.findById(documentId);
+        if (documentOpt.isEmpty()) return; // TODO: add log
+        DocumentEntity document = documentOpt.get();
+        DocumentSearchEntity documentSearch = fillBase(document);
+
+        if (documentTypeService.isSupply(document.getType())) {
+            fillSearch(documentSearch, supplyRepository.findById(documentId).orElseThrow());
         }
-        SupplyEntity supply = supplyOpt.get();
-        DocumentSearchEntity documentSearch = fillBase(supply);
+
+        documentSearchRepository.save(documentSearch);
+    }
+
+
+    private void fillSearch(DocumentSearchEntity documentSearch, SupplyEntity supply) {
         BigDecimal paidAmount = bindDocumentRepository.findAll(Specification.allOf(
                         BindDocumentSpecifications.relatedDocument(supply),
                         BindDocumentSpecifications.primaryDocumentType(documentTypeService.findPaymentOut())))
@@ -121,9 +135,13 @@ public class DocumentSearchService {
         fillSearch(documentSearch);
         fillSearch(documentSearch, supply.getName(), supply.getComment(), supply.getCounterparty().getName());
         fillDiscount(documentSearch, supply);
+    }
 
-
-        documentSearchRepository.save(documentSearch);
+    private void fillPaymentOut(DocumentSearchEntity documentSearch, PaymentOutEntity paymentOut) {
+        fillPaid(documentSearch, paymentOut.getAmount());
+        fillSearch(documentSearch);
+        fillSearch(documentSearch, paymentOut.getName(), paymentOut.getComment(), paymentOut.getCounterparty().getName());
+        fillDiscount(documentSearch, paymentOut);
     }
 
 
