@@ -1,6 +1,7 @@
 package kz.jarkyn.backend.document.core.service;
 
 
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
@@ -19,6 +20,7 @@ import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.core.repository.DocumentSearchRepository;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.payment.model.PaymentOutEntity;
+import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.global.service.CoverageService;
@@ -42,12 +44,13 @@ public class DocumentSearchService {
     private final ItemRepository itemRepository;
     private final SearchFactory searchFactory;
     private final DocumentRepository documentRepository;
+    private final PaymentOutRepository paymentOutRepository;
 
     public DocumentSearchService(SupplyRepository supplyRepository,
                                  DocumentSearchRepository documentSearchRepository,
                                  BindDocumentRepository bindDocumentRepository,
                                  DocumentTypeService documentTypeService,
-                                 CoverageService coverageService, ItemRepository itemRepository, SearchFactory searchFactory, DocumentRepository documentRepository) {
+                                 CoverageService coverageService, ItemRepository itemRepository, SearchFactory searchFactory, DocumentRepository documentRepository, PaymentOutRepository paymentOutRepository) {
         this.supplyRepository = supplyRepository;
         this.documentSearchRepository = documentSearchRepository;
         this.bindDocumentRepository = bindDocumentRepository;
@@ -56,6 +59,7 @@ public class DocumentSearchService {
         this.itemRepository = itemRepository;
         this.searchFactory = searchFactory;
         this.documentRepository = documentRepository;
+        this.paymentOutRepository = paymentOutRepository;
     }
 
     public <T> PageResponse<T> findApiByFilter(
@@ -67,6 +71,7 @@ public class DocumentSearchService {
                 .add("name", (root) -> root.get(DocumentSearchEntity_.name))
                 .addReference("organization", (root) -> root.get(DocumentSearchEntity_.organization))
                 .addReference("warehouse", (root) -> root.get(DocumentSearchEntity_.warehouse))
+                .addReference("account", (root) -> root.get(DocumentSearchEntity_.account))
                 .addReference("counterparty", (root) -> root.get(DocumentSearchEntity_.counterparty))
                 .add("moment", (root) -> root.get(DocumentSearchEntity_.moment))
                 .addEnumType("currency", (root) -> root.get(DocumentSearchEntity_.currency))
@@ -75,12 +80,19 @@ public class DocumentSearchService {
                 .add("deleted", (root) -> root.get(DocumentSearchEntity_.deleted))
                 .add("commited", (root) -> root.get(DocumentSearchEntity_.commited))
                 .add("comment", (root) -> root.get(DocumentSearchEntity_.comment))
+                .add("search", (root) -> root.get(DocumentSearchEntity_.search))
+                
                 .add("paidAmount", (root) -> root.get(DocumentSearchEntity_.paidAmount))
                 .add("notPaidAmount", (root) -> root.get(DocumentSearchEntity_.notPaidAmount))
                 .addEnumType("paidCoverage", (root) -> root.get(DocumentSearchEntity_.paidCoverage))
+
+                .add("attachedAmount", (root) -> root.get(DocumentSearchEntity_.attachedAmount))
+                .add("notAttachedAmount", (root) -> root.get(DocumentSearchEntity_.notAttachedAmount))
+                .addEnumType("attachedCoverage", (root) -> root.join(DocumentSearchEntity_.attachedCoverage, JoinType.LEFT))
+
+                .add("receiptNumber", (root) -> root.get(DocumentSearchEntity_.receiptNumber))
                 .add("discount", (root) -> root.get(DocumentSearchEntity_.discount))
-                .add("surcharge", (root) -> root.get(DocumentSearchEntity_.surcharge))
-                .add("search", (root) -> root.get(DocumentSearchEntity_.search));
+                .add("surcharge", (root) -> root.get(DocumentSearchEntity_.surcharge));
 
         List<UUID> itemsGoodId = queryParams.getFilters()
                 .stream().filter(filter -> filter.getName().equals("items.good.id"))
@@ -119,26 +131,27 @@ public class DocumentSearchService {
         DocumentSearchEntity documentSearch = fillBase(document);
 
         if (documentTypeService.isSupply(document.getType())) {
-            fillSearch(documentSearch, supplyRepository.findById(documentId).orElseThrow());
+            fillSupply(documentSearch, supplyRepository.findById(documentId).orElseThrow());
+        }
+        if (documentTypeService.isPaymentOut(document.getType())) {
+            fillPaymentOut(documentSearch, paymentOutRepository.findById(documentId).orElseThrow());
         }
 
         documentSearchRepository.save(documentSearch);
     }
 
-
-    private void fillSearch(DocumentSearchEntity documentSearch, SupplyEntity supply) {
+    private void fillSupply(DocumentSearchEntity documentSearch, SupplyEntity supply) {
         BigDecimal paidAmount = bindDocumentRepository.findAll(Specification.allOf(
                         BindDocumentSpecifications.relatedDocument(supply),
                         BindDocumentSpecifications.primaryDocumentType(documentTypeService.findPaymentOut())))
                 .stream().map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         fillPaid(documentSearch, paidAmount);
-        fillSearch(documentSearch);
         fillSearch(documentSearch, supply.getName(), supply.getComment(), supply.getCounterparty().getName());
         fillDiscount(documentSearch, supply);
     }
 
     private void fillPaymentOut(DocumentSearchEntity documentSearch, PaymentOutEntity paymentOut) {
-        fillPaid(documentSearch, paymentOut.getAmount());
+        fillAttached(documentSearch, paymentOut.getAmount());
         fillSearch(documentSearch);
         fillSearch(documentSearch, paymentOut.getName(), paymentOut.getComment(), paymentOut.getCounterparty().getName());
         fillDiscount(documentSearch, paymentOut);
@@ -158,6 +171,7 @@ public class DocumentSearchService {
         documentSearch.setOrganization(document.getOrganization());
         documentSearch.setCounterparty(document.getCounterparty());
         documentSearch.setWarehouse(document.getWarehouse());
+        documentSearch.setAccount(document.getAccount());
         documentSearch.setMoment(document.getMoment());
         documentSearch.setCurrency(document.getCurrency());
         documentSearch.setExchangeRate(document.getExchangeRate());
@@ -178,7 +192,18 @@ public class DocumentSearchService {
         } else {
             documentSearch.setPaidCoverage(coverageService.findPartial());
         }
+    }
 
+    private void fillAttached(DocumentSearchEntity documentSearch, BigDecimal attached) {
+        documentSearch.setAttachedAmount(attached);
+        documentSearch.setNotAttachedAmount(documentSearch.getAmount().subtract(attached));
+        if (attached.compareTo(BigDecimal.ZERO) == 0) {
+            documentSearch.setAttachedCoverage(coverageService.findNone());
+        } else if (attached.compareTo(documentSearch.getAmount()) >= 0) {
+            documentSearch.setAttachedCoverage(coverageService.findFull());
+        } else {
+            documentSearch.setAttachedCoverage(coverageService.findPartial());
+        }
     }
 
     private void fillSearch(DocumentSearchEntity documentSearch, String... texts) {

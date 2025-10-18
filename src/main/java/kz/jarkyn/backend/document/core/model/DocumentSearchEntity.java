@@ -2,7 +2,6 @@ package kz.jarkyn.backend.document.core.model;
 
 
 import jakarta.persistence.*;
-import kz.jarkyn.backend.audit.config.AuditIgnore;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.global.model.CoverageEntity;
 import kz.jarkyn.backend.global.model.CurrencyEntity;
@@ -41,10 +40,9 @@ public class DocumentSearchEntity extends AbstractEntity {
     private BigDecimal exchangeRate;
     private BigDecimal amount;
     private String comment;
-    @AuditIgnore
     private Boolean deleted;
-    @AuditIgnore
     private Boolean commited;
+    private String search;
 
     BigDecimal paidAmount;
     BigDecimal notPaidAmount;
@@ -52,7 +50,13 @@ public class DocumentSearchEntity extends AbstractEntity {
     @JoinColumn(name = "paidCoverage_id")
     CoverageEntity paidCoverage;
 
-    private String search;
+    BigDecimal attachedAmount;
+    BigDecimal notAttachedAmount;
+    @ManyToOne
+    @JoinColumn(name = "attachedCoverage_id")
+    CoverageEntity attachedCoverage;
+
+    private String receiptNumber;
     private BigDecimal discount;
     private BigDecimal surcharge;
 
@@ -160,6 +164,14 @@ public class DocumentSearchEntity extends AbstractEntity {
         this.commited = commited;
     }
 
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
     public BigDecimal getPaidAmount() {
         return paidAmount;
     }
@@ -184,12 +196,36 @@ public class DocumentSearchEntity extends AbstractEntity {
         this.paidCoverage = paidCoverage;
     }
 
-    public String getSearch() {
-        return search;
+    public BigDecimal getAttachedAmount() {
+        return attachedAmount;
     }
 
-    public void setSearch(String search) {
-        this.search = search;
+    public void setAttachedAmount(BigDecimal attachedAmount) {
+        this.attachedAmount = attachedAmount;
+    }
+
+    public BigDecimal getNotAttachedAmount() {
+        return notAttachedAmount;
+    }
+
+    public void setNotAttachedAmount(BigDecimal notAttachedAmount) {
+        this.notAttachedAmount = notAttachedAmount;
+    }
+
+    public CoverageEntity getAttachedCoverage() {
+        return attachedCoverage;
+    }
+
+    public void setAttachedCoverage(CoverageEntity attachedCoverage) {
+        this.attachedCoverage = attachedCoverage;
+    }
+
+    public String getReceiptNumber() {
+        return receiptNumber;
+    }
+
+    public void setReceiptNumber(String receiptNumber) {
+        this.receiptNumber = receiptNumber;
     }
 
     public BigDecimal getDiscount() {

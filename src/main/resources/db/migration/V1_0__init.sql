@@ -129,28 +129,32 @@ CREATE TABLE document
 
 CREATE TABLE document_search
 (
-    id               UUID NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    last_modified_at TIMESTAMP WITHOUT TIME ZONE,
-    type_id          UUID,
-    organization_id  UUID,
-    warehouse_id     UUID,
-    account_id       UUID,
-    counterparty_id  UUID,
-    name             VARCHAR(255),
-    moment           TIMESTAMP WITHOUT TIME ZONE,
-    currency_id      UUID,
-    exchange_rate    DECIMAL,
-    amount           DECIMAL,
-    comment          VARCHAR(255),
-    deleted          BOOLEAN,
-    commited         BOOLEAN,
-    paid_amount      DECIMAL,
-    not_paid_amount  DECIMAL,
-    paid_coverage_id UUID,
-    search           VARCHAR(255),
-    discount         DECIMAL,
-    surcharge        DECIMAL,
+    id                   UUID NOT NULL,
+    created_at           TIMESTAMP WITHOUT TIME ZONE,
+    last_modified_at     TIMESTAMP WITHOUT TIME ZONE,
+    type_id              UUID,
+    organization_id      UUID,
+    warehouse_id         UUID,
+    account_id           UUID,
+    counterparty_id      UUID,
+    name                 VARCHAR(255),
+    moment               TIMESTAMP WITHOUT TIME ZONE,
+    currency_id          UUID,
+    exchange_rate        DECIMAL,
+    amount               DECIMAL,
+    comment              VARCHAR(255),
+    deleted              BOOLEAN,
+    commited             BOOLEAN,
+    search               VARCHAR(255),
+    paid_amount          DECIMAL,
+    not_paid_amount      DECIMAL,
+    paid_coverage_id     UUID,
+    attached_amount      DECIMAL,
+    not_attached_amount  DECIMAL,
+    attached_coverage_id UUID,
+    receipt_number       VARCHAR(255),
+    discount             DECIMAL,
+    surcharge            DECIMAL,
     CONSTRAINT pk_document_search PRIMARY KEY (id)
 );
 
@@ -405,6 +409,9 @@ ALTER TABLE document
 
 ALTER TABLE document_search
     ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_ACCOUNT FOREIGN KEY (account_id) REFERENCES account (id);
+
+ALTER TABLE document_search
+    ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_ATTACHEDCOVERAGE FOREIGN KEY (attached_coverage_id) REFERENCES coverage (id);
 
 ALTER TABLE document_search
     ADD CONSTRAINT FK_DOCUMENT_SEARCH_ON_COUNTERPARTY FOREIGN KEY (counterparty_id) REFERENCES counterparty (id);
