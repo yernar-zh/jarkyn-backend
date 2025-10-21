@@ -25,6 +25,8 @@ import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.global.service.CoverageService;
 import kz.jarkyn.backend.warehouse.model.GoodEntity_;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +38,8 @@ import java.util.*;
 
 @Service
 public class DocumentSearchService {
+    private static final Logger log = LoggerFactory.getLogger(DocumentSearchService.class);
+    
     private final SupplyRepository supplyRepository;
     private final DocumentSearchRepository documentSearchRepository;
     private final BindDocumentRepository bindDocumentRepository;
@@ -126,7 +130,10 @@ public class DocumentSearchService {
     @Transactional()
     public void documentSearch(UUID documentId) {
         Optional<DocumentEntity> documentOpt = documentRepository.findById(documentId);
-        if (documentOpt.isEmpty()) return; // TODO: add log
+        if (documentOpt.isEmpty()) {
+            log.error("Document with id {} not found", documentId);
+            return;
+        }
         DocumentEntity document = documentOpt.get();
         DocumentSearchEntity documentSearch = fillBase(document);
 
