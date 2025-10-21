@@ -70,9 +70,9 @@ public class DocumentSearchService {
                 .addEnumType("type", (root) -> root.get(DocumentSearchEntity_.type))
                 .add("name", (root) -> root.get(DocumentSearchEntity_.name))
                 .addReference("organization", (root) -> root.get(DocumentSearchEntity_.organization))
-                .addReference("warehouse", (root) -> root.get(DocumentSearchEntity_.warehouse))
-                .addReference("account", (root) -> root.get(DocumentSearchEntity_.account))
-                .addReference("counterparty", (root) -> root.get(DocumentSearchEntity_.counterparty))
+                .addReference("warehouse", (root) -> root.join(DocumentSearchEntity_.warehouse, JoinType.LEFT))
+                .addReference("account", (root) -> root.join(DocumentSearchEntity_.account, JoinType.LEFT))
+                .addReference("counterparty", (root) -> root.join(DocumentSearchEntity_.counterparty, JoinType.LEFT))
                 .add("moment", (root) -> root.get(DocumentSearchEntity_.moment))
                 .addEnumType("currency", (root) -> root.get(DocumentSearchEntity_.currency))
                 .add("exchangeRate", (root) -> root.get(DocumentSearchEntity_.exchangeRate))
@@ -81,10 +81,10 @@ public class DocumentSearchService {
                 .add("commited", (root) -> root.get(DocumentSearchEntity_.commited))
                 .add("comment", (root) -> root.get(DocumentSearchEntity_.comment))
                 .add("search", (root) -> root.get(DocumentSearchEntity_.search))
-                
+
                 .add("paidAmount", (root) -> root.get(DocumentSearchEntity_.paidAmount))
                 .add("notPaidAmount", (root) -> root.get(DocumentSearchEntity_.notPaidAmount))
-                .addEnumType("paidCoverage", (root) -> root.get(DocumentSearchEntity_.paidCoverage))
+                .addEnumType("paidCoverage", (root) -> root.join(DocumentSearchEntity_.paidCoverage, JoinType.LEFT))
 
                 .add("attachedAmount", (root) -> root.get(DocumentSearchEntity_.attachedAmount))
                 .add("notAttachedAmount", (root) -> root.get(DocumentSearchEntity_.notAttachedAmount))
@@ -118,7 +118,7 @@ public class DocumentSearchService {
 
         Search<T> search = searchFactory.createCriteriaSearch(
                 responseClass, List.of("search"), QueryParams.Sort.MOMENT_DESC,
-                DocumentSearchEntity.class, attributesBuilder.build());
+                DocumentSearchEntity.class, attributesBuilder.build(), filterBuilder.build());
         return search.getResult(queryParams);
     }
 

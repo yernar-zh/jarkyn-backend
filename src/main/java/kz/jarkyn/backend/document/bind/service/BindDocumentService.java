@@ -2,6 +2,8 @@ package kz.jarkyn.backend.document.bind.service;
 
 
 import kz.jarkyn.backend.audit.service.AuditService;
+import kz.jarkyn.backend.core.config.AppRabbitTemplate;
+import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.document.bind.specifications.BindDocumentSpecifications;
@@ -27,15 +29,17 @@ public class BindDocumentService {
     private final BindDocumentMapper bindDocumentMapper;
     private final AuditService auditService;
     private final DocumentTypeService documentTypeService;
+    private final AppRabbitTemplate appRabbitTemplate;
 
     public BindDocumentService(
             BindDocumentRepository bindDocumentRepository,
             BindDocumentMapper bindDocumentMapper,
-            AuditService auditService, DocumentTypeService documentTypeService) {
+            AuditService auditService, DocumentTypeService documentTypeService, AppRabbitTemplate appRabbitTemplate) {
         this.bindDocumentRepository = bindDocumentRepository;
         this.bindDocumentMapper = bindDocumentMapper;
         this.auditService = auditService;
         this.documentTypeService = documentTypeService;
+        this.appRabbitTemplate = appRabbitTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -87,15 +91,18 @@ public class BindDocumentService {
             bindDocument.setPrimaryDocument(primaryDocument);
             bindDocument.setPosition(entry.getReceivedPosition());
             bindDocumentRepository.save(bindDocument);
+            appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, bindDocument.getRelatedDocument().getId());
             auditService.saveEntity(bindDocument, bindDocument.getPrimaryDocument(), "bindDocuments");
         }
         for (EntityDivider<BindDocumentEntity, BindDocumentRequest>.Entry entry : divider.edited()) {
             bindDocumentMapper.editEntity(entry.getCurrent(), entry.getReceived());
             entry.getCurrent().setPosition(entry.getReceivedPosition());
+            appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, entry.getCurrent().getRelatedDocument().getId());
             auditService.saveEntity(entry.getCurrent(), entry.getCurrent().getPrimaryDocument(), "bindDocuments");
         }
         for (BindDocumentEntity bindDocument : divider.skippedCurrent()) {
             bindDocumentRepository.delete(bindDocument);
+            appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, bindDocument.getRelatedDocument().getId());
             auditService.delete(bindDocument, bindDocument.getPrimaryDocument());
         }
 
