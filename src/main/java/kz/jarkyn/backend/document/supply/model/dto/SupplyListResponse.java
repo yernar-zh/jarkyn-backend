@@ -12,4 +12,5 @@ public interface SupplyListResponse extends DocumentResponse {
     ReferenceResponse getCounterparty();
     BigDecimal getPaidAmount();
     BigDecimal getNotPaidAmount();
+    BigDecimal getOverheadCostAmount();
 }

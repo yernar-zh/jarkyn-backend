@@ -126,16 +126,6 @@ public class CriteriaSearch<R, E> implements Search<R> {
             if (expression == null) {
                 return cb.conjunction();
             }
-            if (filter.getType().equals(QueryParams.Filter.Type.EXISTS)) {
-                String value = filter.getValues().getFirst().trim().toLowerCase();
-                if (value.equals("true")) {
-                    return cb.isNotNull(expression);
-                } else if (value.equals("false")) {
-                    return cb.isNull(expression);
-                } else {
-                    throw new ApiValidationException("[exist] can be only true or false");
-                }
-            }
             return filter.getValues().stream().distinct()
                     .map(Objects.requireNonNull(SearchUtils.getConvertor(expression.getJavaType())))
                     .map(filterValue -> switch (filter.getType()) {
@@ -149,11 +139,10 @@ public class CriteriaSearch<R, E> implements Search<R> {
                         case GREATER -> cb.greaterThan((Expression<Comparable>) expression, (Comparable) filterValue);
                         case CONTAINS -> cb.like((Expression<String>) expression, (String) filterValue);
                         case NOT_CONTAINS -> cb.notLike((Expression<String>) expression, (String) filterValue);
-                        case IN -> expression.in(List.of(((String) filterValue).split(QueryParams.IN_SEPARATOR)));
-                        case NOT_IN ->
-                                expression.in(List.of(((String) filterValue).split(QueryParams.IN_SEPARATOR))).not();
-                        case EXISTS -> throw new IllegalStateException();
-                    }).reduce(cb::or).orElse(cb.conjunction());
+                    }).reduce((predicate1, predicate2) -> switch (filter.getType()) {
+                        case NOT_EQUAL_TO, NOT_CONTAINS -> cb.and(predicate1, predicate2);
+                        default -> cb.or(predicate1, predicate2);
+                    }).orElse(cb.conjunction());
         }).toList();
         List<Expression<String>> searchFields = searchByAttributeNames.stream().map(expressions::get)
                 .filter(Objects::nonNull)

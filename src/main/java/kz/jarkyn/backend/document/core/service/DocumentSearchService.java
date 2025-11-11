@@ -19,6 +19,8 @@ import kz.jarkyn.backend.document.core.model.*;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.core.repository.DocumentSearchRepository;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
+import kz.jarkyn.backend.document.expense.model.ExpenseEntity;
+import kz.jarkyn.backend.document.expense.repository.ExpenseRepository;
 import kz.jarkyn.backend.document.payment.model.PaymentOutEntity;
 import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
@@ -39,7 +41,7 @@ import java.util.*;
 @Service
 public class DocumentSearchService {
     private static final Logger log = LoggerFactory.getLogger(DocumentSearchService.class);
-    
+
     private final SupplyRepository supplyRepository;
     private final DocumentSearchRepository documentSearchRepository;
     private final BindDocumentRepository bindDocumentRepository;
@@ -49,12 +51,13 @@ public class DocumentSearchService {
     private final SearchFactory searchFactory;
     private final DocumentRepository documentRepository;
     private final PaymentOutRepository paymentOutRepository;
+    private final ExpenseRepository expenseRepository;
 
     public DocumentSearchService(SupplyRepository supplyRepository,
                                  DocumentSearchRepository documentSearchRepository,
                                  BindDocumentRepository bindDocumentRepository,
                                  DocumentTypeService documentTypeService,
-                                 CoverageService coverageService, ItemRepository itemRepository, SearchFactory searchFactory, DocumentRepository documentRepository, PaymentOutRepository paymentOutRepository) {
+                                 CoverageService coverageService, ItemRepository itemRepository, SearchFactory searchFactory, DocumentRepository documentRepository, PaymentOutRepository paymentOutRepository, ExpenseRepository expenseRepository) {
         this.supplyRepository = supplyRepository;
         this.documentSearchRepository = documentSearchRepository;
         this.bindDocumentRepository = bindDocumentRepository;
@@ -64,6 +67,7 @@ public class DocumentSearchService {
         this.searchFactory = searchFactory;
         this.documentRepository = documentRepository;
         this.paymentOutRepository = paymentOutRepository;
+        this.expenseRepository = expenseRepository;
     }
 
     public <T> PageResponse<T> findApiByFilter(
@@ -92,15 +96,16 @@ public class DocumentSearchService {
 
                 .add("attachedAmount", (root) -> root.get(DocumentSearchEntity_.attachedAmount))
                 .add("notAttachedAmount", (root) -> root.get(DocumentSearchEntity_.notAttachedAmount))
-                .addEnumType("attachedCoverage", (root) -> root.join(DocumentSearchEntity_.attachedCoverage, JoinType.LEFT))
+                .add("attachedCoverage", (root) -> root.join(DocumentSearchEntity_.attachedCoverage, JoinType.LEFT))
 
+                .add("overheadCostAmount", (root) -> root.get(DocumentSearchEntity_.overheadCostAmount))
                 .add("receiptNumber", (root) -> root.get(DocumentSearchEntity_.receiptNumber))
                 .add("discount", (root) -> root.get(DocumentSearchEntity_.discount))
                 .add("surcharge", (root) -> root.get(DocumentSearchEntity_.surcharge));
 
         List<UUID> itemsGoodId = queryParams.getFilters()
                 .stream().filter(filter -> filter.getName().equals("items.good.id"))
-                .filter(filter -> filter.getType().equals(QueryParams.Filter.Type.IN))
+                .filter(filter -> filter.getType().equals(QueryParams.Filter.Type.EQUAL_TO))
                 .map(QueryParams.Filter::getValues)
                 .findFirst().stream().flatMap(Collection::stream)
                 .map(UUID::fromString).toList();
@@ -143,6 +148,10 @@ public class DocumentSearchService {
         if (documentTypeService.isPaymentOut(document.getType())) {
             fillPaymentOut(documentSearch, paymentOutRepository.findById(documentId).orElseThrow());
         }
+        if (documentTypeService.isExpense(document.getType())) {
+            fillExpense(documentSearch, expenseRepository.findById(documentId).orElseThrow());
+        }
+
 
         documentSearchRepository.save(documentSearch);
     }
@@ -153,17 +162,29 @@ public class DocumentSearchService {
                         BindDocumentSpecifications.primaryDocumentType(documentTypeService.findPaymentOut())))
                 .stream().map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         fillPaid(documentSearch, paidAmount);
+
+        BigDecimal overheadCostAmount = bindDocumentRepository.findAll(Specification.allOf(
+                        BindDocumentSpecifications.relatedDocument(supply),
+                        BindDocumentSpecifications.primaryDocumentType(documentTypeService.findExpense())))
+                .stream()
+                .map(bindDocumentEntity -> bindDocumentEntity.getAmount().multiply(bindDocumentEntity.getPrimaryDocument().getExchangeRate()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        documentSearch.setOverheadCostAmount(overheadCostAmount);
+
         fillSearch(documentSearch, supply.getName(), supply.getComment(), supply.getCounterparty().getName());
         fillDiscount(documentSearch, supply);
     }
 
     private void fillPaymentOut(DocumentSearchEntity documentSearch, PaymentOutEntity paymentOut) {
         fillAttached(documentSearch, paymentOut.getAmount());
-        fillSearch(documentSearch);
-        fillSearch(documentSearch, paymentOut.getName(), paymentOut.getComment(), paymentOut.getCounterparty().getName());
-        fillDiscount(documentSearch, paymentOut);
+        fillSearch(documentSearch, paymentOut.getName(), paymentOut.getComment(),
+                paymentOut.getCounterparty().getName(), paymentOut.getReceiptNumber());
     }
 
+    private void fillExpense(DocumentSearchEntity documentSearch, ExpenseEntity expense) {
+        fillAttached(documentSearch, expense.getAmount());
+        fillSearch(documentSearch, expense.getName(), expense.getComment(), expense.getCounterparty().getName());
+    }
 
     private DocumentSearchEntity fillBase(DocumentEntity document) {
         DocumentSearchEntity documentSearch = documentSearchRepository.findById(document.getId()).orElseGet(() -> {

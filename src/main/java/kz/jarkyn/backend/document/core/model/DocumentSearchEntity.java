@@ -56,6 +56,8 @@ public class DocumentSearchEntity extends AbstractEntity {
     @JoinColumn(name = "attachedCoverage_id")
     CoverageEntity attachedCoverage;
 
+    BigDecimal overheadCostAmount;
+
     private String receiptNumber;
     private BigDecimal discount;
     private BigDecimal surcharge;
@@ -202,6 +204,14 @@ public class DocumentSearchEntity extends AbstractEntity {
 
     public void setAttachedAmount(BigDecimal attachedAmount) {
         this.attachedAmount = attachedAmount;
+    }
+
+    public BigDecimal getOverheadCostAmount() {
+        return overheadCostAmount;
+    }
+
+    public void setOverheadCostAmount(BigDecimal overheadCostAmount) {
+        this.overheadCostAmount = overheadCostAmount;
     }
 
     public BigDecimal getNotAttachedAmount() {

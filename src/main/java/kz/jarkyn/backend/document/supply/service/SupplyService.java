@@ -86,7 +86,7 @@ public class SupplyService {
     @Transactional
     public UUID createApi(SupplyRequest request) {
         SupplyEntity supply = supplyMapper.toEntity(request);
-        supply.setType(documentTypeService.findByCode(DocumentTypeService.DocumentTypeCode.SUPPLY));
+        supply.setType(documentTypeService.findSupply());
         if (Strings.isBlank(supply.getName())) {
             supply.setName(documentService.findNextName(supply.getType()));
         } else {

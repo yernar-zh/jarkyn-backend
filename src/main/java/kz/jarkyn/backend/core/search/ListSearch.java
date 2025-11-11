@@ -58,7 +58,7 @@ public class ListSearch<R> implements Search<R> {
                 throw new RuntimeException(e);
             }
             String subFiledName = (fieldName != null ? fieldName + "." : "") +
-                                  Introspector.decapitalize(method.getName().substring(3));
+                    Introspector.decapitalize(method.getName().substring(3));
             getRowValues(fields, subFiledName, method.getReturnType(), methodReturnValue);
         }
     }
@@ -95,16 +95,6 @@ public class ListSearch<R> implements Search<R> {
             }
             return queryParams.getFilters().stream().map(filter -> {
                 Object rowValue = row.getValues().get(filter.getName());
-                if (filter.getType().equals(QueryParams.Filter.Type.EXISTS)) {
-                    String value = filter.getValues().getFirst().trim().toLowerCase();
-                    if (value.equals("true")) {
-                        return rowValue != null;
-                    } else if (value.equals("false")) {
-                        return rowValue == null;
-                    } else {
-                        throw new ApiValidationException("[exist] can be only true or false");
-                    }
-                }
                 if (rowValue == null) {
                     return false;
                 }
@@ -119,11 +109,6 @@ public class ListSearch<R> implements Search<R> {
                             case GREATER -> ((Comparable) rowValue).compareTo(filterValue) > 0;
                             case CONTAINS -> ((String) rowValue).contains((String) filterValue);
                             case NOT_CONTAINS -> !((String) rowValue).contains((String) filterValue);
-                            case IN -> List.of(((String) filterValue).split(QueryParams.IN_SEPARATOR))
-                                    .contains((String) rowValue);
-                            case NOT_IN -> !List.of(((String) filterValue).split(QueryParams.IN_SEPARATOR))
-                                    .contains((String) rowValue);
-                            case EXISTS -> throw new IllegalStateException();
                         }).reduce((b1, b2) -> b1 || b2).orElse(Boolean.TRUE);
             }).reduce((b1, b2) -> b1 && b2).orElse(Boolean.TRUE);
         };

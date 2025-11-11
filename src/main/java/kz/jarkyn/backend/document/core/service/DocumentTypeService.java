@@ -22,7 +22,7 @@ public class DocumentTypeService {
 
     @Transactional(readOnly = true)
     public DocumentTypeEntity findExpense() {
-        return findByCode(DocumentTypeCode.PAYMENT_OUT);
+        return findByCode(DocumentTypeCode.EXPENSE);
     }
 
     @Transactional(readOnly = true)
@@ -51,11 +51,15 @@ public class DocumentTypeService {
     }
 
     @Transactional(readOnly = true)
-    public DocumentTypeEntity findByCode(DocumentTypeCode code) {
+    public boolean isExpense(DocumentTypeEntity documentType) {
+        return documentType.getCode().equals(DocumentTypeCode.EXPENSE.name());
+    }
+
+    private DocumentTypeEntity findByCode(DocumentTypeCode code) {
         return documentTypeRepository.findByCode(code.name()).orElseThrow();
     }
 
-    public enum DocumentTypeCode {
+    private enum DocumentTypeCode {
         SALE, SUPPLY, PAYMENT_IN, PAYMENT_OUT, EXPENSE;
     }
 }

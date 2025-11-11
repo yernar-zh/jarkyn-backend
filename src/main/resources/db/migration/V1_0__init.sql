@@ -152,6 +152,7 @@ CREATE TABLE document_search
     attached_amount      DECIMAL,
     not_attached_amount  DECIMAL,
     attached_coverage_id UUID,
+    overhead_cost_amount DECIMAL,
     receipt_number       VARCHAR(255),
     discount             DECIMAL,
     surcharge            DECIMAL,

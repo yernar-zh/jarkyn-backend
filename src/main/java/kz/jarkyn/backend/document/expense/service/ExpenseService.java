@@ -5,6 +5,8 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
+import kz.jarkyn.backend.core.config.AppRabbitTemplate;
+import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
@@ -15,6 +17,7 @@ import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
 import kz.jarkyn.backend.document.bind.model.BindDocumentEntity_;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
 import kz.jarkyn.backend.document.bind.service.BindDocumentService;
+import kz.jarkyn.backend.document.core.service.DocumentSearchService;
 import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.expense.mapper.ExpenseMapper;
@@ -24,6 +27,7 @@ import kz.jarkyn.backend.document.expense.model.dto.ExpenseListResponse;
 import kz.jarkyn.backend.document.expense.model.dto.ExpenseRequest;
 import kz.jarkyn.backend.document.expense.repository.ExpenseRepository;
 import kz.jarkyn.backend.document.expense.model.ExpenseEntity_;
+import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
 import kz.jarkyn.backend.global.model.CoverageEntity;
 import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.operation.service.CashFlowService;
@@ -45,6 +49,8 @@ public class ExpenseService {
     private final SearchFactory searchFactory;
     private final CashFlowService cashFlowService;
     private final DocumentTypeService documentTypeService;
+    private final DocumentSearchService documentSearchService;
+    private final AppRabbitTemplate appRabbitTemplate;
 
     public ExpenseService(
             ExpenseRepository expenseRepository,
@@ -54,8 +60,8 @@ public class ExpenseService {
             AuditService auditService,
             SearchFactory searchFactory,
             CashFlowService cashFlowService,
-            DocumentTypeService documentTypeService
-    ) {
+            DocumentTypeService documentTypeService,
+            DocumentSearchService documentSearchService, AppRabbitTemplate appRabbitTemplate) {
         this.expenseRepository = expenseRepository;
         this.expenseMapper = expenseMapper;
         this.bindDocumentService = bindDocumentService;
@@ -64,6 +70,8 @@ public class ExpenseService {
         this.searchFactory = searchFactory;
         this.cashFlowService = cashFlowService;
         this.documentTypeService = documentTypeService;
+        this.documentSearchService = documentSearchService;
+        this.appRabbitTemplate = appRabbitTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -75,37 +83,7 @@ public class ExpenseService {
 
     @Transactional(readOnly = true)
     public PageResponse<ExpenseListResponse> findApiByFilter(QueryParams queryParams) {
-        CriteriaAttributes<ExpenseEntity> attributes = documentService
-                .<ExpenseEntity>generateCriteriaAttributesBuilderFor()
-                .add("receiptNumber", (root) -> root.get(ExpenseEntity_.receiptNumber))
-                .addEnumType("itemOfExpenditure", (root) -> root.get(ExpenseEntity_.itemOfExpenditure))
-                .add("purpose", (root) -> root.get(ExpenseEntity_.purpose))
-                .add("attachedAmount", (root, query, cb, map) -> {
-                    Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
-                    Root<BindDocumentEntity> bindDocumentRoot = subQuery.from(BindDocumentEntity.class);
-                    subQuery.select(cb.coalesce(cb.sum(bindDocumentRoot.get(BindDocumentEntity_.amount)), BigDecimal.ZERO));
-                    subQuery.where(cb.equal(bindDocumentRoot.get(BindDocumentEntity_.primaryDocument), root));
-                    return subQuery;
-                })
-                .add("attachedCoverage.id", (root, query, cb, map) -> {
-                    Expression<Number> amount = (Expression<Number>) map.get("amount");
-                    Expression<Number> attachedAmount = (Expression<Number>) map.get("attachedAmount");
-                    Expression<String> coverageCode = cb.<String>selectCase()
-                            .when(cb.equal(amount, attachedAmount), CoverageEntity.FULL)
-                            .when(cb.equal(attachedAmount, 0), CoverageEntity.NONE)
-                            .otherwise(CoverageEntity.PARTIAL);
-                    Subquery<UUID> subQuery = query.subquery(UUID.class);
-                    Root<CoverageEntity> coverageRoot = subQuery.from(CoverageEntity.class);
-                    return subQuery.select(coverageRoot.get(CoverageEntity_.id))
-                            .where(cb.equal(coverageRoot.get(CoverageEntity_.code), coverageCode));
-                })
-                .add("notAttachedAmount", (root, query, cb, map) -> cb.diff(
-                        (Expression<Number>) map.get("amount"), (Expression<Number>) map.get("attachedAmount")))
-                .build();
-        Search<ExpenseListResponse> search = searchFactory.createCriteriaSearch(
-                ExpenseListResponse.class, List.of("name", "counterparty.name"), QueryParams.Sort.MOMENT_DESC,
-                ExpenseEntity.class, attributes);
-        return search.getResult(queryParams);
+        return documentSearchService.findApiByFilter(ExpenseListResponse.class, queryParams, documentTypeService.findExpense());
     }
 
     @Transactional
@@ -122,6 +100,7 @@ public class ExpenseService {
         expenseRepository.save(expense);
         auditService.saveEntity(expense);
         bindDocumentService.save(expense, request.getBindDocuments());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, expense.getId());
         return expense.getId();
     }
 
@@ -132,6 +111,7 @@ public class ExpenseService {
         expenseMapper.editEntity(expense, request);
         auditService.saveEntity(expense);
         bindDocumentService.save(expense, request.getBindDocuments());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, expense.getId());
     }
 
     @Transactional
