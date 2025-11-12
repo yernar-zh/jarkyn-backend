@@ -75,7 +75,9 @@ public class SupplyService {
         List<ItemResponse> items = itemService.findApiByDocument(supply);
         List<BindDocumentResponse> paidDocuments = bindDocumentService
                 .findResponseByRelatedDocument(supply, documentTypeService.findPaymentOut());
-        return supplyMapper.toResponse(supply, items, paidDocuments);
+        List<BindDocumentResponse> overheadDocuments = bindDocumentService
+                .findResponseByRelatedDocument(supply, documentTypeService.findExpense());
+        return supplyMapper.toResponse(supply, items, paidDocuments, overheadDocuments);
     }
 
     @Transactional(readOnly = true)

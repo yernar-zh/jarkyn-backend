@@ -12,4 +12,5 @@ import java.util.List;
 public interface SupplyResponse extends DocumentResponse {
     List<ItemResponse> getItems();
     List<BindDocumentResponse> getPaidDocuments();
+    List<BindDocumentResponse> getOverheadDocuments();
 }
