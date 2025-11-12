@@ -14,7 +14,6 @@ public class ExpenseEntity extends DocumentEntity {
     @ManyToOne
     @JoinColumn(name = "item_of_expenditure_id")
     private ItemOfExpenditureEntity itemOfExpenditure;
-    private String purpose;
 
     public String getReceiptNumber() {
         return receiptNumber;
@@ -30,13 +29,5 @@ public class ExpenseEntity extends DocumentEntity {
 
     public void setItemOfExpenditure(ItemOfExpenditureEntity itemOfExpenditure) {
         this.itemOfExpenditure = itemOfExpenditure;
-    }
-
-    public String getPurpose() {
-        return purpose;
-    }
-
-    public void setPurpose(String purpose) {
-        this.purpose = purpose;
     }
 }

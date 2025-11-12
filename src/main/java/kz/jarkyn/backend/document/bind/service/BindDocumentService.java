@@ -54,7 +54,10 @@ public class BindDocumentService {
                 .map(bindDocument -> {
                     DocumentEntity relatedDocument = bindDocument.getRelatedDocument();
                     BigDecimal relatedNotBindAmount = bindDocumentRepository
-                            .findAll(BindDocumentSpecifications.relatedDocument(relatedDocument))
+                            .findAll(Specification.allOf(
+                                    BindDocumentSpecifications.primaryDocumentType(primaryDocument.getType()),
+                                    BindDocumentSpecifications.relatedDocument(relatedDocument)
+                            ))
                             .stream().map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add)
                             .negate().add(relatedDocument.getAmount());
                     return bindDocumentMapper.toResponse(bindDocument, primaryNotBindAmount, relatedNotBindAmount);

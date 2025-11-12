@@ -32,9 +32,7 @@ VALUES ('6f5d4f59-f10e-42f6-8995-6a67d47e4e3d', 'Полное', 'FULL', false, n
        ('a8b1cf92-2894-41b4-94f5-0b9ad8e1d531', 'Отсутствует', 'NONE', false, now(), now());
 
 INSERT INTO public.item_of_expenditure (id, name, code, archived, created_at, last_modified_at)
-VALUES ('ac03d34e-2274-4f35-8939-46f17ddc05ed', 'Закупка товаров', 'SUPPLY', false, now(), now()),
-       ('f18c785e-9bd9-4446-81f8-c3b64c474cf4', 'Возврат', 'REFUND', false, now(), now()),
-       ('3a50a533-63a7-49e8-b1f1-f130b7b16822', 'Операционные расходы', 'OPEX', false, now(), now()),
-       ('4bcf1be9-a45b-4585-ab94-39d7452b7e85', 'Дивиденд', 'DIVIDEND', false, now(), now()),
+VALUES ('ac03d34e-2274-4f35-8939-46f17ddc05ed', 'Таможенные расходы', 'CUSTOMS', false, now(), now()),
+       ('f18c785e-9bd9-4446-81f8-c3b64c474cf4', 'Расходы на доставку', 'DELIVERY', false, now(), now()),
        ('f8ce8a87-947c-4818-b404-9de519f5125e', 'Зарплата', 'SALARY', false, now(), now()),
        ('25fa0cb2-a4d2-4035-9e8c-0c3b639caa4c', 'Хозяйственные расходы', 'HOUSEHOLD', false, now(), now());

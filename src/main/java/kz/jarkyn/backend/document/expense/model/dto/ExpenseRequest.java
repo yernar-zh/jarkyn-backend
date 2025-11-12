@@ -16,6 +16,5 @@ import java.util.List;
 public interface ExpenseRequest extends DocumentRequest {
     @Nullable String getReceiptNumber();
     IdDto getItemOfExpenditure();
-    @Nullable String getPurpose();
     List<BindDocumentRequest> getBindDocuments();
 }

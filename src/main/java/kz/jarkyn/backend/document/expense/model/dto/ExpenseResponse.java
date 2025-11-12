@@ -13,6 +13,5 @@ import java.util.List;
 public interface ExpenseResponse extends DocumentResponse {
     @Nullable String getReceiptNumber();
     EnumTypeResponse getItemOfExpenditure();
-    @Nullable String getPurpose();
     List<BindDocumentResponse> getBindDocuments();
 }
