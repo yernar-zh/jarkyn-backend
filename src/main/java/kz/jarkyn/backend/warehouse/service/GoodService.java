@@ -132,6 +132,7 @@ public class GoodService {
     @Transactional
     public GoodResponse createApi(GoodRequest request) {
         GoodEntity good = goodRepository.save(goodMapper.toEntity(request));
+        good.setName(good.getName().replaceAll("\\s+", " ").trim());
         good.setArchived(false);
         for (IdDto dto : request.getAttributes()) {
             GoodAttributeEntity goodAttribute = goodMapper.toEntity(good, dto);

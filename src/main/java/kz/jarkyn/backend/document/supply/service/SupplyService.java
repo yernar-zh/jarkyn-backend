@@ -28,6 +28,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -119,7 +120,12 @@ public class SupplyService {
         if (supply.getCommited()) return;
         supply.setCommited(Boolean.TRUE);
         auditService.commit(supply);
-        itemService.createPositiveTurnover(supply, supply.getAmount().multiply(supply.getExchangeRate()));
+        BigDecimal mainCostPrice = supply.getAmount().multiply(supply.getExchangeRate());
+        BigDecimal overheadCostPrice = bindDocumentService
+                .findResponseByRelatedDocument(supply, documentTypeService.findExpense()).stream()
+                .map(bindDocument -> bindDocument.getAmount().multiply(bindDocument.getPrimaryDocument().getExchangeRate()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        itemService.createPositiveTurnover(supply, mainCostPrice.add(overheadCostPrice));
         AccountEntity supplerAccount = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
         cashFlowService.create(supply, supplerAccount, supply.getAmount());
