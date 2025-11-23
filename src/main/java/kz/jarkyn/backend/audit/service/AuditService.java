@@ -25,7 +25,6 @@ import kz.jarkyn.backend.user.model.SessionEntity;
 import kz.jarkyn.backend.user.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,7 +166,7 @@ public class AuditService {
         saveEntity(entity, relatedEntity, entityName, authService.getCurrentSession());
     }
 
-    private void saveEntity(AbstractEntity entity, AbstractEntity relatedEntity, String entityName, SessionEntity session) {
+    public void saveEntity(AbstractEntity entity, AbstractEntity relatedEntity, String entityName, SessionEntity session) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> clazz = entity.getClass(); clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
             fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
@@ -186,6 +185,7 @@ public class AuditService {
             throw new RuntimeException(e);
         }
     }
+
 
     public void saveEntityAsync(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
         AuditSaveMessage message = new AuditSaveMessage(
@@ -228,20 +228,6 @@ public class AuditService {
     @Transactional
     public void unarchive(AbstractEntity entity) {
         addAction(entity, entity, "UNARCHIVE");
-    }
-
-
-    @RabbitListener(queues = "${rabbitmq.queue.audit-save:audit-save}")
-    @Transactional
-    public void onAuditSave(AuditSaveMessage msg) {
-        try {
-            AbstractEntity entity = load(msg.getEntityClass(), msg.getEntityId());
-            AbstractEntity related = load(msg.getRelatedEntityClass(), msg.getRelatedEntityId());
-            SessionEntity session = entityManager.find(SessionEntity.class, msg.getSessionId());
-            saveEntity(entity, related, msg.getEntityName(), session);
-        } catch (Exception e) {
-            log.error("AUDIT_LISTENER", e);
-        }
     }
 
     private void save(AbstractEntity entity, UUID relatedEntityId, String fieldName, Object fieldValueObj,
@@ -328,18 +314,6 @@ public class AuditService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private AbstractEntity load(String className, UUID id) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            Object obj = entityManager.find(clazz, id);
-            if (obj instanceof AbstractEntity abstractEntity) return abstractEntity;
-            throw new RuntimeException("Cannot cast " + obj.getClass().getName() + " to AbstractEntity");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
 }
