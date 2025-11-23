@@ -4,13 +4,12 @@ package kz.jarkyn.backend.audit.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import kz.jarkyn.backend.audit.config.AuditIgnore;
 import kz.jarkyn.backend.audit.mapper.ChangeMapper;
 import kz.jarkyn.backend.audit.model.AuditEntity;
-import kz.jarkyn.backend.audit.model.dto.EntityChangeResponse;
-import kz.jarkyn.backend.audit.model.dto.EntityGroupChangeResponse;
-import kz.jarkyn.backend.audit.model.dto.FieldChangeResponse;
-import kz.jarkyn.backend.audit.model.dto.MainEntityChangeResponse;
+import kz.jarkyn.backend.audit.model.dto.*;
+import kz.jarkyn.backend.audit.model.message.AuditSaveMessage;
 import kz.jarkyn.backend.audit.repository.AuditRepository;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.ReferenceEntity;
@@ -18,12 +17,15 @@ import kz.jarkyn.backend.core.model.dto.Pair;
 import kz.jarkyn.backend.core.model.dto.Triple;
 import kz.jarkyn.backend.core.sorts.EntitySorts;
 import kz.jarkyn.backend.audit.specifications.AuditSpecifications;
+import kz.jarkyn.backend.core.config.AppRabbitTemplate;
+import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.user.model.SessionEntity;
-import kz.jarkyn.backend.user.model.UserEntity;
-import kz.jarkyn.backend.user.repository.UserRepository;
 import kz.jarkyn.backend.user.service.AuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,8 @@ import java.util.stream.Stream;
 
 @Service
 public class AuditService {
+    private static final Logger log = LoggerFactory.getLogger(AuditService.class);
+
     private static final String CREATE = "CREATE";
     private static final String EDITE = "EDITE";
 
@@ -43,16 +47,21 @@ public class AuditService {
     private final ChangeMapper changeMapper;
     private final ObjectMapper objectMapper;
     private final AuthService authService;
+    private final AppRabbitTemplate appRabbitTemplate;
+    private final EntityManager entityManager;
 
     public AuditService(
             AuditRepository auditRepository,
             ChangeMapper changeMapper,
             ObjectMapper objectMapper,
-            AuthService authService) {
+            AuthService authService,
+            AppRabbitTemplate appRabbitTemplate, EntityManager entityManager) {
         this.auditRepository = auditRepository;
         this.changeMapper = changeMapper;
         this.objectMapper = objectMapper;
         this.authService = authService;
+        this.appRabbitTemplate = appRabbitTemplate;
+        this.entityManager = entityManager;
     }
 
     public MainEntityChangeResponse findLastChange(UUID entityId) {
@@ -148,10 +157,12 @@ public class AuditService {
         }).sorted(Comparator.comparing(MainEntityChangeResponse::getMoment).reversed()).toList();
     }
 
+    @Transactional
     public void saveEntity(AbstractEntity entity) {
         saveEntity(entity, entity, null);
     }
 
+    @Transactional
     public void saveEntity(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> clazz = entity.getClass(); clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
@@ -170,6 +181,19 @@ public class AuditService {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void saveEntityAsync(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
+        AuditSaveMessage message = new AuditSaveMessage(
+                entity.getId(), entity.getClass().getName(), relatedEntity.getId(),
+                relatedEntity.getClass().getName(),
+                entityName
+        );
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.AUDIT_SAVE, message);
+    }
+
+    public void saveEntityAsync(AbstractEntity entity) {
+        saveEntityAsync(entity, entity, null);
     }
 
     @Transactional
@@ -202,33 +226,16 @@ public class AuditService {
         addAction(entity, entity, "UNARCHIVE");
     }
 
+
+    @RabbitListener(queues = "${rabbitmq.queue.audit-save:audit-save}")
     @Transactional
-    public void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String action) {
-        SessionEntity session = authService.getCurrentSession();
-        Instant moment = auditRepository.findAll(Specification
-                        .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
-                        .and(AuditSpecifications.session(session))
-                        .and(AuditSpecifications.createdLessThanOneSecond()))
-                .stream().map(AuditEntity::getMoment)
-                .findAny().orElse(Instant.now());
-        AuditEntity newAudit = new AuditEntity();
-        newAudit.setMoment(moment);
-        newAudit.setSession(session);
-        newAudit.setEntityId(entity.getId());
-        newAudit.setRelatedEntityId(relatedEntity.getId());
-        newAudit.setAction(action);
-        newAudit.setFieldName(null);
-        newAudit.setFieldValue(null);
-        auditRepository.save(newAudit);
-    }
-
-
-    private JsonNode toJsonNode(String json) {
-        if (json == null) return null;
+    public void onAuditSave(AuditSaveMessage msg) {
         try {
-            return objectMapper.readTree(json);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            AbstractEntity entity = load(msg.getEntityClass(), msg.getEntityId());
+            AbstractEntity related = load(msg.getRelatedEntityClass(), msg.getRelatedEntityId());
+            saveEntity(entity, related, msg.getEntityName());
+        } catch (Exception e) {
+            log.error("AUDIT_LISTENER", e);
         }
     }
 
@@ -289,4 +296,45 @@ public class AuditService {
             throw new RuntimeException(e);
         }
     }
+
+    private void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String action) {
+        SessionEntity session = authService.getCurrentSession();
+        Instant moment = auditRepository.findAll(Specification
+                        .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
+                        .and(AuditSpecifications.session(session))
+                        .and(AuditSpecifications.createdLessThanOneSecond()))
+                .stream().map(AuditEntity::getMoment)
+                .findAny().orElse(Instant.now());
+        AuditEntity newAudit = new AuditEntity();
+        newAudit.setMoment(moment);
+        newAudit.setSession(session);
+        newAudit.setEntityId(entity.getId());
+        newAudit.setRelatedEntityId(relatedEntity.getId());
+        newAudit.setAction(action);
+        newAudit.setFieldName(null);
+        newAudit.setFieldValue(null);
+        auditRepository.save(newAudit);
+    }
+
+    private JsonNode toJsonNode(String json) {
+        if (json == null) return null;
+        try {
+            return objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private AbstractEntity load(String className, UUID id) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            Object obj = entityManager.find(clazz, id);
+            if (obj instanceof AbstractEntity abstractEntity) return abstractEntity;
+            throw new RuntimeException("Cannot cast " + obj.getClass().getName() + " to AbstractEntity");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
 }

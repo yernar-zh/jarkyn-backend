@@ -21,9 +21,17 @@ public class RabbitConfig {
     @Value("${rabbitmq.queue.document-search}")
     private String supplyIndexQueueName;
 
+    @Value("${rabbitmq.queue.audit-save:audit-save}")
+    private String auditSaveQueueName;
+
     @Bean
     public Queue supplyIndexQueue() {
         return new Queue(supplyIndexQueueName, true);
+    }
+
+    @Bean
+    public Queue auditSaveQueue() {
+        return new Queue(auditSaveQueueName, true);
     }
 
     @Bean
@@ -37,6 +45,14 @@ public class RabbitConfig {
                 .bind(supplyIndexQueue)
                 .to(exchange)
                 .with(RabbitRoutingKeys.DOCUMENT_SEARCH);
+    }
+
+    @Bean
+    public Binding auditSaveBinding(Queue auditSaveQueue, TopicExchange exchange) {
+        return BindingBuilder
+                .bind(auditSaveQueue)
+                .to(exchange)
+                .with(RabbitRoutingKeys.AUDIT_SAVE);
     }
 
     @Bean
