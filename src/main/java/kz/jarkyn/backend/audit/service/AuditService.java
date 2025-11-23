@@ -164,6 +164,10 @@ public class AuditService {
 
     @Transactional
     public void saveEntity(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
+        saveEntity(entity, relatedEntity, entityName, authService.getCurrentSession());
+    }
+
+    private void saveEntity(AbstractEntity entity, AbstractEntity relatedEntity, String entityName, SessionEntity session) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> clazz = entity.getClass(); clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
             fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
@@ -176,7 +180,7 @@ public class AuditService {
                 field.setAccessible(true);
                 save(entity, relatedEntity.getId(),
                         entityName != null ? entityName + "." + field.getName() : field.getName(),
-                        field.get(entity));
+                        field.get(entity), session);
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -187,7 +191,7 @@ public class AuditService {
         AuditSaveMessage message = new AuditSaveMessage(
                 entity.getId(), entity.getClass().getName(), relatedEntity.getId(),
                 relatedEntity.getClass().getName(),
-                entityName
+                entityName, authService.getCurrentSession().getId()
         );
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.AUDIT_SAVE, message);
     }
@@ -233,13 +237,15 @@ public class AuditService {
         try {
             AbstractEntity entity = load(msg.getEntityClass(), msg.getEntityId());
             AbstractEntity related = load(msg.getRelatedEntityClass(), msg.getRelatedEntityId());
-            saveEntity(entity, related, msg.getEntityName());
+            SessionEntity session = entityManager.find(SessionEntity.class, msg.getSessionId());
+            saveEntity(entity, related, msg.getEntityName(), session);
         } catch (Exception e) {
             log.error("AUDIT_LISTENER", e);
         }
     }
 
-    private void save(AbstractEntity entity, UUID relatedEntityId, String fieldName, Object fieldValueObj) {
+    private void save(AbstractEntity entity, UUID relatedEntityId, String fieldName, Object fieldValueObj,
+                      SessionEntity session) {
         try {
             AuditEntity oldAudit = auditRepository.findOne(Specification
                             .where(AuditSpecifications.entityId(entity.getId()))
@@ -276,7 +282,6 @@ public class AuditService {
                 if (oldAudit != null && Objects.equals(oldAudit.getFieldValue(),
                         objectMapper.writeValueAsString(fieldValue))) return;
             }
-            SessionEntity session = authService.getCurrentSession();
             Instant moment = auditRepository.findAll(Specification
                             .where(AuditSpecifications.relatedEntityId(relatedEntityId))
                             .and(AuditSpecifications.session(session))

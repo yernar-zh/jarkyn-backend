@@ -8,15 +8,18 @@ public class AuditSaveMessage {
     private UUID relatedEntityId;
     private String relatedEntityClass;
     private String entityName;
+    private UUID sessionId;
 
-    public AuditSaveMessage() {}
+    public AuditSaveMessage() {
+    }
 
-    public AuditSaveMessage(UUID entityId, String entityClass, UUID relatedEntityId, String relatedEntityClass, String entityName) {
+    public AuditSaveMessage(UUID entityId, String entityClass, UUID relatedEntityId, String relatedEntityClass, String entityName, UUID sessionId) {
         this.entityId = entityId;
         this.entityClass = entityClass;
         this.relatedEntityId = relatedEntityId;
         this.relatedEntityClass = relatedEntityClass;
         this.entityName = entityName;
+        this.sessionId = sessionId;
     }
 
     public UUID getEntityId() {
@@ -57,5 +60,13 @@ public class AuditSaveMessage {
 
     public void setEntityName(String entityName) {
         this.entityName = entityName;
+    }
+
+    public UUID getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
     }
 }
