@@ -63,12 +63,18 @@ class SearchUtils {
     }
 
     public static Object createProxy(String prefix, Map<String, ?> map, Class<?> resultClass) {
+        boolean allFieldsNull = map.entrySet().stream()
+                .filter(e -> e.getKey().startsWith(prefix))
+                .allMatch(e -> e.getValue() == null);
+        if (allFieldsNull) {
+            return null;
+        }
         InvocationHandler handler = (proxy, method, args) -> {
             String methodName = method.getName();
             if (methodName.startsWith("get") && methodName.length() > 3) {
                 String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
                 if (SearchUtils.getConvertor(method.getReturnType()) == null &&
-                    !Collection.class.isAssignableFrom(method.getReturnType())) {
+                        !Collection.class.isAssignableFrom(method.getReturnType())) {
                     return createProxy(fieldName + ".", map, method.getReturnType());
                 }
                 return map.get(prefix + fieldName);

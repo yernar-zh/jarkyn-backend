@@ -2,18 +2,26 @@
 package kz.jarkyn.backend.warehouse.service;
 
 
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import kz.jarkyn.backend.audit.service.AuditService;
+import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.core.exception.DataValidationException;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.document.core.model.DocumentSearchEntity;
+import kz.jarkyn.backend.document.core.model.DocumentSearchEntity_;
 import kz.jarkyn.backend.document.core.model.ItemEntity;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
-import kz.jarkyn.backend.document.core.service.ItemService;
 import kz.jarkyn.backend.document.core.specifications.ItemSpecifications;
+import kz.jarkyn.backend.operation.mode.TurnoverEntity;
+import kz.jarkyn.backend.operation.mode.TurnoverEntity_;
 import kz.jarkyn.backend.warehouse.mapper.SellingPriceMapper;
 import kz.jarkyn.backend.warehouse.model.*;
 import kz.jarkyn.backend.warehouse.model.dto.*;
@@ -95,37 +103,77 @@ public class GoodService {
         List<WarehouseEntity> warehouses = filterWarehouseIds.isEmpty()
                 ? warehouseRepository.findByArchived(false)
                 : warehouseRepository.findAllById(filterWarehouseIds);
-        Search<GoodListResponse> search = searchFactory.createListSearch(
-                GoodListResponse.class,
-                List.of("name", "searchKeywords", "group.name", "group.searchKeywords", "attributeSearchKeywords"),
-                new QueryParams.Sort("path", QueryParams.Sort.Type.ASC),
-                () -> goodRepository.findAll().stream().map(good -> {
-                    String path = getParentGroups(good.getGroup()).stream().map(GroupEntity::getName)
-                            .collect(Collectors.joining("/")) + "/" + good.getName();
-                    String groupIds = getParentGroups(good.getGroup()).stream().map(GroupEntity::getId)
-                            .filter(Objects::nonNull).map(UUID::toString).collect(Collectors.joining("/"));
-                    List<AttributeEntity> attributes = attributeRepository.findByGood(good);
-                    String attributeIds = attributes.stream()
-                            .map(AbstractEntity::getId)
-                            .filter(Objects::nonNull).map(UUID::toString)
-                            .collect(Collectors.joining(","));
-                    String attributeSearchKeywords = attributes.stream()
-                            .flatMap(attribute -> Stream.of(attribute.getName(), attribute.getSearchKeywords()))
-                            .collect(Collectors.joining(" "));
-                    BigDecimal sellingPrice = sellingPriceRepository.findByGood(good)
-                            .stream().map(SellingPriceEntity::getValue)
-                            .max(BigDecimal::compareTo).orElseThrow();
-                    List<Pair<WarehouseEntity, GoodEntity>> goodPair = warehouses.stream()
-                            .map(warehouse -> Pair.of(warehouse, good)).toList();
-                    List<TurnoverService.StockDto> stocks = turnoverService.findStockAtMoment(
-                            goodPair, Optional.ofNullable(filterMoment).orElseGet(Instant::now));
-                    Integer remind = stocks.stream().map(TurnoverService.StockDto::getRemain)
-                            .reduce(0, Integer::sum);
-                    BigDecimal costPrice = stocks.stream().map(TurnoverService.StockDto::getCostPrice)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-                    return goodMapper.toListResponse(good, path, groupIds, attributeIds, attributeSearchKeywords,
-                            sellingPrice, remind, costPrice);
-                }).toList());
+
+        if (filterMoment == null) throw new ApiValidationException("Filed `filterMoment` is null");
+
+        CriteriaAttributes.Builder<GoodEntity> attributesBuilder = CriteriaAttributes
+                .<GoodEntity>builder()
+                .add("id", (root) -> root.get(GoodEntity_.id))
+                .add("name", (root) -> root.get(GoodEntity_.name))
+                .add("archived", (root) -> root.get(GoodEntity_.archived))
+                .addReference("group", (root) -> root.get(GoodEntity_.group))
+                .add("minimumPrice", (root) -> root.get(GoodEntity_.minimumPrice))
+                .add("weight", (root) -> root.get(GoodEntity_.weight))
+                .add("path", (root) -> root.get(GoodEntity_.path))
+                .add("groupIds", (root) -> root.get(GoodEntity_.groupIds))
+                .add("attributeIds", (root) -> root.get(GoodEntity_.attributeIds))
+                .add("sellingPrice", (root, query, cb, map) -> {
+                    Subquery<BigDecimal> subQuery = query.subquery(BigDecimal.class);
+                    Root<SellingPriceEntity> sellingPriceRoot = subQuery.from(SellingPriceEntity.class);
+                    subQuery.select(cb.coalesce(cb.max(sellingPriceRoot.get(SellingPriceEntity_.value)), BigDecimal.ZERO));
+                    subQuery.where(cb.equal(sellingPriceRoot.get(SellingPriceEntity_.good), root));
+                    return subQuery;
+                })
+                .add("remain", (root, query, cb, map) -> {
+                    Subquery<Integer> subquery = query.subquery(Integer.class);
+                    Root<TurnoverEntity> turnoverRoot = subquery.from(TurnoverEntity.class);
+
+                    Subquery<Instant> innerSubquery = query.subquery(Instant.class);
+                    Root<TurnoverEntity> innerTurnoverRoot = innerSubquery.from(TurnoverEntity.class);
+                    innerSubquery.select(cb.greatest(innerTurnoverRoot.get(TurnoverEntity_.moment)));
+                    innerSubquery.where(
+                            cb.equal(innerTurnoverRoot.get(TurnoverEntity_.good), root),
+                            cb.equal(innerTurnoverRoot.get(TurnoverEntity_.warehouse), turnoverRoot.get(TurnoverEntity_.warehouse)),
+                            cb.lessThan(innerTurnoverRoot.get(TurnoverEntity_.moment), filterMoment)
+                    );
+
+                    subquery.where(
+                            cb.equal(turnoverRoot.get(TurnoverEntity_.good), root),
+                            turnoverRoot.get(TurnoverEntity_.warehouse).in(warehouses),
+                            cb.equal(turnoverRoot.get(TurnoverEntity_.moment), innerSubquery)
+                    );
+
+                    subquery.select(cb.coalesce(cb.sum(
+                            cb.sum(turnoverRoot.get(TurnoverEntity_.remain), turnoverRoot.get(TurnoverEntity_.quantity))
+                    ), 0));
+                    return subquery;
+                })
+                .add("costPrice", (root, query, cb, map) -> {
+                    Subquery<BigDecimal> subquery = query.subquery(BigDecimal.class);
+                    Root<TurnoverEntity> turnoverRoot = subquery.from(TurnoverEntity.class);
+
+                    Subquery<Instant> innerSubquery = query.subquery(Instant.class);
+                    Root<TurnoverEntity> innerTurnoverRoot = innerSubquery.from(TurnoverEntity.class);
+                    innerSubquery.select(cb.greatest(innerTurnoverRoot.get(TurnoverEntity_.moment)));
+                    innerSubquery.where(
+                            cb.equal(innerTurnoverRoot.get(TurnoverEntity_.good), root),
+                            cb.equal(innerTurnoverRoot.get(TurnoverEntity_.warehouse), turnoverRoot.get(TurnoverEntity_.warehouse)),
+                            cb.lessThan(innerTurnoverRoot.get(TurnoverEntity_.moment), filterMoment)
+                    );
+
+                    subquery.where(
+                            cb.equal(turnoverRoot.get(TurnoverEntity_.good), root),
+                            turnoverRoot.get(TurnoverEntity_.warehouse).in(warehouses),
+                            cb.equal(turnoverRoot.get(TurnoverEntity_.moment), innerSubquery)
+                    );
+
+                    subquery.select(cb.coalesce(cb.max(turnoverRoot.get(TurnoverEntity_.costPricePerUnit)), BigDecimal.ZERO));
+                    return subquery;
+                });
+
+        Search<GoodListResponse> search = searchFactory.createCriteriaSearch(
+                GoodListResponse.class, List.of("search"), QueryParams.Sort.NAME_ASC,
+                GoodEntity.class, attributesBuilder.build());
         return search.getResult(queryParams);
     }
 
@@ -145,8 +193,8 @@ public class GoodService {
             sellingPriceRepository.save(sellingPrice);
             auditService.saveEntity(sellingPrice, good, "sellingPrices");
         }
-        validate(good);
         auditService.saveEntity(good);
+        validateAndFill(good);
         return findApiById(good.getId());
     }
 
@@ -187,7 +235,7 @@ public class GoodService {
             sellingPriceRepository.delete(sellingPrice);
             auditService.delete(sellingPrice, good);
         }
-        validate(good);
+        validateAndFill(good);
         auditService.saveEntity(good);
         return findApiById(id);
     }
@@ -227,10 +275,29 @@ public class GoodService {
         return result;
     }
 
-    private void validate(GoodEntity good) {
+    private void validateAndFill(GoodEntity good) {
         int size = sellingPriceRepository.findByGood(good).size();
         if (size == 0) {
             throw new DataValidationException("Необходимо указать хотя бы одну цену продажи");
         }
+
+        String path = getParentGroups(good.getGroup()).stream().map(GroupEntity::getName)
+                .collect(Collectors.joining("/")) + "/" + good.getName();
+        String groupIds = getParentGroups(good.getGroup()).stream().map(GroupEntity::getId)
+                .filter(Objects::nonNull).map(UUID::toString).collect(Collectors.joining("/"));
+        List<AttributeEntity> attributes = attributeRepository.findByGood(good);
+        String attributeIds = attributes.stream()
+                .map(AbstractEntity::getId)
+                .filter(Objects::nonNull).map(UUID::toString)
+                .collect(Collectors.joining(","));
+        String attributeSearchKeywords = attributes.stream()
+                .flatMap(attribute -> Stream.of(attribute.getName(), attribute.getSearchKeywords()))
+                .collect(Collectors.joining(" "));
+        String search = good.getName() + " " + good.getSearchKeywords() + " " +
+                good.getGroup().getName() + " " + good.getGroup().getSearchKeywords() + " " + attributeSearchKeywords;
+        good.setSearch(search);
+        good.setPath(path);
+        good.setGroupIds(groupIds);
+        good.setAttributeIds(attributeIds);
     }
 }

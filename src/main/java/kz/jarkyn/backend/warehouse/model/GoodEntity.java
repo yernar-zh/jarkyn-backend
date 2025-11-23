@@ -24,6 +24,15 @@ public class GoodEntity extends ReferenceEntity {
     @Column(name = "search_keywords")
     private String searchKeywords;
 
+    @AuditIgnore
+    private String search;
+    @AuditIgnore
+    private String path;
+    @AuditIgnore
+    private String groupIds;
+    @AuditIgnore
+    private String attributeIds;
+
     public GroupEntity getGroup() {
         return group;
     }
@@ -62,5 +71,37 @@ public class GoodEntity extends ReferenceEntity {
 
     public void setSearchKeywords(String searchKeywords) {
         this.searchKeywords = searchKeywords;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(String groupIds) {
+        this.groupIds = groupIds;
+    }
+
+    public String getAttributeIds() {
+        return attributeIds;
+    }
+
+    public void setAttributeIds(String attributeIds) {
+        this.attributeIds = attributeIds;
     }
 }

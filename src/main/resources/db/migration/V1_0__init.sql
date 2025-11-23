@@ -175,7 +175,6 @@ CREATE TABLE expense
     id                     UUID NOT NULL,
     receipt_number         VARCHAR(255),
     item_of_expenditure_id UUID,
-    purpose                VARCHAR(255),
     CONSTRAINT pk_expense PRIMARY KEY (id)
 );
 
@@ -191,6 +190,10 @@ CREATE TABLE good
     weight           DECIMAL,
     minimum_price    INTEGER,
     search_keywords  VARCHAR(255),
+    search           VARCHAR(255),
+    path             VARCHAR(255),
+    group_ids        VARCHAR(255),
+    attribute_ids    VARCHAR(255),
     CONSTRAINT pk_good PRIMARY KEY (id)
 );
 

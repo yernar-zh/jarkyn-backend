@@ -14,13 +14,10 @@ public interface GoodListResponse extends ReferenceResponse {
     GroupShortResponse getGroup();
     @Nullable ImageResponse getImage();
     Integer getMinimumPrice();
-    String getSearchKeywords();
     BigDecimal getWeight();
-    Boolean getArchived();
     String getPath();
     String getGroupIds();
     String getAttributeIds();
-    String getAttributeSearchKeywords();
     BigDecimal getSellingPrice();
     Integer getRemain();
     BigDecimal getCostPrice();
