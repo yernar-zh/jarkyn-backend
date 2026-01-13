@@ -47,20 +47,18 @@ public class AuditService {
     private final ObjectMapper objectMapper;
     private final AuthService authService;
     private final AppRabbitTemplate appRabbitTemplate;
-    private final EntityManager entityManager;
 
     public AuditService(
             AuditRepository auditRepository,
             ChangeMapper changeMapper,
             ObjectMapper objectMapper,
             AuthService authService,
-            AppRabbitTemplate appRabbitTemplate, EntityManager entityManager) {
+            AppRabbitTemplate appRabbitTemplate) {
         this.auditRepository = auditRepository;
         this.changeMapper = changeMapper;
         this.objectMapper = objectMapper;
         this.authService = authService;
         this.appRabbitTemplate = appRabbitTemplate;
-        this.entityManager = entityManager;
     }
 
     public MainEntityChangeResponse findLastChange(UUID entityId) {
@@ -189,8 +187,8 @@ public class AuditService {
 
     public void saveEntityAsync(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
         AuditSaveMessage message = new AuditSaveMessage(
-                entity.getId(), entity.getClass().getName(), relatedEntity.getId(),
-                relatedEntity.getClass().getName(),
+                entity.getId(), entity.getClass().getName(),
+                relatedEntity.getId(), relatedEntity.getClass().getName(),
                 entityName, authService.getCurrentSession().getId()
         );
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.AUDIT_SAVE, message);
@@ -271,7 +269,7 @@ public class AuditService {
             Instant moment = auditRepository.findAll(Specification
                             .where(AuditSpecifications.relatedEntityId(relatedEntityId))
                             .and(AuditSpecifications.session(session))
-                            .and(AuditSpecifications.createdLessThanOneSecond()))
+                            .and(AuditSpecifications.createdLessThanTenSecond()))
                     .stream().map(AuditEntity::getMoment)
                     .findAny().orElse(Instant.now());
             AuditEntity newAudit = new AuditEntity();
@@ -293,7 +291,7 @@ public class AuditService {
         Instant moment = auditRepository.findAll(Specification
                         .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
                         .and(AuditSpecifications.session(session))
-                        .and(AuditSpecifications.createdLessThanOneSecond()))
+                        .and(AuditSpecifications.createdLessThanTenSecond()))
                 .stream().map(AuditEntity::getMoment)
                 .findAny().orElse(Instant.now());
         AuditEntity newAudit = new AuditEntity();

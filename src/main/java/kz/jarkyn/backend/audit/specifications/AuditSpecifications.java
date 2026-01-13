@@ -3,7 +3,6 @@ package kz.jarkyn.backend.audit.specifications;
 import kz.jarkyn.backend.audit.model.AuditEntity;
 import kz.jarkyn.backend.audit.model.AuditEntity_;
 import kz.jarkyn.backend.user.model.SessionEntity;
-import kz.jarkyn.backend.user.model.UserEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
@@ -26,10 +25,10 @@ public class AuditSpecifications {
         return (root, query, cb) -> cb.equal(root.get(AuditEntity_.session), session);
     }
 
-    public static Specification<AuditEntity> createdLessThanOneSecond() {
+    public static Specification<AuditEntity> createdLessThanTenSecond() {
         return (root, query, cb) -> cb.greaterThan(
                 root.get(AuditEntity_.createdAt),
-                Instant.now().minusSeconds(1)
+                Instant.now().minusSeconds(10)
         );
     }
 }
