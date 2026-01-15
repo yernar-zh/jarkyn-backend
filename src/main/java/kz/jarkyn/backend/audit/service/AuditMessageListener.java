@@ -37,7 +37,7 @@ public class AuditMessageListener {
                 log.error("AUDIT_LISTENER: Session not found: {}", msg.getSessionId());
                 return;
             }
-            auditService.saveEntity(entity, related, msg.getEntityName(), session);
+            auditService.saveEntity(entity, related, msg.getEntityName(), session, msg.getInstant());
         } catch (Exception e) {
             log.error("AUDIT_LISTENER", e);
         }

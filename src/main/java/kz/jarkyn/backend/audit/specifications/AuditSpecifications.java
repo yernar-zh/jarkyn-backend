@@ -25,10 +25,10 @@ public class AuditSpecifications {
         return (root, query, cb) -> cb.equal(root.get(AuditEntity_.session), session);
     }
 
-    public static Specification<AuditEntity> createdLessThanTenSecond() {
+    public static Specification<AuditEntity> createdLessThanSecond(Instant instant) {
         return (root, query, cb) -> cb.greaterThan(
                 root.get(AuditEntity_.createdAt),
-                Instant.now().minusSeconds(10)
+                instant.minusSeconds(1)
         );
     }
 }

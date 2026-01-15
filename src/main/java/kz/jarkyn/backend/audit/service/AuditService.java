@@ -4,7 +4,6 @@ package kz.jarkyn.backend.audit.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
 import kz.jarkyn.backend.audit.config.AuditIgnore;
 import kz.jarkyn.backend.audit.mapper.ChangeMapper;
 import kz.jarkyn.backend.audit.model.AuditEntity;
@@ -161,10 +160,12 @@ public class AuditService {
 
     @Transactional
     public void saveEntity(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
-        saveEntity(entity, relatedEntity, entityName, authService.getCurrentSession());
+        saveEntity(entity, relatedEntity, entityName, authService.getCurrentSession(), Instant.now());
     }
 
-    public void saveEntity(AbstractEntity entity, AbstractEntity relatedEntity, String entityName, SessionEntity session) {
+    public void saveEntity(
+            AbstractEntity entity, AbstractEntity relatedEntity, String entityName,
+            SessionEntity session, Instant instant) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> clazz = entity.getClass(); clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
             fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
@@ -177,7 +178,7 @@ public class AuditService {
                 field.setAccessible(true);
                 save(entity, relatedEntity.getId(),
                         entityName != null ? entityName + "." + field.getName() : field.getName(),
-                        field.get(entity), session);
+                        field.get(entity), session, instant);
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -189,7 +190,7 @@ public class AuditService {
         AuditSaveMessage message = new AuditSaveMessage(
                 entity.getId(), entity.getClass().getName(),
                 relatedEntity.getId(), relatedEntity.getClass().getName(),
-                entityName, authService.getCurrentSession().getId()
+                entityName, authService.getCurrentSession().getId(), Instant.now()
         );
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.AUDIT_SAVE, message);
     }
@@ -229,7 +230,7 @@ public class AuditService {
     }
 
     private void save(AbstractEntity entity, UUID relatedEntityId, String fieldName, Object fieldValueObj,
-                      SessionEntity session) {
+                      SessionEntity session, Instant instant) {
         try {
             AuditEntity oldAudit = auditRepository.findOne(Specification
                             .where(AuditSpecifications.entityId(entity.getId()))
@@ -269,7 +270,7 @@ public class AuditService {
             Instant moment = auditRepository.findAll(Specification
                             .where(AuditSpecifications.relatedEntityId(relatedEntityId))
                             .and(AuditSpecifications.session(session))
-                            .and(AuditSpecifications.createdLessThanTenSecond()))
+                            .and(AuditSpecifications.createdLessThanSecond(instant)))
                     .stream().map(AuditEntity::getMoment)
                     .findAny().orElse(Instant.now());
             AuditEntity newAudit = new AuditEntity();
@@ -291,7 +292,7 @@ public class AuditService {
         Instant moment = auditRepository.findAll(Specification
                         .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
                         .and(AuditSpecifications.session(session))
-                        .and(AuditSpecifications.createdLessThanTenSecond()))
+                        .and(AuditSpecifications.createdLessThanSecond(Instant.now())))
                 .stream().map(AuditEntity::getMoment)
                 .findAny().orElse(Instant.now());
         AuditEntity newAudit = new AuditEntity();
