@@ -24,9 +24,12 @@ import kz.jarkyn.backend.user.model.SessionEntity;
 import kz.jarkyn.backend.user.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import kz.jarkyn.backend.core.utils.RequestMoment;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -46,18 +49,31 @@ public class AuditService {
     private final ObjectMapper objectMapper;
     private final AuthService authService;
     private final AppRabbitTemplate appRabbitTemplate;
+    private final ObjectProvider<RequestMoment> requestMomentProvider;
 
     public AuditService(
             AuditRepository auditRepository,
             ChangeMapper changeMapper,
             ObjectMapper objectMapper,
             AuthService authService,
-            AppRabbitTemplate appRabbitTemplate) {
+            AppRabbitTemplate appRabbitTemplate,
+            ObjectProvider<RequestMoment> requestMomentProvider) {
         this.auditRepository = auditRepository;
         this.changeMapper = changeMapper;
         this.objectMapper = objectMapper;
         this.authService = authService;
         this.appRabbitTemplate = appRabbitTemplate;
+        this.requestMomentProvider = requestMomentProvider;
+    }
+
+    private Instant getCurrentMoment() {
+        if (RequestContextHolder.getRequestAttributes() != null) {
+            RequestMoment requestMoment = requestMomentProvider.getIfAvailable();
+            if (requestMoment != null) {
+                return requestMoment.getMoment();
+            }
+        }
+        return Instant.now();
     }
 
     public MainEntityChangeResponse findLastChange(UUID entityId) {
@@ -160,7 +176,7 @@ public class AuditService {
 
     @Transactional
     public void saveEntity(AbstractEntity entity, AbstractEntity relatedEntity, String entityName) {
-        saveEntity(entity, relatedEntity, entityName, authService.getCurrentSession(), Instant.now());
+        saveEntity(entity, relatedEntity, entityName, authService.getCurrentSession(), getCurrentMoment());
     }
 
     public void saveEntity(
@@ -190,7 +206,7 @@ public class AuditService {
         AuditSaveMessage message = new AuditSaveMessage(
                 entity.getId(), entity.getClass().getName(),
                 relatedEntity.getId(), relatedEntity.getClass().getName(),
-                entityName, authService.getCurrentSession().getId(), Instant.now()
+                entityName, authService.getCurrentSession().getId(), getCurrentMoment()
         );
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.AUDIT_SAVE, message);
     }
@@ -267,14 +283,8 @@ public class AuditService {
                 if (oldAudit != null && Objects.equals(oldAudit.getFieldValue(),
                         objectMapper.writeValueAsString(fieldValue))) return;
             }
-            Instant moment = auditRepository.findAll(Specification
-                            .where(AuditSpecifications.relatedEntityId(relatedEntityId))
-                            .and(AuditSpecifications.session(session))
-                            .and(AuditSpecifications.createdLessThanSecond(instant)))
-                    .stream().map(AuditEntity::getMoment)
-                    .findAny().orElse(Instant.now());
             AuditEntity newAudit = new AuditEntity();
-            newAudit.setMoment(moment);
+            newAudit.setMoment(instant);
             newAudit.setSession(session);
             newAudit.setEntityId(entity.getId());
             newAudit.setRelatedEntityId(relatedEntityId);
@@ -289,14 +299,8 @@ public class AuditService {
 
     private void addAction(AbstractEntity entity, AbstractEntity relatedEntity, String action) {
         SessionEntity session = authService.getCurrentSession();
-        Instant moment = auditRepository.findAll(Specification
-                        .where(AuditSpecifications.relatedEntityId(relatedEntity.getId()))
-                        .and(AuditSpecifications.session(session))
-                        .and(AuditSpecifications.createdLessThanSecond(Instant.now())))
-                .stream().map(AuditEntity::getMoment)
-                .findAny().orElse(Instant.now());
         AuditEntity newAudit = new AuditEntity();
-        newAudit.setMoment(moment);
+        newAudit.setMoment(getCurrentMoment());
         newAudit.setSession(session);
         newAudit.setEntityId(entity.getId());
         newAudit.setRelatedEntityId(relatedEntity.getId());

@@ -1,3 +1,0 @@
-INSERT INTO public.currency (id, code, name, archived, created_at, last_modified_at) VALUES ('559109ea-f824-476d-8fa4-9990e53880ff', 'KZT', 'Тенге', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.currency (id, code, name, archived, created_at, last_modified_at) VALUES ('e6a3c207-a358-47bf-ac18-2d09973f3807', 'CNY', 'Юань', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.currency (id, code, name, archived, created_at, last_modified_at) VALUES ('24f15639-67da-4df4-aab4-56b85c872c3b', 'USD', 'Доллар', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');

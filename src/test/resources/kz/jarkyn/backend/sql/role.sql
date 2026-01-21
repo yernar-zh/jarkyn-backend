@@ -1,4 +1,0 @@
-INSERT INTO public.role (id, code, name, archived, created_at, last_modified_at) VALUES ('82435749-721a-49ee-8402-579d507b21ff', 'SYSTEM', 'Система', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.role (id, code, name, archived, created_at, last_modified_at) VALUES ('c54cf84d-230d-48bf-87fa-172c0cc7e4d5', 'OWNER', 'Владелец', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.role (id, code, name, archived, created_at, last_modified_at) VALUES ('123b4cb7-d57d-48fd-8596-143bf994826e', 'ADMINISTRATOR', 'Администратор', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.role (id, code, name, archived, created_at, last_modified_at) VALUES ('60969353-3986-4d85-bfa1-04f91d375b19', 'STOREKEEPER', 'Кладовщик ', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');

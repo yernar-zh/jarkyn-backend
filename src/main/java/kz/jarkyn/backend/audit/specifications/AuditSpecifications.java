@@ -5,7 +5,6 @@ import kz.jarkyn.backend.audit.model.AuditEntity_;
 import kz.jarkyn.backend.user.model.SessionEntity;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.Instant;
 import java.util.UUID;
 
 public class AuditSpecifications {
@@ -25,10 +24,4 @@ public class AuditSpecifications {
         return (root, query, cb) -> cb.equal(root.get(AuditEntity_.session), session);
     }
 
-    public static Specification<AuditEntity> createdLessThanSecond(Instant instant) {
-        return (root, query, cb) -> cb.greaterThan(
-                root.get(AuditEntity_.createdAt),
-                instant.minusSeconds(1)
-        );
-    }
 }

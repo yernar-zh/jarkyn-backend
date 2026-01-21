@@ -1,2 +1,0 @@
-INSERT INTO public.flyway_schema_history (installed_rank, version, description, type, script, checksum, installed_by, installed_on, execution_time, success) VALUES (1, '1.0', 'init', 'SQL', 'V1_0__init.sql', 1963669332, 'admin', '2025-09-19 13:16:26.274535', 175, true);
-INSERT INTO public.flyway_schema_history (installed_rank, version, description, type, script, checksum, installed_by, installed_on, execution_time, success) VALUES (2, '1.1', 'init insert', 'SQL', 'V1_1__init_insert.sql', -457082738, 'admin', '2025-09-19 13:16:26.505531', 21, true);

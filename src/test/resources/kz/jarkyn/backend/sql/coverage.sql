@@ -1,3 +1,0 @@
-INSERT INTO public.coverage (id, code, name, archived, created_at, last_modified_at) VALUES ('6f5d4f59-f10e-42f6-8995-6a67d47e4e3d', 'FULL', 'Полное', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.coverage (id, code, name, archived, created_at, last_modified_at) VALUES ('c8f52b6a-8a43-4398-9d33-68b2d9b719a4', 'PARTIAL', 'Частичное', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.coverage (id, code, name, archived, created_at, last_modified_at) VALUES ('a8b1cf92-2894-41b4-94f5-0b9ad8e1d531', 'NONE', 'Отсутствует', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');

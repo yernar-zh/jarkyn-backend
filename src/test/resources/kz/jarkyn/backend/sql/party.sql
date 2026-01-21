@@ -1,1 +1,0 @@
-INSERT INTO public.party (id, name, archived, created_at, last_modified_at) VALUES ('70167f17-b7b7-4ce2-b2ad-2c8da4976cff', 'ИП Жаркын', false, '2025-09-19 10:30:01.636575', '2025-09-19 10:30:01.636575');

@@ -1,4 +1,0 @@
-INSERT INTO public.document_type (id, code, name, archived, created_at, last_modified_at) VALUES ('c837fc94-4cd4-4918-a38c-9bd9dd9c3271', 'SALE', 'Продажа', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.document_type (id, code, name, archived, created_at, last_modified_at) VALUES ('3873fc3e-58da-4ecc-81a8-70728d8d3297', 'SUPPLY', 'Приемка', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.document_type (id, code, name, archived, created_at, last_modified_at) VALUES ('b112027c-bf9b-45e4-bcff-74f74b27cff0', 'PAYMENT_IN', 'Входящий платеж', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
-INSERT INTO public.document_type (id, code, name, archived, created_at, last_modified_at) VALUES ('9b755b4e-61fa-457d-855d-6b231d3bfed2', 'PAYMENT_OUT', 'Исходящий платеж', false, '2025-09-19 13:16:26.518669', '2025-09-19 13:16:26.518669');
