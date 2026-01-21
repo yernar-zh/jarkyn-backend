@@ -5,6 +5,8 @@ import kz.jarkyn.backend.core.model.EnumTypeEntity;
 import kz.jarkyn.backend.core.model.EnumTypeEntity_;
 import kz.jarkyn.backend.core.model.ReferenceEntity;
 import kz.jarkyn.backend.core.model.ReferenceEntity_;
+import kz.jarkyn.backend.global.model.ImageEntity;
+import kz.jarkyn.backend.global.model.ImageEntity_;
 
 import java.util.*;
 
@@ -49,6 +51,15 @@ public class CriteriaAttributes<E> {
             return this;
         }
 
+        public Builder<E> addImage(String fieldName, ImageCriteriaAttribute<E> attribute) {
+            add(fieldName + ".id", root -> attribute.get(root).get(ImageEntity_.id));
+            add(fieldName + ".originalFileId", root -> attribute.get(root).get(ImageEntity_.originalFileId));
+            add(fieldName + ".mediumFileId", root -> attribute.get(root).get(ImageEntity_.mediumFileId));
+            add(fieldName + ".thumbnailFileId", root -> attribute.get(root).get(ImageEntity_.thumbnailFileId));
+            return this;
+        }
+
+
         public Builder<E> addEnumType(String fieldName, EnumTypeCriteriaAttribute<E> attribute) {
             add(fieldName + ".id", root -> attribute.get(root).get(EnumTypeEntity_.id));
             add(fieldName + ".name", root -> attribute.get(root).get(EnumTypeEntity_.name));
@@ -73,6 +84,10 @@ public class CriteriaAttributes<E> {
 
     public interface ReferenceCriteriaAttribute<E> {
         Path<? extends ReferenceEntity> get(Root<E> root);
+    }
+
+    public interface ImageCriteriaAttribute<E> {
+        Path<? extends ImageEntity> get(Root<E> root);
     }
 
     public interface EnumTypeCriteriaAttribute<E> {
