@@ -3,7 +3,6 @@ package kz.jarkyn.backend.warehouse.controller;
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupResponse;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeRequest;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeResponse;
 import kz.jarkyn.backend.core.model.dto.MessageResponse;
@@ -29,7 +28,7 @@ public class AttributeController {
 
     @GetMapping
     public PageResponse<AttributeResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return attributeService.findApiByFilter(QueryParams.of(allParams));
+        return attributeService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
     @PostMapping

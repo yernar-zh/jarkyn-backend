@@ -7,7 +7,6 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.party.model.dto.CounterpartyListResponse;
 import kz.jarkyn.backend.party.model.dto.CounterpartyRequest;
 import kz.jarkyn.backend.party.model.dto.CounterpartyResponse;
-import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
 import kz.jarkyn.backend.party.service.CounterpartyService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +31,7 @@ public class CounterpartyController {
 
     @GetMapping
     public PageResponse<CounterpartyListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return counterpartyService.findApiByFilter(QueryParams.of(allParams));
+        return counterpartyService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
     @PostMapping

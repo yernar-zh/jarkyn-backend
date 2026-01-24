@@ -30,7 +30,7 @@ public class ExpenseController {
 
     @GetMapping
     public PageResponse<ExpenseListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return expenseService.findApiByFilter(QueryParams.of(allParams));
+        return expenseService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
 

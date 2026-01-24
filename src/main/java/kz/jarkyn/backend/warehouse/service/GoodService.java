@@ -112,7 +112,7 @@ public class GoodService {
                 .add("name", (root) -> root.get(GoodEntity_.name))
                 .add("archived", (root) -> root.get(GoodEntity_.archived))
                 .addReference("group", (root) -> root.get(GoodEntity_.group))
-                .addImage("image", (root) -> root.get(GoodEntity_.image))
+                .addImage("image", (root) -> root.join(GoodEntity_.image, JoinType.LEFT))
                 .add("minimumPrice", (root) -> root.get(GoodEntity_.minimumPrice))
                 .add("weight", (root) -> root.get(GoodEntity_.weight))
                 .add("path", (root) -> root.get(GoodEntity_.path))

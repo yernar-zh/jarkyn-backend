@@ -7,11 +7,9 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.party.model.dto.AccountRequest;
 import kz.jarkyn.backend.party.model.dto.AccountResponse;
 import kz.jarkyn.backend.party.service.AccountService;
-import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -32,7 +30,7 @@ public class AccountController {
 
     @GetMapping
     public PageResponse<AccountResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return accountService.findApiByFilter(QueryParams.of(allParams));
+        return accountService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
 

@@ -28,6 +28,6 @@ public class CurrencyController {
 
     @GetMapping
     public PageResponse<EnumTypeResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return currencyService.findApiByFilter(QueryParams.of(allParams));
+        return currencyService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 }

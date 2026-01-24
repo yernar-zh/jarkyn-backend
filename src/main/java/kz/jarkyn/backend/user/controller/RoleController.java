@@ -28,6 +28,6 @@ public class RoleController {
 
     @GetMapping
     public PageResponse<EnumTypeResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return roleService.findApiByFilter(QueryParams.of(allParams));
+        return roleService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 }

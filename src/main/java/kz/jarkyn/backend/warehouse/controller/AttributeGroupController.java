@@ -5,14 +5,11 @@ import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupResponse;
 import kz.jarkyn.backend.warehouse.model.dto.AttributeGroupRequest;
-import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.dto.MessageResponse;
 import kz.jarkyn.backend.warehouse.service.AttributeGroupService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +28,7 @@ public class AttributeGroupController {
 
     @GetMapping
     public PageResponse<AttributeGroupResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return attributeGroupService.findApiByFilter(QueryParams.of(allParams));
+        return attributeGroupService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
     @PostMapping

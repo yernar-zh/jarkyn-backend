@@ -29,7 +29,7 @@ public class SupplyController {
 
     @GetMapping
     public PageResponse<SupplyListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return supplyService.findApiByFilter(QueryParams.of(allParams));
+        return supplyService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
 

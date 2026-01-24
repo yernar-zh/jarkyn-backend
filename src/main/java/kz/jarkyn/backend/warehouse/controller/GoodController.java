@@ -28,16 +28,27 @@ public class GoodController {
         return goodService.findApiById(id);
     }
 
-    @GetMapping
-    public PageResponse<GoodListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
+    public PageResponse<GoodListResponse> list(
+            @RequestParam MultiValueMap<String, String> queryParams,
+            @RequestBody(required = false) Map<String, List<String>> bodyParams) {
+
+        // Combine parameters or decide which one to use
+        Map<String, List<String>> allParams = new HashMap<>();
+        if (queryParams != null) allParams.putAll(queryParams);
+        if (bodyParams != null) allParams.putAll(bodyParams);
+
         List<UUID> warehouseIds = Optional.ofNullable(allParams.remove("$warehouse.id"))
                 .orElse(List.of()).stream().map(UUID::fromString).toList();
+
         Instant moment = Optional.ofNullable(allParams.remove("$moment"))
                 .orElse(List.of()).stream().map(Instant::parse).findFirst().orElse(null);
-        return goodService.findApiByFilter(QueryParams.of(allParams), warehouseIds, moment);
+
+        return goodService.findApiByFilter(QueryParams.ofMulty(allParams), warehouseIds, moment);
     }
 
-    @PostMapping
+
+    @PostMapping("create")
     public GoodResponse create(@RequestBody GoodRequest request) {
         return goodService.createApi(request);
     }

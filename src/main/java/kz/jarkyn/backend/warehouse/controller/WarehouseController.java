@@ -4,14 +4,12 @@ import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.MessageResponse;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.warehouse.service.WarehouseService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -32,7 +30,7 @@ public class WarehouseController {
 
     @GetMapping
     public PageResponse<WarehouseResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return warehouseService.findApiByFilter(QueryParams.of(allParams));
+        return warehouseService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
     @PostMapping

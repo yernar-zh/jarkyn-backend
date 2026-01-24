@@ -30,7 +30,7 @@ public class UserController {
 
     @GetMapping
     public PageResponse<UserResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return userService.findApiByFilter(QueryParams.of(allParams));
+        return userService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
     @PostMapping

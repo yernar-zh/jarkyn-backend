@@ -27,7 +27,7 @@ public class ItemOfExpenditureController {
 
     @GetMapping
     public PageResponse<EnumTypeResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return itemOfExpenditureService.findApiByFilter(QueryParams.of(allParams));
+        return itemOfExpenditureService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
 }

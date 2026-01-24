@@ -2,7 +2,6 @@ package kz.jarkyn.backend.core.model.filter;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.util.Pair;
-import org.springframework.util.MultiValueMap;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,7 +35,7 @@ public class QueryParams {
     private final List<Filter> filters;
     private final List<Sort> sorts;
 
-    public static QueryParams of(MultiValueMap<String, String> allParams) {
+    public static QueryParams ofMulty(Map<String, List<String>> allParams) {
         return new QueryParams(allParams);
     }
 

@@ -28,6 +28,6 @@ public class CoverageController {
 
     @GetMapping
     public PageResponse<EnumTypeResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return coverageService.findApiByFilter(QueryParams.of(allParams));
+        return coverageService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 }

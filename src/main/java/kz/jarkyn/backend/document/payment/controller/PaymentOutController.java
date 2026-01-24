@@ -10,7 +10,6 @@ import kz.jarkyn.backend.document.payment.service.PaymentOutService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +30,7 @@ public class PaymentOutController {
 
     @GetMapping
     public PageResponse<PaymentOutListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
-        return paymentOutService.findApiByFilter(QueryParams.of(allParams));
+        return paymentOutService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
 
 
