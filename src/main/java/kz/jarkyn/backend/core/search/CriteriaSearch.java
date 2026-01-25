@@ -107,9 +107,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
         if (!wherePredicates.isEmpty()) {
             query.where(wherePredicates.toArray(new Predicate[0]));
         }
-        Tuple tuple = em.createQuery(query)
-                .setFirstResult(queryParams.getPageFirst()).setMaxResults(queryParams.getPageSize())
-                .getSingleResult();
+        Tuple tuple = em.createQuery(query).getSingleResult();
 
         int count = tuple.get("totalCount", Long.class).intValue();
         R result = tupleToClass(tuple, responseClass);
@@ -137,8 +135,8 @@ public class CriteriaSearch<R, E> implements Search<R> {
                                 cb.greaterThanOrEqualTo((Expression<Comparable>) expression, (Comparable) filterValue);
                         case LESS -> cb.lessThan((Expression<Comparable>) expression, (Comparable) filterValue);
                         case GREATER -> cb.greaterThan((Expression<Comparable>) expression, (Comparable) filterValue);
-                        case CONTAINS -> cb.like((Expression<String>) expression, (String) filterValue);
-                        case NOT_CONTAINS -> cb.notLike((Expression<String>) expression, (String) filterValue);
+                        case CONTAINS -> cb.like((Expression<String>) expression, "%" + filterValue + "%");
+                        case NOT_CONTAINS -> cb.notLike((Expression<String>) expression, "%" + filterValue + "%");
                     }).reduce((predicate1, predicate2) -> switch (filter.getType()) {
                         case NOT_EQUAL_TO, NOT_CONTAINS -> cb.and(predicate1, predicate2);
                         default -> cb.or(predicate1, predicate2);

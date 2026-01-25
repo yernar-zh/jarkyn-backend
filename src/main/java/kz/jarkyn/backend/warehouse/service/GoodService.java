@@ -110,6 +110,7 @@ public class GoodService {
                 .<GoodEntity>builder()
                 .add("id", (root) -> root.get(GoodEntity_.id))
                 .add("name", (root) -> root.get(GoodEntity_.name))
+                .add("search", (root) -> root.get(GoodEntity_.search))
                 .add("archived", (root) -> root.get(GoodEntity_.archived))
                 .addReference("group", (root) -> root.get(GoodEntity_.group))
                 .addImage("image", (root) -> root.join(GoodEntity_.image, JoinType.LEFT))

@@ -31,17 +31,19 @@ public class GoodController {
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
     public PageResponse<GoodListResponse> list(
             @RequestParam MultiValueMap<String, String> queryParams,
-            @RequestBody Map<String, Object> bodyParams) {
+            @RequestBody(required = false) Map<String, Object> bodyParams) {
 
         // Combine parameters or decide which one to use
         Map<String, List<String>> allParams = new HashMap<>(queryParams);
-        bodyParams.forEach((key, value) -> {
-            if (value instanceof List<?> list) {
-                allParams.put(key, list.stream().map(Object::toString).toList());
-            } else if (value != null) {
-                allParams.put(key, List.of(value.toString()));
-            }
-        });
+        if (bodyParams != null) {
+            bodyParams.forEach((key, value) -> {
+                if (value instanceof List<?> list) {
+                    allParams.put(key, list.stream().map(Object::toString).toList());
+                } else if (value != null) {
+                    allParams.put(key, List.of(value.toString()));
+                }
+            });
+        }
 
         List<UUID> warehouseIds = Optional.ofNullable(allParams.remove("$warehouse.id"))
                 .orElse(List.of()).stream().map(UUID::fromString).toList();
