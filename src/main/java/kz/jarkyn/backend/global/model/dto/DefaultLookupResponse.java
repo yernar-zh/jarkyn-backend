@@ -4,8 +4,8 @@ import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.EnumTypeResponse;
 import kz.jarkyn.backend.party.model.dto.CounterpartyResponse;
 import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
-import kz.jarkyn.backend.warehouse.model.dto.GroupDetailResponse;
-import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
+import kz.jarkyn.backend.good.model.dto.GroupDetailResponse;
+import kz.jarkyn.backend.good.model.dto.WarehouseResponse;
 import org.immutables.value.Value;
 
 

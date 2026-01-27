@@ -4,9 +4,9 @@ package kz.jarkyn.backend.operation.service;
 
 import kz.jarkyn.backend.operation.sorts.TurnoverSorts;
 import kz.jarkyn.backend.operation.specifications.TurnoverSpecifications;
-import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
+import kz.jarkyn.backend.good.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
-import kz.jarkyn.backend.warehouse.model.GoodEntity;
+import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.repository.TurnoverRepository;
 import org.springframework.data.jpa.domain.Specification;

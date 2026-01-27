@@ -1,14 +1,12 @@
 package kz.jarkyn.backend.global.mapper;
 
 import kz.jarkyn.backend.core.mapper.BaseMapperConfig;
-import kz.jarkyn.backend.core.mapper.ResponseMapper;
 import kz.jarkyn.backend.core.model.dto.EnumTypeResponse;
-import kz.jarkyn.backend.global.model.CoverageEntity;
 import kz.jarkyn.backend.global.model.dto.DefaultLookupResponse;
 import kz.jarkyn.backend.party.model.dto.CounterpartyResponse;
 import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
-import kz.jarkyn.backend.warehouse.model.dto.GroupDetailResponse;
-import kz.jarkyn.backend.warehouse.model.dto.WarehouseResponse;
+import kz.jarkyn.backend.good.model.dto.GroupDetailResponse;
+import kz.jarkyn.backend.good.model.dto.WarehouseResponse;
 import org.mapstruct.Mapper;
 
 @Mapper(config = BaseMapperConfig.class)

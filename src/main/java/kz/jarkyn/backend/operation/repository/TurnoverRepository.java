@@ -1,9 +1,9 @@
 package kz.jarkyn.backend.operation.repository;
 
 import kz.jarkyn.backend.core.repository.AppRepository;
-import kz.jarkyn.backend.warehouse.model.GoodEntity;
+import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
-import kz.jarkyn.backend.warehouse.model.WarehouseEntity;
+import kz.jarkyn.backend.good.model.WarehouseEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

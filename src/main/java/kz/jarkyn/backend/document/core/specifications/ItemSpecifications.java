@@ -1,7 +1,7 @@
 package kz.jarkyn.backend.document.core.specifications;
 
 import kz.jarkyn.backend.document.core.model.*;
-import kz.jarkyn.backend.warehouse.model.GoodEntity;
+import kz.jarkyn.backend.good.model.GoodEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ItemSpecifications {

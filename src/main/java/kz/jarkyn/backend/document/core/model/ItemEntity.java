@@ -7,7 +7,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kz.jarkyn.backend.audit.config.AuditIgnore;
 import kz.jarkyn.backend.core.model.AbstractEntity;
-import kz.jarkyn.backend.warehouse.model.GoodEntity;
+import kz.jarkyn.backend.good.model.GoodEntity;
 
 import java.math.BigDecimal;
 

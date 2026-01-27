@@ -4,8 +4,8 @@ import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
 import kz.jarkyn.backend.party.model.dto.CounterpartyResponse;
 import kz.jarkyn.backend.party.service.CounterpartyService;
-import kz.jarkyn.backend.warehouse.model.dto.GoodResponse;
-import kz.jarkyn.backend.warehouse.service.GoodService;
+import kz.jarkyn.backend.good.model.dto.GoodResponse;
+import kz.jarkyn.backend.good.service.GoodService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
