@@ -30,6 +30,8 @@ import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.operation.service.TurnoverService;
 import kz.jarkyn.backend.good.specifications.GoodAttributeSpecifications;
 import kz.jarkyn.backend.good.specifications.SellingPriceSpecifications;
+import kz.jarkyn.backend.party.model.WarehouseEntity;
+import kz.jarkyn.backend.party.repository.WarehouseRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;

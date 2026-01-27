@@ -3,7 +3,7 @@ package kz.jarkyn.backend.operation.mode;
 
 import jakarta.persistence.*;
 import kz.jarkyn.backend.core.model.AbstractEntity;
-import kz.jarkyn.backend.good.model.WarehouseEntity;
+import kz.jarkyn.backend.party.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
 

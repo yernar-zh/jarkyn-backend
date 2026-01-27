@@ -8,7 +8,7 @@ import kz.jarkyn.backend.global.model.CurrencyEntity;
 import kz.jarkyn.backend.party.model.AccountEntity;
 import kz.jarkyn.backend.party.model.CounterpartyEntity;
 import kz.jarkyn.backend.party.model.OrganizationEntity;
-import kz.jarkyn.backend.good.model.WarehouseEntity;
+import kz.jarkyn.backend.party.model.WarehouseEntity;
 
 import java.math.BigDecimal;
 import java.time.Instant;

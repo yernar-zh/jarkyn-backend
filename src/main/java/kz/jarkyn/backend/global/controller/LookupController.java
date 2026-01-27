@@ -10,9 +10,9 @@ import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
 import kz.jarkyn.backend.party.service.CounterpartyService;
 import kz.jarkyn.backend.party.service.OrganizationService;
 import kz.jarkyn.backend.good.model.dto.GroupDetailResponse;
-import kz.jarkyn.backend.good.model.dto.WarehouseResponse;
+import kz.jarkyn.backend.party.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.good.service.GroupService;
-import kz.jarkyn.backend.good.service.WarehouseService;
+import kz.jarkyn.backend.party.service.WarehouseService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;

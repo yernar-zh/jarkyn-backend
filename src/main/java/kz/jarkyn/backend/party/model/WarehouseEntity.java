@@ -1,4 +1,4 @@
-package kz.jarkyn.backend.good.model;
+package kz.jarkyn.backend.party.model;
 
 
 import jakarta.persistence.Entity;

@@ -3,6 +3,7 @@ package kz.jarkyn.backend.good.model.dto;
 import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.ReferenceResponse;
 import kz.jarkyn.backend.global.model.dto.ImageResponse;
+import kz.jarkyn.backend.party.model.dto.StockResponse;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;

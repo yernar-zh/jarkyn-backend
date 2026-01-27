@@ -1,5 +1,5 @@
 
-package kz.jarkyn.backend.good.service;
+package kz.jarkyn.backend.party.service;
 
 
 import kz.jarkyn.backend.audit.service.AuditService;
@@ -12,12 +12,12 @@ import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
-import kz.jarkyn.backend.good.model.WarehouseEntity;
+import kz.jarkyn.backend.party.model.WarehouseEntity;
 import kz.jarkyn.backend.good.model.WarehouseEntity_;
-import kz.jarkyn.backend.good.model.dto.WarehouseResponse;
-import kz.jarkyn.backend.good.model.dto.WarehouseRequest;
-import kz.jarkyn.backend.good.repository.WarehouseRepository;
-import kz.jarkyn.backend.good.mapper.WarehouseMapper;
+import kz.jarkyn.backend.party.model.dto.WarehouseResponse;
+import kz.jarkyn.backend.party.model.dto.WarehouseRequest;
+import kz.jarkyn.backend.party.repository.WarehouseRepository;
+import kz.jarkyn.backend.party.mapper.WarehouseMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

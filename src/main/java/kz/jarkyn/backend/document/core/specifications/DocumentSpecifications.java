@@ -6,7 +6,7 @@ import kz.jarkyn.backend.document.core.model.DocumentTypeEntity;
 import kz.jarkyn.backend.party.model.AccountEntity;
 import kz.jarkyn.backend.party.model.CounterpartyEntity;
 import kz.jarkyn.backend.party.model.OrganizationEntity;
-import kz.jarkyn.backend.good.model.WarehouseEntity;
+import kz.jarkyn.backend.party.model.WarehouseEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 public class DocumentSpecifications {

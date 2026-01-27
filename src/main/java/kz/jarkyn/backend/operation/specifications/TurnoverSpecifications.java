@@ -4,7 +4,7 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity_;
 import kz.jarkyn.backend.good.model.GoodEntity;
-import kz.jarkyn.backend.good.model.WarehouseEntity;
+import kz.jarkyn.backend.party.model.WarehouseEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
