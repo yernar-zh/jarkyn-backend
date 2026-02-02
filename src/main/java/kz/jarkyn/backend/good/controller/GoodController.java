@@ -88,12 +88,12 @@ public class GoodController {
     }
 
     @PostMapping("bulk")
-    public BulkResponse bulkCreate(@RequestBody List<GoodRequest> request) {
+    public List<BulkResponse<GoodResponse>> bulkCreate(@RequestBody List<GoodRequest> request) {
         return bulkService.bulkCreate(request, goodService::createApi);
     }
 
     @PutMapping("bulk")
-    public BulkResponse bulkUpdate(@RequestBody List<BulkUpdateRequest<GoodRequest>> request) {
+    public List<BulkResponse<GoodResponse>> bulkUpdate(@RequestBody List<BulkUpdateRequest<GoodRequest>> request) {
         return bulkService.bulkUpdate(request, goodService::editApi);
     }
 }
