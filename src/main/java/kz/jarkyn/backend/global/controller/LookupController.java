@@ -53,8 +53,8 @@ public class LookupController {
                 .getRow().stream().findAny().orElse(null);
         EnumTypeResponse supplyCurrency = currencyService
                 .findApiById(UUID.fromString("e6a3c207-a358-47bf-ac18-2d09973f3807"));
-//        GroupDetailResponse group = groupService
-//                .findApiById(UUID.fromString("35b31b30-898a-4b4c-b772-0644d42ba108"));
-        return lookupMapper.toDefaultResponse(organization, warehouse, null, supplyCurrency, null);
+        GroupDetailResponse group = groupService
+                .findApiById(UUID.fromString("35b31b30-898a-4b4c-b772-0644d42ba108"));
+        return lookupMapper.toDefaultResponse(organization, warehouse, null, supplyCurrency, group);
     }
 }

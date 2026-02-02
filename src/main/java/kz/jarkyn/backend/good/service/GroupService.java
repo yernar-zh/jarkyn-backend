@@ -54,6 +54,14 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
+    public GroupDetailResponse findFirstRoot() {
+        GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        List<GroupEntity> children = groupRepository.findByParent(entity);
+        children.sort(Comparator.comparing(GroupEntity::getPosition));
+        findApiById(entity.getId());
+    }
+
+    @Transactional(readOnly = true)
     public List<GroupResponse> findApiTree(QueryParams queryParams) {
         List<GroupEntity> entities = groupRepository.findAll().stream()
                 .sorted(Comparator.comparing(GroupEntity::getPosition)).toList();

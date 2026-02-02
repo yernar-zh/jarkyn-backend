@@ -105,13 +105,13 @@ public class AccountService {
     @Transactional(readOnly = true)
     public List<AccountShortResponse> findBalanceByCounterparty(CounterpartyEntity counterparty) {
         Stream<AccountShortResponse> accounts = accountRepository
-                .findAll(Specification.where(AccountSpecifications.counterparty(counterparty))).stream()
+                .findAll(AccountSpecifications.counterparty(counterparty)).stream()
                 .sorted(Comparator.comparing(AbstractEntity::getLastModifiedAt).reversed())
                 .map(account -> accountMapper.toResponse(account.getOrganization(),
                         cashFlowService.findCurrentBalance(account), account.getCurrency()))
                 .filter(balance -> balance.getBalance().compareTo(BigDecimal.ZERO) != 0);
         Stream<AccountShortResponse> defaultAccounts = organizationRepository
-                .findAll(Specification.where(OrganizationSpecifications.nonArchived())).stream()
+                .findAll(OrganizationSpecifications.nonArchived()).stream()
                 .map(organization -> accountMapper.toResponse(organization, BigDecimal.ZERO, currencyService.findKZT()));
         return Stream.concat(accounts, defaultAccounts)
                 .collect(Collectors.toMap(

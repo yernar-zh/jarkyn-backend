@@ -78,8 +78,7 @@ public class AuditService {
 
     public MainEntityChangeResponse findLastChange(UUID entityId) {
         AuditEntity audit = auditRepository.findOne(
-                        Specification.where(AuditSpecifications.relatedEntityId(entityId)),
-                        EntitySorts.byCreatedDesc())
+                        AuditSpecifications.relatedEntityId(entityId), EntitySorts.byCreatedDesc())
                 .orElseThrow(ExceptionUtils.entityNotFound());
         String action = audit.getEntityId().equals(entityId) ? audit.getAction() : EDITE;
         return changeMapper.toMainEntityChange(
@@ -88,8 +87,7 @@ public class AuditService {
     }
 
     public List<MainEntityChangeResponse> findChanges(UUID entityId) {
-        List<List<AuditEntity>> changeGroups = auditRepository.findAll(
-                        Specification.where(AuditSpecifications.relatedEntityId(entityId)))
+        List<List<AuditEntity>> changeGroups = auditRepository.findAll(AuditSpecifications.relatedEntityId(entityId))
                 .stream()
                 .collect(Collectors.groupingBy(AuditEntity::getMoment)).entrySet()
                 .stream().sorted(Map.Entry.comparingByKey())

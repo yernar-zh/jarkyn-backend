@@ -261,7 +261,7 @@ public class GoodService {
     @Transactional
     public void delete(UUID id) {
         GoodEntity good = goodRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        List<ItemEntity> items = itemRepository.findAll(Specification.where(ItemSpecifications.good(good)));
+        List<ItemEntity> items = itemRepository.findAll(ItemSpecifications.good(good));
         if (!items.isEmpty()) ExceptionUtils.throwRelationDeleteException();
         sellingPriceRepository.deleteAll(sellingPriceRepository.findAll(Specification
                 .where(SellingPriceSpecifications.good(good))));

@@ -32,9 +32,7 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public String findNextName(DocumentTypeEntity type) {
-        String lastName = documentRepository.findOne(
-                        Specification.where(DocumentSpecifications.type(type)),
-                        EntitySorts.byNameDesc())
+        String lastName = documentRepository.findOne(DocumentSpecifications.type(type), EntitySorts.byNameDesc())
                 .map(DocumentEntity::getName)
                 .orElse("000000");
         Matcher matcher = Pattern.compile("(\\d{6})").matcher(lastName);
