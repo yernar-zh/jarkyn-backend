@@ -13,7 +13,7 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
 import kz.jarkyn.backend.party.model.WarehouseEntity;
-import kz.jarkyn.backend.good.model.WarehouseEntity_;
+import kz.jarkyn.backend.party.model.WarehouseEntity_;
 import kz.jarkyn.backend.party.model.dto.WarehouseResponse;
 import kz.jarkyn.backend.party.model.dto.WarehouseRequest;
 import kz.jarkyn.backend.party.repository.WarehouseRepository;

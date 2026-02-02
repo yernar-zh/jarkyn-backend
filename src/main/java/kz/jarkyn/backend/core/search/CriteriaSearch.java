@@ -46,7 +46,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
     @Override
     public PageResponse<R> getResult(QueryParams queryParams) {
         List<R> row = getRows(queryParams);
-        Pair<Integer, R> sum = getSum(queryParams);
+        Pair<Integer, Map<String, Object>> sum = getSum(queryParams);
         return ImmutablePageResponse.of(row, sum.getSecond(),
                 ImmutablePage.of(queryParams.getPageFirst(), queryParams.getPageSize(), sum.getFirst()));
     }
@@ -86,7 +86,7 @@ public class CriteriaSearch<R, E> implements Search<R> {
         return (R) SearchUtils.createProxy("", map, responseClass);
     }
 
-    private Pair<Integer, R> getSum(QueryParams queryParams) {
+    private Pair<Integer, Map<String, Object>> getSum(QueryParams queryParams) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
         Root<E> root = query.from(entityClass);
@@ -110,8 +110,12 @@ public class CriteriaSearch<R, E> implements Search<R> {
         Tuple tuple = em.createQuery(query).getSingleResult();
 
         int count = tuple.get("totalCount", Long.class).intValue();
-        R result = tupleToClass(tuple, responseClass);
-        return Pair.of(count, result);
+        Map<String, Object> map = tuple.getElements().stream()
+                .filter(element -> Objects.nonNull(tuple.get(element.getAlias())))
+                .collect(HashMap::new,
+                        (m, v) -> m.put(v.getAlias(), tuple.get(v.getAlias())),
+                        HashMap::putAll);
+        return Pair.of(count, map);
 
     }
 

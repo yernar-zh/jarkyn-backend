@@ -81,8 +81,7 @@ public class ListSearch<R> implements Search<R> {
                         (v1, v2) -> SearchUtils.getSum(v1.getClass()).apply((Number) v1, (Number) v2),
                         LinkedHashMap::new
                 ));
-        R sum = (R) SearchUtils.createProxy("", sumMap, responseClass);
-        return ImmutablePageResponse.of(pageResult, sum,
+        return ImmutablePageResponse.of(pageResult, sumMap,
                 ImmutablePage.of(queryParams.getPageFirst(), queryParams.getPageSize(), totalCount));
     }
 
