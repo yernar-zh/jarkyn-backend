@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(Api.Good.PATH)
@@ -34,23 +35,26 @@ public class GoodController {
     }
 
     @GetMapping
+    public PageResponse<GoodListResponse> list(@RequestParam MultiValueMap<String, String> queryParams) {
+        return list(new HashMap<>(queryParams));
+    }
+
     @PostMapping("search")
-    public PageResponse<GoodListResponse> list(
-            @RequestParam MultiValueMap<String, String> queryParams,
-            @RequestBody(required = false) Map<String, Object> bodyParams) {
+    public PageResponse<GoodListResponse> search(@RequestBody Map<String, Object> bodyParams) {
+        Map<String, List<String>> allParams = bodyParams.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                            if (entry.getValue() instanceof List<?> list) {
+                                return list.stream().map(Object::toString).toList();
+                            } else {
+                                return List.of(entry.getValue().toString());
+                            }
+                        }
+                ));
+        return list(allParams);
+    }
 
-        // Combine parameters or decide which one to use
-        Map<String, List<String>> allParams = new HashMap<>(queryParams);
-        if (bodyParams != null) {
-            bodyParams.forEach((key, value) -> {
-                if (value instanceof List<?> list) {
-                    allParams.put(key, list.stream().map(Object::toString).toList());
-                } else if (value != null) {
-                    allParams.put(key, List.of(value.toString()));
-                }
-            });
-        }
-
+    private PageResponse<GoodListResponse> list(Map<String, List<String>> allParams) {
         List<UUID> warehouseIds = Optional.ofNullable(allParams.remove("$warehouse.id"))
                 .orElse(List.of()).stream().map(UUID::fromString).toList();
 
