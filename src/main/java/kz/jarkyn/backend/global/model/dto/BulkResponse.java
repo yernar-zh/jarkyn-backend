@@ -9,5 +9,5 @@ public interface BulkResponse {
     int getTotal();
     int getSuccess();
     int getFailed();
-    List<BulkError> getErrors();
+    List<BulkErrorResponse> getErrors();
 }

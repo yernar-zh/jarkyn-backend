@@ -1,8 +1,6 @@
 package kz.jarkyn.backend.global.service;
 
-import kz.jarkyn.backend.global.model.dto.BulkError;
-import kz.jarkyn.backend.global.model.dto.BulkResponse;
-import kz.jarkyn.backend.global.model.dto.BulkUpdateRequest;
+import kz.jarkyn.backend.global.model.dto.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,7 +12,7 @@ import java.util.function.Consumer;
 @Service
 public class BulkService {
     public <T> BulkResponse bulkCreate(List<T> requests, Consumer<T> createFn) {
-        List<BulkError> errors = new ArrayList<>();
+        List<BulkErrorResponse> errors = new ArrayList<>();
         int success = 0;
 
         for (int i = 0; i < requests.size(); i++) {
@@ -22,7 +20,7 @@ public class BulkService {
                 createFn.accept(requests.get(i));
                 success++;
             } catch (Exception ex) {
-                errors.add(ImmutableBulkError.builder()
+                errors.add(ImmutableBulkErrorResponse.builder()
                         .index(i)
                         .message(errorMessage(ex))
                         .build());
@@ -38,7 +36,7 @@ public class BulkService {
     }
 
     public <T> BulkResponse bulkUpdate(List<BulkUpdateRequest<T>> requests, BiConsumer<UUID, T> updateFn) {
-        List<BulkError> errors = new ArrayList<>();
+        List<BulkErrorResponse> errors = new ArrayList<>();
         int success = 0;
 
         for (int i = 0; i < requests.size(); i++) {
@@ -47,7 +45,7 @@ public class BulkService {
                 updateFn.accept(request.getId(), request.getRequest());
                 success++;
             } catch (Exception ex) {
-                errors.add(ImmutableBulkError.builder()
+                errors.add(ImmutableBulkErrorResponse.builder()
                         .index(i)
                         .message(errorMessage(ex))
                         .build());
