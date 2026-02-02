@@ -7,6 +7,9 @@ import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.good.model.dto.GoodListResponse;
 import kz.jarkyn.backend.good.model.dto.GoodRequest;
 import kz.jarkyn.backend.good.model.dto.GoodResponse;
+import kz.jarkyn.backend.global.model.dto.BulkResponse;
+import kz.jarkyn.backend.global.service.BulkService;
+import kz.jarkyn.backend.global.model.dto.BulkUpdateRequest;
 import kz.jarkyn.backend.good.service.GoodService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +21,11 @@ import java.util.*;
 @RequestMapping(Api.Good.PATH)
 public class GoodController {
     private final GoodService goodService;
+    private final BulkService bulkService;
 
-    public GoodController(GoodService goodService) {
+    public GoodController(GoodService goodService, BulkService bulkService) {
         this.goodService = goodService;
+        this.bulkService = bulkService;
     }
 
     @GetMapping("{id}")
@@ -28,7 +33,8 @@ public class GoodController {
         return goodService.findApiById(id);
     }
 
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
+    @GetMapping
+    @PostMapping("search")
     public PageResponse<GoodListResponse> list(
             @RequestParam MultiValueMap<String, String> queryParams,
             @RequestBody(required = false) Map<String, Object> bodyParams) {
@@ -55,7 +61,7 @@ public class GoodController {
     }
 
 
-    @PostMapping("create")
+    @PostMapping()
     public GoodResponse create(@RequestBody GoodRequest request) {
         return goodService.createApi(request);
     }
@@ -79,5 +85,15 @@ public class GoodController {
     public MessageResponse delete(@PathVariable UUID id) {
         goodService.delete(id);
         return MessageResponse.DELETED;
+    }
+
+    @PostMapping("bulk")
+    public BulkResponse bulkCreate(@RequestBody List<GoodRequest> request) {
+        return bulkService.bulkCreate(request, goodService::createApi);
+    }
+
+    @PutMapping("bulk")
+    public BulkResponse bulkUpdate(@RequestBody List<BulkUpdateRequest<GoodRequest>> request) {
+        return bulkService.bulkUpdate(request, goodService::editApi);
     }
 }

@@ -8,7 +8,9 @@ build/
 /local
 
 ### IntelliJ IDEA ###
-.idea
+.idea/**
+!.idea/codeStyles/
+!.idea/codeStyles/**
 *.iws
 *.iml
 *.ipr
