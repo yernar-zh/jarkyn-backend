@@ -6,6 +6,10 @@ import kz.jarkyn.backend.document.core.model.DocumentEntity_;
 import org.springframework.data.domain.Sort;
 
 public class EntitySorts {
+    public static Sort byCreatedAsc() {
+        return Sort.by(AbstractEntity_.CREATED_AT).ascending();
+    }
+
     public static Sort byCreatedDesc() {
         return Sort.by(AbstractEntity_.CREATED_AT).descending();
     }

@@ -9,6 +9,7 @@ import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
+import kz.jarkyn.backend.core.sorts.EntitySorts;
 import kz.jarkyn.backend.good.model.GroupEntity;
 import kz.jarkyn.backend.good.model.dto.GroupDetailResponse;
 import kz.jarkyn.backend.good.model.dto.GroupRequest;
@@ -18,6 +19,7 @@ import kz.jarkyn.backend.good.repository.GoodRepository;
 import kz.jarkyn.backend.good.repository.GroupRepository;
 import kz.jarkyn.backend.good.mapper.GroupMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
+import kz.jarkyn.backend.good.specifications.GroupSpecifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,10 +57,11 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public GroupDetailResponse findFirstRoot() {
-        GroupEntity entity = groupRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        List<GroupEntity> children = groupRepository.findByParent(entity);
-        children.sort(Comparator.comparing(GroupEntity::getPosition));
-        findApiById(entity.getId());
+        GroupEntity entity = groupRepository.findOne(
+                GroupSpecifications.root(),
+                EntitySorts.byCreatedAsc()
+        ).orElseThrow(ExceptionUtils.entityNotFound());
+        return findApiById(entity.getId());
     }
 
     @Transactional(readOnly = true)
