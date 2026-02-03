@@ -38,7 +38,7 @@ public class BulkService {
         List<BulkResponse<R>> results = new ArrayList<>();
         for (BulkUpdateRequest<T> request : requests) {
             try {
-                R data = updateFn.apply(request.getId(), request.getRequest());
+                R data = updateFn.apply(request.getId(), request.getData());
                 results.add(ImmutableBulkResponse.of(true, data, null));
             } catch (Exception ex) {
                 results.add(ImmutableBulkResponse.of(false, null, exceptionResponse(ex)));

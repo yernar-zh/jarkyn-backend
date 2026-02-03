@@ -7,5 +7,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonDeserialize(builder = ImmutableBulkUpdateRequest.Builder.class)
 public interface BulkUpdateRequest<T> extends IdDto {
-    T getRequest();
+    T getData();
 }
