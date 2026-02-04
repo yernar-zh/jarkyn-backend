@@ -6,6 +6,7 @@ import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.core.search.CriteriaAttributes;
 import kz.jarkyn.backend.core.search.Search;
 import kz.jarkyn.backend.core.search.SearchFactory;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
@@ -18,6 +19,7 @@ import kz.jarkyn.backend.party.mapper.CounterpartyMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,13 +58,17 @@ public class CounterpartyService {
 
     @Transactional(readOnly = true)
     public PageResponse<CounterpartyListResponse> findApiByFilter(QueryParams queryParams) {
-        Search<CounterpartyListResponse> search = searchFactory.createListSearch(
+        CriteriaAttributes<CounterpartyEntity> attributes = CriteriaAttributes.<CounterpartyEntity>builder()
+                .add("id", (root) -> root.get("id"))
+                .add("name", (root) -> root.get("name"))
+                .add("archived", (root) -> root.get("archived"))
+                .add("phoneNumber", (root) -> root.get("phoneNumber"))
+                .add("discount", (root) -> root.get("discount"))
+                .add("shippingAddress", (root) -> root.get("shippingAddress"))
+                .build();
+        Search<CounterpartyListResponse> search = searchFactory.createCriteriaSearch(
                 CounterpartyListResponse.class, List.of("name", "phoneNumber"), QueryParams.Sort.NAME_ASC,
-                () -> counterpartyRepository.findAll().stream().map(counterparty -> {
-                    AccountShortResponse account = accountService.findBalanceByCounterparty(counterparty)
-                            .stream().findFirst().orElseThrow();
-                    return counterpartyMapper.toResponse(counterparty, account.getBalance(), account.getCurrency());
-                }).toList());
+                CounterpartyEntity.class, attributes);
         return search.getResult(queryParams);
     }
 

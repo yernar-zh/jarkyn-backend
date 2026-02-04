@@ -21,10 +21,6 @@ public abstract class GoodMapper implements RequestMapper<GoodEntity, GoodReques
     public abstract GoodResponse toResponse(
             GoodEntity entity, List<AttributeEntity> attributes, List<SellingPriceEntity> sellingPrices,
             List<TurnoverService.StockDto> stocks);
-    public abstract GoodListResponse toListResponse(
-            GoodEntity entity, String path, String groupIds, String attributeIds, String attributeSearchKeywords,
-            BigDecimal sellingPrice, Integer remain, BigDecimal costPrice);
-
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "good", source = "good")
     @Mapping(target = "attribute", source = "attribute")
