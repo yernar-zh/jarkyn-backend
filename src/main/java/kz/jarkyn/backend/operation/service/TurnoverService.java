@@ -7,8 +7,11 @@ import kz.jarkyn.backend.operation.specifications.TurnoverSpecifications;
 import kz.jarkyn.backend.party.model.WarehouseEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.good.model.GoodEntity;
+import kz.jarkyn.backend.operation.model.message.TurnoverFixMessage;
 import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.repository.TurnoverRepository;
+import kz.jarkyn.backend.core.config.AppRabbitTemplate;
+import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -26,11 +29,14 @@ import static java.util.stream.Collectors.*;
 @Service
 public class TurnoverService {
     private final TurnoverRepository turnoverRepository;
+    private final AppRabbitTemplate appRabbitTemplate;
 
     public TurnoverService(
-            TurnoverRepository turnoverRepository
+            TurnoverRepository turnoverRepository,
+            AppRabbitTemplate appRabbitTemplate
     ) {
         this.turnoverRepository = turnoverRepository;
+        this.appRabbitTemplate = appRabbitTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +67,7 @@ public class TurnoverService {
         turnover.setCostPricePerUnit(costPricePerUnit);
         turnover.setRemain(0);
         turnoverRepository.save(turnover);
-        fix(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
+        sendFixMessage(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
     }
 
     @Transactional
@@ -70,7 +76,7 @@ public class TurnoverService {
                 .where(TurnoverSpecifications.document(document)));
         turnoverRepository.deleteAll(turnovers);
         for (TurnoverEntity turnover : turnovers) {
-            fix(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
+            sendFixMessage(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
         }
     }
 
@@ -89,7 +95,6 @@ public class TurnoverService {
 
     private Map<GoodEntity, BigDecimal> findCostPriceAtMoment(
             WarehouseEntity warehouse, List<GoodEntity> goods, Instant moment) {
-        // TODO
         Map<GoodEntity, BigDecimal> firstInflowMap = turnoverRepository
                 .findFirstInflow(warehouse, goods, moment).stream()
                 .collect(toMap(TurnoverEntity::getGood, TurnoverEntity::getCostPricePerUnit));
@@ -101,9 +106,15 @@ public class TurnoverService {
         return result;
     }
 
-    private void fix(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
+    @Transactional
+    public void fix(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
         fixRemind(warehouse, good, moment);
         fixCostPrice(warehouse, good, moment);
+    }
+
+    private void sendFixMessage(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
+        TurnoverFixMessage message = new TurnoverFixMessage(warehouse.getId(), good.getId(), moment);
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.TURNOVER_FIX, message);
     }
 
     private void fixRemind(WarehouseEntity warehouse, GoodEntity good, Instant moment) {

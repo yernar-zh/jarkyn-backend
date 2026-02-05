@@ -21,8 +21,11 @@ public class RabbitConfig {
     @Value("${rabbitmq.queue.document-search}")
     private String supplyIndexQueueName;
 
-    @Value("${rabbitmq.queue.audit-save:audit-save}")
+    @Value("${rabbitmq.queue.audit-save}")
     private String auditSaveQueueName;
+
+    @Value("${rabbitmq.queue.turnover-fix:turnover-fix}")
+    private String turnoverFixQueueName;
 
     @Bean
     public Queue supplyIndexQueue() {
@@ -32,6 +35,11 @@ public class RabbitConfig {
     @Bean
     public Queue auditSaveQueue() {
         return new Queue(auditSaveQueueName, true);
+    }
+
+    @Bean
+    public Queue turnoverFixQueue() {
+        return new Queue(turnoverFixQueueName, true);
     }
 
     @Bean
@@ -53,6 +61,14 @@ public class RabbitConfig {
                 .bind(auditSaveQueue)
                 .to(exchange)
                 .with(RabbitRoutingKeys.AUDIT_SAVE);
+    }
+
+    @Bean
+    public Binding turnoverFixBinding(Queue turnoverFixQueue, TopicExchange exchange) {
+        return BindingBuilder
+                .bind(turnoverFixQueue)
+                .to(exchange)
+                .with(RabbitRoutingKeys.TURNOVER_FIX);
     }
 
     @Bean

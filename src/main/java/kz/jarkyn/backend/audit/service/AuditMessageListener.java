@@ -23,7 +23,7 @@ public class AuditMessageListener {
         this.auditService = auditService;
     }
 
-    @RabbitListener(queues = "${rabbitmq.queue.audit-save:audit-save}")
+    @RabbitListener(queues = "${rabbitmq.queue.audit-save}", concurrency = "4")
     public void onAuditSave(AuditSaveMessage msg) {
         try {
             AbstractEntity entity = load(msg.getEntityClass(), msg.getEntityId());

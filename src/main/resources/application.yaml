@@ -18,3 +18,5 @@ opensearch:
 rabbitmq:
   queue:
     document-search: document-search-queue
+    audit-save: audit-save-queue
+    turnover-fix: turnover-fix-queue
