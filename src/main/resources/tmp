@@ -1,0 +1,2 @@
+CREATE INDEX idx_audit_entity_related_field_created_desc ON
+    audit (entity_id, related_entity_id, field_name, created_at DESC);

@@ -1,8 +1,19 @@
+import org.yaml.snakeyaml.Yaml
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.yaml:snakeyaml:2.2'
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.3'
     id 'io.spring.dependency-management' version '1.1.6'
-    id "org.flywaydb.flyway" version "10.21.0"
+    id "org.flywaydb.flyway" version "12.0.0"
 }
 
 group = 'kz.jarkyn'
@@ -36,7 +47,7 @@ dependencies {
     // Database
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-database-postgresql'
+    runtimeOnly 'org.flywaydb:flyway-database-postgresql'
     implementation 'org.postgresql:postgresql'
     annotationProcessor 'org.hibernate:hibernate-jpamodelgen:6.2.5.Final'
 
@@ -61,6 +72,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+
 compileJava {
     options.compilerArgs += [
             '-Amapstruct.defaultComponentModel=spring',
@@ -70,4 +82,14 @@ compileJava {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+def appDevConfig = file('src/main/resources/application-dev.yaml')
+def devYaml = appDevConfig.exists() ? new Yaml().load(appDevConfig.text) : [:]
+def devDatasource = devYaml?.spring?.datasource ? devYaml?.spring?.datasource as Map : [:]
+
+flyway {
+    url = devDatasource.url
+    user = devDatasource.username
+    password = devDatasource.password
 }
