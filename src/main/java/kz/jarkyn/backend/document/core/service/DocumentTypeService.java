@@ -21,6 +21,11 @@ public class DocumentTypeService {
     }
 
     @Transactional(readOnly = true)
+    public DocumentTypeEntity findPaymentIn() {
+        return findByCode(DocumentTypeCode.PAYMENT_IN);
+    }
+
+    @Transactional(readOnly = true)
     public DocumentTypeEntity findExpense() {
         return findByCode(DocumentTypeCode.EXPENSE);
     }
@@ -28,6 +33,11 @@ public class DocumentTypeService {
     @Transactional(readOnly = true)
     public DocumentTypeEntity findSupply() {
         return findByCode(DocumentTypeCode.SUPPLY);
+    }
+
+    @Transactional(readOnly = true)
+    public DocumentTypeEntity findSale() {
+        return findByCode(DocumentTypeCode.SALE);
     }
 
     @Transactional(readOnly = true)
@@ -48,6 +58,11 @@ public class DocumentTypeService {
     @Transactional(readOnly = true)
     public boolean isSupply(DocumentTypeEntity documentType) {
         return documentType.getCode().equals(DocumentTypeCode.SUPPLY.name());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isSale(DocumentTypeEntity documentType) {
+        return documentType.getCode().equals(DocumentTypeCode.SALE.name());
     }
 
     @Transactional(readOnly = true)

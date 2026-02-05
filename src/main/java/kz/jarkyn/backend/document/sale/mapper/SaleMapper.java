@@ -1,0 +1,19 @@
+package kz.jarkyn.backend.document.sale.mapper;
+
+import kz.jarkyn.backend.core.mapper.BaseMapperConfig;
+import kz.jarkyn.backend.core.mapper.RequestMapper;
+import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
+import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
+import kz.jarkyn.backend.document.sale.model.SaleEntity;
+import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
+import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
+import org.mapstruct.Mapper;
+
+import java.util.List;
+
+@Mapper(config = BaseMapperConfig.class)
+public interface SaleMapper extends RequestMapper<SaleEntity, SaleRequest> {
+    SaleResponse toResponse(
+            SaleEntity entity, List<ItemResponse> items,
+            List<BindDocumentResponse> paidDocuments, List<BindDocumentResponse> overheadDocuments);
+}

@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.yaml:snakeyaml:2.2'
+        classpath 'org.flywaydb:flyway-database-postgresql:12.0.0'
     }
 }
 

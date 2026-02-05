@@ -23,6 +23,8 @@ import kz.jarkyn.backend.document.expense.model.ExpenseEntity;
 import kz.jarkyn.backend.document.expense.repository.ExpenseRepository;
 import kz.jarkyn.backend.document.payment.model.PaymentOutEntity;
 import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
+import kz.jarkyn.backend.document.sale.model.SaleEntity;
+import kz.jarkyn.backend.document.sale.repository.SaleRepository;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.global.service.CoverageService;
@@ -43,6 +45,7 @@ public class DocumentSearchService {
     private static final Logger log = LoggerFactory.getLogger(DocumentSearchService.class);
 
     private final SupplyRepository supplyRepository;
+    private final SaleRepository saleRepository;
     private final DocumentSearchRepository documentSearchRepository;
     private final BindDocumentRepository bindDocumentRepository;
     private final DocumentTypeService documentTypeService;
@@ -54,11 +57,18 @@ public class DocumentSearchService {
     private final ExpenseRepository expenseRepository;
 
     public DocumentSearchService(SupplyRepository supplyRepository,
+                                 SaleRepository saleRepository,
                                  DocumentSearchRepository documentSearchRepository,
                                  BindDocumentRepository bindDocumentRepository,
                                  DocumentTypeService documentTypeService,
-                                 CoverageService coverageService, ItemRepository itemRepository, SearchFactory searchFactory, DocumentRepository documentRepository, PaymentOutRepository paymentOutRepository, ExpenseRepository expenseRepository) {
+                                 CoverageService coverageService,
+                                 ItemRepository itemRepository,
+                                 SearchFactory searchFactory,
+                                 DocumentRepository documentRepository,
+                                 PaymentOutRepository paymentOutRepository,
+                                 ExpenseRepository expenseRepository) {
         this.supplyRepository = supplyRepository;
+        this.saleRepository = saleRepository;
         this.documentSearchRepository = documentSearchRepository;
         this.bindDocumentRepository = bindDocumentRepository;
         this.documentTypeService = documentTypeService;
@@ -145,6 +155,9 @@ public class DocumentSearchService {
         if (documentTypeService.isSupply(document.getType())) {
             fillSupply(documentSearch, supplyRepository.findById(documentId).orElseThrow());
         }
+        if (documentTypeService.isSale(document.getType())) {
+            fillSale(documentSearch, saleRepository.findById(documentId).orElseThrow());
+        }
         if (documentTypeService.isPaymentOut(document.getType())) {
             fillPaymentOut(documentSearch, paymentOutRepository.findById(documentId).orElseThrow());
         }
@@ -173,6 +186,25 @@ public class DocumentSearchService {
 
         fillSearch(documentSearch, supply.getName(), supply.getComment(), supply.getCounterparty().getName());
         fillDiscount(documentSearch, supply);
+    }
+
+    private void fillSale(DocumentSearchEntity documentSearch, SaleEntity sale) {
+        BigDecimal paidAmount = bindDocumentRepository.findAll(Specification.allOf(
+                        BindDocumentSpecifications.relatedDocument(sale),
+                        BindDocumentSpecifications.primaryDocumentType(documentTypeService.findPaymentIn())))
+                .stream().map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        fillPaid(documentSearch, paidAmount);
+
+        BigDecimal overheadCostAmount = bindDocumentRepository.findAll(Specification.allOf(
+                        BindDocumentSpecifications.relatedDocument(sale),
+                        BindDocumentSpecifications.primaryDocumentType(documentTypeService.findExpense())))
+                .stream()
+                .map(bindDocumentEntity -> bindDocumentEntity.getAmount().multiply(bindDocumentEntity.getPrimaryDocument().getExchangeRate()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        documentSearch.setOverheadCostAmount(overheadCostAmount);
+
+        fillSearch(documentSearch, sale.getName(), sale.getComment(), sale.getCounterparty().getName());
+        fillDiscount(documentSearch, sale);
     }
 
     private void fillPaymentOut(DocumentSearchEntity documentSearch, PaymentOutEntity paymentOut) {

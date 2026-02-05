@@ -323,6 +323,17 @@ CREATE TABLE supply
     CONSTRAINT pk_supply PRIMARY KEY (id)
 );
 
+CREATE TABLE sale
+(
+    id UUID NOT NULL,
+    CONSTRAINT pk_sale PRIMARY KEY (id)
+);
+
+
+ALTER TABLE sale
+    ADD CONSTRAINT FK_SALE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
+
+
 CREATE TABLE turnover
 (
     id                        UUID NOT NULL,
