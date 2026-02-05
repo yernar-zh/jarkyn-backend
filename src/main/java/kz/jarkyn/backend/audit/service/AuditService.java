@@ -22,10 +22,12 @@ import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.user.model.SessionEntity;
 import kz.jarkyn.backend.user.service.AuthService;
+import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import kz.jarkyn.backend.core.utils.RequestMoment;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +52,7 @@ public class AuditService {
     private final AuthService authService;
     private final AppRabbitTemplate appRabbitTemplate;
     private final ObjectProvider<RequestMoment> requestMomentProvider;
+    private final EntityManager entityManager;
 
     public AuditService(
             AuditRepository auditRepository,
@@ -57,13 +60,15 @@ public class AuditService {
             ObjectMapper objectMapper,
             AuthService authService,
             AppRabbitTemplate appRabbitTemplate,
-            ObjectProvider<RequestMoment> requestMomentProvider) {
+            ObjectProvider<RequestMoment> requestMomentProvider,
+            EntityManager entityManager) {
         this.auditRepository = auditRepository;
         this.changeMapper = changeMapper;
         this.objectMapper = objectMapper;
         this.authService = authService;
         this.appRabbitTemplate = appRabbitTemplate;
         this.requestMomentProvider = requestMomentProvider;
+        this.entityManager = entityManager;
     }
 
     private Instant getCurrentMoment() {
@@ -213,6 +218,27 @@ public class AuditService {
         saveEntityAsync(entity, entity, null);
     }
 
+    @RabbitListener(queues = "${rabbitmq.queue.audit-save}", concurrency = "4")
+    @Transactional
+    public void onAuditSave(AuditSaveMessage msg) {
+        try {
+            AbstractEntity entity = load(msg.getEntityClass(), msg.getEntityId());
+            if (entity == null) return; // nothing to do
+            AbstractEntity related = msg.getRelatedEntityClass() != null && msg.getRelatedEntityId() != null
+                    ? load(msg.getRelatedEntityClass(), msg.getRelatedEntityId())
+                    : entity;
+            if (related == null) related = entity;
+            SessionEntity session = entityManager.find(SessionEntity.class, msg.getSessionId());
+            if (session == null) {
+                log.error("AUDIT_LISTENER: Session not found: {}", msg.getSessionId());
+                return;
+            }
+            saveEntity(entity, related, msg.getEntityName(), session, msg.getInstant());
+        } catch (Exception e) {
+            log.error("AUDIT_LISTENER", e);
+        }
+    }
+
     @Transactional
     public void delete(AbstractEntity entity) {
         delete(entity, entity);
@@ -314,6 +340,18 @@ public class AuditService {
             return objectMapper.readTree(json);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private AbstractEntity load(String className, UUID id) {
+        if (className == null || id == null) return null;
+        try {
+            Class<?> entityClass = Class.forName(className);
+            Object obj = entityManager.find(entityClass, id);
+            return (obj instanceof AbstractEntity) ? (AbstractEntity) obj : null;
+        } catch (ClassNotFoundException e) {
+            log.error("AUDIT_LISTENER: Class not found {}", className, e);
+            return null;
         }
     }
 

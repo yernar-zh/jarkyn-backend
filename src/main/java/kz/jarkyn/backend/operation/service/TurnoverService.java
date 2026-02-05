@@ -12,6 +12,10 @@ import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.repository.TurnoverRepository;
 import kz.jarkyn.backend.core.config.AppRabbitTemplate;
 import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
+import jakarta.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -28,15 +32,20 @@ import static java.util.stream.Collectors.*;
 
 @Service
 public class TurnoverService {
+    private static final Logger log = LoggerFactory.getLogger(TurnoverService.class);
+
     private final TurnoverRepository turnoverRepository;
     private final AppRabbitTemplate appRabbitTemplate;
+    private final EntityManager entityManager;
 
     public TurnoverService(
             TurnoverRepository turnoverRepository,
-            AppRabbitTemplate appRabbitTemplate
+            AppRabbitTemplate appRabbitTemplate,
+            EntityManager entityManager
     ) {
         this.turnoverRepository = turnoverRepository;
         this.appRabbitTemplate = appRabbitTemplate;
+        this.entityManager = entityManager;
     }
 
     @Transactional(readOnly = true)
@@ -110,6 +119,22 @@ public class TurnoverService {
     public void fix(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
         fixRemind(warehouse, good, moment);
         fixCostPrice(warehouse, good, moment);
+    }
+
+    @RabbitListener(queues = "${rabbitmq.queue.turnover-fix:turnover-fix}", concurrency = "4")
+    @Transactional
+    public void onTurnoverFix(TurnoverFixMessage message) {
+        WarehouseEntity warehouse = entityManager.find(WarehouseEntity.class, message.getWarehouseId());
+        if (warehouse == null) {
+            log.error("TURNOVER_LISTENER: Warehouse not found: {}", message.getWarehouseId());
+            return;
+        }
+        GoodEntity good = entityManager.find(GoodEntity.class, message.getGoodId());
+        if (good == null) {
+            log.error("TURNOVER_LISTENER: Good not found: {}", message.getGoodId());
+            return;
+        }
+        fix(warehouse, good, message.getMoment());
     }
 
     private void sendFixMessage(WarehouseEntity warehouse, GoodEntity good, Instant moment) {
