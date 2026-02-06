@@ -11,8 +11,6 @@ import kz.jarkyn.backend.document.core.mapper.ItemMapper;
 import kz.jarkyn.backend.core.utils.EntityDivider;
 import kz.jarkyn.backend.operation.service.TurnoverService;
 import kz.jarkyn.backend.good.model.GoodEntity;
-import kz.jarkyn.backend.party.model.WarehouseEntity;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,15 +42,12 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemResponse> findApiByDocument(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
-        List<Pair<WarehouseEntity, GoodEntity>> goodsPair = items.stream()
-                .map(itemEntity -> Pair.of(document.getWarehouse(), itemEntity.getGood()))
-                .distinct().toList();
         Map<GoodEntity, TurnoverService.StockDto> stocks = turnoverService
-                .findStockAtMoment(goodsPair, document.getMoment())
+                .findStockByDocument(document)
                 .stream().collect(Collectors.toMap(TurnoverService.StockDto::getGood, Function.identity()));
         return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition))
                 .map(item -> itemMapper.toResponse(item, stocks.get(item.getGood()).getRemain(),
-                        stocks.get(item.getGood()).getCostPrice()))
+                        stocks.get(item.getGood()).getCostPricePerUnit()))
                 .toList();
     }
 

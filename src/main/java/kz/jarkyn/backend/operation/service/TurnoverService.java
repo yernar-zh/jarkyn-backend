@@ -12,6 +12,8 @@ import kz.jarkyn.backend.operation.mode.TurnoverEntity;
 import kz.jarkyn.backend.operation.repository.TurnoverRepository;
 import kz.jarkyn.backend.core.config.AppRabbitTemplate;
 import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
+import kz.jarkyn.backend.document.core.model.ItemEntity;
+import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,15 +40,18 @@ public class TurnoverService {
     private final TurnoverRepository turnoverRepository;
     private final AppRabbitTemplate appRabbitTemplate;
     private final EntityManager entityManager;
+    private final ItemRepository itemRepository;
 
     public TurnoverService(
             TurnoverRepository turnoverRepository,
             AppRabbitTemplate appRabbitTemplate,
-            EntityManager entityManager
+            EntityManager entityManager,
+            ItemRepository itemRepository
     ) {
         this.turnoverRepository = turnoverRepository;
         this.appRabbitTemplate = appRabbitTemplate;
         this.entityManager = entityManager;
+        this.itemRepository = itemRepository;
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +68,36 @@ public class TurnoverService {
                             new StockDto(entry.getKey(), good, remainMap.get(good), costPriceMap.get(good)));
                 })
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<StockDto> findStockByDocument(DocumentEntity document) {
+        List<ItemEntity> items = itemRepository.findByDocument(document);
+        List<Pair<WarehouseEntity, GoodEntity>> goodsPair = items.stream()
+                .map(itemEntity -> Pair.of(document.getWarehouse(), itemEntity.getGood()))
+                .distinct().toList();
+        if (!Boolean.TRUE.equals(document.getCommited())) {
+            return findStockAtMoment(goodsPair, document.getMoment());
+        }
+
+        Map<GoodEntity, List<TurnoverEntity>> turnoverByGood = turnoverRepository
+                .findAll(TurnoverSpecifications.document(document)).stream()
+                .collect(groupingBy(TurnoverEntity::getGood));
+
+        Map<GoodEntity, StockDto> fallback = findStockAtMoment(goodsPair, document.getMoment()).stream()
+                .collect(toMap(StockDto::getGood, Function.identity()));
+
+        return items.stream().map(ItemEntity::getGood).map(good -> {
+            List<TurnoverEntity> turnovers = turnoverByGood.getOrDefault(good, List.of());
+            if (turnovers.isEmpty()) {
+                log.warn("TURNOVER_STOCK: No turnover rows for committed document. documentId={}, goodId={}",
+                        document.getId(), good.getId());
+                return fallback.get(good);
+            }
+            TurnoverEntity turnover = turnovers.getFirst();
+            return new StockDto(turnover.getWarehouse(), turnover.getGood(),
+                    turnover.getRemain(), turnover.getCostPricePerUnit());
+        }).toList();
     }
 
 
@@ -226,13 +262,13 @@ public class TurnoverService {
         private final WarehouseEntity warehouse;
         private final GoodEntity good;
         private final Integer remain;
-        private final BigDecimal costPrice;
+        private final BigDecimal costPricePerUnit;
 
-        public StockDto(WarehouseEntity warehouse, GoodEntity good, Integer remain, BigDecimal costPrice) {
+        public StockDto(WarehouseEntity warehouse, GoodEntity good, Integer remain, BigDecimal costPricePerUnit) {
             this.warehouse = warehouse;
             this.good = good;
             this.remain = remain;
-            this.costPrice = costPrice;
+            this.costPricePerUnit = costPricePerUnit;
         }
 
         public WarehouseEntity getWarehouse() {
@@ -247,8 +283,8 @@ public class TurnoverService {
             return remain;
         }
 
-        public BigDecimal getCostPrice() {
-            return costPrice;
+        public BigDecimal getCostPricePerUnit() {
+            return costPricePerUnit;
         }
     }
 }
