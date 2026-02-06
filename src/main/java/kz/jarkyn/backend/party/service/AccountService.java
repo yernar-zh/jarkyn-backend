@@ -116,7 +116,7 @@ public class AccountService {
         return Stream.concat(accounts, defaultAccounts)
                 .collect(Collectors.toMap(
                         AccountShortResponse::getOrganization, Function.identity(),
-                        (a, b) -> a.getBalance().compareTo(b.getBalance()) >= 0 ? a : b
+                        (a, b) -> a.getBalance().abs().compareTo(b.getBalance().abs()) >= 0 ? a : b
                 )).values().stream().toList();
     }
 

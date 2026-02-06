@@ -123,7 +123,7 @@ public class SaleService {
         itemService.createNegativeTurnover(sale);
         AccountEntity customerAccount = accountService.findOrCreateForCounterparty(
                 sale.getOrganization(), sale.getCounterparty(), sale.getCurrency());
-        cashFlowService.create(sale, customerAccount, sale.getAmount());
+        cashFlowService.create(sale, customerAccount, sale.getAmount().negate());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, sale.getId());
     }
 
