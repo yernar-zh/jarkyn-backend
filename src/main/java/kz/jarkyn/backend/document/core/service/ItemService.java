@@ -100,12 +100,15 @@ public class ItemService {
     public void createNegativeTurnover(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         for (ItemEntity item : items) {
-            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), BigDecimal.ZERO); // TODO
+            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), BigDecimal.ZERO);
         }
     }
 
     @Transactional
     public void deleteTurnover(DocumentEntity document) {
-        turnoverService.delete(document);
+        List<ItemEntity> items = itemRepository.findByDocument(document);
+        for (ItemEntity item : items) {
+            turnoverService.delete(item.getDocument(), item.getGood());
+        }
     }
 }

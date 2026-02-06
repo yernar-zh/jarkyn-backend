@@ -273,6 +273,13 @@ CREATE TABLE party
     CONSTRAINT pk_party PRIMARY KEY (id)
 );
 
+CREATE TABLE payment_in
+(
+    id             UUID NOT NULL,
+    receipt_number VARCHAR(255),
+    CONSTRAINT pk_payment_in PRIMARY KEY (id)
+);
+
 CREATE TABLE payment_out
 (
     id             UUID NOT NULL,
@@ -289,6 +296,12 @@ CREATE TABLE role
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_role PRIMARY KEY (id)
+);
+
+CREATE TABLE sale
+(
+    id UUID NOT NULL,
+    CONSTRAINT pk_sale PRIMARY KEY (id)
 );
 
 CREATE TABLE selling_price
@@ -322,17 +335,6 @@ CREATE TABLE supply
     id UUID NOT NULL,
     CONSTRAINT pk_supply PRIMARY KEY (id)
 );
-
-CREATE TABLE sale
-(
-    id UUID NOT NULL,
-    CONSTRAINT pk_sale PRIMARY KEY (id)
-);
-
-
-ALTER TABLE sale
-    ADD CONSTRAINT FK_SALE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
-
 
 CREATE TABLE turnover
 (
@@ -476,8 +478,14 @@ ALTER TABLE item
 ALTER TABLE organization
     ADD CONSTRAINT FK_ORGANIZATION_ON_ID FOREIGN KEY (id) REFERENCES party (id);
 
+ALTER TABLE payment_in
+    ADD CONSTRAINT FK_PAYMENT_IN_ON_ID FOREIGN KEY (id) REFERENCES document (id);
+
 ALTER TABLE payment_out
     ADD CONSTRAINT FK_PAYMENT_OUT_ON_ID FOREIGN KEY (id) REFERENCES document (id);
+
+ALTER TABLE sale
+    ADD CONSTRAINT FK_SALE_ON_ID FOREIGN KEY (id) REFERENCES document (id);
 
 ALTER TABLE selling_price
     ADD CONSTRAINT FK_SELLING_PRICE_ON_GOOD FOREIGN KEY (good_id) REFERENCES good (id);

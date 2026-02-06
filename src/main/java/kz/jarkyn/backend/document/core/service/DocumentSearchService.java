@@ -21,7 +21,9 @@ import kz.jarkyn.backend.document.core.repository.DocumentSearchRepository;
 import kz.jarkyn.backend.document.core.repository.ItemRepository;
 import kz.jarkyn.backend.document.expense.model.ExpenseEntity;
 import kz.jarkyn.backend.document.expense.repository.ExpenseRepository;
+import kz.jarkyn.backend.document.payment.model.PaymentInEntity;
 import kz.jarkyn.backend.document.payment.model.PaymentOutEntity;
+import kz.jarkyn.backend.document.payment.repository.PaymentInRepository;
 import kz.jarkyn.backend.document.payment.repository.PaymentOutRepository;
 import kz.jarkyn.backend.document.sale.model.SaleEntity;
 import kz.jarkyn.backend.document.sale.repository.SaleRepository;
@@ -53,6 +55,7 @@ public class DocumentSearchService {
     private final ItemRepository itemRepository;
     private final SearchFactory searchFactory;
     private final DocumentRepository documentRepository;
+    private final PaymentInRepository paymentInRepository;
     private final PaymentOutRepository paymentOutRepository;
     private final ExpenseRepository expenseRepository;
 
@@ -65,6 +68,7 @@ public class DocumentSearchService {
                                  ItemRepository itemRepository,
                                  SearchFactory searchFactory,
                                  DocumentRepository documentRepository,
+                                 PaymentInRepository paymentInRepository,
                                  PaymentOutRepository paymentOutRepository,
                                  ExpenseRepository expenseRepository) {
         this.supplyRepository = supplyRepository;
@@ -76,6 +80,7 @@ public class DocumentSearchService {
         this.itemRepository = itemRepository;
         this.searchFactory = searchFactory;
         this.documentRepository = documentRepository;
+        this.paymentInRepository = paymentInRepository;
         this.paymentOutRepository = paymentOutRepository;
         this.expenseRepository = expenseRepository;
     }
@@ -158,6 +163,9 @@ public class DocumentSearchService {
         if (documentTypeService.isSale(document.getType())) {
             fillSale(documentSearch, saleRepository.findById(documentId).orElseThrow());
         }
+        if (documentTypeService.isPaymentIn(document.getType())) {
+            fillPaymentIn(documentSearch, paymentInRepository.findById(documentId).orElseThrow());
+        }
         if (documentTypeService.isPaymentOut(document.getType())) {
             fillPaymentOut(documentSearch, paymentOutRepository.findById(documentId).orElseThrow());
         }
@@ -211,6 +219,12 @@ public class DocumentSearchService {
         fillAttached(documentSearch, paymentOut.getAmount());
         fillSearch(documentSearch, paymentOut.getName(), paymentOut.getComment(),
                 paymentOut.getCounterparty().getName(), paymentOut.getReceiptNumber());
+    }
+
+    private void fillPaymentIn(DocumentSearchEntity documentSearch, PaymentInEntity paymentIn) {
+        fillAttached(documentSearch, paymentIn.getAmount());
+        fillSearch(documentSearch, paymentIn.getName(), paymentIn.getComment(),
+                paymentIn.getCounterparty().getName(), paymentIn.getReceiptNumber());
     }
 
     private void fillExpense(DocumentSearchEntity documentSearch, ExpenseEntity expense) {

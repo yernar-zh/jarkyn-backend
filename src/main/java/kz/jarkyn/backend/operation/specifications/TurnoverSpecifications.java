@@ -33,6 +33,10 @@ public class TurnoverSpecifications {
         return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get(TurnoverEntity_.moment), moment);
     }
 
+    public static Specification<TurnoverEntity> lastInflow(TurnoverEntity lastInflow) {
+        return (root, query, cb) -> cb.equal(root.get(TurnoverEntity_.LAST_INFLOW), lastInflow);
+    }
+
     public static Specification<TurnoverEntity> isIncome() {
         return (root, query, cb) -> cb.greaterThan(root.get(TurnoverEntity_.quantity), 0);
     }
