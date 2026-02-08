@@ -31,6 +31,8 @@ import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
 import kz.jarkyn.backend.global.model.CoverageEntity;
 import kz.jarkyn.backend.global.model.CoverageEntity_;
 import kz.jarkyn.backend.operation.service.CashFlowService;
+import kz.jarkyn.backend.party.model.AccountEntity;
+import kz.jarkyn.backend.party.service.AccountService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,11 +48,11 @@ public class ExpenseService {
     private final BindDocumentService bindDocumentService;
     private final DocumentService documentService;
     private final AuditService auditService;
-    private final SearchFactory searchFactory;
     private final CashFlowService cashFlowService;
     private final DocumentTypeService documentTypeService;
     private final DocumentSearchService documentSearchService;
     private final AppRabbitTemplate appRabbitTemplate;
+    private final AccountService accountService;
 
     public ExpenseService(
             ExpenseRepository expenseRepository,
@@ -58,27 +60,29 @@ public class ExpenseService {
             BindDocumentService bindDocumentService,
             DocumentService documentService,
             AuditService auditService,
-            SearchFactory searchFactory,
             CashFlowService cashFlowService,
             DocumentTypeService documentTypeService,
-            DocumentSearchService documentSearchService, AppRabbitTemplate appRabbitTemplate) {
+            DocumentSearchService documentSearchService,
+            AppRabbitTemplate appRabbitTemplate, AccountService accountService) {
         this.expenseRepository = expenseRepository;
         this.expenseMapper = expenseMapper;
         this.bindDocumentService = bindDocumentService;
         this.documentService = documentService;
         this.auditService = auditService;
-        this.searchFactory = searchFactory;
         this.cashFlowService = cashFlowService;
         this.documentTypeService = documentTypeService;
         this.documentSearchService = documentSearchService;
         this.appRabbitTemplate = appRabbitTemplate;
+        this.accountService = accountService;
     }
 
     @Transactional(readOnly = true)
     public ExpenseResponse findApiById(UUID id) {
         ExpenseEntity expense = expenseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         List<BindDocumentResponse> bindDocuments = bindDocumentService.findResponseByPrimaryDocument(expense);
-        return expenseMapper.toResponse(expense, bindDocuments);
+        List<BindDocumentResponse> paidDocuments = bindDocumentService
+                .findResponseByRelatedDocument(expense, documentTypeService.findPaymentOut());
+        return expenseMapper.toResponse(expense, bindDocuments, paidDocuments);
     }
 
     @Transactional(readOnly = true)
@@ -119,7 +123,11 @@ public class ExpenseService {
         ExpenseEntity expense = expenseRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         expense.setCommited(Boolean.TRUE);
         auditService.commit(expense);
-        cashFlowService.create(expense, expense.getAccount(), expense.getAmount());
+
+        AccountEntity counterpartyAccount = accountService.findOrCreateForCounterparty(
+                expense.getOrganization(), expense.getCounterparty(), expense.getCurrency());
+        cashFlowService.create(expense, counterpartyAccount, expense.getAmount());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, expense.getId());
     }
 
     @Transactional
@@ -128,6 +136,7 @@ public class ExpenseService {
         expense.setCommited(Boolean.FALSE);
         auditService.undoCommit(expense);
         cashFlowService.delete(expense);
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, expense.getId());
     }
 
     @Transactional
@@ -137,5 +146,6 @@ public class ExpenseService {
         expense.setDeleted(Boolean.TRUE);
         auditService.delete(expense);
         bindDocumentService.save(expense, List.of());
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, expense.getId());
     }
 }

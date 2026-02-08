@@ -47,7 +47,7 @@ public class ItemService {
                 .stream().collect(Collectors.toMap(TurnoverService.StockDto::getGood, Function.identity()));
         return items.stream().sorted(Comparator.comparing(ItemEntity::getPosition))
                 .map(item -> itemMapper.toResponse(item, stocks.get(item.getGood()).getRemain(),
-                        stocks.get(item.getGood()).getCostPricePerUnit()))
+                        stocks.get(item.getGood()).getCostPrice()))
                 .toList();
     }
 

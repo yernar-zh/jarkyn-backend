@@ -262,13 +262,13 @@ public class TurnoverService {
         private final WarehouseEntity warehouse;
         private final GoodEntity good;
         private final Integer remain;
-        private final BigDecimal costPricePerUnit;
+        private final BigDecimal costPrice;
 
-        public StockDto(WarehouseEntity warehouse, GoodEntity good, Integer remain, BigDecimal costPricePerUnit) {
+        public StockDto(WarehouseEntity warehouse, GoodEntity good, Integer remain, BigDecimal costPrice) {
             this.warehouse = warehouse;
             this.good = good;
             this.remain = remain;
-            this.costPricePerUnit = costPricePerUnit;
+            this.costPrice = costPrice;
         }
 
         public WarehouseEntity getWarehouse() {
@@ -283,8 +283,8 @@ public class TurnoverService {
             return remain;
         }
 
-        public BigDecimal getCostPricePerUnit() {
-            return costPricePerUnit;
+        public BigDecimal getCostPrice() {
+            return costPrice;
         }
     }
 }

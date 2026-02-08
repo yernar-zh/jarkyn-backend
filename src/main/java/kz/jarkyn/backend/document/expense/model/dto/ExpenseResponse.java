@@ -14,4 +14,6 @@ public interface ExpenseResponse extends DocumentResponse {
     @Nullable String getReceiptNumber();
     EnumTypeResponse getItemOfExpenditure();
     List<BindDocumentResponse> getBindDocuments();
+    List<BindDocumentResponse> getPaidDocuments();
+
 }

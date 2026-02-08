@@ -12,5 +12,6 @@ import java.util.List;
 
 @Mapper(config = BaseMapperConfig.class)
 public interface ExpenseMapper extends RequestMapper<ExpenseEntity, ExpenseRequest> {
-    ExpenseResponse toResponse(ExpenseEntity entity, List<BindDocumentResponse> bindDocuments);
+    ExpenseResponse toResponse(ExpenseEntity entity, List<BindDocumentResponse> bindDocuments,
+                               List<BindDocumentResponse> paidDocuments);
 }
