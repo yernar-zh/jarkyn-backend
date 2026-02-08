@@ -216,19 +216,19 @@ public class DocumentSearchService {
     }
 
     private void fillPaymentOut(DocumentSearchEntity documentSearch, PaymentOutEntity paymentOut) {
-        fillAttached(documentSearch, paymentOut.getAmount());
+        fillAttached(documentSearch, paymentOut);
         fillSearch(documentSearch, paymentOut.getName(), paymentOut.getComment(),
                 paymentOut.getCounterparty().getName(), paymentOut.getReceiptNumber());
     }
 
     private void fillPaymentIn(DocumentSearchEntity documentSearch, PaymentInEntity paymentIn) {
-        fillAttached(documentSearch, paymentIn.getAmount());
+        fillAttached(documentSearch, paymentIn);
         fillSearch(documentSearch, paymentIn.getName(), paymentIn.getComment(),
                 paymentIn.getCounterparty().getName(), paymentIn.getReceiptNumber());
     }
 
     private void fillExpense(DocumentSearchEntity documentSearch, ExpenseEntity expense) {
-        fillAttached(documentSearch, expense.getAmount());
+        fillAttached(documentSearch, expense);
         fillSearch(documentSearch, expense.getName(), expense.getComment(), expense.getCounterparty().getName());
     }
 
@@ -268,7 +268,11 @@ public class DocumentSearchService {
         }
     }
 
-    private void fillAttached(DocumentSearchEntity documentSearch, BigDecimal attached) {
+    private void fillAttached(DocumentSearchEntity documentSearch, DocumentEntity document) {
+        BigDecimal attached = bindDocumentRepository
+                .findAll(BindDocumentSpecifications.primaryDocument(document)).stream()
+                .map(BindDocumentEntity::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+
         documentSearch.setAttachedAmount(attached);
         documentSearch.setNotAttachedAmount(documentSearch.getAmount().subtract(attached));
         if (attached.compareTo(BigDecimal.ZERO) == 0) {
