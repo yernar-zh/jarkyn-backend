@@ -85,10 +85,9 @@ public class AuditService {
         AuditEntity audit = auditRepository.findOne(
                         AuditSpecifications.relatedEntityId(entityId), EntitySorts.byCreatedDesc())
                 .orElseThrow(ExceptionUtils.entityNotFound());
-        String action = audit.getEntityId().equals(entityId) ? audit.getAction() : EDITE;
         return changeMapper.toMainEntityChange(
                 audit.getMoment(), audit.getSession().getUser(),
-                action, List.of(), List.of());
+                audit.getAction(), List.of(), List.of());
     }
 
     public List<MainEntityChangeResponse> findChanges(UUID entityId) {
