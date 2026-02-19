@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.core.model.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 import java.util.UUID;

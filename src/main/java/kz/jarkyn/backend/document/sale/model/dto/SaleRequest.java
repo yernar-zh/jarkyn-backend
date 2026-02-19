@@ -1,7 +1,7 @@
 
 package kz.jarkyn.backend.document.sale.model.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.document.core.model.dto.DocumentRequest;
 import kz.jarkyn.backend.document.core.model.dto.ItemRequest;

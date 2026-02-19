@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.global.model.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import org.immutables.value.Value;
 

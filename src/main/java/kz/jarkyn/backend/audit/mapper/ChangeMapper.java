@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.audit.mapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import kz.jarkyn.backend.audit.model.dto.EntityChangeResponse;
 import kz.jarkyn.backend.audit.model.dto.EntityGroupChangeResponse;
 import kz.jarkyn.backend.audit.model.dto.FieldChangeResponse;

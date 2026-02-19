@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.good.model.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 import jakarta.annotation.Nullable;
 import kz.jarkyn.backend.core.model.dto.IdDto;
 import kz.jarkyn.backend.core.model.dto.ReferenceRequest;

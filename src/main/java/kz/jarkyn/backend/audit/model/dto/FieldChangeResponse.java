@@ -1,6 +1,6 @@
 package kz.jarkyn.backend.audit.model.dto;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import jakarta.annotation.Nullable;
 import org.immutables.value.Value;
 

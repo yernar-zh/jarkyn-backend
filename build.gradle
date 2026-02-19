@@ -5,16 +5,16 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.yaml:snakeyaml:2.2'
-        classpath 'org.flywaydb:flyway-database-postgresql:12.0.0'
+        classpath 'org.yaml:snakeyaml:2.5'
+        classpath 'org.flywaydb:flyway-database-postgresql:12.0.1'
     }
 }
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.3'
-    id 'io.spring.dependency-management' version '1.1.6'
-    id "org.flywaydb.flyway" version "12.0.0"
+    id 'org.springframework.boot' version '4.0.2'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id "org.flywaydb.flyway" version "12.0.1"
 }
 
 group = 'kz.jarkyn'
@@ -34,42 +34,40 @@ dependencies {
     // Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.apache.commons:commons-lang3:3.18.0'
+    implementation 'org.apache.commons:commons-lang3:3.20.0'
 
     // Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
 
     // Cloud
-    implementation 'software.amazon.awssdk:s3:2.31.23'
+    implementation 'software.amazon.awssdk:s3:2.41.32'
 
     // Database
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.flywaydb:flyway-core'
-    runtimeOnly 'org.flywaydb:flyway-database-postgresql'
     implementation 'org.postgresql:postgresql'
-    annotationProcessor 'org.hibernate:hibernate-jpamodelgen:6.2.5.Final'
+    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:7.2.4.Final'
 
     // Model and Databind
-    implementation 'org.immutables:value:2.8.2'
-    annotationProcessor 'org.immutables:value:2.8.2'
-    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+    implementation 'org.immutables:value:2.12.1'
+    annotationProcessor 'org.immutables:value:2.12.1'
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
     // Image processioning
-    implementation 'net.coobird:thumbnailator:0.4.20'
+    implementation 'net.coobird:thumbnailator:0.4.21'
 
     //Excel
-    implementation 'org.jxls:jxls-poi:2.14.0'
+    implementation 'org.jxls:jxls-poi:3.0.0'
 
     // Message Broker
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
     //Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'com.opentable.components:otj-pg-embedded:1.1.0'
+    testImplementation 'com.opentable.components:otj-pg-embedded:1.1.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

@@ -4,8 +4,7 @@ package kz.jarkyn.backend.export.service;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jxls.common.Context;
-import org.jxls.util.JxlsHelper;
+import org.jxls.transform.poi.JxlsPoiTemplateFillerBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -17,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -67,10 +67,13 @@ public class ExportService {
         try (InputStream is = new ByteArrayInputStream(temp.toByteArray());
              ByteArrayOutputStream os = new ByteArrayOutputStream()
         ) {
-            Context context = new Context();
-            args.forEach(context::putVar);
-            context.putVar("utils", exportUtils);
-            JxlsHelper.getInstance().processTemplate(is, os, context);
+            Map<String, Object> templateArgs = new HashMap<>(args);
+            templateArgs.put("utils", exportUtils);
+            os.write(
+                    JxlsPoiTemplateFillerBuilder.newInstance()
+                            .withTemplate(is)
+                            .buildAndFill(templateArgs)
+            );
             temp2 = os;
         } catch (IOException e) {
             throw new RuntimeException(e);
