@@ -71,8 +71,8 @@ public interface Api {
         String PATH = Api.PATH + "/coverage";
     }
 
-    interface Lookup {
-        String PATH = Api.PATH + "/lookup";
+    interface Setting {
+        String PATH = Api.PATH + "/setting";
     }
 
     interface Role {

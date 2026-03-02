@@ -7,7 +7,6 @@ import kz.jarkyn.backend.global.mapper.LookupMapper;
 import kz.jarkyn.backend.global.model.dto.DefaultLookupResponse;
 import kz.jarkyn.backend.global.service.CurrencyService;
 import kz.jarkyn.backend.party.model.dto.OrganizationResponse;
-import kz.jarkyn.backend.party.service.CounterpartyService;
 import kz.jarkyn.backend.party.service.OrganizationService;
 import kz.jarkyn.backend.good.model.dto.GroupDetailResponse;
 import kz.jarkyn.backend.party.model.dto.WarehouseResponse;
@@ -19,32 +18,29 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(Api.Lookup.PATH)
-public class LookupController {
+@RequestMapping(Api.Setting.PATH)
+public class SettingController {
     private final OrganizationService organizationService;
     private final WarehouseService warehouseService;
-    private final CounterpartyService counterpartyService;
     private final CurrencyService currencyService;
     private final GroupService groupService;
     private final LookupMapper lookupMapper;
 
-    public LookupController(
+    public SettingController(
             OrganizationService organizationService,
             WarehouseService warehouseService,
-            CounterpartyService counterpartyService,
             CurrencyService currencyService,
             GroupService groupService,
             LookupMapper lookupMapper) {
         this.organizationService = organizationService;
         this.warehouseService = warehouseService;
-        this.counterpartyService = counterpartyService;
         this.currencyService = currencyService;
         this.groupService = groupService;
         this.lookupMapper = lookupMapper;
     }
 
-    @GetMapping("default")
-    public DefaultLookupResponse getDefault() {
+    @GetMapping("defaults")
+    public DefaultLookupResponse getDefaults() {
         OrganizationResponse organization = organizationService
                 .findApiByFilter(QueryParams.of(Map.of("archived", "false")))
                 .getRow().stream().findAny().orElse(null);
