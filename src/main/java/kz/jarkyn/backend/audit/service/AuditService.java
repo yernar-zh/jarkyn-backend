@@ -243,9 +243,20 @@ public class AuditService {
         delete(entity, entity);
     }
 
+
     @Transactional
     public void delete(AbstractEntity entity, AbstractEntity relatedEntity) {
         addAction(entity, relatedEntity, "DELETE");
+    }
+
+    @Transactional
+    public void restore(AbstractEntity entity) {
+        restore(entity, entity);
+    }
+
+    @Transactional
+    public void restore(AbstractEntity entity, AbstractEntity relatedEntity) {
+        addAction(entity, relatedEntity, "RESTORE");
     }
 
     @Transactional

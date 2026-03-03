@@ -32,10 +32,7 @@ import kz.jarkyn.backend.document.sale.repository.SaleRepository;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.global.service.CoverageService;
-import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.good.model.GoodEntity_;
-import kz.jarkyn.backend.operation.model.message.TurnoverFixMessage;
-import kz.jarkyn.backend.party.model.WarehouseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -44,7 +41,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.*;
 
 
@@ -316,7 +312,7 @@ public class DocumentSearchService {
         }
     }
 
-    public void sendFixMessage(DocumentEntity document) {
+    public void update(DocumentEntity document) {
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, document.getId());
     }
 }

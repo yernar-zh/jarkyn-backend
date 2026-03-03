@@ -79,7 +79,7 @@ public class ItemService {
         saveApi(document, items);
 
         if (!document.getCommited()) {
-            turnoverService.deleteAll(document, Set.of());
+            turnoverService.delete(document, Set.of());
             return;
         }
 
@@ -120,7 +120,7 @@ public class ItemService {
                 updatedGoods.add(entry.getKey());
             }
         }
-        turnoverService.deleteAll(document, updatedGoods);
+        turnoverService.delete(document, updatedGoods);
     }
 
     @Transactional
@@ -133,9 +133,6 @@ public class ItemService {
 
     @Transactional
     public void deleteTurnover(DocumentEntity document) {
-        List<ItemEntity> items = itemRepository.findByDocument(document);
-        for (ItemEntity item : items) {
-            turnoverService.delete(item.getDocument(), item.getGood());
-        }
+        turnoverService.delete(document, Set.of());
     }
 }

@@ -3,6 +3,7 @@ package kz.jarkyn.backend.document.supply.controller;
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyListResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyResponse;
 import kz.jarkyn.backend.document.supply.model.dto.SupplyRequest;
@@ -48,6 +49,12 @@ public class SupplyController {
     @DeleteMapping("{id}")
     public SupplyResponse delete(@PathVariable UUID id) {
         supplyService.delete(id);
+        return supplyService.findApiById(id);
+    }
+
+    @PostMapping("{id}/restore")
+    public SupplyResponse restore(@PathVariable UUID id) {
+        supplyService.restore(id);
         return supplyService.findApiById(id);
     }
 }

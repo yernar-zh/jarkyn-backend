@@ -3,8 +3,6 @@ package kz.jarkyn.backend.document.supply.service;
 
 
 import kz.jarkyn.backend.audit.service.AuditService;
-import kz.jarkyn.backend.core.config.AppRabbitTemplate;
-import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
@@ -12,8 +10,6 @@ import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
 import kz.jarkyn.backend.document.core.service.DocumentSearchService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
-import kz.jarkyn.backend.good.model.GoodEntity;
-import kz.jarkyn.backend.operation.model.message.TurnoverFixMessage;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
@@ -32,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -131,18 +126,31 @@ public class SupplyService {
         }
 
         auditService.saveEntity(supply);
-        documentSearchService.sendFixMessage(supply);
+        documentSearchService.update(supply);
     }
 
     @Transactional
     public void delete(UUID id) {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (supply.getDeleted()) return;
         List<BindDocumentResponse> paidDocuments = bindDocumentService
                 .findResponseByRelatedDocument(supply, documentTypeService.findPaymentOut());
         if (!paidDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
-        if (supply.getCommited()) ExceptionUtils.throwCommitedDeleteException();
+        supply.setCommited(Boolean.FALSE);
         supply.setDeleted(Boolean.TRUE);
-        auditService.delete(supply);
-        documentSearchService.sendFixMessage(supply);
+        itemService.deleteTurnover(supply);
+        cashFlowService.deleteAll(supply, Set.of());
+        auditService.saveEntity(supply);
+        documentSearchService.update(supply);
+    }
+
+    @Transactional
+    public void restore(UUID id) {
+        SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (!supply.getDeleted()) return;
+        supply.setCommited(Boolean.FALSE);
+        supply.setDeleted(Boolean.FALSE);
+        auditService.saveEntity(supply);
+        documentSearchService.update(supply);
     }
 }

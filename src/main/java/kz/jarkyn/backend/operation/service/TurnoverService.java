@@ -148,24 +148,16 @@ public class TurnoverService {
     }
 
     @Transactional
-    public void delete(DocumentEntity document, GoodEntity good) {
-        TurnoverEntity turnover = turnoverRepository.findOne(
-                        TurnoverSpecifications.document(document).and(TurnoverSpecifications.good(good)))
-                .orElseThrow();
-        turnoverRepository.findAll(TurnoverSpecifications.lastInflow(turnover)).forEach(outflow -> {
-            outflow.setLastInflow(null);
-            outflow.setLastInflowUsedQuantity(null);
-        });
-        turnoverRepository.delete(turnover);
-        sendFixMessage(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
-    }
-
-    @Transactional
-    public void deleteAll(DocumentEntity document, Set<GoodEntity> excludeGoods) {
-        List<TurnoverEntity> currentTurnovers = turnoverRepository.findAll(TurnoverSpecifications.document(document));
-        for (TurnoverEntity turnover : currentTurnovers) {
+    public void delete(DocumentEntity document, Set<GoodEntity> excludeGoods) {
+        List<TurnoverEntity> turnovers = turnoverRepository.findAll(TurnoverSpecifications.document(document));
+        for (TurnoverEntity turnover : turnovers) {
             if (!excludeGoods.contains(turnover.getGood())) {
-                delete(document, turnover.getGood());
+                turnoverRepository.findAll(TurnoverSpecifications.lastInflow(turnover)).forEach(outflow -> {
+                    outflow.setLastInflow(null);
+                    outflow.setLastInflowUsedQuantity(null);
+                });
+                turnoverRepository.delete(turnover);
+                sendFixMessage(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
             }
         }
     }

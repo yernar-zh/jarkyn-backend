@@ -42,9 +42,7 @@ public class DocumentEntity extends AbstractEntity {
     private BigDecimal exchangeRate;
     private BigDecimal amount;
     private String comment;
-    @AuditIgnore
     private Boolean deleted;
-    @AuditIgnore
     private Boolean commited;
 
     public DocumentTypeEntity getType() {
