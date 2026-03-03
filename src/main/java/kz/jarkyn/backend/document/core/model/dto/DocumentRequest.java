@@ -20,4 +20,5 @@ public interface DocumentRequest {
     BigDecimal getExchangeRate();
     BigDecimal getAmount();
     String getComment();
+    Boolean getCommited();
 }

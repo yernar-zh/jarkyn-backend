@@ -16,9 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,15 +26,18 @@ public class ItemService {
     private final ItemMapper itemMapper;
     private final TurnoverService turnoverService;
     private final AuditService auditService;
+    private final DocumentTypeService documentTypeService;
 
     public ItemService(
             ItemRepository itemRepository,
             ItemMapper itemMapper,
-            TurnoverService turnoverService, AuditService auditService) {
+            TurnoverService turnoverService,
+            AuditService auditService, DocumentTypeService documentTypeService) {
         this.itemRepository = itemRepository;
         this.itemMapper = itemMapper;
         this.turnoverService = turnoverService;
         this.auditService = auditService;
+        this.documentTypeService = documentTypeService;
     }
 
     @Transactional(readOnly = true)
@@ -74,28 +75,59 @@ public class ItemService {
     }
 
     @Transactional
-    public void createPositiveTurnover(DocumentEntity document, BigDecimal documentCostPrice) {
-        List<ItemEntity> items = itemRepository.findByDocument(document);
-        BigDecimal totalItemAmount = items.stream()
-                .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        Map<GoodEntity, List<ItemEntity>> map = items.stream().collect(Collectors.groupingBy(ItemEntity::getGood));
-        for (Map.Entry<GoodEntity, List<ItemEntity>> entry : map.entrySet()) {
-            Integer quantity = entry.getValue().stream().map(ItemEntity::getQuantity).reduce(0, Integer::sum);
-            BigDecimal price = entry.getValue().stream()
-                    .map(itemEntity -> itemEntity.getPrice().multiply(BigDecimal.valueOf(quantity)))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                    .divide(BigDecimal.valueOf(quantity), 2, RoundingMode.HALF_UP);
-            BigDecimal costPricePerUnit = documentCostPrice.multiply(price).divide(totalItemAmount, 2, RoundingMode.HALF_UP);
-            turnoverService.create(document, entry.getKey(), quantity, costPricePerUnit);
+    public void saveApi(DocumentEntity document, List<ItemRequest> items, BigDecimal documentCostPrice) {
+        saveApi(document, items);
+
+        if (!document.getCommited()) {
+            turnoverService.deleteAll(document, Set.of());
+            return;
         }
+
+        List<ItemEntity> currentItems = itemRepository.findByDocument(document);
+        Map<GoodEntity, List<ItemEntity>> itemMap = currentItems.stream()
+                .collect(Collectors.groupingBy(ItemEntity::getGood));
+        Set<GoodEntity> updatedGoods = new HashSet<>();
+        boolean positiveTurnover = documentTypeService.isSupply(document.getType());
+
+        if (positiveTurnover) {
+            BigDecimal totalItemAmount = currentItems.stream()
+                    .map(item -> BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice()))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            for (Map.Entry<GoodEntity, List<ItemEntity>> entry : itemMap.entrySet()) {
+                Integer quantity = entry.getValue().stream().map(ItemEntity::getQuantity).reduce(0, Integer::sum);
+                if (quantity == 0) {
+                    continue;
+                }
+                BigDecimal goodAmount = entry.getValue().stream()
+                        .map(itemEntity -> itemEntity.getPrice().multiply(BigDecimal.valueOf(itemEntity.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal costPricePerUnit = totalItemAmount.compareTo(BigDecimal.ZERO) == 0
+                        ? BigDecimal.ZERO
+                        : documentCostPrice.multiply(goodAmount)
+                        .divide(totalItemAmount, 8, RoundingMode.HALF_UP)
+                        .divide(BigDecimal.valueOf(quantity), 2, RoundingMode.HALF_UP);
+                turnoverService.save(document, entry.getKey(), quantity, costPricePerUnit);
+                updatedGoods.add(entry.getKey());
+            }
+        } else {
+            for (Map.Entry<GoodEntity, List<ItemEntity>> entry : itemMap.entrySet()) {
+                Integer quantity = entry.getValue().stream().map(ItemEntity::getQuantity).reduce(0, Integer::sum);
+                if (quantity == 0) {
+                    continue;
+                }
+                turnoverService.save(document, entry.getKey(), -quantity, BigDecimal.ZERO);
+                updatedGoods.add(entry.getKey());
+            }
+        }
+        turnoverService.deleteAll(document, updatedGoods);
     }
 
     @Transactional
     public void createNegativeTurnover(DocumentEntity document) {
         List<ItemEntity> items = itemRepository.findByDocument(document);
         for (ItemEntity item : items) {
-            turnoverService.create(item.getDocument(), item.getGood(), -item.getQuantity(), BigDecimal.ZERO);
+            turnoverService.save(item.getDocument(), item.getGood(), -item.getQuantity(), BigDecimal.ZERO);
         }
     }
 

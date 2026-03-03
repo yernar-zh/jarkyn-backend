@@ -8,6 +8,7 @@ import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
 import kz.jarkyn.backend.document.core.service.DocumentSearchService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
@@ -96,11 +97,8 @@ public class SupplyService {
             documentService.validateName(supply);
         }
         supply.setDeleted(false);
-        supply.setCommited(false);
         supplyRepository.save(supply);
-        auditService.saveEntity(supply);
-        itemService.saveApi(supply, request.getItems());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
+        save(supply, request.getItems());
         return supply.getId();
     }
 
@@ -109,37 +107,23 @@ public class SupplyService {
         SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         documentService.validateName(supply);
         supplyMapper.editEntity(supply, request);
-        auditService.saveEntity(supply);
-        itemService.saveApi(supply, request.getItems());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
+        save(supply, request.getItems());
     }
 
-    @Transactional
-    public void commit(UUID id) {
-        SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (supply.getCommited()) return;
-        supply.setCommited(Boolean.TRUE);
-        auditService.commit(supply);
+    private void save(SupplyEntity supply, List<ItemRequest> items) {
         BigDecimal mainCostPrice = supply.getAmount().multiply(supply.getExchangeRate());
         BigDecimal overheadCostPrice = bindDocumentService
                 .findResponseByRelatedDocument(supply, documentTypeService.findExpense()).stream()
                 .map(bindDocument -> bindDocument.getAmount().multiply(bindDocument.getPrimaryDocument().getExchangeRate()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        itemService.createPositiveTurnover(supply, mainCostPrice.add(overheadCostPrice));
+
+        auditService.saveEntity(supply);
+        itemService.saveApi(supply, items, mainCostPrice.add(overheadCostPrice));
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
+
         AccountEntity supplerAccount = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
         cashFlowService.create(supply, supplerAccount, supply.getAmount());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
-    }
-
-    @Transactional
-    public void undoCommit(UUID id) {
-        SupplyEntity supply = supplyRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (!supply.getCommited()) return;
-        supply.setCommited(Boolean.FALSE);
-        auditService.undoCommit(supply);
-        itemService.deleteTurnover(supply);
-        cashFlowService.delete(supply);
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
     }
 

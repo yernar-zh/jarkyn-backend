@@ -102,38 +102,71 @@ public class TurnoverService {
 
 
     @Transactional
-    public void create(DocumentEntity document, GoodEntity good, Integer quantity, BigDecimal costPricePerUnit) {
-        TurnoverEntity turnover = new TurnoverEntity();
-        turnover.setDocument(document);
-        turnover.setGood(good);
+    public void save(DocumentEntity document, GoodEntity good, Integer quantity, BigDecimal costPricePerUnit) {
+        TurnoverEntity turnover = turnoverRepository.findOne(
+                TurnoverSpecifications.document(document).and(TurnoverSpecifications.good(good))
+        ).orElse(null);
+        if (turnover == null) {
+            TurnoverEntity newTurnover = new TurnoverEntity();
+            newTurnover.setDocument(document);
+            newTurnover.setGood(good);
+            newTurnover.setQuantity(quantity);
+            newTurnover.setWarehouse(document.getWarehouse());
+            newTurnover.setMoment(document.getMoment());
+            newTurnover.setCostPricePerUnit(costPricePerUnit);
+            newTurnover.setRemain(0);
+            turnoverRepository.save(newTurnover);
+            sendFixMessage(newTurnover.getWarehouse(), newTurnover.getGood(), newTurnover.getMoment());
+            return;
+        }
+
+        boolean sameWarehouse = Objects.equals(turnover.getWarehouse(), document.getWarehouse());
+        boolean sameMoment = Objects.equals(turnover.getMoment(), document.getMoment());
+        boolean sameQuantity = Objects.equals(turnover.getQuantity(), quantity);
+        boolean sameCost = (turnover.getCostPricePerUnit() == null && costPricePerUnit == null) || (
+                turnover.getCostPricePerUnit() != null && costPricePerUnit != null
+                && turnover.getCostPricePerUnit().compareTo(costPricePerUnit) == 0);
+        if (sameWarehouse && sameMoment && sameQuantity && sameCost) {
+            return;
+        }
+
+        WarehouseEntity oldWarehouse = turnover.getWarehouse();
+        Instant oldMoment = turnover.getMoment();
+
         turnover.setQuantity(quantity);
         turnover.setWarehouse(document.getWarehouse());
         turnover.setMoment(document.getMoment());
         turnover.setCostPricePerUnit(costPricePerUnit);
-        turnover.setRemain(0);
-        turnoverRepository.save(turnover);
-        sendFixMessage(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
+
+        if (!Objects.equals(oldWarehouse, turnover.getWarehouse())) {
+            sendFixMessage(oldWarehouse, turnover.getGood(), oldMoment);
+            sendFixMessage(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
+            return;
+        }
+        Instant minMoment = oldMoment.isBefore(turnover.getMoment()) ? oldMoment : turnover.getMoment();
+        sendFixMessage(turnover.getWarehouse(), turnover.getGood(), minMoment);
     }
 
     @Transactional
     public void delete(DocumentEntity document, GoodEntity good) {
-        TurnoverEntity turnover = turnoverRepository.findOne(TurnoverSpecifications.document(document)
-                        .and(TurnoverSpecifications.warehouseAndGoodEquals(document.getWarehouse(), good)))
+        TurnoverEntity turnover = turnoverRepository.findOne(
+                        TurnoverSpecifications.document(document).and(TurnoverSpecifications.good(good)))
                 .orElseThrow();
         turnoverRepository.findAll(TurnoverSpecifications.lastInflow(turnover)).forEach(outflow -> {
             outflow.setLastInflow(null);
             outflow.setLastInflowUsedQuantity(null);
         });
         turnoverRepository.delete(turnover);
+        sendFixMessage(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
     }
 
     @Transactional
-    public void delete(DocumentEntity document) {
-        List<TurnoverEntity> turnovers = turnoverRepository.findAll(Specification
-                .where(TurnoverSpecifications.document(document)));
-        turnoverRepository.deleteAll(turnovers);
-        for (TurnoverEntity turnover : turnovers) {
-            sendFixMessage(turnover.getWarehouse(), turnover.getGood(), turnover.getMoment());
+    public void deleteAll(DocumentEntity document, Set<GoodEntity> excludeGoods) {
+        List<TurnoverEntity> currentTurnovers = turnoverRepository.findAll(TurnoverSpecifications.document(document));
+        for (TurnoverEntity turnover : currentTurnovers) {
+            if (!excludeGoods.contains(turnover.getGood())) {
+                delete(document, turnover.getGood());
+            }
         }
     }
 

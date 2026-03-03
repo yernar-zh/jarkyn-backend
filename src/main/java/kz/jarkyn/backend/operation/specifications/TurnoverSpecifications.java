@@ -24,6 +24,10 @@ public class TurnoverSpecifications {
         return (root, query, cb) -> cb.equal(root.get(TurnoverEntity_.document), document);
     }
 
+    public static Specification<TurnoverEntity> good(GoodEntity good) {
+        return (root, query, cb) -> cb.equal(root.get(TurnoverEntity_.good), good);
+    }
+
 
     public static Specification<TurnoverEntity> momentLessThan(Instant moment) {
         return (root, query, cb) -> cb.lessThan(root.get(TurnoverEntity_.moment), moment);
