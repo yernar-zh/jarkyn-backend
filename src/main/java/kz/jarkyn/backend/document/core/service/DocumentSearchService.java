@@ -5,6 +5,8 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
+import kz.jarkyn.backend.core.config.AppRabbitTemplate;
+import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
 import kz.jarkyn.backend.core.search.CriteriaAttributes;
@@ -30,7 +32,10 @@ import kz.jarkyn.backend.document.sale.repository.SaleRepository;
 import kz.jarkyn.backend.document.supply.model.SupplyEntity;
 import kz.jarkyn.backend.document.supply.repository.SupplyRepository;
 import kz.jarkyn.backend.global.service.CoverageService;
+import kz.jarkyn.backend.good.model.GoodEntity;
 import kz.jarkyn.backend.good.model.GoodEntity_;
+import kz.jarkyn.backend.operation.model.message.TurnoverFixMessage;
+import kz.jarkyn.backend.party.model.WarehouseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -39,6 +44,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.*;
 
 
@@ -58,6 +64,7 @@ public class DocumentSearchService {
     private final PaymentInRepository paymentInRepository;
     private final PaymentOutRepository paymentOutRepository;
     private final ExpenseRepository expenseRepository;
+    private final AppRabbitTemplate appRabbitTemplate;
 
     public DocumentSearchService(SupplyRepository supplyRepository,
                                  SaleRepository saleRepository,
@@ -70,7 +77,7 @@ public class DocumentSearchService {
                                  DocumentRepository documentRepository,
                                  PaymentInRepository paymentInRepository,
                                  PaymentOutRepository paymentOutRepository,
-                                 ExpenseRepository expenseRepository) {
+                                 ExpenseRepository expenseRepository, AppRabbitTemplate appRabbitTemplate) {
         this.supplyRepository = supplyRepository;
         this.saleRepository = saleRepository;
         this.documentSearchRepository = documentSearchRepository;
@@ -83,6 +90,7 @@ public class DocumentSearchService {
         this.paymentInRepository = paymentInRepository;
         this.paymentOutRepository = paymentOutRepository;
         this.expenseRepository = expenseRepository;
+        this.appRabbitTemplate = appRabbitTemplate;
     }
 
     public <T> PageResponse<T> findApiByFilter(
@@ -308,4 +316,7 @@ public class DocumentSearchService {
         }
     }
 
+    public void sendFixMessage(DocumentEntity document) {
+        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, document.getId());
+    }
 }

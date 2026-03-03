@@ -26,5 +26,6 @@ public interface CashFlowRepository extends JpaRepository<CashFlowEntity, UUID> 
             @Param("moment") Instant moment
     );
     List<CashFlowEntity> findByDocument(DocumentEntity document);
+    Optional<CashFlowEntity> findByDocumentAndAccount(DocumentEntity document, AccountEntity account);
     List<CashFlowEntity> findByAccountAndMomentGreaterThanEqual(AccountEntity account, Instant moment);
 }

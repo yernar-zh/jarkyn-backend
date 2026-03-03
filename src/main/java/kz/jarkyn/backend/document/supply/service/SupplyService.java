@@ -12,6 +12,8 @@ import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
 import kz.jarkyn.backend.document.core.service.DocumentSearchService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
+import kz.jarkyn.backend.good.model.GoodEntity;
+import kz.jarkyn.backend.operation.model.message.TurnoverFixMessage;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
 import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
@@ -30,7 +32,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -45,7 +49,6 @@ public class SupplyService {
     private final AccountService accountService;
     private final DocumentTypeService documentTypeService;
     private final DocumentSearchService documentSearchService;
-    private final AppRabbitTemplate appRabbitTemplate;
 
     public SupplyService(
             SupplyRepository supplyRepository,
@@ -57,7 +60,7 @@ public class SupplyService {
             CashFlowService cashFlowService,
             AccountService accountService,
             DocumentTypeService documentTypeService,
-            DocumentSearchService documentSearchService, AppRabbitTemplate appRabbitTemplate) {
+            DocumentSearchService documentSearchService) {
         this.supplyRepository = supplyRepository;
         this.supplyMapper = supplyMapper;
         this.itemService = itemService;
@@ -68,7 +71,6 @@ public class SupplyService {
         this.accountService = accountService;
         this.documentTypeService = documentTypeService;
         this.documentSearchService = documentSearchService;
-        this.appRabbitTemplate = appRabbitTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -117,14 +119,19 @@ public class SupplyService {
                 .map(bindDocument -> bindDocument.getAmount().multiply(bindDocument.getPrimaryDocument().getExchangeRate()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        auditService.saveEntity(supply);
         itemService.saveApi(supply, items, mainCostPrice.add(overheadCostPrice));
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
 
         AccountEntity supplerAccount = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
-        cashFlowService.create(supply, supplerAccount, supply.getAmount());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
+        if (supply.getCommited()) {
+            cashFlowService.change(supply, supplerAccount, supply.getAmount());
+            cashFlowService.deleteAll(supply, Set.of(supplerAccount));
+        } else {
+            cashFlowService.deleteAll(supply, Set.of());
+        }
+
+        auditService.saveEntity(supply);
+        documentSearchService.sendFixMessage(supply);
     }
 
     @Transactional
@@ -136,6 +143,6 @@ public class SupplyService {
         if (supply.getCommited()) ExceptionUtils.throwCommitedDeleteException();
         supply.setDeleted(Boolean.TRUE);
         auditService.delete(supply);
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, supply.getId());
+        documentSearchService.sendFixMessage(supply);
     }
 }

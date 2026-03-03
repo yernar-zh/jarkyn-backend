@@ -13,7 +13,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CashFlowService {
@@ -49,11 +51,45 @@ public class CashFlowService {
     }
 
     @Transactional
+    public void change(DocumentEntity document, AccountEntity account, BigDecimal amount) {
+        CashFlowEntity cashFlow = cashFlowRepository.findByDocumentAndAccount(document, account).orElse(null);
+        if (cashFlow == null) {
+            create(document, account, amount);
+            return;
+        }
+
+        boolean sameMoment = Objects.equals(cashFlow.getMoment(), document.getMoment());
+        boolean sameAmount = (cashFlow.getAmount() == null && amount == null) || (
+                cashFlow.getAmount() != null && amount != null && cashFlow.getAmount().compareTo(amount) == 0);
+        if (sameMoment && sameAmount) {
+            return;
+        }
+
+        Instant oldMoment = cashFlow.getMoment();
+        cashFlow.setMoment(document.getMoment());
+        cashFlow.setAmount(amount);
+
+        Instant fixFromMoment = oldMoment.isBefore(cashFlow.getMoment()) ? oldMoment : cashFlow.getMoment();
+        fixBalances(cashFlow.getAccount(), fixFromMoment);
+    }
+
+    @Transactional
     public void delete(DocumentEntity document) {
         List<CashFlowEntity> cashFlows = cashFlowRepository.findByDocument(document);
         cashFlowRepository.deleteAll(cashFlows);
         for (CashFlowEntity cashFlow : cashFlows) {
             fixBalances(cashFlow.getAccount(), cashFlow.getMoment());
+        }
+    }
+
+    @Transactional
+    public void deleteAll(DocumentEntity document, Set<AccountEntity> excludeAccounts) {
+        List<CashFlowEntity> currentCashFlows = cashFlowRepository.findByDocument(document);
+        for (CashFlowEntity cashFlow : currentCashFlows) {
+            if (!excludeAccounts.contains(cashFlow.getAccount())) {
+                cashFlowRepository.delete(cashFlow);
+                fixBalances(cashFlow.getAccount(), cashFlow.getMoment());
+            }
         }
     }
 
