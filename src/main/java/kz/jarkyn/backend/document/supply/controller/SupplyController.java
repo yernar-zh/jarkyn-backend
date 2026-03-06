@@ -27,12 +27,10 @@ public class SupplyController {
         return supplyService.findApiById(id);
     }
 
-
     @GetMapping
     public PageResponse<SupplyListResponse> list(@RequestParam MultiValueMap<String, String> allParams) {
         return supplyService.findApiByFilter(QueryParams.ofMulty(allParams));
     }
-
 
     @PostMapping
     public SupplyResponse create(@RequestBody SupplyRequest request) {
