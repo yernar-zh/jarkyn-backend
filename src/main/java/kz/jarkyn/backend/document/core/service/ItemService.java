@@ -2,6 +2,7 @@ package kz.jarkyn.backend.document.core.service;
 
 
 import kz.jarkyn.backend.audit.service.AuditService;
+import kz.jarkyn.backend.core.exception.ApiValidationException;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.ItemEntity;
 import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
@@ -55,8 +56,9 @@ public class ItemService {
 
     @Transactional
     public void saveApi(DocumentEntity document, List<ItemRequest> items, BigDecimal documentCostPrice) {
-        EntityDivider<ItemEntity, ItemRequest> divider = new EntityDivider<>(
-                itemRepository.findByDocument(document), items);
+        List<ItemEntity> currentItems = itemRepository.findByDocument(document);
+        validateItemOwnership(document, currentItems, items);
+        EntityDivider<ItemEntity, ItemRequest> divider = new EntityDivider<>(currentItems, items);
         for (EntityDivider<ItemEntity, ItemRequest>.Entry entry : divider.newReceived()) {
             ItemEntity item = itemMapper.toEntity(entry.getReceived());
             item.setDocument(document);
@@ -79,7 +81,7 @@ public class ItemService {
             return;
         }
 
-        List<ItemEntity> currentItems = itemRepository.findByDocument(document);
+        currentItems = itemRepository.findByDocument(document);
         Map<GoodEntity, List<ItemEntity>> itemMap = currentItems.stream()
                 .collect(Collectors.groupingBy(ItemEntity::getGood));
         Set<GoodEntity> updatedGoods = new HashSet<>();
@@ -117,6 +119,24 @@ public class ItemService {
             }
         }
         turnoverService.delete(document, updatedGoods);
+    }
+
+    private void validateItemOwnership(DocumentEntity document, List<ItemEntity> currentItems, List<ItemRequest> items) {
+        Set<UUID> currentItemIds = currentItems.stream()
+                .map(ItemEntity::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (ItemRequest item : items) {
+            UUID itemId = item.getId();
+            if (itemId == null || currentItemIds.contains(itemId)) {
+                continue;
+            }
+            ItemEntity existingItem = itemRepository.findById(itemId).orElse(null);
+            if (existingItem != null && !Objects.equals(existingItem.getDocument(), document)) {
+                throw new ApiValidationException("Item `" + itemId + "` does not belong to document `" + document.getId() + "`");
+            }
+        }
     }
 
     @Transactional
