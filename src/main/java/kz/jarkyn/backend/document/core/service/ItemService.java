@@ -52,10 +52,11 @@ public class ItemService {
                 .toList();
     }
 
+
     @Transactional
-    public void saveApi(DocumentEntity document, List<ItemRequest> itemRequests) {
+    public void saveApi(DocumentEntity document, List<ItemRequest> items, BigDecimal documentCostPrice) {
         EntityDivider<ItemEntity, ItemRequest> divider = new EntityDivider<>(
-                itemRepository.findByDocument(document), itemRequests);
+                itemRepository.findByDocument(document), items);
         for (EntityDivider<ItemEntity, ItemRequest>.Entry entry : divider.newReceived()) {
             ItemEntity item = itemMapper.toEntity(entry.getReceived());
             item.setDocument(document);
@@ -72,11 +73,6 @@ public class ItemService {
             itemRepository.delete(item);
             auditService.delete(item, item.getDocument());
         }
-    }
-
-    @Transactional
-    public void saveApi(DocumentEntity document, List<ItemRequest> items, BigDecimal documentCostPrice) {
-        saveApi(document, items);
 
         if (!document.getCommited()) {
             turnoverService.delete(document, Set.of());

@@ -99,7 +99,7 @@ public class SaleService {
         sale.setCommited(false);
         saleRepository.save(sale);
         auditService.saveEntity(sale);
-        itemService.saveApi(sale, request.getItems());
+        //itemService.saveApi(sale, request.getItems());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, sale.getId());
         return sale.getId();
     }
@@ -110,7 +110,7 @@ public class SaleService {
         documentService.validateName(sale);
         saleMapper.editEntity(sale, request);
         auditService.saveEntity(sale);
-        itemService.saveApi(sale, request.getItems());
+        //itemService.saveApi(sale, request.getItems());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, sale.getId());
     }
 
