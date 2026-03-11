@@ -5,6 +5,17 @@
 - Stack: Spring Boot 4, Java 25, Gradle (Groovy DSL), PostgreSQL
 - This file applies only to backend work in this repository.
 
+## Thread Guard (Wrong-Thread Warning)
+- Before doing any work, quickly classify the user request as `backend` vs `non-backend`.
+- If the request is not clearly backend, pause and warn the user immediately before making edits or running backend commands.
+- Treat the request as suspicious/non-backend when it is primarily about:
+  - Frontend UI/UX (Angular/React/Vue components, HTML/CSS, layout, browser behavior).
+  - Analytics/data tasks in Python (notebooks, pandas, matplotlib, BI-style analysis, model experiments).
+  - Any task targeting another repository/thread context (frontend, analytics, product docs) rather than this backend codebase.
+- In suspicious cases, respond with a short warning and confirmation prompt, for example:
+  - `Warning: this looks like a frontend/analytics task, not a backend task in jarkyn-backend. Please confirm whether to continue here or move to the correct thread.`
+- Do not proceed with code changes until the user confirms.
+
 ## Project Structure
 - Application code: `src/main/java/kz/jarkyn/backend/`
 - Entry point: `src/main/java/kz/jarkyn/backend/BackendApplication.java`
@@ -46,3 +57,6 @@
 - Make minimal, targeted edits.
 - Do not refactor unrelated modules during feature fixes.
 - Keep secrets out of committed files.
+
+
+
