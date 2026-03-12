@@ -233,7 +233,13 @@ public class DocumentSearchService {
 
     private void fillExpense(DocumentSearchEntity documentSearch, ExpenseEntity expense) {
         fillAttached(documentSearch, expense);
-        fillSearch(documentSearch, expense.getName(), expense.getComment(), expense.getCounterparty().getName());
+        documentSearch.setReceiptNumber(expense.getReceiptNumber());
+        fillSearch(
+                documentSearch,
+                expense.getName(),
+                expense.getComment(),
+                expense.getCounterparty().getName(),
+                expense.getReceiptNumber());
     }
 
     private DocumentSearchEntity fillBase(DocumentEntity document) {
@@ -290,6 +296,7 @@ public class DocumentSearchService {
 
     private void fillSearch(DocumentSearchEntity documentSearch, String... texts) {
         String searchText = Arrays.stream(texts)
+                .filter(Objects::nonNull)
                 .map(PrefixSearch::split)
                 .flatMap(Collection::stream)
                 .distinct()

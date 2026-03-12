@@ -46,18 +46,6 @@ public class ExpenseController {
         return expenseService.findApiById(id);
     }
 
-    @PutMapping("{id}/commit")
-    public ExpenseResponse commit(@PathVariable UUID id) {
-        expenseService.commit(id);
-        return expenseService.findApiById(id);
-    }
-
-    @PutMapping("{id}/undoCommit")
-    public ExpenseResponse undoCommit(@PathVariable UUID id) {
-        expenseService.undoCommit(id);
-        return expenseService.findApiById(id);
-    }
-
     @DeleteMapping("{id}")
     public ExpenseResponse delete(@PathVariable UUID id) {
         expenseService.delete(id);
