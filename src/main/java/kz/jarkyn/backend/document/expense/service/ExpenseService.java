@@ -4,8 +4,10 @@ import kz.jarkyn.backend.audit.service.AuditService;
 import kz.jarkyn.backend.core.config.AppRabbitTemplate;
 import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
+import kz.jarkyn.backend.core.model.AbstractEntity;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.document.bind.model.BindDocumentEntity;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentRequest;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
 import kz.jarkyn.backend.document.bind.service.BindDocumentService;
@@ -149,9 +151,9 @@ public class ExpenseService {
 
     private Set<UUID> findRelatedSupplyIds(ExpenseEntity expense) {
         return bindDocumentRepository.findAll(BindDocumentSpecifications.primaryDocument(expense)).stream()
-                .map(bindDocument -> bindDocument.getRelatedDocument())
+                .map(BindDocumentEntity::getRelatedDocument)
                 .filter(relatedDocument -> documentTypeService.isSupply(relatedDocument.getType()))
-                .map(relatedDocument -> relatedDocument.getId())
+                .map(AbstractEntity::getId)
                 .collect(java.util.stream.Collectors.toSet());
     }
 }

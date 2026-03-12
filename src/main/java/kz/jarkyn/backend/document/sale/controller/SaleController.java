@@ -45,21 +45,15 @@ public class SaleController {
         return saleService.findApiById(id);
     }
 
-    @PutMapping("{id}/commit")
-    public SaleResponse commit(@PathVariable UUID id) {
-        saleService.commit(id);
-        return saleService.findApiById(id);
-    }
-
-    @PutMapping("{id}/undoCommit")
-    public SaleResponse undoCommit(@PathVariable UUID id) {
-        saleService.undoCommit(id);
-        return saleService.findApiById(id);
-    }
-
     @DeleteMapping("{id}")
     public SaleResponse delete(@PathVariable UUID id) {
         saleService.delete(id);
+        return saleService.findApiById(id);
+    }
+
+    @PostMapping("{id}/restore")
+    public SaleResponse restore(@PathVariable UUID id) {
+        saleService.restore(id);
         return saleService.findApiById(id);
     }
 }

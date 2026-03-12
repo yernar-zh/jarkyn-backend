@@ -1,34 +1,32 @@
-
 package kz.jarkyn.backend.document.sale.service;
 
-
 import kz.jarkyn.backend.audit.service.AuditService;
-import kz.jarkyn.backend.core.config.AppRabbitTemplate;
-import kz.jarkyn.backend.core.config.RabbitRoutingKeys;
 import kz.jarkyn.backend.core.exception.ExceptionUtils;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
-import kz.jarkyn.backend.document.core.service.DocumentSearchService;
-import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
-import kz.jarkyn.backend.party.model.*;
-import kz.jarkyn.backend.party.service.AccountService;
-import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
-import kz.jarkyn.backend.document.core.service.DocumentService;
-import kz.jarkyn.backend.document.core.service.ItemService;
 import kz.jarkyn.backend.document.bind.service.BindDocumentService;
+import kz.jarkyn.backend.document.core.model.dto.ItemResponse;
+import kz.jarkyn.backend.document.core.service.DocumentSearchService;
+import kz.jarkyn.backend.document.core.service.DocumentService;
+import kz.jarkyn.backend.document.core.service.DocumentTypeService;
+import kz.jarkyn.backend.document.core.service.ItemService;
+import kz.jarkyn.backend.document.sale.mapper.SaleMapper;
 import kz.jarkyn.backend.document.sale.model.SaleEntity;
 import kz.jarkyn.backend.document.sale.model.dto.SaleListResponse;
-import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
+import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.sale.repository.SaleRepository;
-import kz.jarkyn.backend.document.sale.mapper.SaleMapper;
 import kz.jarkyn.backend.operation.service.CashFlowService;
+import kz.jarkyn.backend.party.model.AccountEntity;
+import kz.jarkyn.backend.party.service.AccountService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -43,7 +41,6 @@ public class SaleService {
     private final AccountService accountService;
     private final DocumentTypeService documentTypeService;
     private final DocumentSearchService documentSearchService;
-    private final AppRabbitTemplate appRabbitTemplate;
 
     public SaleService(
             SaleRepository saleRepository,
@@ -55,8 +52,7 @@ public class SaleService {
             CashFlowService cashFlowService,
             AccountService accountService,
             DocumentTypeService documentTypeService,
-            DocumentSearchService documentSearchService,
-            AppRabbitTemplate appRabbitTemplate) {
+            DocumentSearchService documentSearchService) {
         this.saleRepository = saleRepository;
         this.saleMapper = saleMapper;
         this.itemService = itemService;
@@ -67,7 +63,6 @@ public class SaleService {
         this.accountService = accountService;
         this.documentTypeService = documentTypeService;
         this.documentSearchService = documentSearchService;
-        this.appRabbitTemplate = appRabbitTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -96,11 +91,8 @@ public class SaleService {
             documentService.validateName(sale);
         }
         sale.setDeleted(false);
-        sale.setCommited(false);
         saleRepository.save(sale);
-        auditService.saveEntity(sale);
-        //itemService.saveApi(sale, request.getItems());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, sale.getId());
+        save(sale, request);
         return sale.getId();
     }
 
@@ -109,44 +101,47 @@ public class SaleService {
         SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         documentService.validateName(sale);
         saleMapper.editEntity(sale, request);
-        auditService.saveEntity(sale);
-        //itemService.saveApi(sale, request.getItems());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, sale.getId());
+        save(sale, request);
     }
 
-    @Transactional
-    public void commit(UUID id) {
-        SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (sale.getCommited()) return;
-        sale.setCommited(Boolean.TRUE);
-        auditService.commit(sale);
-        itemService.createNegativeTurnover(sale);
+    private void save(SaleEntity sale, SaleRequest request) {
+        itemService.saveApi(sale, request.getItems(), BigDecimal.ZERO);
+
         AccountEntity customerAccount = accountService.findOrCreateForCounterparty(
                 sale.getOrganization(), sale.getCounterparty(), sale.getCurrency());
-        cashFlowService.create(sale, customerAccount, sale.getAmount().negate());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, sale.getId());
-    }
+        if (Boolean.TRUE.equals(sale.getCommited())) {
+            cashFlowService.change(sale, customerAccount, sale.getAmount().negate());
+            cashFlowService.deleteAll(sale, Set.of(customerAccount));
+        } else {
+            cashFlowService.deleteAll(sale, Set.of());
+        }
 
-    @Transactional
-    public void undoCommit(UUID id) {
-        SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (!sale.getCommited()) return;
-        sale.setCommited(Boolean.FALSE);
-        auditService.undoCommit(sale);
-        itemService.deleteTurnover(sale);
-        cashFlowService.delete(sale);
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, sale.getId());
+        auditService.saveEntity(sale);
+        documentSearchService.update(sale);
     }
 
     @Transactional
     public void delete(UUID id) {
         SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (sale.getDeleted()) return;
         List<BindDocumentResponse> paidDocuments = bindDocumentService
                 .findResponseByRelatedDocument(sale, documentTypeService.findPaymentIn());
         if (!paidDocuments.isEmpty()) ExceptionUtils.throwRelationDeleteException();
-        if (sale.getCommited()) ExceptionUtils.throwCommitedDeleteException();
+        sale.setCommited(Boolean.FALSE);
         sale.setDeleted(Boolean.TRUE);
-        auditService.delete(sale);
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, sale.getId());
+        itemService.deleteTurnover(sale);
+        cashFlowService.deleteAll(sale, Set.of());
+        auditService.saveEntity(sale);
+        documentSearchService.update(sale);
+    }
+
+    @Transactional
+    public void restore(UUID id) {
+        SaleEntity sale = saleRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
+        if (!sale.getDeleted()) return;
+        sale.setCommited(Boolean.FALSE);
+        sale.setDeleted(Boolean.FALSE);
+        auditService.saveEntity(sale);
+        documentSearchService.update(sale);
     }
 }
