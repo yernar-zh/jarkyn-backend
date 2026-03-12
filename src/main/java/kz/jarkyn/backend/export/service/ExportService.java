@@ -23,10 +23,10 @@ import java.util.Objects;
 
 @Service
 public class ExportService {
-    @Value("classpath:jxls/template/receiptNote.xlsx")
-    private Resource receiptNoteResource;
-    @Value("classpath:jxls/template/invoice.xlsx")
-    private Resource invoiceResource;
+    @Value("classpath:jxls/template/supply/deliveryNote.xlsx")
+    private Resource supplyDeliveryNote;
+    @Value("classpath:jxls/template/supply/invoice.xlsx")
+    private Resource supplyInvoiceResource;
 
     private final ExportUtils exportUtils;
     private final WebClient webClient;
@@ -156,13 +156,13 @@ public class ExportService {
 
     private Resource getResource(Template template) {
         return switch (template) {
-            case RECEIPT_NOTE -> receiptNoteResource;
-            case INVOICE -> invoiceResource;
+            case SUPPLY_RECEIPT_NOTE -> supplyDeliveryNote;
+            case SUPPLY_INVOICE -> supplyInvoiceResource;
         };
     }
 
     public enum Template {
-        RECEIPT_NOTE,
-        INVOICE
+        SUPPLY_RECEIPT_NOTE,
+        SUPPLY_INVOICE
     }
 }

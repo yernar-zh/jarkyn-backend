@@ -68,7 +68,7 @@ public class SaleController {
     @PostMapping("export/invoice/xlsx")
     public ResponseEntity<Resource> exportInvoiceXlsx(@RequestBody SaleRequest request) {
         Resource resource = documentService.generateXlsx(
-                ExportService.Template.INVOICE,
+                ExportService.Template.SUPPLY_INVOICE,
                 request,
                 request.getItems());
         return ResponseEntity.ok().body(resource);
@@ -77,7 +77,7 @@ public class SaleController {
     @PostMapping("export/invoice/pdf")
     public ResponseEntity<Resource> exportInvoicePdf(@RequestBody SaleRequest request) {
         Resource resource = documentService.generatePdf(
-                ExportService.Template.INVOICE,
+                ExportService.Template.SUPPLY_INVOICE,
                 request,
                 request.getItems());
         return ResponseEntity.ok().body(resource);

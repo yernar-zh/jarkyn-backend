@@ -66,7 +66,7 @@ public class SupplyController {
     @PostMapping("export/deliveryNote/xlsx")
     public ResponseEntity<Resource> exportDeliveryNoteXlsx(@RequestBody SupplyRequest request) {
         Resource resource = documentService.generateXlsx(
-                ExportService.Template.RECEIPT_NOTE,
+                ExportService.Template.SUPPLY_RECEIPT_NOTE,
                 request, request.getItems());
         return ResponseEntity.ok().body(resource);
     }
@@ -74,7 +74,7 @@ public class SupplyController {
     @PostMapping("export/deliveryNote/pdf")
     public ResponseEntity<Resource> exportDeliveryNotePdf(@RequestBody SupplyRequest request) {
         Resource resource = documentService.generatePdf(
-                ExportService.Template.RECEIPT_NOTE,
+                ExportService.Template.SUPPLY_RECEIPT_NOTE,
                 request, request.getItems());
         return ResponseEntity.ok().body(resource);
     }
