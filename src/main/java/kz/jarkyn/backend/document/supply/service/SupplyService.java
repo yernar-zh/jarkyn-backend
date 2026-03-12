@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -108,13 +109,7 @@ public class SupplyService {
     }
 
     private void save(SupplyEntity supply, List<ItemRequest> items) {
-        BigDecimal mainCostPrice = supply.getAmount().multiply(supply.getExchangeRate());
-        BigDecimal overheadCostPrice = bindDocumentService
-                .findResponseByRelatedDocument(supply, documentTypeService.findExpense()).stream()
-                .map(bindDocument -> bindDocument.getAmount().multiply(bindDocument.getPrimaryDocument().getExchangeRate()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        itemService.saveApi(supply, items, mainCostPrice.add(overheadCostPrice));
+        itemService.saveApi(supply, items, findTotalCostPrice(supply));
 
         AccountEntity supplerAccount = accountService.findOrCreateForCounterparty(
                 supply.getOrganization(), supply.getCounterparty(), supply.getCurrency());
@@ -127,6 +122,27 @@ public class SupplyService {
 
         auditService.saveEntity(supply);
         documentSearchService.update(supply);
+    }
+
+    @Transactional
+    public void recalculateCostForSupplies(Set<UUID> supplyIds) {
+        if (supplyIds.isEmpty()) return;
+        Set<UUID> uniqueSupplyIds = new HashSet<>(supplyIds);
+        for (UUID supplyId : uniqueSupplyIds) {
+            SupplyEntity supply = supplyRepository.findById(supplyId).orElse(null);
+            if (supply == null) continue;
+            itemService.recalculateTurnover(supply, findTotalCostPrice(supply));
+            documentSearchService.update(supply);
+        }
+    }
+
+    private BigDecimal findTotalCostPrice(SupplyEntity supply) {
+        BigDecimal mainCostPrice = supply.getAmount().multiply(supply.getExchangeRate());
+        BigDecimal overheadCostPrice = bindDocumentService
+                .findResponseByRelatedDocument(supply, documentTypeService.findExpense()).stream()
+                .map(bindDocument -> bindDocument.getAmount().multiply(bindDocument.getPrimaryDocument().getExchangeRate()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return mainCostPrice.add(overheadCostPrice);
     }
 
     @Transactional

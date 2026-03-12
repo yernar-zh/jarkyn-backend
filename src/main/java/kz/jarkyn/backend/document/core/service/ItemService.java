@@ -76,12 +76,23 @@ public class ItemService {
             auditService.delete(item, item.getDocument());
         }
 
+        currentItems = itemRepository.findByDocument(document);
+        recalculateTurnover(document, currentItems, documentCostPrice);
+    }
+
+    @Transactional
+    public void recalculateTurnover(DocumentEntity document, BigDecimal documentCostPrice) {
+        List<ItemEntity> currentItems = itemRepository.findByDocument(document);
+        recalculateTurnover(document, currentItems, documentCostPrice);
+    }
+
+    private void recalculateTurnover(
+            DocumentEntity document, List<ItemEntity> currentItems, BigDecimal documentCostPrice) {
         if (!document.getCommited()) {
             turnoverService.delete(document, Set.of());
             return;
         }
 
-        currentItems = itemRepository.findByDocument(document);
         Map<GoodEntity, List<ItemEntity>> itemMap = currentItems.stream()
                 .collect(Collectors.groupingBy(ItemEntity::getGood));
         Set<GoodEntity> updatedGoods = new HashSet<>();
