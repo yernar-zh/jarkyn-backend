@@ -1,11 +1,16 @@
-
 package kz.jarkyn.backend.export.service;
 
-
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Comment;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jspecify.annotations.NonNull;
 import org.jxls.transform.poi.JxlsPoiTemplateFillerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -16,15 +21,25 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 @Service
 public class ExportService {
+    private static final Logger LOG = LoggerFactory.getLogger(ExportService.class);
+    private static final String CURRENCY_COMMENT_KEY = "app:currency";
+    private static final String XLSX_FILENAME = "result.xlsx";
+    private static final String PDF_FILENAME = "result.pdf";
+    private static final String GOTENBERG_CONVERT_URI = "/forms/libreoffice/convert";
+
     @Value("classpath:jxls/template/supply/deliveryNote.xlsx")
     private Resource supplyDeliveryNote;
+
     @Value("classpath:jxls/template/supply/invoice.xlsx")
     private Resource supplyInvoiceResource;
 
@@ -37,23 +52,45 @@ public class ExportService {
     }
 
     public Resource generateXlsx(Template template, Map<String, Object> args, ExportCurrency currency) {
-        ByteArrayOutputStream temp;
+        return namedResource(renderXlsx(template, args, currency), XLSX_FILENAME);
+    }
+
+    public Resource generatePdf(Template template, Map<String, Object> args, ExportCurrency currency) {
+        Resource xlsxResource = namedResource(renderXlsx(template, args, currency), XLSX_FILENAME);
+        byte[] response = webClient.post()
+                .uri(GOTENBERG_CONVERT_URI)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("files", xlsxResource))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, clientResponse ->
+                        clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    LOG.error("Gotenberg error response: {}", errorBody);
+                                    return Mono.error(new RuntimeException("Gotenberg error: " + errorBody));
+                                })
+                )
+                .bodyToMono(byte[].class)
+                .block();
+        return namedResource(Objects.requireNonNull(response), PDF_FILENAME);
+    }
+
+    private byte[] renderXlsx(Template template, Map<String, Object> args, ExportCurrency currency) {
+        byte[] formattedTemplate = applyCurrencyFormatting(template, currency);
+        byte[] filledTemplate = fillTemplate(formattedTemplate, args);
+        return normalizeSheetRows(filledTemplate);
+    }
+
+    private byte[] applyCurrencyFormatting(Template template, ExportCurrency currency) {
         try (InputStream is = getResource(template).getInputStream();
-             ByteArrayOutputStream os = new ByteArrayOutputStream()
-        ) {
+             ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             Workbook workbook = new XSSFWorkbook(is);
             if (currency != null) {
-                String symbol = switch (currency.getCode()) {
-                    case "KZT" -> "₸";
-                    case "USD" -> "$";
-                    case "CNY" -> "¥";
-                    default -> throw new IllegalStateException("Unexpected value: " + currency);
-                };
-                String dataFormatStr = "# ##0" + (currency.isFractional() ? ".00" : "") + " \"" + symbol + "\"";
-                short dataFormat = workbook.createDataFormat().getFormat(dataFormatStr);
+                short dataFormat = workbook.createDataFormat().getFormat(currencyDataFormat(currency));
                 workbook.forEach(sheet -> sheet.forEach(row -> row.forEach(cell -> {
                     Comment comment = cell.getCellComment();
-                    if (comment == null || !comment.getString().toString().equals("app:currency")) return;
+                    if (comment == null || !comment.getString().toString().equals(CURRENCY_COMMENT_KEY)) {
+                        return;
+                    }
                     CellStyle cellStyle = workbook.createCellStyle();
                     cellStyle.cloneStyleFrom(cell.getCellStyle());
                     cellStyle.setDataFormat(dataFormat);
@@ -62,14 +99,15 @@ public class ExportService {
                 })));
             }
             workbook.write(os);
-            temp = os;
+            return os.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        ByteArrayOutputStream temp2;
-        try (InputStream is = new ByteArrayInputStream(temp.toByteArray());
-             ByteArrayOutputStream os = new ByteArrayOutputStream()
-        ) {
+    }
+
+    private byte[] fillTemplate(byte[] templateBytes, Map<String, Object> args) {
+        try (InputStream is = new ByteArrayInputStream(templateBytes);
+             ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             Map<String, Object> templateArgs = new HashMap<>(args);
             templateArgs.put("utils", exportUtils);
             os.write(
@@ -77,38 +115,35 @@ public class ExportService {
                             .withTemplate(is)
                             .buildAndFill(templateArgs)
             );
-            temp2 = os;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try (InputStream is = new ByteArrayInputStream(temp2.toByteArray());
-             ByteArrayOutputStream os = new ByteArrayOutputStream()
-        ) {
-            Workbook workbook = getSheets(is);
-            workbook.write(os);
-            return new ByteArrayResource(os.toByteArray()) {
-                @Override
-                public String getFilename() {
-                    return "result.xlsx";
-                }
-            };
+            return os.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static @NonNull Workbook getSheets(InputStream is) throws IOException {
+    private byte[] normalizeSheetRows(byte[] workbookBytes) {
+        try (InputStream is = new ByteArrayInputStream(workbookBytes);
+             ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            Workbook workbook = withNormalizedRows(is);
+            workbook.write(os);
+            return os.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static @NonNull Workbook withNormalizedRows(InputStream is) throws IOException {
         Workbook workbook = new XSSFWorkbook(is);
         workbook.forEach(sheet -> sheet.forEach(row -> {
-            float maxHeight = row.getHeightInPoints();  // Start with existing height
+            float maxHeight = row.getHeightInPoints();
             for (Cell cell : row) {
                 CellStyle style = cell.getCellStyle();
                 if (style.getWrapText() && cell.getCellType() == CellType.STRING) {
                     String text = cell.getStringCellValue();
                     Font font = workbook.getFontAt(style.getFontIndex());
-                    int fontSize = font.getFontHeightInPoints(); // Approx height per line
+                    int fontSize = font.getFontHeightInPoints();
                     int lineCount = estimateLineCount(text, sheet.getColumnWidth(cell.getColumnIndex()), fontSize);
-                    float estimatedHeight = lineCount * fontSize + 4; // Add padding
+                    float estimatedHeight = lineCount * fontSize + 4;
                     if (estimatedHeight > maxHeight) {
                         maxHeight = estimatedHeight;
                     }
@@ -119,37 +154,15 @@ public class ExportService {
         return workbook;
     }
 
-    public Resource generatePdf(Template template, Map<String, Object> args, ExportCurrency currency) {
-        Resource xlsxResource = generateXlsx(template, args, currency);
-        byte[] response = webClient.post()
-                .uri("/forms/libreoffice/convert")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("files", xlsxResource))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
-                        clientResponse.bodyToMono(String.class)
-                                .flatMap(errorBody -> {
-                                    System.err.println("Gotenberg Error Response: " + errorBody);
-                                    return Mono.error(new RuntimeException("Gotenberg error: " + errorBody));
-                                })
-                )
-                .bodyToMono(byte[].class)
-                .block();
-        return new ByteArrayResource(Objects.requireNonNull(response)) {
-            @Override
-            public String getFilename() {
-                return "result.pdf";
-            }
-        };
-    }
-
     private static int estimateLineCount(String text, int columnWidthUnits, int fontSize) {
-        int avgCharPerLine = (int) ((columnWidthUnits - 2) * 0.1934 / fontSize);
-        String[] lines = text.split("\n"); // If multiline already
+        int avgCharPerLine = (int) ((columnWidthUnits - 2) * 0.1934 / Math.max(fontSize, 1));
+        if (avgCharPerLine <= 0) {
+            avgCharPerLine = 1;
+        }
+        String[] lines = text.split("\\n");
         int lineCount = 0;
         for (String line : lines) {
-            int lineLength = line.length();
-            lineCount += (int) Math.ceil((double) lineLength / avgCharPerLine);
+            lineCount += (int) Math.ceil((double) line.length() / avgCharPerLine);
         }
         return Math.max(lineCount, 1);
     }
@@ -158,6 +171,25 @@ public class ExportService {
         return switch (template) {
             case SUPPLY_RECEIPT_NOTE -> supplyDeliveryNote;
             case SUPPLY_INVOICE -> supplyInvoiceResource;
+        };
+    }
+
+    private String currencyDataFormat(ExportCurrency currency) {
+        String symbol = switch (currency.getCode()) {
+            case "KZT" -> "₸";
+            case "USD" -> "$";
+            case "CNY" -> "¥";
+            default -> throw new IllegalStateException("Unsupported currency code for export: " + currency.getCode());
+        };
+        return "# ##0" + (currency.isFractional() ? ".00" : "") + " \"" + symbol + "\"";
+    }
+
+    private Resource namedResource(byte[] data, String filename) {
+        return new ByteArrayResource(data) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
         };
     }
 

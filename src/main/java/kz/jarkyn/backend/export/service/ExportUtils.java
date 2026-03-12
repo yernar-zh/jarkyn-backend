@@ -9,7 +9,9 @@ import kz.jarkyn.backend.good.service.GoodService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ExportUtils {
@@ -26,8 +28,10 @@ public class ExportUtils {
     }
 
     public double calcItemsSum(List<ItemRequest> items) {
-        return items.stream()
-                .map(itemResponse -> itemResponse.getPrice().multiply(BigDecimal.valueOf(itemResponse.getQuantity())))
+        List<ItemRequest> safeItems = (items == null) ? Collections.emptyList() : items;
+        return safeItems.stream()
+                .filter(Objects::nonNull)
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add).doubleValue();
     }
 
