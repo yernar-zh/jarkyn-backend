@@ -12,6 +12,7 @@ import kz.jarkyn.backend.document.bind.service.BindDocumentService;
 import kz.jarkyn.backend.document.core.service.DocumentSearchService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.*;
+import kz.jarkyn.backend.document.bind.model.dto.BindDocumentRequest;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
@@ -26,7 +27,9 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -86,10 +89,8 @@ public class PaymentOutService {
             documentService.validateName(paymentOut);
         }
         paymentOut.setDeleted(false);
-        paymentOut.setCommited(false);
         paymentOutRepository.save(paymentOut);
-        auditService.saveEntity(paymentOut);
-        bindDocumentService.save(paymentOut, request.getBindDocuments());
+        save(paymentOut, request.getBindDocuments());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
         return paymentOut.getId();
     }
@@ -99,38 +100,39 @@ public class PaymentOutService {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         documentService.validateName(paymentOut);
         paymentOutMapper.editEntity(paymentOut, request);
-        auditService.saveEntity(paymentOut);
-        bindDocumentService.save(paymentOut, request.getBindDocuments());
+        save(paymentOut, request.getBindDocuments());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
     }
 
-    @Transactional
-    public void commit(UUID id) {
-        PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        paymentOut.setCommited(Boolean.TRUE);
-        auditService.commit(paymentOut);
+    private void save(PaymentOutEntity paymentOut, List<BindDocumentRequest> bindDocumentRequests) {
+        auditService.saveEntity(paymentOut);
+        bindDocumentService.save(paymentOut, bindDocumentRequests);
+
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 paymentOut.getOrganization(), paymentOut.getCounterparty(), paymentOut.getCurrency());
-        cashFlowService.create(paymentOut, account, paymentOut.getAmount().negate());
-        cashFlowService.create(paymentOut, paymentOut.getAccount(), paymentOut.getAmount().negate());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
-    }
+        if (Boolean.TRUE.equals(paymentOut.getCommited())) {
+            cashFlowService.change(paymentOut, account, paymentOut.getAmount().negate());
+            cashFlowService.change(paymentOut, paymentOut.getAccount(), paymentOut.getAmount().negate());
 
-    @Transactional
-    public void undoCommit(UUID id) {
-        PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        paymentOut.setCommited(Boolean.FALSE);
-        auditService.undoCommit(paymentOut);
-        cashFlowService.delete(paymentOut);
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
+            Set<AccountEntity> accountsToKeep = new HashSet<>();
+            accountsToKeep.add(account);
+            if (paymentOut.getAccount() != null) {
+                accountsToKeep.add(paymentOut.getAccount());
+            }
+            cashFlowService.deleteAll(paymentOut, accountsToKeep);
+        } else {
+            cashFlowService.deleteAll(paymentOut, Set.of());
+        }
     }
 
     @Transactional
     public void delete(UUID id) {
         PaymentOutEntity paymentOut = paymentOutRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (paymentOut.getCommited()) ExceptionUtils.throwCommitedDeleteException();
+        if (paymentOut.getDeleted()) return;
+        paymentOut.setCommited(Boolean.FALSE);
         paymentOut.setDeleted(Boolean.TRUE);
         auditService.delete(paymentOut);
+        cashFlowService.deleteAll(paymentOut, Set.of());
         bindDocumentService.save(paymentOut, List.of());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentOut.getId());
     }

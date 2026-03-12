@@ -46,18 +46,6 @@ public class PaymentOutController {
         return paymentOutService.findApiById(id);
     }
 
-    @PutMapping("{id}/commit")
-    public PaymentOutResponse commit(@PathVariable UUID id) {
-        paymentOutService.commit(id);
-        return paymentOutService.findApiById(id);
-    }
-
-    @PutMapping("{id}/undoCommit")
-    public PaymentOutResponse undoCommit(@PathVariable UUID id) {
-        paymentOutService.undoCommit(id);
-        return paymentOutService.findApiById(id);
-    }
-
     @DeleteMapping("{id}")
     public PaymentOutResponse delete(@PathVariable UUID id) {
         paymentOutService.delete(id);
