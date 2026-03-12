@@ -59,10 +59,6 @@ public interface Api {
         String PATH = Api.PATH + "/currency";
     }
 
-    interface Export {
-        String PATH = Api.PATH + "/export";
-    }
-
     interface Change {
         String PATH = Api.PATH + "/change";
     }

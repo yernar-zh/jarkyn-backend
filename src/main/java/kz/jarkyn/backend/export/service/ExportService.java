@@ -4,6 +4,7 @@ package kz.jarkyn.backend.export.service;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jspecify.annotations.NonNull;
 import org.jxls.transform.poi.JxlsPoiTemplateFillerBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,6 +25,8 @@ import java.util.Objects;
 public class ExportService {
     @Value("classpath:jxls/template/receiptNote.xlsx")
     private Resource receiptNoteResource;
+    @Value("classpath:jxls/template/invoice.xlsx")
+    private Resource invoiceResource;
 
     private final ExportUtils exportUtils;
     private final WebClient webClient;
@@ -81,24 +84,7 @@ public class ExportService {
         try (InputStream is = new ByteArrayInputStream(temp2.toByteArray());
              ByteArrayOutputStream os = new ByteArrayOutputStream()
         ) {
-            Workbook workbook = new XSSFWorkbook(is);
-            workbook.forEach(sheet -> sheet.forEach(row -> {
-                float maxHeight = row.getHeightInPoints();  // Start with existing height
-                for (Cell cell : row) {
-                    CellStyle style = cell.getCellStyle();
-                    if (style.getWrapText() && cell.getCellType() == CellType.STRING) {
-                        String text = cell.getStringCellValue();
-                        Font font = workbook.getFontAt(style.getFontIndex());
-                        int fontSize = font.getFontHeightInPoints(); // Approx height per line
-                        int lineCount = estimateLineCount(text, sheet.getColumnWidth(cell.getColumnIndex()), fontSize);
-                        float estimatedHeight = lineCount * fontSize + 4; // Add padding
-                        if (estimatedHeight > maxHeight) {
-                            maxHeight = estimatedHeight;
-                        }
-                    }
-                }
-                row.setHeightInPoints(maxHeight);
-            }));
+            Workbook workbook = getSheets(is);
             workbook.write(os);
             return new ByteArrayResource(os.toByteArray()) {
                 @Override
@@ -109,6 +95,28 @@ public class ExportService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static @NonNull Workbook getSheets(InputStream is) throws IOException {
+        Workbook workbook = new XSSFWorkbook(is);
+        workbook.forEach(sheet -> sheet.forEach(row -> {
+            float maxHeight = row.getHeightInPoints();  // Start with existing height
+            for (Cell cell : row) {
+                CellStyle style = cell.getCellStyle();
+                if (style.getWrapText() && cell.getCellType() == CellType.STRING) {
+                    String text = cell.getStringCellValue();
+                    Font font = workbook.getFontAt(style.getFontIndex());
+                    int fontSize = font.getFontHeightInPoints(); // Approx height per line
+                    int lineCount = estimateLineCount(text, sheet.getColumnWidth(cell.getColumnIndex()), fontSize);
+                    float estimatedHeight = lineCount * fontSize + 4; // Add padding
+                    if (estimatedHeight > maxHeight) {
+                        maxHeight = estimatedHeight;
+                    }
+                }
+            }
+            row.setHeightInPoints(maxHeight);
+        }));
+        return workbook;
     }
 
     public Resource generatePdf(Template template, Map<String, Object> args, ExportCurrency currency) {
@@ -149,10 +157,12 @@ public class ExportService {
     private Resource getResource(Template template) {
         return switch (template) {
             case RECEIPT_NOTE -> receiptNoteResource;
+            case INVOICE -> invoiceResource;
         };
     }
 
     public enum Template {
-        RECEIPT_NOTE
+        RECEIPT_NOTE,
+        INVOICE
     }
 }

@@ -3,10 +3,14 @@ package kz.jarkyn.backend.document.sale.controller;
 import kz.jarkyn.backend.core.controller.Api;
 import kz.jarkyn.backend.core.model.dto.PageResponse;
 import kz.jarkyn.backend.core.model.filter.QueryParams;
+import kz.jarkyn.backend.document.core.service.DocumentService;
 import kz.jarkyn.backend.document.sale.model.dto.SaleListResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleResponse;
 import kz.jarkyn.backend.document.sale.model.dto.SaleRequest;
 import kz.jarkyn.backend.document.sale.service.SaleService;
+import kz.jarkyn.backend.export.service.ExportService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +20,13 @@ import java.util.UUID;
 @RequestMapping(Api.Sale.PATH)
 public class SaleController {
     private final SaleService saleService;
+    private final DocumentService documentService;
 
-    public SaleController(SaleService saleService) {
+    public SaleController(
+            SaleService saleService,
+            DocumentService documentService) {
         this.saleService = saleService;
+        this.documentService = documentService;
     }
 
     @GetMapping("{id}")
@@ -55,5 +63,23 @@ public class SaleController {
     public SaleResponse restore(@PathVariable UUID id) {
         saleService.restore(id);
         return saleService.findApiById(id);
+    }
+
+    @PostMapping("export/invoice/xlsx")
+    public ResponseEntity<Resource> exportInvoiceXlsx(@RequestBody SaleRequest request) {
+        Resource resource = documentService.generateXlsx(
+                ExportService.Template.INVOICE,
+                request,
+                request.getItems());
+        return ResponseEntity.ok().body(resource);
+    }
+
+    @PostMapping("export/invoice/pdf")
+    public ResponseEntity<Resource> exportInvoicePdf(@RequestBody SaleRequest request) {
+        Resource resource = documentService.generatePdf(
+                ExportService.Template.INVOICE,
+                request,
+                request.getItems());
+        return ResponseEntity.ok().body(resource);
     }
 }

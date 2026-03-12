@@ -7,21 +7,39 @@ import kz.jarkyn.backend.core.sorts.EntitySorts;
 import kz.jarkyn.backend.document.core.model.DocumentEntity;
 import kz.jarkyn.backend.document.core.model.DocumentEntity_;
 import kz.jarkyn.backend.document.core.model.DocumentTypeEntity;
+import kz.jarkyn.backend.document.core.model.dto.DocumentRequest;
+import kz.jarkyn.backend.document.core.model.dto.ItemRequest;
 import kz.jarkyn.backend.document.core.repository.DocumentRepository;
 import kz.jarkyn.backend.document.core.specifications.DocumentSpecifications;
+import kz.jarkyn.backend.export.service.ExportCurrency;
+import kz.jarkyn.backend.export.service.ExportService;
+import kz.jarkyn.backend.global.service.CurrencyService;
+import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class DocumentService {
     private final DocumentRepository documentRepository;
+    private final ExportService exportService;
+    private final CurrencyService currencyService;
 
-    public DocumentService(DocumentRepository documentRepository) {
+    public DocumentService(
+            DocumentRepository documentRepository,
+            ExportService exportService,
+            CurrencyService currencyService) {
         this.documentRepository = documentRepository;
+        this.exportService = exportService;
+        this.currencyService = currencyService;
     }
 
     @Transactional(readOnly = true)
@@ -52,6 +70,34 @@ public class DocumentService {
         if (!matcher.find()) {
             throw new RuntimeException("unsupported name : " + name);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Resource generateXlsx(ExportService.Template template, DocumentRequest request, List<ItemRequest> items) {
+        String currencyCode = currencyService.findApiById(request.getCurrency().getId()).getCode();
+        boolean fraction = existFraction(request.getAmount(), items);
+        return exportService.generateXlsx(
+                template,
+                Map.of("document", request),
+                ExportCurrency.of(fraction, currencyCode));
+    }
+
+    @Transactional(readOnly = true)
+    public Resource generatePdf(ExportService.Template template, DocumentRequest request, List<ItemRequest> items) {
+        String currencyCode = currencyService.findApiById(request.getCurrency().getId()).getCode();
+        boolean fraction = existFraction(request.getAmount(), items);
+        return exportService.generatePdf(
+                template,
+                Map.of("document", request),
+                ExportCurrency.of(fraction, currencyCode));
+    }
+
+    private boolean existFraction(BigDecimal amount, List<ItemRequest> items) {
+        Stream<BigDecimal> itemPrices = (items == null) ? Stream.empty() : items.stream().map(ItemRequest::getPrice);
+        return Stream.concat(itemPrices, Stream.of(amount))
+                .filter(Objects::nonNull)
+                .map(BigDecimal::stripTrailingZeros)
+                .anyMatch(value -> value.scale() > 0);
     }
 
     @Deprecated
