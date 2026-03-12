@@ -11,6 +11,7 @@ import kz.jarkyn.backend.document.bind.service.BindDocumentService;
 import kz.jarkyn.backend.document.core.service.DocumentSearchService;
 import kz.jarkyn.backend.document.core.service.DocumentTypeService;
 import kz.jarkyn.backend.document.payment.model.*;
+import kz.jarkyn.backend.document.bind.model.dto.BindDocumentRequest;
 import kz.jarkyn.backend.document.bind.model.dto.BindDocumentResponse;
 import kz.jarkyn.backend.party.model.*;
 import kz.jarkyn.backend.party.service.AccountService;
@@ -25,7 +26,9 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -86,10 +89,8 @@ public class PaymentInService {
             documentService.validateName(paymentIn);
         }
         paymentIn.setDeleted(false);
-        paymentIn.setCommited(false);
         paymentInRepository.save(paymentIn);
-        auditService.saveEntity(paymentIn);
-        bindDocumentService.save(paymentIn, request.getBindDocuments());
+        save(paymentIn, request.getBindDocuments());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentIn.getId());
         return paymentIn.getId();
     }
@@ -99,38 +100,39 @@ public class PaymentInService {
         PaymentInEntity paymentIn = paymentInRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
         documentService.validateName(paymentIn);
         paymentInMapper.editEntity(paymentIn, request);
-        auditService.saveEntity(paymentIn);
-        bindDocumentService.save(paymentIn, request.getBindDocuments());
+        save(paymentIn, request.getBindDocuments());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentIn.getId());
     }
 
-    @Transactional
-    public void commit(UUID id) {
-        PaymentInEntity paymentIn = paymentInRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        paymentIn.setCommited(Boolean.TRUE);
-        auditService.commit(paymentIn);
+    private void save(PaymentInEntity paymentIn, List<BindDocumentRequest> bindDocumentRequests) {
+        auditService.saveEntity(paymentIn);
+        bindDocumentService.save(paymentIn, bindDocumentRequests);
+
         AccountEntity account = accountService.findOrCreateForCounterparty(
                 paymentIn.getOrganization(), paymentIn.getCounterparty(), paymentIn.getCurrency());
-        cashFlowService.create(paymentIn, account, paymentIn.getAmount());
-        cashFlowService.create(paymentIn, paymentIn.getAccount(), paymentIn.getAmount());
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentIn.getId());
-    }
+        if (Boolean.TRUE.equals(paymentIn.getCommited())) {
+            cashFlowService.change(paymentIn, account, paymentIn.getAmount());
+            cashFlowService.change(paymentIn, paymentIn.getAccount(), paymentIn.getAmount());
 
-    @Transactional
-    public void undoCommit(UUID id) {
-        PaymentInEntity paymentIn = paymentInRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        paymentIn.setCommited(Boolean.FALSE);
-        auditService.undoCommit(paymentIn);
-        cashFlowService.delete(paymentIn);
-        appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentIn.getId());
+            Set<AccountEntity> accountsToKeep = new HashSet<>();
+            accountsToKeep.add(account);
+            if (paymentIn.getAccount() != null) {
+                accountsToKeep.add(paymentIn.getAccount());
+            }
+            cashFlowService.deleteAll(paymentIn, accountsToKeep);
+        } else {
+            cashFlowService.deleteAll(paymentIn, Set.of());
+        }
     }
 
     @Transactional
     public void delete(UUID id) {
         PaymentInEntity paymentIn = paymentInRepository.findById(id).orElseThrow(ExceptionUtils.entityNotFound());
-        if (paymentIn.getCommited()) ExceptionUtils.throwCommitedDeleteException();
+        if (paymentIn.getDeleted()) return;
+        paymentIn.setCommited(Boolean.FALSE);
         paymentIn.setDeleted(Boolean.TRUE);
         auditService.delete(paymentIn);
+        cashFlowService.deleteAll(paymentIn, Set.of());
         bindDocumentService.save(paymentIn, List.of());
         appRabbitTemplate.sendAfterCommit(RabbitRoutingKeys.DOCUMENT_SEARCH, paymentIn.getId());
     }

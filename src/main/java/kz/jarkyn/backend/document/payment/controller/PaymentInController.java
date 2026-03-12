@@ -46,18 +46,6 @@ public class PaymentInController {
         return paymentInService.findApiById(id);
     }
 
-    @PutMapping("{id}/commit")
-    public PaymentInResponse commit(@PathVariable UUID id) {
-        paymentInService.commit(id);
-        return paymentInService.findApiById(id);
-    }
-
-    @PutMapping("{id}/undoCommit")
-    public PaymentInResponse undoCommit(@PathVariable UUID id) {
-        paymentInService.undoCommit(id);
-        return paymentInService.findApiById(id);
-    }
-
     @DeleteMapping("{id}")
     public PaymentInResponse delete(@PathVariable UUID id) {
         paymentInService.delete(id);
